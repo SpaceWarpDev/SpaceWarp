@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 using Newtonsoft.Json;
 using SpaceWarp.API.Logging;
@@ -18,8 +19,17 @@ namespace SpaceWarp.API
         {
             string modsFolder = Application.dataPath + "/" + MODS_FOLDER_NAME;
             string configLocation = modsFolder + "/" + SPACE_WARP_CONFIG;
-            SpaceWarpConfiguration = new GlobalConfiguration();
-            SpaceWarpConfiguration.LogLevel = (int)LogLevel.Trace;
+            if (!File.Exists(configLocation))
+            {
+                SpaceWarpConfiguration = new GlobalConfiguration();
+                SpaceWarpConfiguration.ApplyDefaultValues();
+            }
+            else
+            {
+                SpaceWarpConfiguration = JsonConvert.DeserializeObject<GlobalConfiguration>(File.ReadAllText(configLocation));
+            }
+
+            File.WriteAllLines(configLocation,new string[] {JsonConvert.SerializeObject(SpaceWarpConfiguration)});
             _modLogger = new ModLogger("Space Warp");
             _modLogger.Info("Warping Spacetime");
         }

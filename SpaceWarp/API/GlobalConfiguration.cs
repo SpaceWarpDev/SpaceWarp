@@ -7,5 +7,10 @@ namespace SpaceWarp.API
     public class GlobalConfiguration
     {
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)] [DefaultValue((int)Logging.LogLevel.Info)] public int LogLevel { get; set; }
+
+        public void ApplyDefaultValues()
+        {
+            LogLevel = Logging.LogLevel.Info;
+        }
     }
 }
