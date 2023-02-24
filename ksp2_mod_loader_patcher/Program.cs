@@ -26,7 +26,7 @@ namespace ksp2_mod_loader_patcher
 
 		static void Main(string[] args)
 		{
-			string pathToDll = LocateGameDirectory(args);
+			string pathToDll = LocateGameDirectory(args) + OFFSET_INTO_GAME_PATH;
 
 			string dirPath = Path.GetDirectoryName(pathToDll) + "/";
 
@@ -65,13 +65,13 @@ namespace ksp2_mod_loader_patcher
 
 		static string LocateGameDirectory(string[] args)
 		{
-			string pathToDll;
+			string pathToGameInstall;
 
 			if (args.Length == 0)
 			{
 				if (Directory.Exists(EXPECTED_PATH))
 				{
-					pathToDll = EXPECTED_PATH + OFFSET_INTO_GAME_PATH;
+					pathToGameInstall = EXPECTED_PATH;
 				}
 				else
 				{
@@ -79,17 +79,17 @@ namespace ksp2_mod_loader_patcher
 					{
 						Console.WriteLine("Unable to locate game install, please specify it");
 
-						pathToDll = Console.ReadLine().Trim('\"');
-					} while (!Directory.Exists(pathToDll));
+						pathToGameInstall = Console.ReadLine().Trim('\"');
+					} while (!Directory.Exists(pathToGameInstall));
 				}
 			}
 			else
 			{
-				pathToDll = args[0];
+				pathToGameInstall = args[0];
 			}
 
-			Console.WriteLine($"Found game path at {pathToDll}");
-			return pathToDll;
+			Console.WriteLine($"Found game path at \"{pathToGameInstall}\"");
+			return pathToGameInstall;
 		}
 	}
 
