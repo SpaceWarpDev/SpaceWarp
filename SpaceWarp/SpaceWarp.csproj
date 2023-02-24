@@ -65,6 +65,7 @@
     <Compile Include="API\Logging\ModLogger.cs" />
     <Compile Include="API\Mod.cs" />
     <Compile Include="API\SpaceWarpManager.cs" />
+    <Compile Include="ModInfo.cs" />
     <Compile Include="StartupManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -10,7 +10,7 @@ namespace SpaceWarp.API
 
         public void ApplyDefaultValues()
         {
-            LogLevel = Logging.LogLevel.Info;
+            LogLevel = (int)Logging.LogLevel.Info;
         }
     }
 }
