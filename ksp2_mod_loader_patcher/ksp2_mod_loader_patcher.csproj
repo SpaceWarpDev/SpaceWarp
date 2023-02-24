@@ -63,9 +63,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\mod_loader\mod_loader.csproj">
+    <ProjectReference Include="..\SpaceWarp\SpaceWarp.csproj">
       <Project>{42fa2f7b-a595-44e8-8cd5-a9c30b80a667}</Project>
-      <Name>mod_loader</Name>
+      <Name>SpaceWarp</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

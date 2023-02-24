@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace mod_loader
+namespace SpaceWarp.API
 {
 	public class MainModAttribute : Attribute
 	{

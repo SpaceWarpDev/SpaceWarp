@@ -5,7 +5,7 @@ VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ksp2_mod_loader_patcher", "ksp2_mod_loader_patcher\ksp2_mod_loader_patcher.csproj", "{DFCA7C3B-AEAC-465F-98B2-ED61D3929EE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mod_loader", "mod_loader\mod_loader.csproj", "{42FA2F7B-A595-44E8-8CD5-A9C30B80A667}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarp", "SpaceWarp\SpaceWarp.csproj", "{42FA2F7B-A595-44E8-8CD5-A9C30B80A667}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

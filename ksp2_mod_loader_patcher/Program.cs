@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using mod_loader;
+using SpaceWarp;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -12,14 +12,20 @@ namespace ksp2_mod_loader_patcher
 {
 	internal class Program
 	{
-		const string MOD_LOADER_DLL_NAME = "mod_loader.dll";
+		static readonly string[] DLLS_TO_TRANSFER = new string[]
+		{
+			"SpaceWarp.dll",
+		};
 
 		static void Main(string[] args)
 		{
 			string pathToDll = args[0];
 			string dirPath = Path.GetDirectoryName(pathToDll) + "/";
 
-			File.Copy(MOD_LOADER_DLL_NAME, dirPath + MOD_LOADER_DLL_NAME, true);
+			foreach(string dll in DLLS_TO_TRANSFER)
+			{
+				File.Copy(dll, dirPath + dll, true);
+			}
 
 			var module = ModuleDefinition.ReadModule(pathToDll, new ReaderParameters()
 			{
@@ -36,7 +42,7 @@ namespace ksp2_mod_loader_patcher
 
 	public static class HookInjector
 	{
-		public static void Hook(ModuleDefinition module, string targetTypeName, string targetFunctionName)
+		public static bool Hook(ModuleDefinition module, string targetTypeName, string targetFunctionName)
 		{
 			var target_type = module.Types.First(mod => mod.FullName == targetTypeName);
 			var target_method = target_type.Methods.First(method => method.Name == targetFunctionName);
@@ -47,7 +53,17 @@ namespace ksp2_mod_loader_patcher
 			var newInstruction = processor.Create(OpCodes.Call, methodReference);
 			var firstInstruction = target_method.Body.Instructions[0];
 
+			// we've already injected, no need to do it again
+			if (firstInstruction.OpCode == OpCodes.Call &&
+				firstInstruction.Operand is MethodReference oldReference &&
+				oldReference.FullName == methodReference.FullName)
+			{
+				return false;
+			}
+
 			processor.InsertBefore(firstInstruction, newInstruction);
+
+			return true;
 		}
 	}
 
@@ -62,16 +78,7 @@ namespace ksp2_mod_loader_patcher
 
 		public override AssemblyDefinition Resolve(AssemblyNameReference name)
 		{
-			AssemblyDefinition assembly;
-			try
-			{
-				assembly = AssemblyDefinition.ReadAssembly(_path + name.Name + ".dll");
-			}
-			catch (AssemblyResolutionException ex)
-			{
-				assembly = null;// ...; // Your resolve logic   
-			}
-			return assembly;
+			return AssemblyDefinition.ReadAssembly(_path + name.Name + ".dll");
 		}
 	}
 }
