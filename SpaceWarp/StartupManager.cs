@@ -13,6 +13,7 @@ namespace SpaceWarp
 {
     public static class StartupManager
     {
+        public static SpaceWarpManager SpaceWarpObject;
         public static void OnGameStarted()
         {
             Console.WriteLine("[Space Warp] Loaded");
@@ -22,7 +23,7 @@ namespace SpaceWarp
             Directory.CreateDirectory(modsFolder);
             GameObject spaceWarp = new GameObject("Space Warp");
             Object.DontDestroyOnLoad(spaceWarp);
-            spaceWarp.AddComponent<SpaceWarpManager>();
+            SpaceWarpObject = spaceWarp.AddComponent<SpaceWarpManager>();
             spaceWarp.SetActive(true);
         }
     }

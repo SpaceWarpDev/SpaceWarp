@@ -56,9 +56,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Configuration\DependencyInfo.cs" />
+    <Compile Include="API\Configuration\ModInfo.cs" />
+    <Compile Include="API\Configuration\VersionInfo.cs" />
     <Compile Include="API\GlobalConfiguration.cs" />
-    <Compile Include="API\Logging\IModLogger.cs" />
+    <Compile Include="API\Logging\BaseModLogger.cs" />
     <Compile Include="API\Logging\LogLevel.cs" />
+    <Compile Include="API\Logging\ModLogger.cs" />
     <Compile Include="API\Mod.cs" />
     <Compile Include="API\SpaceWarpManager.cs" />
     <Compile Include="StartupManager.cs" />
