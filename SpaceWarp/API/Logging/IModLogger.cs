@@ -2,6 +2,7 @@
 {
     public interface IModLogger
     {
+        void Log(LogLevel level, string message);
         
     }
 }

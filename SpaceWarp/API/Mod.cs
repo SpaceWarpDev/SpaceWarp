@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace SpaceWarp.API
 {
@@ -10,8 +11,14 @@ namespace SpaceWarp.API
 	{
 	}
 
-	public abstract class Mod
+	public abstract class Mod : MonoBehaviour
 	{
-		public abstract void OnLoaded();
+
+		public virtual void Start()
+		{
+			// Default mod startup code
+		}
+
+		public abstract void Initialize();
 	}
 }
