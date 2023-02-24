@@ -43,7 +43,7 @@ namespace SpaceWarp.API
                 _modLogger.Info($"Found mod: {modName}, attempting to do a simple load of the mod");
                 ModLogger newModLogger = new ModLogger(modName);
                 // Now we load all assemblies under the code folder of the mod
-                string codePath = dir + "/code/";
+                string codePath = dir + "/bin/";
                 if (Directory.Exists(codePath))
                 {
                     List<Assembly> modAssemblies = new List<Assembly>();
