@@ -18,6 +18,8 @@ namespace SpaceWarp.API
         {
             string modsFolder = Application.dataPath + "/" + MODS_FOLDER_NAME;
             string configLocation = modsFolder + "/" + SPACE_WARP_CONFIG;
+            SpaceWarpConfiguration = new GlobalConfiguration();
+            SpaceWarpConfiguration.LogLevel = (int)LogLevel.Trace;
             _modLogger = new ModLogger("Space Warp");
             _modLogger.Info("Warping Spacetime");
         }
