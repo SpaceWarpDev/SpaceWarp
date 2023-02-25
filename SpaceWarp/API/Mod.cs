@@ -1,10 +1,11 @@
-﻿using SpaceWarp.API.Configuration;
+﻿using KSP.Game;
+using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 using UnityEngine;
 
 namespace SpaceWarp.API
 {
-	public abstract class Mod : MonoBehaviour
+	public abstract class Mod : KerbalMonoBehaviour
 	{
 		public BaseModLogger Logger;
 		public SpaceWarpManager Manager;
