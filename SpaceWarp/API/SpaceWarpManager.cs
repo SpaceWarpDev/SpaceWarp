@@ -55,7 +55,13 @@ namespace SpaceWarp.API
         /// </summary>
         private void InitializeMods()
         {
+            _modLogger.Info("Initializing mods");
             string[] modDirectories = Directory.GetDirectories(MODS_FULL_PATH);
+
+            if (modDirectories.Length == 0)
+            {
+                _modLogger.Warn("No mods were found! No panic though.");
+            }
 
             foreach (string modFolder in modDirectories)
             {
@@ -144,7 +150,7 @@ namespace SpaceWarp.API
         {
             ModLogger newModLogger = new ModLogger(modName);
 
-            GameObject modObject = new GameObject($"MOD: {modName}");
+            GameObject modObject = new GameObject($"Mod: {modName}");
             Mod modComponent = (Mod)modObject.AddComponent(mainModType);
 
             modObject.transform.SetParent(transform.parent);
