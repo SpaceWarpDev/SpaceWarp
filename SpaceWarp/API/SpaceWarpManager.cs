@@ -69,15 +69,27 @@ namespace SpaceWarp.API
         internal void ReadMods()
         {
             _modLogger.Info("Reading mods");
-            string[] modDirectories = Directory.GetDirectories(MODS_FULL_PATH);
-            // First we read all the mod folders
+            string[] modDirectories;
+            try
+            {
+                modDirectories = Directory.GetDirectories(MODS_FULL_PATH);
+            }
+            catch(Exception exception)
+            {
+                _modLogger.Critical($"Unable to open mod path: {MODS_FULL_PATH}\nException:{exception}");
+                return;
+            }
+
             if (modDirectories.Length == 0)
             {
                 _modLogger.Warn("No mods were found! No panic though.");
             }
 
-            foreach (string modFolder in modDirectories)
+            foreach (string modFolderuntrimmedU in modDirectories)
             {
+                string modFolder = modFolderuntrimmedU.TrimEnd('/', '\\');
+
+                string modName = Path.GetFileName(modFolder);
                 if (!File.Exists(modFolder + "\\modinfo.json"))
                 {
                     _modLogger.Warn($"Found mod {Path.GetFileName(modFolder)} without modinfo.json");
@@ -212,6 +224,7 @@ namespace SpaceWarp.API
         internal void InitializeMods()
         {
             _modLogger.Info("Initializing mods");
+            
 
             foreach ((string modName, ModInfo info) in modLoadOrder)
             {
@@ -226,9 +239,8 @@ namespace SpaceWarp.API
                 {
                     if (!TryLoadMod(codePath, modName, out Type mainModType))
                     {
-                        _modLogger.Error($"Could not load mod: {modName}, code does not exist at location {codePath}");
-
-                        continue;
+						// error logging is done inside TryLoadMod
+						continue;
                     }
 
                     InitializeModObject(modName, info, mainModType);
@@ -249,10 +261,42 @@ namespace SpaceWarp.API
         /// <returns>If the mod was successfully found.</returns>
         private bool TryLoadMod(string codePath, string modName, out Type mainModType)
         {
-            List<Assembly> modAssemblies = new List<Assembly>();
-            foreach (string file in Directory.GetFiles(codePath))
+            string[] files;
+            try
             {
-                modAssemblies.Add(Assembly.LoadFrom(file));
+                files = Directory.GetFiles(codePath);
+			}
+            catch
+            {
+                _modLogger.Error("Could not load mod: {modName}, unable to read directory");
+                mainModType = null;
+				return false;
+            }
+
+            List<Assembly> modAssemblies = new List<Assembly>();
+            foreach (string file in files)
+            {
+                // we only want to load dll files, ignore everything else
+                if (!file.EndsWith(".dll"))
+                {
+                    _modLogger.Warn($"Non-dll file found in \"{codePath}\" \"{file}\", Ignoring");
+					continue;
+				}
+
+                Assembly asm;
+                try
+                {
+					asm = Assembly.LoadFrom(file);
+				}
+                catch(Exception exeption)
+                {
+                    _modLogger.Error($"Could not load mod: {modName}, Failed to load assembly {file}\nException: {exeption}");
+                    mainModType = null;
+
+                    return false;
+                }
+
+				modAssemblies.Add(asm);
             }
 
             mainModType = null;
@@ -262,9 +306,20 @@ namespace SpaceWarp.API
                 if (mainModType != null) break;
             }
 
-            if (mainModType != null) return true;
-            _modLogger.Error($"Could not load mod: {modName}, no type with [MainMod] exists");
-            return false;
+            if (mainModType == null)
+            {
+				_modLogger.Error($"Could not load mod: {modName}, no type with [MainMod] exists");
+				return false;
+            }
+
+            if (!mainModType.IsAssignableFrom(typeof(Mod)))
+            {
+                _modLogger.Error($"Could not load mod: {modName}, the found class ({mainModType.FullName}) with [MainMod] doesn't inherit from {nameof(Mod)}");
+                mainModType = null;
+				return false;
+            }
+
+            return true;
 
         }
 
@@ -281,10 +336,31 @@ namespace SpaceWarp.API
             }
             else
             {
-                SpaceWarpConfiguration = JsonConvert.DeserializeObject<SpaceWarpGlobalConfiguration>(File.ReadAllText(SPACEWARP_CONFIG_FULL_PATH));
-            }
+                try
+                {
+                    string json = File.ReadAllText(SPACEWARP_CONFIG_FULL_PATH);
+                    SpaceWarpConfiguration = JsonConvert.DeserializeObject<SpaceWarpGlobalConfiguration>(json);
+                }
+                catch (Exception exception)
+                {
+                    //TODO: log this in a nicer way, for now I guess we can just construct a new logger
+                    new ModLogger("Space Warp").Error($"Loading space warp config failed\nException: {exception}");
 
-            File.WriteAllLines(SPACEWARP_CONFIG_FULL_PATH,new[] {JsonConvert.SerializeObject(SpaceWarpConfiguration)});
+                    File.Delete(SPACEWARP_CONFIG_FULL_PATH);
+                    InitializeSpaceWarpConfig();
+                    return;
+                }
+            }
+            
+            try
+            {
+				File.WriteAllLines(SPACEWARP_CONFIG_FULL_PATH, new[] { JsonConvert.SerializeObject(SpaceWarpConfiguration) });
+			}
+            catch(Exception exception)
+            {
+                //TODO: log this in a nicer way, for now I guess we can just construct a new logger
+                new ModLogger("Space Warp").Error($"Saving the spacewarp config failed\nException: {exception}");
+			}
         }
 
         /// <summary>
@@ -308,14 +384,29 @@ namespace SpaceWarp.API
             modObject.SetActive(true);
             _modLogger.Info($"Loaded: {modName}");
 
-            modComponent.Initialize();
+			// we probably dont want to completley stop loading mods if 1 mod throws an exception on Initialize
+			try
+			{
+				modComponent.Initialize();
+			}
+            catch(Exception exception)
+            {
+                _modLogger.Critical($"Exception in {modName} Initialize(): {exception}");
+            }
         }
 
         internal void AfterInitializationTasks()
         {
             foreach (Mod mod in allModScripts)
             {
-                mod.AfterInitialization();
+                try
+                {
+					mod.AfterInitialization();
+				}
+                catch(Exception exception)
+                {
+					_modLogger.Critical($"Exception in {mod.name} AfterInitialization(): {exception}");
+				}
             }
         }
     }
