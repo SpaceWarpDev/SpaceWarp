@@ -5,6 +5,8 @@ using SpaceWarp;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Threading;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace ksp2_mod_loader_patcher
 {
@@ -18,104 +20,315 @@ namespace ksp2_mod_loader_patcher
 			"SpaceWarp.dll",
 		};
 
-		private const string EXPECTED_PATH = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program 2";
-		private const string OFFSET_INTO_GAME_PATH = "\\KSP2_x64_Data\\Managed\\Assembly-CSharp.dll";
+		private const string OFFSET_INTO_GAME_PATH = "/" + DATA_FOLDER_NAME + "/" + MANAGED_FOLDER_NAME;
+		public const string TARGET_ASSEMBLY_NAME = "Assembly-CSharp.dll";
+		
+		const string DATA_FOLDER_NAME = "KSP2_x64_Data";
+		const string MANAGED_FOLDER_NAME = "Managed";
 
-		private const string TARGET_TYPE_NAME = "KSP.Game.GameManager";
-		private const string TARGET_METHOD_NAME = "StartGame";
+		const string MODS_FOLDER_NAME = "Mods";
 
-		private static void Main(string[] args)
+
+		static void Main(string[] args)
 		{
-			string pathToDll = LocateGameDirectory(args) + OFFSET_INTO_GAME_PATH;
+			string asmLocation = getGameInstallLocation(args);
+			asmLocation = asmLocation.TrimEnd('/', '\\');
 
-			string dirPath = Path.GetDirectoryName(pathToDll) + "/";
+			Console.WriteLine("Selected game install location!");
 
-			foreach(string dllPath in DLLS_TO_TRANSFER)
+			foreach (string dllPath in DLLS_TO_TRANSFER)
 			{
-				string targetPath = dirPath + dllPath;
+				string targetPath = asmLocation + "/" + dllPath;
 
 				Console.WriteLine($"Copying {dllPath} to {targetPath}");
 
 				File.Copy(dllPath, targetPath, true);
 			}
-
-			ModuleDefinition module = ModuleDefinition.ReadModule(pathToDll, new ReaderParameters
+			string modsFolderDirectory = Path.GetDirectoryName(asmLocation) + "/" + MODS_FOLDER_NAME;
+			if (Directory.Exists(modsFolderDirectory))
 			{
-				ReadWrite = true,
-				AssemblyResolver = new CustomResolver(dirPath)
-			});
+				Console.WriteLine("Created mods folder!");
+				Directory.CreateDirectory(modsFolderDirectory);
+			}
 
-			bool patched = HookInjector.Hook(module, TARGET_TYPE_NAME, TARGET_METHOD_NAME);
-
-			Console.WriteLine(patched ? $"Patched into {TARGET_TYPE_NAME}.{TARGET_METHOD_NAME}" : "Did not patch anything, patch already present");
-			Console.WriteLine("Writing to file...");
-
-			module.Write();
-			module.Dispose();
-			
-			Console.WriteLine("Patched! You can now open KSP2 and the SpaceWarp modloader will be loaded!");
-
-			Thread.Sleep(10000);
-		}
-
-		private static string LocateGameDirectory(string[] args)
-		{
-			string pathToGameInstall;
-
-			if (args.Length == 0)
+			using (Patcher patcher = new Patcher(asmLocation, TARGET_ASSEMBLY_NAME))
 			{
-				if (Directory.Exists(EXPECTED_PATH))
+				patcher.TryRegisterHook("KSP.Game.GameManager", "StartGame", typeof(StartupManager).GetMethod("OnGameStarted"));
+
+				if (patcher.GetPatchedState() != PatchState.Full)
 				{
-					pathToGameInstall = EXPECTED_PATH;
+					Console.WriteLine("Patching hooks...");
+					patcher.PatchAllUnpatched();
+					patcher.Write();
+					Console.WriteLine("Done!");
 				}
 				else
 				{
+					string response;
 					do
 					{
-						Console.WriteLine("Unable to locate game install, please specify it");
+						Console.WriteLine("SpaceWard is already patched into the game, do you want to unpatch? y/n");
+						response = Console.ReadLine();
+					} while (response != "y" && response != "n");
 
-						pathToGameInstall = Console.ReadLine()?.Trim('\"');
-					} while (!Directory.Exists(pathToGameInstall));
+					if (response == "y")
+					{
+						Console.WriteLine("Unpatching hooks...");
+						patcher.UnpatchAllPatched();
+						patcher.Write();
+						Console.WriteLine("Done!");
+					}
+
+				}
+			}
+
+			Console.WriteLine("Press any key to continue");
+			Console.ReadKey();
+		}
+
+		static string getGameInstallLocation(string[] args)
+		{
+			if (args.Length != 0)
+			{
+				string argPath = args[0];
+				argPath = argPath.TrimEnd('/', '\\');
+
+				if (tryGetGameInstallLocationFromCustomPath(argPath, out string result))
+				{
+					return result;
+				}
+
+				Console.WriteLine("The provided path was not a valid game install location");
+			}
+
+			if (SteamInstallLocationFinder.TryGetInstallPath(out string path))
+			{
+				string result;
+				do
+				{
+					Console.WriteLine($"Found kerbal installation at \"{path}\", install Space Warp here? y/n");
+					result = Console.ReadLine();
+				}
+				while (result != "y" && result != "n");
+
+				if (result == "y")
+				{
+					return path + OFFSET_INTO_GAME_PATH;
 				}
 			}
 			else
 			{
-				pathToGameInstall = args[0];
+				Console.WriteLine("Unable to find kerbal installation");
 			}
 
-			Console.WriteLine($"Found game path at \"{pathToGameInstall}\"");
-			return pathToGameInstall;
+			Console.WriteLine("Please specify the path to kerbal");
+			string output_path = null;
+			do
+			{
+				string content = Console.ReadLine();
+				if (tryGetGameInstallLocationFromCustomPath(content, out string output))
+				{
+					output_path = output;
+				}
+
+			} while (output_path != null);
+
+			return output_path;
 		}
+
+		static bool tryGetGameInstallLocationFromCustomPath(string path, out string result)
+		{
+			path = path.TrimEnd('/', '\\');
+			if (path.EndsWith(".dll"))
+			{
+				path = Path.GetDirectoryName(path);
+			}
+
+			if (isValidGameLocation(path))
+			{
+				result = path + OFFSET_INTO_GAME_PATH;
+				return true;
+			}
+			else if (isValidGameLocation(Path.GetDirectoryName(path)))
+			{
+				result = Path.GetDirectoryName(path) + OFFSET_INTO_GAME_PATH;
+				return true;
+			}
+			else if (isValidGameLocation(Path.GetDirectoryName(Path.GetDirectoryName(path))))
+			{
+				result = Path.GetDirectoryName(Path.GetDirectoryName(path)) + OFFSET_INTO_GAME_PATH;
+				return true;
+			}
+
+			result = null;
+			return false;
+		}
+
+		static bool isValidGameLocation(string path)
+		{
+			path = path.TrimEnd('/', '\\');
+
+			if (!Directory.Exists(path))
+				return false;
+
+			if (!Directory.Exists(path + "/" + DATA_FOLDER_NAME))
+				return false;
+
+			if (!Directory.Exists(path + "/" + DATA_FOLDER_NAME + "/" + MANAGED_FOLDER_NAME))
+				return false;
+
+			if (!File.Exists(path + "/" + DATA_FOLDER_NAME + "/" + MANAGED_FOLDER_NAME + "/" + TARGET_ASSEMBLY_NAME))
+				return false;
+
+			return true;
+		}
+
 	}
 
-	public static class HookInjector
+	public class Patcher : IDisposable
 	{
-		public static bool Hook(ModuleDefinition module, string targetTypeName, string targetFunctionName)
+		ModuleDefinition _module;
+		List<RegisterdHook> _hooks = new List<RegisterdHook>();
+
+		public Patcher(string managedFolderPath, string targetAsmName)
 		{
-			TypeDefinition targetType = module.Types.First(mod => mod.FullName == targetTypeName);
-			MethodDefinition targetMethod = targetType.Methods.First(method => method.Name == targetFunctionName);
+			managedFolderPath = managedFolderPath.TrimEnd('/', '\\');
 
-			MethodReference methodReference = module.ImportReference(typeof(StartupManager).GetMethod("OnGameStarted"));
+			_module = ModuleDefinition.ReadModule(managedFolderPath + "/" + targetAsmName, new ReaderParameters
+			{
+				ReadWrite = true,
+				AssemblyResolver = new CustomResolver(managedFolderPath)
+			});
+		}
 
-			ILProcessor processor = targetMethod.Body.GetILProcessor();
-			Instruction newInstruction = processor.Create(OpCodes.Call, methodReference);
-			Instruction firstInstruction = targetMethod.Body.Instructions[0];
-
-			MethodReference oldReference = firstInstruction.Operand as MethodReference;
-
-			bool isMethodReference = firstInstruction.Operand is MethodReference;
-			bool namesAreEqual = oldReference?.FullName == methodReference.FullName;
-			bool firstInstructionIsCall = firstInstruction.OpCode == OpCodes.Call;
-
-			// we've already injected, no need to do it again
-			if (firstInstructionIsCall && isMethodReference && namesAreEqual)
+		public bool TryRegisterHook(string targetTypeName, string targetFunctionName, MethodInfo callTarget)
+		{
+			TypeDefinition targetType = _module.Types.FirstOrDefault(mod => mod.FullName == targetTypeName);
+			
+			// type not found with the provided name, renamed / removed?
+			if(targetType == null)
 			{
 				return false;
 			}
 
-			processor.InsertBefore(firstInstruction, newInstruction);
+			MethodDefinition targetMethod = targetType.Methods.FirstOrDefault(method => method.Name == targetFunctionName);
+
+			// method not found with the provided name, renamed / removed?
+			if (targetType == null)
+			{
+				return false;
+			}
+
+			var reference = _module.ImportReference(callTarget);
+
+			_hooks.Add(new RegisterdHook(targetMethod, reference));
 			return true;
 		}
+
+		public PatchState GetPatchedState()
+		{
+			int donePatches = 0;
+
+			foreach (RegisterdHook hook in _hooks)
+			{
+				if (hook.IsPatched())
+				{
+					donePatches++;
+				}
+			}
+
+			if (donePatches == 0)
+			{
+				return PatchState.None;
+			}
+			else if (donePatches == _hooks.Count)
+			{
+				return PatchState.Full;
+			}
+			else
+			{
+				return PatchState.Partial;
+			}
+		}
+
+		public void PatchAllUnpatched()
+		{
+			foreach(RegisterdHook hook in _hooks)
+			{
+				if (!hook.IsPatched())
+				{
+					hook.Patch();
+				}
+			}
+		}
+
+		public void UnpatchAllPatched()
+		{
+			foreach (RegisterdHook hook in _hooks)
+			{
+				if (hook.IsPatched())
+				{
+					hook.Unpatch();
+				}
+			}
+		}
+
+		class RegisterdHook
+		{
+			public MethodDefinition Target;
+			public MethodReference CallTarget;
+
+			public RegisterdHook(MethodDefinition target, MethodReference callTarget)
+			{
+				Target = target;
+				CallTarget = callTarget;
+			}
+
+			public bool IsPatched()
+			{
+				Instruction firstInstruction = Target.Body.Instructions[0];
+
+				MethodReference oldReference = firstInstruction.Operand as MethodReference;
+				if (oldReference == null)
+					return false;
+
+				return firstInstruction.OpCode == OpCodes.Call &&
+					firstInstruction.Operand is MethodReference &&
+					oldReference.FullName == CallTarget.FullName;
+			}
+			public void Patch()
+			{
+				ILProcessor processor = Target.Body.GetILProcessor();
+				Instruction newInstruction = processor.Create(OpCodes.Call, CallTarget);
+				Instruction firstInstruction = Target.Body.Instructions[0];
+
+				processor.InsertBefore(firstInstruction, newInstruction);
+			}
+
+			public void Unpatch()
+			{
+				ILProcessor processor = Target.Body.GetILProcessor();
+
+				processor.RemoveAt(0);
+			}
+		}
+
+		public void Write()
+		{
+			_module.Write();
+		}
+
+		public void Dispose()
+		{
+			_module.Dispose();
+		}
+	}
+
+	public enum PatchState
+	{
+		None,
+		Partial,
+		Full
 	}
 
 	class CustomResolver : BaseAssemblyResolver
@@ -124,12 +337,14 @@ namespace ksp2_mod_loader_patcher
 
 		public CustomResolver(string path)
 		{
+			path = path.TrimEnd('/', '\\');
+
 			_path = path;
 		}
 
 		public override AssemblyDefinition Resolve(AssemblyNameReference name)
 		{
-			return AssemblyDefinition.ReadAssembly(_path + name.Name + ".dll");
+			return AssemblyDefinition.ReadAssembly(_path + "/" + name.Name + ".dll");
 		}
 	}
 }
