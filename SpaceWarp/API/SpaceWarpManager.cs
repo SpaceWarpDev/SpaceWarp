@@ -50,13 +50,26 @@ namespace SpaceWarp.API
         /// </summary>
         private void Initialize()
         {
+            InitializeConfigManager();
             InitializeSpaceWarpConfig();
-
+            
             InitializeModLogger();
             
             InitializePatches();
         }
 
+        ///<summary>
+        ///Initializes the configuration manager
+        ///</summary>
+        public void InitializeConfigManager()
+        {
+            var confManagerObject = new GameObject("Configuration Manager");
+            DontDestroyOnLoad(confManagerObject);
+            confManagerObject.AddComponent<ConfigurationManager>();
+            confManagerObject.SetActive(true);
+        }
+        
+        
         /// <summary>
         /// Initializes Harmony
         /// </summary>
@@ -250,7 +263,7 @@ namespace SpaceWarp.API
 			}
             catch
             {
-                _modLogger.Error("Could not load mod: {modName}, unable to read directory");
+                _modLogger.Error($"Could not load mod: {modName}, unable to read directory");
                 mainModType = null;
 				return false;
             }
@@ -294,6 +307,21 @@ namespace SpaceWarp.API
                 return false;
             }
 
+            
+            // We want to load the configuration for the mod as well
+            Type configurationModType = null;
+            foreach (Assembly asm in modAssemblies)
+            {
+                configurationModType = asm.GetTypes()
+                    .FirstOrDefault(type => type.GetCustomAttribute <ModConfigAttribute>() != null);
+                if (configurationModType != null) break;
+            }
+
+            if (configurationModType != null)
+            {
+                InitializeModConfig(configurationModType, modName);
+            }
+
             if (!typeof(Mod).IsAssignableFrom(mainModType))
             {
                 _modLogger.Error($"Could not load mod: {modName}, the found class ({mainModType.FullName}) with [MainMod] doesn't inherit from {nameof(Mod)}");
@@ -307,7 +335,59 @@ namespace SpaceWarp.API
         }
 
         /// <summary>
-        /// Tried to find the SpaceWarp config file in the game, if none is round one is created.
+        /// Tries to find a specific mods config file, if none is found, one is created
+        /// </summary>
+        private void InitializeModConfig(Type config_type, string mod_id)
+        {
+            object modConfiguration = null;
+            var config_path = MODS_FULL_PATH + "\\" + mod_id + "\\config\\config.json";
+            if (!File.Exists(config_path))
+            {
+                modConfiguration = Activator.CreateInstance(config_type);
+                foreach (var fieldInfo in config_type.GetFields(BindingFlags.Instance | BindingFlags.Public))
+                {
+                    var def = fieldInfo.GetCustomAttribute<ConfigDefaultValueAttribute>();
+                    if (def != null)
+                    {
+                        fieldInfo.SetValue(modConfiguration, def.DefaultValue);
+                    }
+                }
+            }
+            else
+            {
+                try
+                {
+                    string json = File.ReadAllText(config_path);
+                    modConfiguration = JsonConvert.DeserializeObject(json,config_type);
+                    
+                }
+                catch (Exception exception)
+                {
+                    _modLogger.Error($"Loading mod config failed\nException: {exception}");
+
+                    File.Delete(config_path);
+                    InitializeSpaceWarpConfig();
+                    return;
+                }
+            }
+
+            try
+            {
+                File.WriteAllLines(config_path, new[] { JsonConvert.SerializeObject(modConfiguration) });
+            }
+            catch (Exception exception)
+            {
+                _modLogger.Error($"Saving mod config failed\nException: {exception}");
+            }
+
+            if (ManagerLocator.TryGet(out ConfigurationManager configurationManager))
+            {
+                configurationManager.Add(mod_id,(config_type,modConfiguration,config_path));
+            }
+        }
+        
+        /// <summary>
+        /// Tried to find the SpaceWarp config file in the game, if none is found one is created.
         /// </summary>
         /// <param name="spaceWarpGlobalConfiguration"></param>
         private void InitializeSpaceWarpConfig()

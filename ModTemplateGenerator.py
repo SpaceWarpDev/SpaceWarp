@@ -16,6 +16,7 @@ from xml.dom import minidom
 #       config/
 #   ModId
 #       Mod.cs
+#       Config.cs
 #   mod_project.csproj
 #   external_dlls/
 #       .gitignore
@@ -141,8 +142,10 @@ with open(release_folder + "/README.json","w") as readme:
     readme.write("# Default Readme")
 code_folder = project_name + "/" + project_name + "/" + namespace
 with open(code_folder + "/" + namespace + "Mod.cs","w") as default_code:
-    default_code.write("using SpaceWarp.API;\n\nnamespace " + namespace + "\n{\n    [MainMod]\n     public class " + namespace + "Mod : Mod\n    {\n        public override void Initialize()\n        {\n            Logger.Info(\"Mod is initialized\");\n        }\n    }\n}")
+    default_code.write("using SpaceWarp.API.Mods;\n\nnamespace " + namespace + "\n{\n    [MainMod]\n     public class " + namespace + "Mod : Mod\n    {\n        public override void Initialize()\n        {\n            Logger.Info(\"Mod is initialized\");\n        }\n    }\n}")
 
+with open(code_folder + "/" + namespace + "Config.cs","w") as default_config:
+    default_config.write("using SpaceWarp.API.Configuration;\nusing Newtonsoft.Json;\n\nnamespace " + namespace + "\n{\n    [JsonObject(MemberSerialization.OptOut)]\n    [ModConfig]\n    public class " + namespace + "Config\n    {\n         [ConfigField(\"pi\")] [ConfigDefaultValue(3.14159)] public double pi;\n    }\n}")
 
 
 def quickCreateProperty(root,name,text):
@@ -183,6 +186,14 @@ with open(project_name + "/" + project_name + "/" + project_name + ".csproj","w"
     ref4 = root.createElement('Reference')
     ref4.setAttribute("Include","..\\external_dlls\\Assembly-CSharp.dll")
     itemGroup.appendChild(ref4)
+
+    ref5 = root.createElement('Reference')
+    ref5.setAttribute("Include","..\\external_dlls\\NewtonSoft.Json.dll")
+    itemGroup.appendChild(ref5)
+    
+    ref6 = root.createElement('Reference')
+    ref6.setAttribute("Include","..\\external_dlls\\NewtonSoft.Json.dll")
+    itemGroup.appendChild(ref6)
 
     xml_str = root.toprettyxml(indent = '  ')
     csproj.write(xml_str)

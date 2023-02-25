@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using KSP.Game;
 using SpaceWarp.API.Configuration;
+using SpaceWarp.API.Managers;
 using UnityEngine;
 
 namespace SpaceWarp.UI
@@ -19,7 +21,6 @@ namespace SpaceWarp.UI
         private int windowWidth = 350;
         private int windowHeight = 700;
         private Rect windowRect;
-        public ConfigurationManager manager;
 
 
         private List<(string name, FieldInfo info, object confAttribute)> fieldsToConfigure =
@@ -33,7 +34,7 @@ namespace SpaceWarp.UI
 
         public void Start()
         {
-            foreach (var field in configurationType.GetFields())
+            foreach (var field in configurationType.GetFields(BindingFlags.Instance | BindingFlags.Public))
             {
                 object attribute = null;
                 string attributeName = "";
@@ -45,16 +46,6 @@ namespace SpaceWarp.UI
                     fieldsToConfigure.Add((attributeName, field, attribute));
                     
                 }
-                else
-                {
-                    var sliderAttribute = field.GetCustomAttribute<ConfigSliderAttribute>();
-                    if (sliderAttribute != null)
-                    {
-                        attribute = sliderAttribute;
-                        attributeName = sliderAttribute.Name;
-                        fieldsToConfigure.Add((attributeName, field, attribute));
-                    }
-                }
             }
             windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f),
                 0, 0);
@@ -65,16 +56,28 @@ namespace SpaceWarp.UI
                 GUIUtility.GetControlID(FocusType.Passive),
                 windowRect,
                 FillWindow,
-                $"{modName} configuration",
+                $"{modID} configuration",
                 GUILayout.Width((float)(windowWidth * 0.5)),
                 GUILayout.Height((float)(windowHeight * 0.5))
             );
         }
-        
+
+
+        public void EditorInputField(string fieldName, FieldInfo info, ConfigFieldAttribute fieldAttribute)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(fieldName);
+            var val = GUILayout.TextField(info.GetValue(configurationObject).ToString());
+            info.SetValue(configurationObject, TypeDescriptor.GetConverter(info.FieldType).ConvertFromInvariantString(val));
+            GUILayout.EndHorizontal();
+        }
         
         public void EditorForField((string name, FieldInfo info, object confAttribute) field)
         {
-            
+            if (field.confAttribute is ConfigFieldAttribute fieldAttribute)
+            {
+                EditorInputField(field.name,field.info,fieldAttribute);
+            }
         }
         private static GUIStyle boxStyle;
 
@@ -90,6 +93,10 @@ namespace SpaceWarp.UI
             if (GUILayout.Button("Save and close"))
             {
                 //Run saving code from the configuration manager
+                if (ManagerLocator.TryGet(out ConfigurationManager configurationManager))
+                {
+                    configurationManager.UpdateConfiguration(modID);
+                }
                 Destroy(this);
             }
             GUILayout.EndVertical();

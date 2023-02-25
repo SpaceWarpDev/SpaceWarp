@@ -2,6 +2,7 @@
 using KSP.Game;
 using SpaceWarp.API;
 using SpaceWarp.API.Configuration;
+using SpaceWarp.API.Managers;
 using UnityEngine;
 
 namespace SpaceWarp.UI
@@ -68,7 +69,7 @@ namespace SpaceWarp.UI
             GUILayout.BeginVertical();
             scrollPositionMods = GUILayout.BeginScrollView(scrollPositionMods, false, true,
                 GUILayout.Height((float)(windowHeight * 0.8)), GUILayout.Width(300));
-            foreach ((string modID, ModInfo modInfo) in manager.loadedMods)
+            foreach ((string modID, ModInfo modInfo) in manager.LoadedMods)
             {
                 if (GUILayout.Button(modID))
                 {
@@ -90,6 +91,24 @@ namespace SpaceWarp.UI
                 foreach (var dependency in selectedModInfo.dependencies)
                 {
                     GUILayout.Label($"{dependency.id}: {dependency.version.min} - {dependency.version.max}");
+                }
+                
+                if (ManagerLocator.TryGet(out ConfigurationManager configManager))
+                {
+                    if (configManager.TryGet(selectedModInfo.mod_id, out var config))
+                    {
+                        if (GUILayout.Button("Configure"))
+                        {
+                            GameObject go = new GameObject(selectedModInfo.mod_id);
+                            go.transform.SetParent(transform);
+                            ModConfigurationUI configUI = go.AddComponent<ModConfigurationUI>();
+                            configUI.configurationType = config.configType;
+                            configUI.configurationObject = config.configObject;
+                            configUI.name = selectedModInfo.name;
+                            configUI.modID = selectedModInfo.mod_id;
+                            go.SetActive(true);
+                        }
+                    }
                 }
             }
             else
