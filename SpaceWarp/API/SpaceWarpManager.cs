@@ -4,12 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
+using KSP;
 using KSP.Game;
 using UnityEngine;
 using Newtonsoft.Json;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 using SpaceWarp.Patching;
+using SpaceWarp.UI;
 
 namespace SpaceWarp.API
 {
@@ -30,6 +32,7 @@ namespace SpaceWarp.API
 
         internal List<Mod> allModScripts = new List<Mod>();
         internal List<(string,ModInfo)> modLoadOrder = new List<(string,ModInfo)>();
+        internal List<(string,ModInfo)> loadedMods = new List<(string,ModInfo)>();
         
         public void Start()
         {
@@ -309,8 +312,8 @@ namespace SpaceWarp.API
 
             if (mainModType == null)
             {
-				_modLogger.Error($"Could not load mod: {modName}, no type with [MainMod] exists");
-				return false;
+                _modLogger.Error($"Could not load mod: {modName}, no type with [MainMod] exists");
+                return false;
             }
 
             if (!typeof(Mod).IsAssignableFrom(mainModType))
@@ -394,6 +397,8 @@ namespace SpaceWarp.API
             {
                 _modLogger.Critical($"Exception in {modName} Initialize(): {exception}");
             }
+
+            loadedMods.Add((modName, info));
         }
 
         internal void AfterInitializationTasks()
@@ -409,6 +414,18 @@ namespace SpaceWarp.API
 					_modLogger.Critical($"Exception in {mod.name} AfterInitialization(): {exception}");
 				}
             }
+            InitModUI();
+        }
+
+        private void InitModUI()
+        {
+            GameObject modUIObject = new GameObject();
+            DontDestroyOnLoad(modUIObject);
+            modUIObject.transform.SetParent(transform.parent);
+            ModListUI UI = modUIObject.AddComponent<ModListUI>();
+            UI.manager = this;
+            
+            modUIObject.SetActive(true);
         }
     }
 }

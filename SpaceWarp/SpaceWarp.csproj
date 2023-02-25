@@ -57,9 +57,20 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\external_dlls\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\external_dlls\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\external_dlls\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Configuration\ConfigDefaultValueAttribute.cs" />
+    <Compile Include="API\Configuration\ConfigFieldAttribute.cs" />
+    <Compile Include="API\Configuration\ConfigSliderAttribute.cs" />
+    <Compile Include="API\Configuration\ConfigurationManager.cs" />
     <Compile Include="API\Configuration\DependencyInfo.cs" />
+    <Compile Include="API\Configuration\ModConfigAttribute.cs" />
     <Compile Include="API\Configuration\ModInfo.cs" />
     <Compile Include="API\Configuration\SupportedVersionsInfo.cs" />
     <Compile Include="API\GlobalModDefines.cs" />
@@ -77,6 +88,8 @@
     <Compile Include="Patching\LoadingScreenPatcher.cs" />
     <Compile Include="StartupManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\ModConfigurationUI.cs" />
+    <Compile Include="UI\ModListUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
