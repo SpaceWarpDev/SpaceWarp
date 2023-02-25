@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
+using KSP.Game;
 using UnityEngine;
 using Newtonsoft.Json;
 using SpaceWarp.API.Configuration;
@@ -15,7 +16,7 @@ namespace SpaceWarp.API
     /// <summary>
     /// Handles all the SpaceWarp initialization and mod processing.
     /// </summary>
-    public class SpaceWarpManager : MonoBehaviour
+    public class SpaceWarpManager : KerbalMonoBehaviour
     {
         private BaseModLogger _modLogger;
         
