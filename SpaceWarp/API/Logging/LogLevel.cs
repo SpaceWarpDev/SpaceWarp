@@ -1,5 +1,8 @@
 ﻿namespace SpaceWarp.API.Logging
 {
+    /// <summary>
+    /// Log levels for the BaseModLogger class.
+    /// </summary>
     public enum LogLevel
     {
         Trace = 0,

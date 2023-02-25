@@ -1,8 +1,11 @@
 ﻿namespace SpaceWarp.API.Logging
 {
+    /// <summary>
+    /// Used to print logs on each mod.
+    /// </summary>
     public abstract class BaseModLogger
     {
-        public abstract void Log(LogLevel level, string message);
+        protected abstract void Log(LogLevel level, string message);
 
         public void Trace(string message) => Log(LogLevel.Trace, message);
         public void Debug(string message) => Log(LogLevel.Debug, message);

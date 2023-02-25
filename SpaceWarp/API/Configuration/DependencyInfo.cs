@@ -2,10 +2,16 @@
 
 namespace SpaceWarp.API.Configuration
 {
+    /// <summary>
+    /// Represents the json property info. Properties have to use the same name as in the JSON file, that's why they break convention.
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class DependencyInfo
     {
-        [JsonProperty] public string id { get; set; }
-        [JsonProperty] public VersionInfo version { get; set; }
+        [JsonProperty("id")]
+        public string id { get; set; }
+
+        [JsonProperty("version")] 
+        public SupportedVersionsInfo version { get; set; }
     }
 }
