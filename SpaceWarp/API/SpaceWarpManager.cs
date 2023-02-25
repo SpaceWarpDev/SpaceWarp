@@ -6,86 +6,155 @@ using System.Reflection;
 using UnityEngine;
 using Newtonsoft.Json;
 using SpaceWarp.API.Logging;
-using Object = UnityEngine.Object;
 
 namespace SpaceWarp.API
 {
+    /// <summary>
+    /// Handles all the SpaceWarp initialization and mod processing.
+    /// </summary>
     public class SpaceWarpManager : MonoBehaviour
     {
         private BaseModLogger _modLogger;
         
         public const string MODS_FOLDER_NAME = "Mods";
-        public const string SPACE_WARP_CONFIG = "space_warp_config.json";
+        public static string MODS_FULL_PATH = Application.dataPath + "/" + MODS_FOLDER_NAME;
 
-        public GlobalConfiguration SpaceWarpConfiguration;
+        public const string SPACE_WARP_CONFIG_FILE_NAME = "space_warp_config.json";
+        public static string SPACEWARP_CONFIG_FULL_PATH = MODS_FULL_PATH + "/" + SPACE_WARP_CONFIG_FILE_NAME;
+
+        public SpaceWarpGlobalConfiguration SpaceWarpConfiguration;
         
         public void Start()
         {
-            string modsFolder = Application.dataPath + "/" + MODS_FOLDER_NAME;
-            string configLocation = modsFolder + "/" + SPACE_WARP_CONFIG;
-            if (!File.Exists(configLocation))
+            Initialize();
+        }
+
+        /// <summary>
+        /// Initializes the SpaceWarp manager.
+        /// </summary>
+        private void Initialize()
+        {
+            InitializeSpaceWarpConfig();
+
+            InitializeModLogger();
+
+            InitializeMods();
+        }
+
+        /// <summary>
+        /// Initializes the SpaceWarp mod logger.
+        /// </summary>
+        private void InitializeModLogger()
+        {
+            _modLogger = new ModLogger("Space Warp");
+            _modLogger.Info("Warping Spacetime");
+        }
+
+        /// <summary>
+        /// Runs the mod initialization procedures.
+        /// </summary>
+        private void InitializeMods()
+        {
+            string[] modDirectories = Directory.GetDirectories(MODS_FULL_PATH);
+
+            foreach (string modFolder in modDirectories)
             {
-                SpaceWarpConfiguration = new GlobalConfiguration();
+                string modName = Path.GetFileName(modFolder);
+
+                _modLogger.Info($"Found mod: {modName}, attempting to do a simple load of the mod");
+
+                // Now we load all assemblies under the code folder of the mod
+                string codePath = modFolder + GlobalModDefines.BINARIES_FOLDER;
+
+                if (Directory.Exists(codePath))
+                {
+                    if (!TryLoadMod(codePath, modName, out Type mainModType))
+                    {
+                        _modLogger.Error($"Could not load mod: {modName}, code does not exist at location {codePath}");
+
+                        continue;
+                    }
+
+                    InitializeModObject(modName, mainModType);
+                }
+                else
+                {
+                    _modLogger.Error($"Directory not found: {codePath}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tries to load a mod at a path
+        /// </summary>
+        /// <param name="codePath">The full path to this mod binaries.</param>
+        /// <param name="modName">The mod name</param>
+        /// <param name="mainModType">The Mod type found</param>
+        /// <returns>If the mod was successfully found.</returns>
+        private bool TryLoadMod(string codePath, string modName, out Type mainModType)
+        {
+            List<Assembly> modAssemblies = new List<Assembly>();
+            foreach (string file in Directory.GetFiles(codePath))
+            {
+                modAssemblies.Add(Assembly.LoadFrom(file));
+            }
+
+            mainModType = null;
+            foreach (Assembly asm in modAssemblies)
+            {
+                mainModType = asm.GetTypes().FirstOrDefault(type => type.GetCustomAttributes<MainModAttribute>() != null);
+                if (mainModType != null) break;
+            }
+
+            if (mainModType == null)
+            {
+                _modLogger.Error($"Could not load mod: {modName}, no type with [MainMod] exists");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Tried to find the SpaceWarp config file in the game, if none is round one is created.
+        /// </summary>
+        /// <param name="spaceWarpGlobalConfiguration"></param>
+        private void InitializeSpaceWarpConfig()
+        {
+            if (!File.Exists(SPACEWARP_CONFIG_FULL_PATH))
+            {
+                SpaceWarpConfiguration = new SpaceWarpGlobalConfiguration();
                 SpaceWarpConfiguration.ApplyDefaultValues();
             }
             else
             {
-                SpaceWarpConfiguration = JsonConvert.DeserializeObject<GlobalConfiguration>(File.ReadAllText(configLocation));
+                SpaceWarpConfiguration = JsonConvert.DeserializeObject<SpaceWarpGlobalConfiguration>(File.ReadAllText(SPACEWARP_CONFIG_FULL_PATH));
             }
 
-            File.WriteAllLines(configLocation,new string[] {JsonConvert.SerializeObject(SpaceWarpConfiguration)});
-            _modLogger = new ModLogger("Space Warp");
-            _modLogger.Info("Warping Spacetime");
-
-            foreach (string dir in Directory.GetDirectories(modsFolder))
-            {
-                string modName = Path.GetFileName(dir);
-                _modLogger.Info($"Found mod: {modName}, attempting to do a simple load of the mod");
-                ModLogger newModLogger = new ModLogger(modName);
-                // Now we load all assemblies under the code folder of the mod
-                string codePath = dir + "/bin/";
-                if (Directory.Exists(codePath))
-                {
-                    List<Assembly> modAssemblies = new List<Assembly>();
-                    foreach (string file in Directory.GetFiles(codePath))
-                    {
-                        modAssemblies.Add(Assembly.LoadFrom(file));
-                    }
-
-                    Type mainModType = null;
-                    foreach (Assembly asm in modAssemblies)
-                    {
-                        mainModType = asm.GetTypes().FirstOrDefault(type => type.GetCustomAttributes<MainModAttribute>() != null);
-                        if (mainModType != null) break;
-                    }
-
-                    if (mainModType == null)
-                    {
-                        _modLogger.Error($"Could not load mod: {modName}, no type with [MainMod] exists");
-                        continue;
-                    }
-
-                    GameObject modObject = new GameObject($"MOD: {modName}");
-                    Object.DontDestroyOnLoad(modObject);
-                    Mod modComponent = (Mod)modObject.AddComponent(mainModType);
-                    modObject.transform.SetParent(transform.parent);
-                    modComponent.Logger = newModLogger;
-                    modComponent.Manager = this;
-                    modObject.SetActive(true);
-                    _modLogger.Info($"Loaded: {modName}");
-                    modComponent.Initialize();
-                }
-                else
-                {
-                    _modLogger.Error($"Could not load mod: {modName}, code does not exist");
-                }
-            }
-
+            File.WriteAllLines(SPACEWARP_CONFIG_FULL_PATH,new[] {JsonConvert.SerializeObject(SpaceWarpConfiguration)});
         }
 
-        public void Update()
+        /// <summary>
+        /// Initializes a mod object.
+        /// </summary>
+        /// <param name="modName">The mod name to initialize.</param>
+        /// <param name="mainModType">The mod type to initialize.</param>
+        /// <param name="newModLogger">The new mod logger to spawn</param>
+        private void InitializeModObject(string modName, Type mainModType)
         {
-            // TODO: Space Warp
+            ModLogger newModLogger = new ModLogger(modName);
+
+            GameObject modObject = new GameObject($"MOD: {modName}");
+            Mod modComponent = (Mod)modObject.AddComponent(mainModType);
+
+            modObject.transform.SetParent(transform.parent);
+            modComponent.Logger = newModLogger;
+            modComponent.Manager = this;
+
+            modObject.SetActive(true);
+            _modLogger.Info($"Loaded: {modName}");
+
+            modComponent.Initialize();
         }
     }
 }

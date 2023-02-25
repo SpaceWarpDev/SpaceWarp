@@ -58,8 +58,10 @@
   <ItemGroup>
     <Compile Include="API\Configuration\DependencyInfo.cs" />
     <Compile Include="API\Configuration\ModInfo.cs" />
-    <Compile Include="API\Configuration\VersionInfo.cs" />
-    <Compile Include="API\GlobalConfiguration.cs" />
+    <Compile Include="API\Configuration\SupportedVersionsInfo.cs" />
+    <Compile Include="API\GlobalModDefines.cs" />
+    <Compile Include="API\MainModAttribute.cs" />
+    <Compile Include="API\SpaceWarpGlobalConfiguration.cs" />
     <Compile Include="API\Logging\BaseModLogger.cs" />
     <Compile Include="API\Logging\LogLevel.cs" />
     <Compile Include="API\Logging\ModLogger.cs" />
