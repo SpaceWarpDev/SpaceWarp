@@ -61,6 +61,7 @@
     <Compile Include="API\Configuration\SupportedVersionsInfo.cs" />
     <Compile Include="API\GlobalModDefines.cs" />
     <Compile Include="API\MainModAttribute.cs" />
+    <Compile Include="API\ModLocator.cs" />
     <Compile Include="API\SpaceWarpGlobalConfiguration.cs" />
     <Compile Include="API\Logging\BaseModLogger.cs" />
     <Compile Include="API\Logging\LogLevel.cs" />

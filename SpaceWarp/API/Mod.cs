@@ -10,6 +10,7 @@ namespace SpaceWarp.API
 
 		public virtual void Initialize()
 		{
+			ModLocator.Add(this);
 			DontDestroyOnLoad(gameObject);
 		}
 	}
