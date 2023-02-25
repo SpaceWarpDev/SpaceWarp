@@ -66,9 +66,18 @@ namespace SpaceWarp.UI
         public void EditorInputField(string fieldName, FieldInfo info, ConfigFieldAttribute fieldAttribute)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(fieldName);
-            var val = GUILayout.TextField(info.GetValue(configurationObject).ToString());
-            info.SetValue(configurationObject, TypeDescriptor.GetConverter(info.FieldType).ConvertFromInvariantString(val));
+            if (info.FieldType != typeof(bool))
+            {
+                GUILayout.Label(fieldName);
+                var val = GUILayout.TextField(info.GetValue(configurationObject).ToString());
+                info.SetValue(configurationObject,
+                    TypeDescriptor.GetConverter(info.FieldType).ConvertFromInvariantString(val));
+            }
+            else
+            {
+                info.SetValue(configurationObject,GUILayout.Toggle((bool)info.GetValue(configurationObject),fieldName));
+            }
+
             GUILayout.EndHorizontal();
         }
         
