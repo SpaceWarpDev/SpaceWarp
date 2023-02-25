@@ -42,6 +42,7 @@ namespace SpaceWarp
             Object.DontDestroyOnLoad(spaceWarp);
             SpaceWarpObject = spaceWarp.AddComponent<SpaceWarpManager>();
             spaceWarp.SetActive(true);
+            // SpaceWarpObject.Initialize();
         }
 
         /// <summary>

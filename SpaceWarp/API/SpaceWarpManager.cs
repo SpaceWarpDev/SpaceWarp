@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib;
 using UnityEngine;
 using Newtonsoft.Json;
 using SpaceWarp.API.Logging;
+using SpaceWarp.Patching;
 
 namespace SpaceWarp.API
 {
@@ -23,6 +25,8 @@ namespace SpaceWarp.API
         public static string SPACEWARP_CONFIG_FULL_PATH = MODS_FULL_PATH + "/" + SPACE_WARP_CONFIG_FILE_NAME;
 
         public SpaceWarpGlobalConfiguration SpaceWarpConfiguration;
+
+        internal List<Mod> allModScripts = new List<Mod>();
         
         public void Start()
         {
@@ -37,10 +41,19 @@ namespace SpaceWarp.API
             InitializeSpaceWarpConfig();
 
             InitializeModLogger();
-
-            InitializeMods();
+            
+            InitializePatches();
         }
 
+        /// <summary>
+        /// Initializes Harmony
+        /// </summary>
+
+        private void InitializePatches()
+        {
+            LoadingScreenPatcher.AddScreens(KSP.Game.GameManager.Instance,this);
+        }
+        
         /// <summary>
         /// Initializes the SpaceWarp mod logger.
         /// </summary>
@@ -53,7 +66,7 @@ namespace SpaceWarp.API
         /// <summary>
         /// Runs the mod initialization procedures.
         /// </summary>
-        private void InitializeMods()
+        internal void InitializeMods()
         {
             _modLogger.Info("Initializing mods");
             string[] modDirectories = Directory.GetDirectories(MODS_FULL_PATH);
@@ -108,17 +121,14 @@ namespace SpaceWarp.API
             mainModType = null;
             foreach (Assembly asm in modAssemblies)
             {
-                mainModType = asm.GetTypes().FirstOrDefault(type => type.GetCustomAttributes<MainModAttribute>() != null);
+                mainModType = asm.GetTypes().FirstOrDefault(type => type.GetCustomAttribute<MainModAttribute>() != null);
                 if (mainModType != null) break;
             }
 
-            if (mainModType == null)
-            {
-                _modLogger.Error($"Could not load mod: {modName}, no type with [MainMod] exists");
-                return false;
-            }
+            if (mainModType != null) return true;
+            _modLogger.Error($"Could not load mod: {modName}, no type with [MainMod] exists");
+            return false;
 
-            return true;
         }
 
         /// <summary>
@@ -151,8 +161,11 @@ namespace SpaceWarp.API
             ModLogger newModLogger = new ModLogger(modName);
 
             GameObject modObject = new GameObject($"Mod: {modName}");
+            _modLogger.Info("Before AddComponent");
+            _modLogger.Info(mainModType.FullName);
             Mod modComponent = (Mod)modObject.AddComponent(mainModType);
-
+            _modLogger.Info("After AddComponent");
+            allModScripts.Add(modComponent);
             modObject.transform.SetParent(transform.parent);
             modComponent.Logger = newModLogger;
             modComponent.Manager = this;
@@ -161,6 +174,14 @@ namespace SpaceWarp.API
             _modLogger.Info($"Loaded: {modName}");
 
             modComponent.Initialize();
+        }
+
+        internal void AfterInitializationTasks()
+        {
+            foreach (Mod mod in allModScripts)
+            {
+                mod.AfterInitialization();
+            }
         }
     }
 }

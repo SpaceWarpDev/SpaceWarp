@@ -13,5 +13,10 @@ namespace SpaceWarp.API
 			ModLocator.Add(this);
 			DontDestroyOnLoad(gameObject);
 		}
+
+		public virtual void AfterInitialization()
+		{
+			// Empty
+		}
 	}
 }

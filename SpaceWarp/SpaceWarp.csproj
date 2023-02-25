@@ -34,6 +34,9 @@
     <Reference Include="0Harmony, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Lib.Harmony.2.2.2\lib\net472\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\external_dlls\Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\external_dlls\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -68,11 +71,17 @@
     <Compile Include="API\Logging\ModLogger.cs" />
     <Compile Include="API\Mod.cs" />
     <Compile Include="API\SpaceWarpManager.cs" />
+    <Compile Include="Patching\LoadingActions\AfterModsLoadedAction.cs" />
+    <Compile Include="Patching\LoadingActions\LoadModsAction.cs" />
+    <Compile Include="Patching\LoadingScreenPatcher.cs" />
     <Compile Include="StartupManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="API\Loading" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
