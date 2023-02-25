@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpaceWarp.API
+namespace SpaceWarp.API.Mods
 {
     public class MainModAttribute : Attribute { }
 }

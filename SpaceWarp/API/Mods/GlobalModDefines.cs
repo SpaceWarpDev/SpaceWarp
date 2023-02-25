@@ -1,4 +1,4 @@
-﻿namespace SpaceWarp.API
+﻿namespace SpaceWarp.API.Mods
 {
     public static class GlobalModDefines
     {

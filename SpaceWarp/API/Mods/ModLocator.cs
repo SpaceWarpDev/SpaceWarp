@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SpaceWarp.API
+namespace SpaceWarp.API.Mods
 {
     /// <summary>
     /// Useful performance-optimized locator for Mod objects. Should be used instead of any other way.
@@ -16,12 +16,12 @@ namespace SpaceWarp.API
         /// <param name="modObject">The Mod component</param>
         public static void Add(Mod modObject)
         {
-            if (Mods.TryGetValue(typeof(Mod), out object _))
+            if (Mods.TryGetValue(modObject.GetType(), out object _))
             {
                 return;
             }
 
-            Mods.Add(typeof(Mod), modObject);
+            Mods.Add(modObject.GetType(), modObject);
         }
 
         /// <summary>
@@ -30,12 +30,21 @@ namespace SpaceWarp.API
         /// <param name="foundMod">The mod object found.</param>
         /// <typeparam name="T">The type of Mod you want to find.</typeparam>
         /// <returns></returns>
-        public static bool TryGetMod<T>(out T foundMod) where T : Mod
+        public static bool TryGet<T>(out T foundMod) where T : Mod
         {
             bool hasMod = Mods.TryGetValue(typeof(T), out object mod);
 
             foundMod = mod as T;
             return hasMod;
+        }
+
+        /// <summary>
+        /// Removes a manager from the dictionary
+        /// </summary>
+        /// <param name="manager"></param>
+        public static void Remove(Mod modObject)
+        {
+            Mods.Remove(modObject.GetType());
         }
     }
 }
