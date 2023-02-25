@@ -133,6 +133,10 @@ with open(release_folder + "/modinfo.json","w") as modinfo:
             }
         },indent=4)
     )
+with open(release_folder + "README.json","w") as readme:
+    readme.write("# Usage")
+    readme.write("Any code compiled in the csproj's dll should be moved to the /bin folder of the mod")
+
 with open(release_folder + "/README.json","w") as readme:
     readme.write("# Default Readme")
 code_folder = project_name + "/" + project_name + "/" + namespace
@@ -156,7 +160,7 @@ with open(project_name + "/" + project_name + "/" + project_name + ".csproj","w"
     root.appendChild(xml)
     propertyGroup = root.createElement('PropertyGroup')
     xml.appendChild(propertyGroup)
-    propertyGroup.appendChild(quickCreateProperty(root,"TargetFramework","netstandard2.1"))
+    propertyGroup.appendChild(quickCreateProperty(root,"TargetFramework","netstandard2.0"))
     propertyGroup.appendChild(quickCreateProperty(root,"AllowUnsafeBlocks","true"))
     propertyGroup.appendChild(quickCreateProperty(root,"LangVersion","11"))
     propertyGroup.appendChild(quickCreateProperty(root,"ImplicitUsings","true"))
