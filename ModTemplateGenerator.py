@@ -142,7 +142,7 @@ with open(release_folder + "/README.json","w") as readme:
     readme.write("# Default Readme")
 code_folder = project_name + "/" + project_name + "/" + namespace
 with open(code_folder + "/" + namespace + "Mod.cs","w") as default_code:
-    default_code.write("using SpaceWarp.API.Mods;\n\nnamespace " + namespace + "\n{\n    [MainMod]\n     public class " + namespace + "Mod : Mod\n    {\n        public override void Initialize()\n        {\n            Logger.Info(\"Mod is initialized\");\n        }\n    }\n}")
+    default_code.write("using SpaceWarp.API.Mods;\n\nnamespace " + namespace + "\n{\n    [MainMod]\n     public class " + namespace + "Mod : Mod\n    {\n        public override void OnInitialized()\n        {\n            Logger.Info(\"Mod is initialized\");\n        }\n    }\n}")
 
 with open(code_folder + "/" + namespace + "Config.cs","w") as default_config:
     default_config.write("using SpaceWarp.API.Configuration;\nusing Newtonsoft.Json;\n\nnamespace " + namespace + "\n{\n    [JsonObject(MemberSerialization.OptOut)]\n    [ModConfig]\n    public class " + namespace + "Config\n    {\n         [ConfigField(\"pi\")] [ConfigDefaultValue(3.14159)] public double pi;\n    }\n}")
