@@ -1,22 +1,24 @@
 ﻿using System;
 using KSP.Game.Flow;
 using SpaceWarp.API;
+using SpaceWarp.API.Managers;
 
 namespace SpaceWarp.Patching.LoadingActions
 {
     public class ReadingModsAction : FlowAction
     {
-        private SpaceWarpManager _manager;
-        public ReadingModsAction(string name, SpaceWarpManager manager) : base(name)
+        public ReadingModsAction(string name) : base(name)
         {
-            _manager = manager;
+            //
         }
 
         protected override void DoAction(Action resolve, Action<string> reject)
         {
+            ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager);
+
             try
             {
-                _manager.ReadMods();
+                spaceWarpManager.ReadMods();
                 resolve();
             }
             catch (Exception e)

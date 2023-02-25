@@ -7,6 +7,8 @@ namespace ExampleMod
     {
         public override void Initialize()
         {
+            base.Initialize();
+
             Logger.Info("Mod is initialized");
         }
     }
