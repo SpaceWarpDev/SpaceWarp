@@ -313,7 +313,7 @@ namespace SpaceWarp.API
 				return false;
             }
 
-            if (!mainModType.IsAssignableFrom(typeof(Mod)))
+            if (!typeof(Mod).IsAssignableFrom(mainModType))
             {
                 _modLogger.Error($"Could not load mod: {modName}, the found class ({mainModType.FullName}) with [MainMod] doesn't inherit from {nameof(Mod)}");
                 mainModType = null;
