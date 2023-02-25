@@ -180,5 +180,9 @@ with open(project_name + "/" + project_name + "/" + project_name + ".csproj","w"
     ref3.setAttribute("Include","..\\external_dlls\\UnityEngine.CoreModule.dll")
     itemGroup.appendChild(ref3)
 
+    ref4 = root.createElement('Reference')
+    ref4.setAttribute("Include","..\\external_dlls\\Assembly-CSharp.dll")
+    itemGroup.appendChild(ref4)
+
     xml_str = root.toprettyxml(indent = '  ')
     csproj.write(xml_str)

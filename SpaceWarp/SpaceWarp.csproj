@@ -73,6 +73,7 @@
     <Compile Include="API\SpaceWarpManager.cs" />
     <Compile Include="Patching\LoadingActions\AfterModsLoadedAction.cs" />
     <Compile Include="Patching\LoadingActions\LoadModsAction.cs" />
+    <Compile Include="Patching\LoadingActions\ReadingModsAction.cs" />
     <Compile Include="Patching\LoadingScreenPatcher.cs" />
     <Compile Include="StartupManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

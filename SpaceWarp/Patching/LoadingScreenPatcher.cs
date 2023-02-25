@@ -19,8 +19,9 @@ namespace SpaceWarp.Patching
     {
         public static void AddScreens(KSP.Game.GameManager gameManager, SpaceWarpManager spaceWarpManager)
         {
+            gameManager.LoadingFlow.AddAction(new ReadingModsAction("Resolving Space Warp Mod Load Order",spaceWarpManager));
             gameManager.LoadingFlow.AddAction(new LoadModsAction("Loading Space Warp Mods",spaceWarpManager));
-            gameManager.LoadingFlow.AddAction(new AfterModsLoadedAction("Loading Space Warp Mods",spaceWarpManager));
+            gameManager.LoadingFlow.AddAction(new AfterModsLoadedAction("Space Warp Mod Post-Initialization",spaceWarpManager));
         }
     }
 }

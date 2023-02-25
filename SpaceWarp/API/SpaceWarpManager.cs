@@ -6,6 +6,7 @@ using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 using Newtonsoft.Json;
+using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 using SpaceWarp.Patching;
 
@@ -27,6 +28,7 @@ namespace SpaceWarp.API
         public SpaceWarpGlobalConfiguration SpaceWarpConfiguration;
 
         internal List<Mod> allModScripts = new List<Mod>();
+        internal List<(string,ModInfo)> modLoadOrder = new List<(string,ModInfo)>();
         
         public void Start()
         {
@@ -63,14 +65,12 @@ namespace SpaceWarp.API
             _modLogger.Info("Warping Spacetime");
         }
 
-        /// <summary>
-        /// Runs the mod initialization procedures.
-        /// </summary>
-        internal void InitializeMods()
+        private static List<(string, ModInfo)> _allEnabledModInfo = new List<(string, ModInfo)>();
+        internal void ReadMods()
         {
-            _modLogger.Info("Initializing mods");
+            _modLogger.Info("Reading mods");
             string[] modDirectories = Directory.GetDirectories(MODS_FULL_PATH);
-
+            // First we read all the mod folders
             if (modDirectories.Length == 0)
             {
                 _modLogger.Warn("No mods were found! No panic though.");
@@ -78,9 +78,146 @@ namespace SpaceWarp.API
 
             foreach (string modFolder in modDirectories)
             {
-                string modName = Path.GetFileName(modFolder);
+                if (!File.Exists(modFolder + "\\modinfo.json"))
+                {
+                    _modLogger.Warn($"Found mod {Path.GetFileName(modFolder)} without modinfo.json");
+                    continue;
+                }
 
-                _modLogger.Info($"Found mod: {modName}, attempting to do a simple load of the mod");
+                if (File.Exists(modFolder + "\\.ignore"))
+                {
+                    _modLogger.Info($"Skipping mod {Path.GetFileName(modFolder)} due to .ignore file");
+                    continue;
+                }
+                _modLogger.Info($"Found mod: {Path.GetDirectoryName(modFolder)}, adding to enable mods");
+
+                ModInfo info = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(modFolder + "\\modinfo.json"));
+                string name = Path.GetFileName(modFolder);
+                _allEnabledModInfo.Add((name,info));
+            }
+            ResolveLoadOrder();
+        }
+
+        private bool isAboveVersion(string toCheck, string ver)
+        {
+            if (ver == "")
+            {
+                return true;
+            }
+
+            string[] sem_ver = toCheck.Split('.');
+            string[] needed_ver = ver.Split('.');
+            for (int i = 0; i < needed_ver.Length; i++)
+            {
+                if (needed_ver[i] == "*")
+                {
+                    continue;
+                }
+
+                if (Int32.Parse(sem_ver[i]) < Int32.Parse(needed_ver[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool isBelowVersion(string toCheck, string ver)
+        {
+            if (ver == "")
+            {
+                return true;
+            }
+
+            string[] sem_ver = toCheck.Split('.');
+            string[] needed_ver = ver.Split('.');
+            for (int i = 0; i < needed_ver.Length; i++)
+            {
+                if (needed_ver[i] == "*")
+                {
+                    continue;
+                }
+
+                if (Int32.Parse(sem_ver[i]) > Int32.Parse(needed_ver[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        private bool DependenciesResolved(ModInfo mod)
+        {
+            foreach (var dependency in mod.dependencies)
+            {
+                _modLogger.Info($"{mod.name} dependency - {dependency.id} {dependency.version.min}-{dependency.version.max}");
+                var depName = dependency.id;
+                var depVersion = dependency.version;
+                bool found = false;
+                foreach (var loaded in modLoadOrder)
+                {
+                    if (loaded.Item2.mod_id == depName)
+                    {
+                        var depLoadedVersion = loaded.Item2.version;
+                        if (!isAboveVersion(depLoadedVersion, depVersion.min)) return false;
+                        if (!isBelowVersion(depLoadedVersion, depVersion.max)) return false;
+                        found = true;
+                    }
+                }
+
+                if (!found) return false;
+            }
+
+            return true;
+        }
+        private void ResolveLoadOrder()
+        {
+            //TODO: Make this way more optimized!
+            _modLogger.Info("Resolving Load Order");
+            bool changed = true;
+            while (changed)
+            {
+                changed = false;
+                List<int> toRemove = new List<int>();
+                for (int i = 0; i < _allEnabledModInfo.Count; i++)
+                {
+                    _modLogger.Info("Attempting to resolve dependencies for " + _allEnabledModInfo[i].Item1);
+                    if (DependenciesResolved(_allEnabledModInfo[i].Item2))
+                    {
+                        modLoadOrder.Add(_allEnabledModInfo[i]);
+                        toRemove.Add(i);
+                        changed = true;
+                    }
+                }
+
+                for (int i = toRemove.Count - 1; i >= 0; i--)
+                {
+                    _allEnabledModInfo.RemoveAt(toRemove[i]);
+                }
+            }
+
+            if (_allEnabledModInfo.Count > 0)
+            {
+                foreach ((string modName, ModInfo info) in _allEnabledModInfo)
+                {
+                    _modLogger.Warn($"Skipping loading of {modName} as not all dependencies could be met");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Runs the mod initialization procedures.
+        /// </summary>
+        internal void InitializeMods()
+        {
+            _modLogger.Info("Initializing mods");
+
+            foreach ((string modName, ModInfo info) in modLoadOrder)
+            {
+                string modFolder = MODS_FULL_PATH + "/" + modName;
+
+                _modLogger.Info($"Found mod: {modName}, attempting to load mod");
 
                 // Now we load all assemblies under the code folder of the mod
                 string codePath = modFolder + GlobalModDefines.BINARIES_FOLDER;
@@ -94,7 +231,7 @@ namespace SpaceWarp.API
                         continue;
                     }
 
-                    InitializeModObject(modName, mainModType);
+                    InitializeModObject(modName, info, mainModType);
                 }
                 else
                 {
@@ -156,19 +293,17 @@ namespace SpaceWarp.API
         /// <param name="modName">The mod name to initialize.</param>
         /// <param name="mainModType">The mod type to initialize.</param>
         /// <param name="newModLogger">The new mod logger to spawn</param>
-        private void InitializeModObject(string modName, Type mainModType)
+        private void InitializeModObject(string modName, ModInfo info, Type mainModType)
         {
-            ModLogger newModLogger = new ModLogger(modName);
+            ModLogger newModLogger = new ModLogger(info.name);
 
             GameObject modObject = new GameObject($"Mod: {modName}");
-            _modLogger.Info("Before AddComponent");
-            _modLogger.Info(mainModType.FullName);
             Mod modComponent = (Mod)modObject.AddComponent(mainModType);
-            _modLogger.Info("After AddComponent");
             allModScripts.Add(modComponent);
             modObject.transform.SetParent(transform.parent);
             modComponent.Logger = newModLogger;
             modComponent.Manager = this;
+            modComponent.Info = info;
 
             modObject.SetActive(true);
             _modLogger.Info($"Loaded: {modName}");
