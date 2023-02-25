@@ -307,7 +307,7 @@ namespace SpaceWarp.API
                 if (mainModType != null) break;
             }
 
-            if (mainModType == null)
+            if (mainModType != null)
             {
 				_modLogger.Error($"Could not load mod: {modName}, no type with [MainMod] exists");
 				return false;
