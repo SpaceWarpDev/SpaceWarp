@@ -1,4 +1,4 @@
-![Top Banner](Cool Banner.png)
+![Cool Banner](Cool_Banner.png)
 
 # Space Warp
 Space Warp is a mod loader for kerbal space program 2
