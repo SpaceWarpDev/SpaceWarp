@@ -163,7 +163,7 @@ os.mkdir(f"{mod_id}/{mod_id}/assets/models")
 os.mkdir(f"{mod_id}/{mod_id}/assets/resources")
 os.mkdir(f"{mod_id}/{mod_id}/bin")
 os.mkdir(f"{mod_id}/{mod_id}/config")
-os.mkdir(f"{mod_id}/{mod_id_title}")
+os.mkdir(f"{mod_id}/{mod_id_title}Project")
 os.mkdir(f"{mod_id}/{mod_id_title}Project/{mod_id_title}")
 os.mkdir(f"{mod_id}/external_dlls")
 
