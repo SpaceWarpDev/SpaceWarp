@@ -52,7 +52,7 @@ namespace SpaceWarp.UI
         {
             if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.M))
             {
-                drawUI = !drawUI;
+                this.ToggleVisible();
             }
         }
 
@@ -122,6 +122,10 @@ namespace SpaceWarp.UI
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
             GUI.DragWindow(new Rect(0, 0, 10000, 500));
+        }
+
+        public void ToggleVisible() {
+            this.drawUI = !this.drawUI;
         }
     }
 }

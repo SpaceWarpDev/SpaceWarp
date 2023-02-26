@@ -31,17 +31,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lib.Harmony.2.2.2\lib\net472\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony">
+      <HintPath>D:\Steam\steamapps\common\Kerbal Space Program 2\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\external_dlls\Assembly-CSharp.dll</HintPath>
+      <HintPath>D:\Steam\steamapps\common\Kerbal Space Program 2\KSP2_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\external_dlls\Newtonsoft.Json.dll</HintPath>
+      <HintPath>D:\Steam\steamapps\common\Kerbal Space Program 2\KSP2_x64_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json.UnityConverters">
-      <HintPath>..\external_dlls\Newtonsoft.Json.UnityConverters.dll</HintPath>
+      <HintPath>D:\Steam\steamapps\common\Kerbal Space Program 2\KSP2_x64_Data\Managed\Newtonsoft.Json.UnityConverters.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,21 +51,26 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine">
-      <HintPath>..\external_dlls\UnityEngine.dll</HintPath>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>D:\Steam\steamapps\common\Kerbal Space Program 2\KSP2_x64_Data\Managed\Unity.TextMeshPro.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ksp_console_opener\external_dlls\UnityEngine.AssetBundleModule.dll</HintPath>
+    <Reference Include="UnityEngine">
+      <HintPath>D:\Steam\steamapps\common\Kerbal Space Program 2\KSP2_x64_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>D:\Steam\steamapps\common\Kerbal Space Program 2\KSP2_x64_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\external_dlls\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>D:\Steam\steamapps\common\Kerbal Space Program 2\KSP2_x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\external_dlls\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>D:\Steam\steamapps\common\Kerbal Space Program 2\KSP2_x64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\external_dlls\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>D:\Steam\steamapps\common\Kerbal Space Program 2\KSP2_x64_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>D:\Steam\steamapps\common\Kerbal Space Program 2\KSP2_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +95,7 @@
     <Compile Include="API\Logging\ModLogger.cs" />
     <Compile Include="API\SpaceWarpManager.cs" />
     <Compile Include="API\Versions\VersionUtility.cs" />
+    <Compile Include="Patching\MainMenuPatcher.cs" />
     <Compile Include="Patching\LoadingActions\AfterModsLoadedAction.cs" />
     <Compile Include="Patching\LoadingActions\LoadAssetsAction.cs" />
     <Compile Include="Patching\LoadingActions\LoadModsAction.cs" />
