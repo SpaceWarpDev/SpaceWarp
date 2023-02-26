@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Space Warp Setup</title>
+  <link rel="stylesheet" href="style.css">
+    <script src="main.js"></script>
+</head>
+<body>
+    <div id="page1">
+      <h1>Welcome to the Space Warp Installer.<br>This program will install Space Warp.</h1>
+      <button onclick="scrollToPage('page2')">Next</button>
+    </div>
+
+    <div id="page2">
+      <h1>Click the button below to download</h1>
+      <button onclick="download_file()">Download</button>
+      <br>
+      <div id="progress">
+        <div id="progress-bar" style="width: 0;"></div>
+      </div>
+    </div>
+
+    <div id="page3">
+        <h1>Downloaded</h1>
+        <button onclick="window.close()">Done.</button>
+    </div>
+
+    <div id="page4">
+        <h1>We've not been able to detect your path.</h1>
+        <h1>Enter your path here:</h1>
+        <div class="input-container">
+            <label for="input_path"></label>
+            <input id="input_path" type="text" placeholder="e.g. if i knew, i would have found it :?">
+            <button id="select_folder_button" onclick="select_folder()">Select Folder</button>
+        </div>
+        <button id="second_install_button" onclick="install()">Install</button>
+    </div>
+
+    <div id="page5">
+        <h1>File already exists</h1>
+        <h1>No double dipping :C</h1>
+    </div>
+
+</body>
+</html>
