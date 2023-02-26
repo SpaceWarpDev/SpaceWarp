@@ -10,6 +10,38 @@ using UnityEngine;
 using KSP.Logging;
 namespace SpaceWarp.UI
 {
+    public class SpaceWarpConsoleLogListener
+    {
+        public static SpaceWarpConsoleLogListener instance;
+
+        public SpaceWarpConsoleLogListener() => instance = this;
+
+        internal List<string> debugMessages = new List<string>();
+
+        public void LogCallback(string condition, string stackTrace, LogType type)
+        {
+            switch (type)
+            {
+                case LogType.Error:
+                    debugMessages.Add($"[ERR] {condition}");
+                    break;
+                case LogType.Assert:
+                    debugMessages.Add($"[AST] {condition}");
+                    break;
+                case LogType.Warning:
+                    debugMessages.Add($"[WRN] {condition}");
+                    break;
+                case LogType.Log:
+                    debugMessages.Add($"[LOG] {condition}");
+                    break;
+                case LogType.Exception:
+                    debugMessages.Add($"[EXC] {condition}");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+    }
     public class SpaceWarpConsole : KerbalBehavior
     {
         static bool loaded = false;
@@ -17,8 +49,9 @@ namespace SpaceWarp.UI
         private Rect windowRect;
         private int windowWidth = 350;
         private int windowHeight = 700;
-        
-        
+        private SpaceWarpConsoleLogListener LogList;
+
+
         public void Start()
         {
             if (loaded)
@@ -31,7 +64,7 @@ namespace SpaceWarp.UI
         
         void Awake()
         {
-            KspLogManager.AddLogCallback(LogCallback);
+            LogList = SpaceWarpConsoleLogListener.instance;
             windowWidth = (int)(Screen.width * 0.5f);
             windowHeight = (int)(Screen.height * 0.5f);
             windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f),
@@ -55,31 +88,6 @@ namespace SpaceWarp.UI
         private static GUIStyle boxStyle;
         private static Vector2 scrollPosition;
 
-        private List<string> debugMessages = new List<string>();
-
-        private void LogCallback(string condition, string stackTrace, LogType type)
-        {
-            switch (type)
-            {
-                case LogType.Error:
-                    debugMessages.Add($"[ERR] {condition}");
-                    break;
-                case LogType.Assert:
-                    debugMessages.Add($"[AST] {condition}");
-                    break;
-                case LogType.Warning:
-                    debugMessages.Add($"[WRN] {condition}");
-                    break;
-                case LogType.Log:
-                    debugMessages.Add($"[LOG] {condition}");
-                    break;
-                case LogType.Exception:
-                    debugMessages.Add($"[EXC] {condition}");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
-        }
         private void Update()
         {
             if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))
@@ -93,7 +101,7 @@ namespace SpaceWarp.UI
             boxStyle = GUI.skin.GetStyle("Box");
             GUILayout.BeginVertical();
             scrollPosition = GUILayout.BeginScrollView(scrollPosition, false, true);
-            foreach (var debugMessage in debugMessages)
+            foreach (var debugMessage in LogList.debugMessages)
             {
                 GUILayout.Label(debugMessage);
             }
@@ -107,7 +115,7 @@ namespace SpaceWarp.UI
 
             if (GUILayout.Button("Clear"))
             {
-                debugMessages.Clear();
+                LogList.debugMessages.Clear();
             }
 
             if (GUILayout.Button("Clear Control Locks"))
