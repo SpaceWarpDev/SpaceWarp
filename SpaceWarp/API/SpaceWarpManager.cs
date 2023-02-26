@@ -585,6 +585,8 @@ namespace SpaceWarp.API
             modUIObject.transform.SetParent(transform.parent);
             modUIObject.AddComponent<ModListUI>();
             
+            ModListUI = modUIObject.AddComponent<ModListUI>();
+            
             modUIObject.SetActive(true);
 
             GameObject consoleUIObject = new GameObject("Space Warp Console");
