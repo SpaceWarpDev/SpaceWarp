@@ -39,6 +39,7 @@ namespace SpaceWarp.API
         public readonly List<(string,ModInfo)> LoadedMods = new List<(string,ModInfo)>();
         private static readonly List<(string, ModInfo)> AllEnabledModInfo = new List<(string, ModInfo)>();
 
+        public ModListUI ModListUI { get; private set; }
         protected override void Start()
         {
             base.Start();
@@ -77,6 +78,9 @@ namespace SpaceWarp.API
 
         private void InitializePatches()
         {
+            Harmony harmony = new Harmony("com.github.x606.spacewarp");
+            harmony.PatchAll();
+
             LoadingScreenPatcher.AddModLoadingScreens();
         }
 
@@ -522,7 +526,7 @@ namespace SpaceWarp.API
             GameObject modUIObject = new GameObject("Space Warp Mod UI");
             DontDestroyOnLoad(modUIObject);
             modUIObject.transform.SetParent(transform.parent);
-            ModListUI UI = modUIObject.AddComponent<ModListUI>();
+            this.ModListUI = modUIObject.AddComponent<ModListUI>();
             
             modUIObject.SetActive(true);
 
