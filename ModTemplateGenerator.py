@@ -291,7 +291,7 @@ with open(f"{mod_id}/{mod_id_title}/{mod_id_title}.csproj", "w") as csproj:
 
     for ref in refs:
         element = root.createElement("Reference")
-        element.setAttribute("Include", ref[0])
+        element.setAttribute("Include", ref)
         itemGroup.appendChild(element)
 
     xml_str = root.toprettyxml(indent="  ")
