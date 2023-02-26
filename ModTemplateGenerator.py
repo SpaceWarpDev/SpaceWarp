@@ -183,8 +183,8 @@ with open(f"{external_dlls}/.gitignore", "w") as external_gitignore:
     external_gitignore.write("*\n!.gitignore")
 
 with open(f"{mod_id}/.gitignore", "w") as main_gitignore:
-    main_gitignore.writelines(
-        [
+    main_gitignore.write(
+        '\n'.join([
             "*.rsuser",
             "*.suo",
             "*.user",
@@ -205,7 +205,7 @@ with open(f"{mod_id}/.gitignore", "w") as main_gitignore:
             "[Oo]bj/",
             "[Ll]og/",
             "[Ll]ogs/",
-        ]
+        ])
     )
 
 with open(f"{release_folder}/modinfo.json", "w") as modinfo:
