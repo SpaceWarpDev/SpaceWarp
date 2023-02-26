@@ -27,7 +27,7 @@ namespace SpaceWarp.API.AssetBundles
 				string path = modId + "/" + assetBundleName + "/" + names[i];
 				Object bundleObject = bundleObjects[i];
 
-				System.Console.WriteLine($"registering path\"{path}\"");
+				System.Console.WriteLine($"registering path \"{path}\"");
 
 				_allAssets.Add(path, bundleObject);
 			}
@@ -58,6 +58,35 @@ namespace SpaceWarp.API.AssetBundles
 			}
 
 			return tValue;
+		}
+
+		/// <summary>
+		/// Tries to get an asset from the specified asset path
+		/// </summary>
+		/// <typeparam name="T">The type</typeparam>
+		/// <param name="path">an asset path, format: {mod_id}/{asset_bundle}/{asset_name}</param>
+		/// <param name="asset">the asset output</param>
+		/// <returns>Whether or not the asset exists and is loaded</returns>
+		public static bool TryGetAsset<T>(string path, out T asset) where T : UnityEngine.Object
+		{
+			asset = null;
+			string[] subPaths = path.Split('/', '\\');
+			if (subPaths.Length < 3)
+			{
+				return false;
+			}
+			if (!_allAssets.TryGetValue(path, out Object value))
+			{
+				return false;
+			}
+			if (!(value is T tValue))
+			{
+				return false;
+			}
+
+			asset = tValue;
+
+			return true;
 		}
 	}
 }
