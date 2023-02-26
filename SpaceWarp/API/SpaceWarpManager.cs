@@ -56,9 +56,9 @@ namespace SpaceWarp.API
             InitializeSpaceWarpConfig();
             
             InitializeModLogger();
-            
-            InitializePatches();
-        }
+
+			LoadingScreenPatcher.AddModLoadingScreens();
+		}
 
         ///<summary>
         ///Initializes the configuration manager
@@ -71,19 +71,6 @@ namespace SpaceWarp.API
             confManagerObject.SetActive(true);
         }
         
-        
-        /// <summary>
-        /// Initializes Harmony
-        /// </summary>
-
-        private void InitializePatches()
-        {
-            Harmony harmony = new Harmony("com.github.x606.spacewarp");
-            harmony.PatchAll();
-
-            LoadingScreenPatcher.AddModLoadingScreens();
-        }
-
         /// <summary>
         /// Initializes the SpaceWarp mod logger.
         /// </summary>

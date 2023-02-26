@@ -5,6 +5,8 @@ using SpaceWarp.API;
 using Object = UnityEngine.Object;
 using UnityEngine.SceneManagement;
 using HarmonyLib;
+using System.Reflection;
+using SpaceWarp.Patching;
 
 namespace Doorstop {
 
@@ -25,18 +27,22 @@ namespace Doorstop {
         static void OnSceneLoaded(Scene unused1, LoadSceneMode unused2)
         {
             if (!patched) {
-
-                Harmony harmony = new Harmony("com.github.celisium.spacewarp-doorstop");
-
-                var original = typeof(KSP.Game.GameManager).GetMethod(nameof(KSP.Game.GameManager.StartGame));
-                var postfix = typeof(SpaceWarp.StartupManager).GetMethod(nameof(SpaceWarp.StartupManager.OnGameStarted));
-
-                harmony.Patch(original, postfix: new HarmonyMethod(postfix));
-
+                InitializePatches();
                 patched = true;
             }
         }
-    }
+
+		/// <summary>
+		/// Initializes Harmony
+		/// </summary>
+
+		static void InitializePatches()
+		{
+			Harmony harmony = new Harmony("com.github.x606.spacewarp");
+
+			harmony.PatchAll(Assembly.GetExecutingAssembly());
+		}
+	}
 }
 
 namespace SpaceWarp
