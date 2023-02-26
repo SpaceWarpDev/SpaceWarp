@@ -62,26 +62,25 @@ mod_version = input("What is the starting version of the mod: ")
 mod_ksp_min_version = input("What is the minimum version of KSP this mod will accept: ")
 mod_ksp_max_version = input("What is the maximum version of KSP this mod will accept: ")
 
-os.mkdir(project_name)
-os.mkdir(project_name + "/" + mod_id)
-os.mkdir(project_name + "/" + mod_id + "/assets")
-os.mkdir(project_name + "/" + mod_id + "/assets/parts")
-os.mkdir(project_name + "/" + mod_id + "/assets/models")
-os.mkdir(project_name + "/" + mod_id + "/assets/resources")
-os.mkdir(project_name + "/" + mod_id + "/bin")
-os.mkdir(project_name + "/" + mod_id + "/config")
-namespace = mod_id.replace("_", " ").title().replace(" ", "")
-os.mkdir(project_name + "/" + project_name)
-os.mkdir(project_name + "/" + project_name + "/" + namespace)
-os.mkdir(project_name + "/external_dlls")
-
-external_dlls = project_name + "/external_dlls"
-release_folder = project_name + "/" + mod_id
-
-
 # Now we copy all the game directories
 space_warp_path = input("What is the path to spacewarp.dll: ")
 managed_path = input("What is the path to the KSP managed dlls: ")
+
+os.mkdir(project_name)
+os.mkdir(f"{project_name}/{mod_id}")
+os.mkdir(f"{project_name}/{mod_id}/assets")
+os.mkdir(f"{project_name}/{mod_id}/assets/parts")
+os.mkdir(f"{project_name}/{mod_id}/assets/models")
+os.mkdir(f"{project_name}/{mod_id}/assets/resources")
+os.mkdir(f"{project_name}/{mod_id}/bin")
+os.mkdir(f"{project_name}/{mod_id}/config")
+namespace = mod_id.replace("_", " ").title().replace(" ", "")
+os.mkdir(f"{project_name}/{mod_id}project_name")
+os.mkdir(f"{project_name}/{mod_id}/namespace")
+os.mkdir(f"{project_name}/external_dlls")
+
+external_dlls = f"{project_name}/external_dlls"
+release_folder = f"{project_name}/{mod_id}"
 
 shutil.copy2(space_warp_path,external_dlls)
 
@@ -89,10 +88,10 @@ for filename in os.listdir(managed_path):
     if filename.endswith(".dll"):
         shutil.copy2(os.path.join(managed_path,filename),external_dlls)
 
-with open(external_dlls + "/.gitignore","w") as external_gitignore:
+with open(f"{external_dlls}/.gitignore","w") as external_gitignore:
     external_gitignore.write("*\n!.gitignore")
 
-with open(project_name + "/.gitignore","w") as main_gitignore:
+with open(f"{project_name}/.gitignore","w") as main_gitignore:
     main_gitignore.writelines(
         [
             "*.rsuser",
@@ -118,7 +117,7 @@ with open(project_name + "/.gitignore","w") as main_gitignore:
         ]
     )
 
-with open(release_folder + "/modinfo.json","w") as modinfo:
+with open(f"{release_folder}/modinfo.json","w") as modinfo:
     modinfo.write(
         json.dumps({
             "mod_id": mod_id,
@@ -134,17 +133,19 @@ with open(release_folder + "/modinfo.json","w") as modinfo:
             }
         },indent=4)
     )
-with open(release_folder + "README.json","w") as readme:
+with open(f"{release_folder}README.json","w") as readme:
     readme.write("# Usage")
     readme.write("Any code compiled in the csproj's dll should be moved to the /bin folder of the mod")
 
-with open(release_folder + "/README.json","w") as readme:
+with open(f"{release_folder}/README.json","w") as readme:
     readme.write("# Default Readme")
-code_folder = project_name + "/" + project_name + "/" + namespace
-with open(code_folder + "/" + namespace + "Mod.cs","w") as default_code:
+
+code_folder = f"{project_name}/{project_name}/{namespace}"
+
+with open(f"{code_folder}/{namespace}Mod.cs","w") as default_code:
     default_code.write("using SpaceWarp.API.Mods;\n\nnamespace " + namespace + "\n{\n    [MainMod]\n     public class " + namespace + "Mod : Mod\n    {\n        public override void OnInitialized()\n        {\n            Logger.Info(\"Mod is initialized\");\n        }\n    }\n}")
 
-with open(code_folder + "/" + namespace + "Config.cs","w") as default_config:
+with open(f"{code_folder}/{namespace}Config.cs","w") as default_config:
     default_config.write("using SpaceWarp.API.Configuration;\nusing Newtonsoft.Json;\n\nnamespace " + namespace + "\n{\n    [JsonObject(MemberSerialization.OptOut)]\n    [ModConfig]\n    public class " + namespace + "Config\n    {\n         [ConfigField(\"pi\")] [ConfigDefaultValue(3.14159)] public double pi;\n    }\n}")
 
 
@@ -155,8 +156,7 @@ def quickCreateProperty(root,name,text):
     return a
 
 
-
-with open(project_name + "/" + project_name + "/" + project_name + ".csproj","w") as csproj:
+with open(f"{project_name}/{project_name}/{project_name}.csproj","w") as csproj:
     root = minidom.Document()
     xml = root.createElement('Project')
     xml.setAttribute('Sdk','Microsoft.NET.Sdk')
