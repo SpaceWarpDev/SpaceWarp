@@ -107,6 +107,7 @@
     <Compile Include="API\Versions\VersionUtility.cs" />
     <Compile Include="Patching\LoadingActions\LoadAssetAction.cs" />
     <Compile Include="Patching\LoadingActions\LoadModAction.cs" />
+    <Compile Include="Patching\LoadingActions\SpaceWarpAssetInitializationAction.cs" />
     <Compile Include="Patching\MainMenuPatcher.cs" />
     <Compile Include="Patching\LoadingActions\AfterModsLoadedAction.cs" />
     <Compile Include="Patching\LoadingActions\LoadAssetsAction.cs" />

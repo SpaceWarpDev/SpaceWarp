@@ -217,6 +217,35 @@ namespace SpaceWarp.API
 
         }
 
+
+        internal void LoadSpaceWarpAssets()
+        {
+            string bundlesPath = Directory.GetCurrentDirectory() + "/SpaceWarp" + GlobalModDefines.ASSET_BUNDLES_FOLDER;
+            if (Directory.Exists(bundlesPath))
+            {
+                foreach (string file in Directory.GetFiles(bundlesPath))
+                {
+                    string assetBundleName = Path.GetFileName(file);
+
+                    AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
+
+                    if (assetBundle == null)
+                    {
+                        _modLogger.Error($"Failed to load AssetBundle space_warp/{assetBundleName}");
+                        continue;
+                    }
+
+                    AssetManager.RegisterAssetBundle("space_warp", assetBundleName, assetBundle);
+                    _modLogger.Info($"Loaded AssetBundle space_warp/{assetBundleName}");
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Loads a single mods assets
+        /// </summary>
+        /// <param name="modName">the name/id of the mod</param>
+        /// <param name="info">the mod info structure that describes the mod</param>
         internal void LoadSingleModAssets(string modName, ModInfo info)
         {
             string modFolder = MODS_FULL_PATH + "/" + modName;

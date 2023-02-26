@@ -17,6 +17,7 @@ namespace SpaceWarp.Patching
 
             GameManager gameManager = GameManager.Instance;
             gameManager.LoadingFlow.AddAction(new ReadingModsAction("Resolving Space Warp Mod Load Order"));
+            gameManager.LoadingFlow.AddAction(new SpaceWarpAssetInitializationAction("Initializing Space Warp Provided Assets"));
         }
 
         public static void AddAllModLoadingSteps()
@@ -26,8 +27,8 @@ namespace SpaceWarp.Patching
             if (!ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager)) return; //TODO: Log a message here
             foreach (var mod in spaceWarpManager._modLoadOrder)
             {
-                gameManager.LoadingFlow.AddAction(new LoadAssetAction($"Loading assets for {mod}",mod.Item1, mod.Item2));
-                gameManager.LoadingFlow.AddAction(new LoadModAction($"Initializing {mod}",mod.Item1,mod.Item2));
+                gameManager.LoadingFlow.AddAction(new LoadAssetAction($"Loading assets for {mod.Item1}",mod.Item1, mod.Item2));
+                gameManager.LoadingFlow.AddAction(new LoadModAction($"Initializing {mod.Item1}",mod.Item1,mod.Item2));
             }
             
             gameManager.LoadingFlow.AddAction(new AfterModsLoadedAction("Space Warp Mod Post-Initialization"));
