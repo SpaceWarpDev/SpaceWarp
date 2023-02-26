@@ -122,6 +122,7 @@
     <Compile Include="UI\ModConfigurationUI.cs" />
     <Compile Include="UI\ModListUI.cs" />
     <Compile Include="UI\SpaceWarpConsole.cs" />
+    <Compile Include="UI\SpaceWarpConsoleLogListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -2,46 +2,11 @@
 using System.Collections.Generic;
 using KSP.Game;
 using KSP.Sim.impl;
-using SpaceWarp.API;
-using SpaceWarp.API.Configuration;
-using SpaceWarp.API.Managers;
 using UnityEngine;
 
 using KSP.Logging;
 namespace SpaceWarp.UI
 {
-    public class SpaceWarpConsoleLogListener
-    {
-        public static SpaceWarpConsoleLogListener instance;
-
-        public SpaceWarpConsoleLogListener() => instance = this;
-
-        internal List<string> debugMessages = new List<string>();
-
-        public void LogCallback(string condition, string stackTrace, LogType type)
-        {
-            switch (type)
-            {
-                case LogType.Error:
-                    debugMessages.Add($"[ERR] {condition}");
-                    break;
-                case LogType.Assert:
-                    debugMessages.Add($"[AST] {condition}");
-                    break;
-                case LogType.Warning:
-                    debugMessages.Add($"[WRN] {condition}");
-                    break;
-                case LogType.Log:
-                    debugMessages.Add($"[LOG] {condition}");
-                    break;
-                case LogType.Exception:
-                    debugMessages.Add($"[EXC] {condition}");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
-        }
-    }
     public class SpaceWarpConsole : KerbalBehavior
     {
         private static bool _loaded;
@@ -69,8 +34,8 @@ namespace SpaceWarp.UI
 
         private void Awake()
         {
-            LogList = SpaceWarpConsoleLogListener.instance;
             KspLogManager.AddLogCallback(LogCallback);
+
             _windowWidth = (int)(Screen.width * 0.5f);
             _windowHeight = (int)(Screen.height * 0.5f);
             _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f),
@@ -144,7 +109,7 @@ namespace SpaceWarp.UI
 
             if (GUILayout.Button("Clear"))
             {
-                LogList.debugMessages.Clear();
+                SpaceWarpConsoleLogListener.DebugMessages.Clear();
             }
 
             if (GUILayout.Button("Clear Control Locks"))

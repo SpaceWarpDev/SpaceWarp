@@ -8,6 +8,7 @@ using HarmonyLib;
 using System.Reflection;
 using SpaceWarp.Patching;
 using KSP.Logging;
+using SpaceWarp.UI;
 using static UnityEngine.Application;
 
 namespace Doorstop {
@@ -19,8 +20,8 @@ namespace Doorstop {
         public static void Start()
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
-            var LogListener = new SpaceWarp.UI.SpaceWarpConsoleLogListener();
-            KspLogManager.AddLogCallback(LogListener.LogCallback);
+
+            KspLogManager.AddLogCallback(SpaceWarpConsoleLogListener.LogCallback);
         }
 
         static bool patched = false;
