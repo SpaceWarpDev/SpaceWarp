@@ -78,15 +78,15 @@ def find_ksp2_install_path():
 
 print("Space Warp Mod Setup Wizard")
 
-while True:
-    project_name = input("What would you like to name the project: ")
-    if not project_name:
-        print("Project name cannot be empty, please try again.")
-    else:
-        break
+# while True:
+#     project_name = input("What would you like to name the project: ")
+#     if not project_name:
+#         print("Project name cannot be empty, please try again.")
+#     else:
+#         break
 
 while True:
-    mod_id = input("What is the ID of the mod: ")
+    mod_id = input("What is the ID of the mod (This should be in snake_case): ")
     if not mod_id:
         print("Mod ID cannot be empty, please try again.")
     else:
@@ -122,21 +122,21 @@ else:
 managed_path = os.path.join(steam_install_folder, "KSP2_x64_Data", "Managed")
 
 
-os.mkdir(project_name)
-os.mkdir(f"{project_name}/{mod_id}")
-os.mkdir(f"{project_name}/{mod_id}/assets")
-os.mkdir(f"{project_name}/{mod_id}/assets/parts")
-os.mkdir(f"{project_name}/{mod_id}/assets/models")
-os.mkdir(f"{project_name}/{mod_id}/assets/resources")
-os.mkdir(f"{project_name}/{mod_id}/bin")
-os.mkdir(f"{project_name}/{mod_id}/config")
-namespace = mod_id.replace("_", " ").title().replace(" ", "")
-os.mkdir(f"{project_name}/{project_name}")
-os.mkdir(f"{project_name}/{project_name}/{namespace}")
-os.mkdir(f"{project_name}/external_dlls")
+mod_id_title = mod_id.replace("_", " ").title().replace(" ", "")
+os.mkdir(mod_id)
+os.mkdir(f"{mod_id}/{mod_id}")
+os.mkdir(f"{mod_id}/{mod_id}/assets")
+os.mkdir(f"{mod_id}/{mod_id}/assets/parts")
+os.mkdir(f"{mod_id}/{mod_id}/assets/models")
+os.mkdir(f"{mod_id}/{mod_id}/assets/resources")
+os.mkdir(f"{mod_id}/{mod_id}/bin")
+os.mkdir(f"{mod_id}/{mod_id}/config")
+os.mkdir(f"{mod_id}/{mod_id_title}")
+os.mkdir(f"{mod_id}/{mod_id_title}/{mod_id_title}")
+os.mkdir(f"{mod_id}/external_dlls")
 
-external_dlls = f"{project_name}/external_dlls"
-release_folder = f"{project_name}/{mod_id}"
+external_dlls = f"{mod_id}/external_dlls"
+release_folder = f"{mod_id}/{mod_id}"
 
 space_warp_path = os.path.join(managed_path, "SpaceWarp.dll")
 
@@ -149,7 +149,7 @@ for filename in os.listdir(managed_path):
 with open(f"{external_dlls}/.gitignore","w") as external_gitignore:
     external_gitignore.write("*\n!.gitignore")
 
-with open(f"{project_name}/.gitignore","w") as main_gitignore:
+with open(f"{mod_id}/.gitignore","w") as main_gitignore:
     main_gitignore.writelines(
         [
             "*.rsuser",
@@ -198,13 +198,13 @@ with open(f"{release_folder}README.json","w") as readme:
 with open(f"{release_folder}/README.json","w") as readme:
     readme.write("# Default Readme")
 
-code_folder = f"{project_name}/{project_name}/{namespace}"
+code_folder = f"{mod_id}/{mod_id_title}/{mod_id_title}"
 
-with open(f"{code_folder}/{namespace}Mod.cs","w") as default_code:
-    default_code.write("using SpaceWarp.API.Mods;\n\nnamespace " + namespace + "\n{\n    [MainMod]\n     public class " + namespace + "Mod : Mod\n    {\n        public override void OnInitialized()\n        {\n            Logger.Info(\"Mod is initialized\");\n        }\n    }\n}")
+with open(f"{code_folder}/{mod_id_title}Mod.cs","w") as default_code:
+    default_code.write("using SpaceWarp.API.Mods;\n\nnamespace " + mod_id_title + "\n{\n    [MainMod]\n     public class " + mod_id_title + "Mod : Mod\n    {\n        public override void OnInitialized()\n        {\n            Logger.Info(\"Mod is initialized\");\n        }\n    }\n}")
 
-with open(f"{code_folder}/{namespace}Config.cs","w") as default_config:
-    default_config.write("using SpaceWarp.API.Configuration;\nusing Newtonsoft.Json;\n\nnamespace " + namespace + "\n{\n    [JsonObject(MemberSerialization.OptOut)]\n    [ModConfig]\n    public class " + namespace + "Config\n    {\n         [ConfigField(\"pi\")] [ConfigDefaultValue(3.14159)] public double pi;\n    }\n}")
+with open(f"{code_folder}/{mod_id_title}Config.cs","w") as default_config:
+    default_config.write("using SpaceWarp.API.Configuration;\nusing Newtonsoft.Json;\n\nnamespace " + mod_id_title + "\n{\n    [JsonObject(MemberSerialization.OptOut)]\n    [ModConfig]\n    public class " + mod_id_title + "Config\n    {\n         [ConfigField(\"pi\")] [ConfigDefaultValue(3.14159)] public double pi;\n    }\n}")
 
 
 def quickCreateProperty(root,name,text):
@@ -214,7 +214,7 @@ def quickCreateProperty(root,name,text):
     return a
 
 
-with open(f"{project_name}/{project_name}/{project_name}.csproj","w") as csproj:
+with open(f"{mod_id}/{mod_id_title}/{mod_id_title}.csproj","w") as csproj:
     root = minidom.Document()
     xml = root.createElement('Project')
     xml.setAttribute('Sdk','Microsoft.NET.Sdk')
