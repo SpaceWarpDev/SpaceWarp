@@ -11,6 +11,16 @@ namespace SpaceWarp
         private static bool _patched;
      
         private const string HARMONY_PACKAGE_URL = "com.github.x606.spacewarp";
+        
+        /// <summary>
+        /// EntryPoint for Spacewarp, called from Doorstop
+        /// </summary>
+        public static void Start()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+
+            KspLogManager.AddLogCallback(SpaceWarpConsoleLogListener.LogCallback);
+        }
 
         /// <summary>
         /// Add OnGameStarted as postfix to StartGame
