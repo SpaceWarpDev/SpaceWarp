@@ -117,7 +117,7 @@ steam_install_folder = find_ksp2_install_path()
 if os.path.exists(steam_install_folder):
     print(f"Kerbal Space Program 2 is installed at {steam_install_folder}")
 else:
-    print("Could not find the installation path for Kerbal Space Program 2.\n Please enter the path to the KSP2 installation folder manually.: ")
+    managed_path = input("Could not find the installation path for Kerbal Space Program 2.\n Please enter the path to the KSP2 installation folder manually: ")
 
 managed_path = os.path.join(steam_install_folder, "KSP2_x64_Data", "Managed")
 
