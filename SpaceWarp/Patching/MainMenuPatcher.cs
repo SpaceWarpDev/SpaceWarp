@@ -34,6 +34,7 @@ namespace SpaceWarp.Patching
 
             // Set the label to "Mods".
             TextMeshProUGUI tmp = modsButton.GetComponentInChildren<TextMeshProUGUI>();
+
             tmp.SetText("Mods");
 
         }
