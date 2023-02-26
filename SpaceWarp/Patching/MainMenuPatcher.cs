@@ -6,13 +6,15 @@ using SpaceWarp.API.Managers;
 using TMPro;
 using UnityEngine;
 
-namespace SpaceWarp.Patching {
+namespace SpaceWarp.Patching
+{
 
     [HarmonyPatch(typeof(KSP.Game.StartupFlow.LandingHUD))]
     [HarmonyPatch("Start")]
-    class MainMenuPatcher {
-
-        public static void Postfix(KSP.Game.StartupFlow.LandingHUD __instance) {
+    class MainMenuPatcher
+    {
+        public static void Postfix(KSP.Game.StartupFlow.LandingHUD __instance)
+        {
 
             Transform menuItemsGroupTransform = __instance.transform.FindChildEx("MenuItemsGroup");
 
@@ -32,19 +34,19 @@ namespace SpaceWarp.Patching {
 
             // Set the label to "Mods".
             TextMeshProUGUI tmp = modsButton.GetComponentInChildren<TextMeshProUGUI>();
+
             tmp.SetText("Mods");
 
         }
 
-        static void ModsOnClick() {
-            SpaceWarpManager manager;
-            bool found = ManagerLocator.TryGet(out manager);
+        static void ModsOnClick()
+        {
+            bool found = ManagerLocator.TryGet(out SpaceWarpManager manager);
 
-            if (found) {
+            if (found)
+            {
                 manager.ModListUI.ToggleVisible();
             }
         }
-
     }
-
 }
