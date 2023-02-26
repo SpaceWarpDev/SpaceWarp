@@ -2,6 +2,7 @@
 using KSP.Game;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
+using SpaceWarp.API.Mods.JSON;
 using UnityEngine;
 
 namespace SpaceWarp.API.Mods

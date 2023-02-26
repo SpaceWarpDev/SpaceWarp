@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SpaceWarp.API.AssetBundles
 {
 	public static class AssetManager
 	{
-		static Dictionary<string, UnityEngine.Object> _allAssets = new Dictionary<string, UnityEngine.Object>();
+		static readonly Dictionary<string, Object> AllAssets = new Dictionary<string, Object>();
 
 		internal static void RegisterAssetBundle(string modId, string assetBundleName, AssetBundle assetBundle)
 		{
@@ -46,7 +44,7 @@ namespace SpaceWarp.API.AssetBundles
 
 				System.Console.WriteLine($"registering path \"{path}\"");
 
-				_allAssets.Add(path, bundleObject);
+				AllAssets.Add(path, bundleObject);
 			}
 		}
 
@@ -64,7 +62,7 @@ namespace SpaceWarp.API.AssetBundles
 				throw new System.ArgumentException("Invalid path, asset paths must follow to following structure: {mod_id}/{asset_bundle}/{asset_path}");
 			}
 
-			if (!_allAssets.TryGetValue(path, out Object value))
+			if (!AllAssets.TryGetValue(path, out Object value))
 			{
 				throw new System.Exception($"Unable to find asset at path \"{path}\"");
 			}
@@ -84,7 +82,7 @@ namespace SpaceWarp.API.AssetBundles
 		/// <param name="path">an asset path, format: {mod_id}/{asset_bundle}/{asset_name}</param>
 		/// <param name="asset">the asset output</param>
 		/// <returns>Whether or not the asset exists and is loaded</returns>
-		public static bool TryGetAsset<T>(string path, out T asset) where T : UnityEngine.Object
+		public static bool TryGetAsset<T>(string path, out T asset) where T : Object
 		{
 			asset = null;
 			string[] subPaths = path.Split('/', '\\');
@@ -92,7 +90,7 @@ namespace SpaceWarp.API.AssetBundles
 			{
 				return false;
 			}
-			if (!_allAssets.TryGetValue(path, out Object value))
+			if (!AllAssets.TryGetValue(path, out Object value))
 			{
 				return false;
 			}

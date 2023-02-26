@@ -8,26 +8,26 @@ namespace SpaceWarp.API.Configuration
 {
     public class ConfigurationManager : Manager
     {
-        public readonly Dictionary<string, (Type configType, object configObject, string path)> ModConfigurations = new Dictionary<string, (Type configType, object configObject, string path)>();
+        private readonly Dictionary<string, (Type configType, object configObject, string path)> _modConfigurations = new Dictionary<string, (Type configType, object configObject, string path)>();
         
         public void Add(string id, (Type configType, object configObject, string path) configuration)
         {
-            if (ModConfigurations.ContainsKey(id))
+            if (_modConfigurations.ContainsKey(id))
             {
                 return;
             }
 
-            ModConfigurations[id] = configuration;
+            _modConfigurations[id] = configuration;
         }
 
         public bool TryGet(string id, out (Type configType, object configObject, string path) config)
         {
-            return ModConfigurations.TryGetValue(id, out config);
+            return _modConfigurations.TryGetValue(id, out config);
         }
 
         public void UpdateConfiguration(string id)
         {
-            if (!ModConfigurations.TryGetValue(id, out (Type, object, string) config))
+            if (!_modConfigurations.TryGetValue(id, out (Type, object, string) config))
             {
                 return;
             }

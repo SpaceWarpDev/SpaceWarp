@@ -3,6 +3,7 @@ using KSP.Game;
 using SpaceWarp.API;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Managers;
+using SpaceWarp.API.Mods.JSON;
 using UnityEngine;
 
 namespace SpaceWarp.UI

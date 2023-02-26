@@ -89,13 +89,13 @@
     <Compile Include="API\Configuration\ConfigFieldAttribute.cs" />
     <Compile Include="API\Configuration\ConfigSectionAttribute.cs" />
     <Compile Include="API\Configuration\ConfigurationManager.cs" />
-    <Compile Include="API\Configuration\DependencyInfo.cs" />
     <Compile Include="API\Configuration\ModConfigAttribute.cs" />
-    <Compile Include="API\Configuration\ModInfo.cs" />
-    <Compile Include="API\Configuration\SupportedVersionsInfo.cs" />
     <Compile Include="API\Managers\Manager.cs" />
     <Compile Include="API\Managers\ManagerLocator.cs" />
     <Compile Include="API\Mods\GlobalModDefines.cs" />
+    <Compile Include="API\Mods\JSON\DependencyInfo.cs" />
+    <Compile Include="API\Mods\JSON\ModInfo.cs" />
+    <Compile Include="API\Mods\JSON\SupportedVersionsInfo.cs" />
     <Compile Include="API\Mods\MainModAttribute.cs" />
     <Compile Include="API\Mods\Mod.cs" />
     <Compile Include="API\Mods\ModLocator.cs" />
@@ -126,6 +126,5 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

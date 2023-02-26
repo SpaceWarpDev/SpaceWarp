@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace SpaceWarp.API.Configuration
+namespace SpaceWarp.API.Mods.JSON
 {
     /// <summary>
     /// Representation of the supported version info of a mod from a JSON file.

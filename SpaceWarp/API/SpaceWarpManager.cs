@@ -13,6 +13,7 @@ using SpaceWarp.API.Logging;
 using SpaceWarp.API.AssetBundles;
 using SpaceWarp.API.Managers;
 using SpaceWarp.API.Mods;
+using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
 using SpaceWarp.Patching;
 using SpaceWarp.UI;
