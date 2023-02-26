@@ -24,7 +24,24 @@ namespace SpaceWarp.API.AssetBundles
 
 			for(int i = 0; i < bundleObjects.Length; i++)
 			{
-				string path = modId + "/" + assetBundleName + "/" + names[i];
+				List<string> assetNamePath = names[i].Split('/').ToList();
+				if (assetNamePath[0] == "Assets")
+				{
+					assetNamePath.RemoveAt(0);
+				}
+
+				string assetName = "";
+				for (int j = 0; j < assetNamePath.Count; j++)
+				{
+					assetName += assetNamePath[j];
+					if (j != assetNamePath.Count - 1)
+					{
+						assetName += "/";
+					}
+				}
+				
+				
+				string path = modId + "/" + assetBundleName + "/" + assetName;
 				Object bundleObject = bundleObjects[i];
 
 				System.Console.WriteLine($"registering path \"{path}\"");
