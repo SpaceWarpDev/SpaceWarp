@@ -8,10 +8,10 @@ namespace SpaceWarp.API.Configuration
     [JsonObject(MemberSerialization.OptIn)]
     public class SupportedVersionsInfo
     {
-        [JsonProperty("min")] 
-        public string min { get; set; }
+        [JsonProperty("min")]
+        public string min { get; set; } = "0.0.0";
 
-        [JsonProperty("max")] 
-        public string max { get; set; }
+        [JsonProperty("max")]
+        public string max { get; set; } = "*";
     }
 }
