@@ -170,7 +170,6 @@ os.mkdir(f"{mod_id}/external_dlls")
 external_dlls = f"{mod_id}/external_dlls"
 release_folder = f"{mod_id}/{mod_id}"
 
-shutil.copy2(space_warp_path, external_dlls)
 
 for filename in os.listdir(space_warp_path):
     if filename.endswith(".dll"):
