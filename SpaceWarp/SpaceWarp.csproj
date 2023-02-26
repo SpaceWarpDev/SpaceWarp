@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="API\Configuration\ConfigDefaultValueAttribute.cs" />
     <Compile Include="API\Configuration\ConfigFieldAttribute.cs" />
+    <Compile Include="API\Configuration\ConfigSectionAttribute.cs" />
     <Compile Include="API\Configuration\ConfigurationManager.cs" />
     <Compile Include="API\Configuration\DependencyInfo.cs" />
     <Compile Include="API\Configuration\ModConfigAttribute.cs" />
