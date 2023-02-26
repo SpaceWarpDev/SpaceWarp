@@ -153,6 +153,8 @@ managed_path = os.path.join(steam_install_folder, "KSP2_x64_Data", "Managed")
 space_warp_path = os.path.join(steam_install_folder, "SpaceWarp", "core")
 
 mod_id_title = mod_id.replace("_", " ").title().replace(" ", "")
+
+
 os.mkdir(mod_id)
 os.mkdir(f"{mod_id}/{mod_id}")
 os.mkdir(f"{mod_id}/{mod_id}/assets")
@@ -162,7 +164,7 @@ os.mkdir(f"{mod_id}/{mod_id}/assets/resources")
 os.mkdir(f"{mod_id}/{mod_id}/bin")
 os.mkdir(f"{mod_id}/{mod_id}/config")
 os.mkdir(f"{mod_id}/{mod_id_title}")
-os.mkdir(f"{mod_id}/{mod_id_title}/{mod_id_title}")
+os.mkdir(f"{mod_id}/{mod_id_title}Project/{mod_id_title}")
 os.mkdir(f"{mod_id}/external_dlls")
 
 external_dlls = f"{mod_id}/external_dlls"
@@ -226,7 +228,7 @@ with open(f"{release_folder}/modinfo.json", "w") as modinfo:
             indent=4,
         )
     )
-with open(f"{release_folder}README.json", "w") as readme:
+with open(f"README.json", "w") as readme:
     readme.write("# Usage")
     readme.write(
         "Any code compiled in the csproj's dll should be moved to the /bin folder of the mod"
@@ -235,7 +237,7 @@ with open(f"{release_folder}README.json", "w") as readme:
 with open(f"{release_folder}/README.json", "w") as readme:
     readme.write("# Default Readme")
 
-code_folder = f"{mod_id}/{mod_id_title}/{mod_id_title}"
+code_folder = f"{mod_id}/{mod_id_title}Project/{mod_id_title}"
 
 with open(f"{code_folder}/{mod_id_title}Mod.cs", "w") as default_code:
     default_code.write(
@@ -263,7 +265,7 @@ def quickCreateProperty(root, name, text):
     return a
 
 
-with open(f"{mod_id}/{mod_id_title}/{mod_id_title}.csproj", "w") as csproj:
+with open(f"{mod_id}/{mod_id_title}Project/{mod_id_title}.csproj", "w") as csproj:
     root = minidom.Document()
     xml = root.createElement("Project")
     xml.setAttribute("Sdk", "Microsoft.NET.Sdk")

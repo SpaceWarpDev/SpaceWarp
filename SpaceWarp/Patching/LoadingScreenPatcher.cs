@@ -14,12 +14,24 @@ namespace SpaceWarp.Patching
     {
         public static void AddModLoadingScreens()
         {	
-            GameManager gameManager = GameManager.Instance;
 
+            GameManager gameManager = GameManager.Instance;
             gameManager.LoadingFlow.AddAction(new ReadingModsAction("Resolving Space Warp Mod Load Order"));
-            gameManager.LoadingFlow.AddAction(new LoadAssetsAction("Loading Space Warp Assets"));
-			gameManager.LoadingFlow.AddAction(new LoadModsAction("Loading Space Warp Mods"));
+        }
+
+        public static void AddAllModLoadingSteps()
+        {
+            
+            GameManager gameManager = GameManager.Instance;
+            if (!ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager)) return; //TODO: Log a message here
+            foreach (var mod in spaceWarpManager._modLoadOrder)
+            {
+                gameManager.LoadingFlow.AddAction(new LoadAssetAction($"Loading assets for {mod}",mod.Item1, mod.Item2));
+                gameManager.LoadingFlow.AddAction(new LoadModAction($"Initializing {mod}",mod.Item1,mod.Item2));
+            }
+            
             gameManager.LoadingFlow.AddAction(new AfterModsLoadedAction("Space Warp Mod Post-Initialization"));
+            
         }
     }
 }

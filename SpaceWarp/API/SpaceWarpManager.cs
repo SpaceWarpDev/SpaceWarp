@@ -35,7 +35,7 @@ namespace SpaceWarp.API
         public SpaceWarpGlobalConfiguration SpaceWarpConfiguration;
 
         private readonly List<Mod> _allModScripts = new List<Mod>();
-        private readonly List<(string, ModInfo)> _modLoadOrder = new List<(string, ModInfo)>();
+        internal readonly List<(string, ModInfo)> _modLoadOrder = new List<(string, ModInfo)>();
         public readonly List<(string,ModInfo)> LoadedMods = new List<(string,ModInfo)>();
         private static readonly List<(string, ModInfo)> AllEnabledModInfo = new List<(string, ModInfo)>();
 
@@ -203,6 +203,7 @@ namespace SpaceWarp.API
                     _modLogger.Warn($"Skipping loading of {modName} as not all dependencies could be met");
                 }
             }
+            LoadingScreenPatcher.AddAllModLoadingSteps();
         }
 
         internal void InitializeAssets()
@@ -211,39 +212,43 @@ namespace SpaceWarp.API
 
             foreach ((string modName, ModInfo info) in _modLoadOrder)
             {
-                string modFolder = MODS_FULL_PATH + "/" + modName;
-
-                // Now we load all asset bundles under the asset/bundles folder of the mod
-                string bundlesPath = modFolder + GlobalModDefines.ASSET_BUNDLES_FOLDER;
-                if (Directory.Exists(bundlesPath))
-                {
-                    foreach (string file in Directory.GetFiles(bundlesPath))
-                    {
-                        string assetBundleName = Path.GetFileName(file);
-
-                        AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
-
-                        if (assetBundle == null)
-                        {
-                            _modLogger.Error($"Failed to load AssetBundle {info.mod_id}/{assetBundleName}");
-                            continue;
-                        }
-
-                        AssetManager.RegisterAssetBundle(info.mod_id, assetBundleName, assetBundle);
-						_modLogger.Info($"Loaded AssetBundle {info.mod_id}/{assetBundleName}");
-					}
-                }
-                else
-                {
-                    
-                }
-
-                // TODO: load part specific json stuff
+                LoadSingleModAssets(modName, info);
             }
 
         }
 
-		/// <summary>
+        internal void LoadSingleModAssets(string modName, ModInfo info)
+        {
+            string modFolder = MODS_FULL_PATH + "/" + modName;
+
+            // Now we load all asset bundles under the asset/bundles folder of the mod
+            string bundlesPath = modFolder + GlobalModDefines.ASSET_BUNDLES_FOLDER;
+            if (Directory.Exists(bundlesPath))
+            {
+                foreach (string file in Directory.GetFiles(bundlesPath))
+                {
+                    string assetBundleName = Path.GetFileName(file);
+
+                    AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
+
+                    if (assetBundle == null)
+                    {
+                        _modLogger.Error($"Failed to load AssetBundle {info.mod_id}/{assetBundleName}");
+                        continue;
+                    }
+
+                    AssetManager.RegisterAssetBundle(info.mod_id, assetBundleName, assetBundle);
+                    _modLogger.Info($"Loaded AssetBundle {info.mod_id}/{assetBundleName}");
+                }
+            }
+            else
+            {
+            }
+
+            // TODO: load part specific json stuff
+        }
+
+        /// <summary>
 		/// Runs the mod initialization procedures.
 		/// </summary>
 		internal void InitializeMods()
@@ -253,27 +258,37 @@ namespace SpaceWarp.API
 
             foreach ((string modName, ModInfo info) in _modLoadOrder)
             {
-                string modFolder = MODS_FULL_PATH + "/" + modName;
+                InitializeSingleMod(modName, info);
+            }
+        }
 
-                _modLogger.Info($"Found mod: {modName}, attempting to load mod");
+        /// <summary>
+        /// Initializes a single mod
+        /// </summary>
+        /// <param name="modName">the name/id of the mod</param>
+        /// <param name="info">the mod info structure that describes the mod</param>
+        internal void InitializeSingleMod(string modName, ModInfo info)
+        {
+            string modFolder = MODS_FULL_PATH + "/" + modName;
 
-                // Now we load all assemblies under the code folder of the mod
-                string codePath = modFolder + GlobalModDefines.BINARIES_FOLDER;
+            _modLogger.Info($"Found mod: {modName}, attempting to load mod");
 
-                if (Directory.Exists(codePath))
+            // Now we load all assemblies under the code folder of the mod
+            string codePath = modFolder + GlobalModDefines.BINARIES_FOLDER;
+
+            if (Directory.Exists(codePath))
+            {
+                if (!TryLoadMod(codePath, modName, info, out Type mainModType))
                 {
-                    if (!TryLoadMod(codePath, modName, info, out Type mainModType))
-                    {
-						// error logging is done inside TryLoadMod
-						continue;
-                    }
+                    // error logging is done inside TryLoadMod
+                    return;
+                }
 
-                    InitializeModObject(modName, info, mainModType);
-                }
-                else
-                {
-                    _modLogger.Error($"Directory not found: {codePath}");
-                }
+                InitializeModObject(modName, info, mainModType);
+            }
+            else
+            {
+                _modLogger.Error($"Directory not found: {codePath}");
             }
         }
 
