@@ -59,8 +59,8 @@ mod_name = input("What is the name of the mod: ")
 mod_description = input("What is a short description of the mod: ")
 mod_source = input("What is the source link of the mod: ")
 mod_version = input("What is the starting version of the mod: ")
-mod_ksp_min_version = input("What is the minimum version of KSP this mod will accept: ")
-mod_ksp_max_version = input("What is the maximum version of KSP this mod will accept: ")
+mod_ksp_min_version = input("What is the minimum version of KSP2 this mod will accept: ")
+mod_ksp_max_version = input("What is the maximum version of KSP2 this mod will accept: ")
 
 # Now we copy all the game directories
 space_warp_path = input("What is the path to spacewarp.dll: ")
@@ -171,29 +171,19 @@ with open(f"{project_name}/{project_name}/{project_name}.csproj","w") as csproj:
     itemGroup = root.createElement('ItemGroup')
     xml.appendChild(itemGroup)
 
-    ref1 = root.createElement('Reference')
-    ref1.setAttribute("Include","..\\external_dlls\\SpaceWarp.dll")
-    itemGroup.appendChild(ref1)
+    refs = [
+        "..\\external_dlls\\SpaceWarp.dll",
+        "..\\external_dlls\\UnityEngine.dll",
+        "..\\external_dlls\\UnityEngine.CoreModule.dll",
+        "..\\external_dlls\\Assembly-CSharp.dll",
+        "..\\external_dlls\\NewtonSoft.Json.dll",
+        "..\\external_dlls\\NewtonSoft.Json.dll"
+    ]
 
-    ref2 = root.createElement('Reference')
-    ref2.setAttribute("Include","..\\external_dlls\\UnityEngine.dll")
-    itemGroup.appendChild(ref2)
-
-    ref3 = root.createElement('Reference')
-    ref3.setAttribute("Include","..\\external_dlls\\UnityEngine.CoreModule.dll")
-    itemGroup.appendChild(ref3)
-
-    ref4 = root.createElement('Reference')
-    ref4.setAttribute("Include","..\\external_dlls\\Assembly-CSharp.dll")
-    itemGroup.appendChild(ref4)
-
-    ref5 = root.createElement('Reference')
-    ref5.setAttribute("Include","..\\external_dlls\\NewtonSoft.Json.dll")
-    itemGroup.appendChild(ref5)
-    
-    ref6 = root.createElement('Reference')
-    ref6.setAttribute("Include","..\\external_dlls\\NewtonSoft.Json.dll")
-    itemGroup.appendChild(ref6)
+    for ref in refs:
+        element = root.createElement('Reference')
+        element.setAttribute("Include", ref[0])
+        itemGroup.appendChild(element)
 
     xml_str = root.toprettyxml(indent = '  ')
     csproj.write(xml_str)
