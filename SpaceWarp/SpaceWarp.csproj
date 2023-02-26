@@ -38,6 +38,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\external_dlls\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>..\external_dlls\BepInEx.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Cecil, Version=0.11.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
       <HintPath>..\packages\Mono.Cecil.0.11.4\lib\net40\Mono.Cecil.dll</HintPath>
     </Reference>
