@@ -26,7 +26,7 @@ namespace SpaceWarp.API
         private BaseModLogger _modLogger;
 
         private const string MODS_FOLDER_NAME = "Mods";
-        public static string MODS_FULL_PATH = Application.dataPath + "/" + MODS_FOLDER_NAME;
+        public static string MODS_FULL_PATH = Directory.GetCurrentDirectory() + "/SpaceWarp/" + MODS_FOLDER_NAME;
 
         private const string SPACE_WARP_CONFIG_FILE_NAME = "space_warp_config.json";
         private static string SPACEWARP_CONFIG_FULL_PATH = MODS_FULL_PATH + "/" + SPACE_WARP_CONFIG_FILE_NAME;
@@ -480,13 +480,18 @@ namespace SpaceWarp.API
         /// </summary>
         private void InitModUI()
         {
-            GameObject modUIObject = new GameObject();
+            GameObject modUIObject = new GameObject("Space Warp Mod UI");
             DontDestroyOnLoad(modUIObject);
             modUIObject.transform.SetParent(transform.parent);
             ModListUI UI = modUIObject.AddComponent<ModListUI>();
-            UI.manager = this;
             
             modUIObject.SetActive(true);
+
+            GameObject consoleUIObject = new GameObject("Space Warp Console");
+            DontDestroyOnLoad(consoleUIObject);
+            consoleUIObject.transform.SetParent(transform.parent);
+            SpaceWarpConsole con = consoleUIObject.AddComponent<SpaceWarpConsole>();
+            consoleUIObject.SetActive(true);
         }
     }
 }

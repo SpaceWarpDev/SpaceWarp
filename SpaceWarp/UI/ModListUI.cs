@@ -15,7 +15,6 @@ namespace SpaceWarp.UI
         private Rect windowRect;
         private int windowWidth = 350;
         private int windowHeight = 700;
-        public SpaceWarpManager manager;
         public void Start()
         {
             if (loaded)
@@ -69,14 +68,19 @@ namespace SpaceWarp.UI
             GUILayout.BeginVertical();
             scrollPositionMods = GUILayout.BeginScrollView(scrollPositionMods, false, true,
                 GUILayout.Height((float)(windowHeight * 0.8)), GUILayout.Width(300));
-            foreach ((string modID, ModInfo modInfo) in manager.LoadedMods)
+            SpaceWarpManager manager;
+            if (ManagerLocator.TryGet(out manager))
             {
-                if (GUILayout.Button(modID))
+                foreach ((string modID, ModInfo modInfo) in manager.LoadedMods)
                 {
-                    selectedMod = modID;
-                    selectedModInfo = modInfo;
+                    if (GUILayout.Button(modID))
+                    {
+                        selectedMod = modID;
+                        selectedModInfo = modInfo;
+                    }
                 }
             }
+
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
             GUILayout.BeginVertical();
