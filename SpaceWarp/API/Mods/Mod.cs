@@ -14,12 +14,7 @@ namespace SpaceWarp.API.Mods
 		public BaseModLogger Logger;
 		public ModInfo Info;
 
-		public void Awake()
-		{
-			ModLocator.Add(this);
 
-			DontDestroyOnLoad(gameObject);
-		}
 
 		public virtual void Initialize()
 		{

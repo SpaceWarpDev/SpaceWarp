@@ -484,6 +484,8 @@ namespace SpaceWarp.API
 			// we probably dont want to completely stop loading mods if 1 mod throws an exception on Initialize
 			try
 			{
+                ModLocator.Add(modComponent);
+                DontDestroyOnLoad(modObject);
 				modComponent.Initialize();
 			}
             catch(Exception exception)
