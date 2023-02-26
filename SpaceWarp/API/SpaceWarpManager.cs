@@ -237,7 +237,7 @@ namespace SpaceWarp.API
                         continue;
                     }
 
-                    AssetManager.RegisterAssetBundle("space_warp", assetBundleName, assetBundle);
+                    ResourceManager.RegisterAssetBundle("space_warp", assetBundleName, assetBundle);
                     _modLogger.Info($"Loaded AssetBundle space_warp/{assetBundleName}");
                 }
             }
@@ -268,7 +268,7 @@ namespace SpaceWarp.API
                         continue;
                     }
 
-                    AssetManager.RegisterAssetBundle(info.mod_id, assetBundleName, assetBundle);
+                    ResourceManager.RegisterAssetBundle(info.mod_id, assetBundleName, assetBundle);
                     _modLogger.Info($"Loaded AssetBundle {info.mod_id}/{assetBundleName}");
                 }
             }

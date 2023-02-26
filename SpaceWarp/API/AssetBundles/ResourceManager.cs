@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SpaceWarp.API.AssetBundles
 {
-	public static class AssetManager
+	public static class ResourceManager
 	{
 		static readonly Dictionary<string, Object> AllAssets = new Dictionary<string, Object>();
 
