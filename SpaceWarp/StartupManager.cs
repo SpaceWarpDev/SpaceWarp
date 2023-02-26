@@ -3,56 +3,13 @@ using UnityEngine;
 using System.IO;
 using SpaceWarp.API;
 using Object = UnityEngine.Object;
-using UnityEngine.SceneManagement;
-using HarmonyLib;
-using System.Reflection;
 using SpaceWarp.Patching;
 using KSP.Logging;
 using SpaceWarp.UI;
 using static UnityEngine.Application;
 
-namespace Doorstop {
-
-    public class Entrypoint {
-        /// <summary>
-        /// EntryPoint for Spacewarp, called from Doorstop
-        /// </summary>
-        public static void Start()
-        {
-            SceneManager.sceneLoaded += OnSceneLoaded;
-
-            KspLogManager.AddLogCallback(SpaceWarpConsoleLogListener.LogCallback);
-        }
-
-        static bool patched = false;
-
-        /// <summary>
-        /// Add OnGameStarted as postfix to StartGame
-        /// </summary>
-        static void OnSceneLoaded(Scene unused1, LoadSceneMode unused2)
-        {
-            if (!patched) {
-                InitializePatches();
-                patched = true;
-            }
-        }
-
-		/// <summary>
-		/// Initializes Harmony
-		/// </summary>
-
-		static void InitializePatches()
-		{
-			Harmony harmony = new Harmony("com.github.x606.spacewarp");
-
-			harmony.PatchAll(Assembly.GetExecutingAssembly());
-		}
-	}
-}
-
 namespace SpaceWarp
 {
-
     /// <summary>
     /// Starts the SpaceWarm mod manager
     /// </summary>

@@ -1,34 +1,38 @@
 using HarmonyLib;
+using KSP.Game;
+using KSP.Logging;
+using SpaceWarp.UI;
 using System.Reflection;
 using UnityEngine.SceneManagement;
 namespace SpaceWarp
 {
-    public class Entrypoint
+    public class Entrypoint : KerbalMonoBehaviour
     {
         private static bool _patched;
      
-        private const string HARMONY_PACKAGE_URL = "com.github.celisium.spacewarp-doorstop";
+        private const string HARMONY_PACKAGE_URL = "com.github.x606.spacewarp";
 
-        public static void Start()
+        /// <summary>
+        /// Add OnGameStarted as postfix to StartGame
+        /// </summary>
+        static void OnSceneLoaded(Scene unused1, LoadSceneMode unused2)
         {
-            SceneManager.sceneLoaded += OnSceneLoaded;
+            if (!_patched)
+            {
+                InitializePatches();
+                _patched = true;
+            }
         }
 
-        static void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+        /// <summary>
+        /// Initializes Harmony
+        /// </summary>
+
+        static void InitializePatches()
         {
-            if (_patched)
-            {
-                return;
-            }
-            
             Harmony harmony = new Harmony(HARMONY_PACKAGE_URL);
 
-            MethodInfo original = typeof(KSP.Game.GameManager).GetMethod(nameof(KSP.Game.GameManager.StartGame));
-            MethodInfo postfix = typeof(StartupManager).GetMethod(nameof(StartupManager.OnGameStarted));
-
-            harmony.Patch(original, postfix: new HarmonyMethod(postfix));
-
-            _patched = true;
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
     }
 }
