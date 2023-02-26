@@ -1,6 +1,7 @@
 ![Cool Banner](Cool_Banner.png)
 
 # Space Warp
+![Downloads](https://img.shields.io/github/downloads/X606/SpaceWarp/latest/total.svg?label=%E2%A4%93Download&style=plastic)
 
 Space Warp is a mod loader for Kerbal Space Program 2.
 
