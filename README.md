@@ -7,7 +7,7 @@ Note: Use at your own risk, this is an early version which is expected to have a
 # Compiling
 In order to compile this project you need the code from kerbal space program 2, so before you can build anything, copy everything in ``Kerbal Space Program 2\KSP2_x64_Data\Managed`` into ``external_dlls/``
 
-Then compile the `spacewarp` project, then run the `injector` project.
+Then compile the `spacewarp` project, then run the `ksp2_mod_loader_patcher` project.
 
 Then run KSP2, and wait until the title screen, there should then be a mods folder under the `KSP2_X64_data` folder
 
