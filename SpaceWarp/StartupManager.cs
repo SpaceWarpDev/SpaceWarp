@@ -9,14 +9,21 @@ using HarmonyLib;
 namespace Doorstop {
 
     public class Entrypoint {
-
-        public static void Start() {
+        /// <summary>
+        /// EntryPoint for Spacewarp, called from Doorstop
+        /// </summary>
+        public static void Start()
+        {
             SceneManager.sceneLoaded += OnSceneLoaded;
-         }
+        }
 
         static bool patched = false;
-        static void OnSceneLoaded(Scene unused1, LoadSceneMode unused2) {
-            
+
+        /// <summary>
+        /// Add OnGameStarted as postfix to StartGame
+        /// </summary>
+        static void OnSceneLoaded(Scene unused1, LoadSceneMode unused2)
+        {
             if (!patched) {
 
                 Harmony harmony = new Harmony("com.github.celisium.spacewarp-doorstop");
@@ -28,9 +35,7 @@ namespace Doorstop {
 
                 patched = true;
             }
-
         }
-
     }
 }
 
