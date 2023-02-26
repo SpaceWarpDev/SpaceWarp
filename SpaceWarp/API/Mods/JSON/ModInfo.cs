@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-namespace SpaceWarp.API.Configuration
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+
+namespace SpaceWarp.API.Mods.JSON
 {
     /// <summary>
     /// Representation of the mod info JSON file.

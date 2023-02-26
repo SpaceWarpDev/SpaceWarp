@@ -4,7 +4,7 @@ namespace SpaceWarp.API.Configuration
 {
     public class ConfigSectionAttribute : Attribute
     {
-        public string Path;
+        public readonly string Path;
 
         public ConfigSectionAttribute(string path)
         {

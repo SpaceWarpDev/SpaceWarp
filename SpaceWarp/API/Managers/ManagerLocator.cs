@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SpaceWarp.API.Managers
 {
-    public class ManagerLocator
+    public static class ManagerLocator
     {
         private static readonly Dictionary<Type, object> Managers = new Dictionary<Type, object>();
 

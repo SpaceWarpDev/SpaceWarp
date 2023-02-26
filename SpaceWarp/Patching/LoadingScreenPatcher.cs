@@ -28,7 +28,7 @@ namespace SpaceWarp.Patching
             foreach (var mod in spaceWarpManager._modLoadOrder)
             {
                 gameManager.LoadingFlow.AddAction(new LoadAssetAction($"Loading assets for {mod.Item1}",mod.Item1, mod.Item2));
-                gameManager.LoadingFlow.AddAction(new LoadModAction($"Initializing {mod.Item1}",mod.Item1,mod.Item2));
+                gameManager.LoadingFlow.AddAction(new LoadModAction($"Initializing {mod.Item1}",mod.Item1, mod.Item2));
             }
             
             gameManager.LoadingFlow.AddAction(new AfterModsLoadedAction("Space Warp Mod Post-Initialization"));

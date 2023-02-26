@@ -4,7 +4,7 @@ namespace SpaceWarp.API.Configuration
 {
     public class ConfigFieldAttribute : Attribute
     {
-        public string Name;
+        public readonly string Name;
 
         public ConfigFieldAttribute(string name)
         {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace SpaceWarp.API.Configuration
+namespace SpaceWarp.API.Mods.JSON
 {
     /// <summary>
     /// Represents the json property info. Properties have to use the same name as in the JSON file, that's why they break convention.
