@@ -59,7 +59,7 @@ namespace SpaceWarp.UI
         {
             if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.M))
             {
-                this.ToggleVisible();
+                ToggleVisible();
             }
         }
 
@@ -70,8 +70,8 @@ namespace SpaceWarp.UI
             GUILayout.BeginVertical();
 
             _scrollPositionMods = GUILayout.BeginScrollView(_scrollPositionMods, false, true, GUILayout.Height((float)(_windowHeight * 0.8)), GUILayout.Width(300));
-            SpaceWarpManager manager;
-            if (ManagerLocator.TryGet(out manager))
+
+            if (ManagerLocator.TryGet(out SpaceWarpManager manager))
             {
                 foreach ((string modID, ModInfo modInfo) in manager.LoadedMods)
                 {
