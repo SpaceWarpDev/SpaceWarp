@@ -227,7 +227,10 @@ namespace SpaceWarp.API
             {
                 foreach (string file in Directory.GetFiles(bundlesPath))
                 {
-                    string assetBundleName = Path.GetFileName(file);
+
+                    string assetBundleName = Path.GetFileNameWithoutExtension(file);
+                    if (Path.GetExtension(file) != ".bundle") continue;
+                    
 
                     AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
 
@@ -236,7 +239,6 @@ namespace SpaceWarp.API
                         _modLogger.Error($"Failed to load AssetBundle space_warp/{assetBundleName}");
                         continue;
                     }
-
                     ResourceManager.RegisterAssetBundle("space_warp", assetBundleName, assetBundle);
                     _modLogger.Info($"Loaded AssetBundle space_warp/{assetBundleName}");
                 }
