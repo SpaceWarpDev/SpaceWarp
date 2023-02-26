@@ -44,73 +44,102 @@ namespace SpaceWarp.UI
     }
     public class SpaceWarpConsole : KerbalBehavior
     {
-        static bool loaded = false;
-        private bool drawUI = false;
-        private Rect windowRect;
-        private int windowWidth = 350;
-        private int windowHeight = 700;
-        private SpaceWarpConsoleLogListener LogList;
+        private static bool _loaded;
 
+        private bool _drawUI;
+        private Rect _windowRect;
+
+        private int _windowWidth = 350;
+        private int _windowHeight = 700;
+
+        private static GUIStyle _boxStyle;
+        private static Vector2 _scrollPosition;
+
+        private readonly List<string> _debugMessages = new List<string>();
 
         public void Start()
         {
-            if (loaded)
+            if (_loaded)
             {
                 Destroy(this);
             }
 
-            loaded = true;
+            _loaded = true;
         }
-        
-        void Awake()
+
+        private void Awake()
         {
             LogList = SpaceWarpConsoleLogListener.instance;
-            windowWidth = (int)(Screen.width * 0.5f);
-            windowHeight = (int)(Screen.height * 0.5f);
-            windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f),
+            KspLogManager.AddLogCallback(LogCallback);
+            _windowWidth = (int)(Screen.width * 0.5f);
+            _windowHeight = (int)(Screen.height * 0.5f);
+            _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f),
                 0, 0);
         }
+
         private void OnGUI()
         {
-            if (drawUI)
+            if (!_drawUI)
             {
-                windowRect = GUILayout.Window(
-                    GUIUtility.GetControlID(FocusType.Passive),
-                    windowRect,
-                    DrawConsole,
-                    "Space Warp Console",
-                    GUILayout.Width((float)(windowWidth * 0.8)),
-                    GUILayout.Height((float)(windowHeight * 0.8))
-                );
+                return;
             }
+
+            int controlID = GUIUtility.GetControlID(FocusType.Passive);
+            string header = $"Space Warp Console";
+            GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
+            GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
+
+            _windowRect = GUILayout.Window(controlID, _windowRect, DrawConsole, header, width, height);
         }
 
-        private static GUIStyle boxStyle;
-        private static Vector2 scrollPosition;
-
+        private void LogCallback(string condition, string stackTrace, LogType type)
+        {
+            switch (type)
+            {
+                case LogType.Error:
+                    _debugMessages.Add($"[ERR] {condition}");
+                    break;
+                case LogType.Assert:
+                    _debugMessages.Add($"[AST] {condition}");
+                    break;
+                case LogType.Warning:
+                    _debugMessages.Add($"[WRN] {condition}");
+                    break;
+                case LogType.Log:
+                    _debugMessages.Add($"[LOG] {condition}");
+                    break;
+                case LogType.Exception:
+                    _debugMessages.Add($"[EXC] {condition}");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
         private void Update()
         {
             if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))
             {
-                drawUI = !drawUI;
+                _drawUI = !_drawUI;
             }
         }
 
         private void DrawConsole(int windowID)
         {
-            boxStyle = GUI.skin.GetStyle("Box");
+            _boxStyle = GUI.skin.GetStyle("Box");
             GUILayout.BeginVertical();
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition, false, true);
-            foreach (var debugMessage in LogList.debugMessages)
+            _scrollPosition = GUILayout.BeginScrollView(_scrollPosition, false, true);
+            
+            foreach (string debugMessage in _debugMessages)
             {
                 GUILayout.Label(debugMessage);
             }
             
             GUILayout.EndScrollView();
             GUILayout.BeginHorizontal();
+            
             if (GUILayout.Button("Close"))
             {
-                drawUI = false;
+                _drawUI = false;
             }
 
             if (GUILayout.Button("Clear"))
@@ -120,8 +149,9 @@ namespace SpaceWarp.UI
 
             if (GUILayout.Button("Clear Control Locks"))
             {
-                KSP.Game.GameManager.Instance.Game.ViewController.inputLockManager.ClearControlLocks();
+                GameManager.Instance.Game.ViewController.inputLockManager.ClearControlLocks();
             }
+            
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
             GUI.DragWindow(new Rect(0, 0, 10000, 500));
