@@ -4,7 +4,7 @@ namespace SpaceWarp.API.Configuration
 {
     public class ConfigDefaultValueAttribute : Attribute
     {
-        public readonly object DefaultValue;
+        public object DefaultValue;
 
         public ConfigDefaultValueAttribute(object defaultValue)
         {
