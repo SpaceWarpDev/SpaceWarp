@@ -12,7 +12,7 @@ namespace SpaceWarp.API.AssetBundles
 
 		internal static void RegisterAssetBundle(string modId, string assetBundleName, AssetBundle assetBundle)
 		{
-			// TODO: use async loading instead
+			// TODO: use async loading instead?
 
 			Object[] bundleObjects = assetBundle.LoadAllAssets();
 			string[] names = assetBundle.GetAllAssetNames();
@@ -27,8 +27,6 @@ namespace SpaceWarp.API.AssetBundles
 				string path = modId + "/" + assetBundleName + "/" + names[i];
 				Object bundleObject = bundleObjects[i];
 
-				System.Console.WriteLine($"registering path\"{path}\"");
-
 				_allAssets.Add(path, bundleObject);
 			}
 		}
@@ -37,14 +35,14 @@ namespace SpaceWarp.API.AssetBundles
 		/// Gets an asset from the specified asset path
 		/// </summary>
 		/// <typeparam name="T">The type</typeparam>
-		/// <param name="path">an asset path, format: {mod_id}/{asset_bundle}/{asset_name}</param>
+		/// <param name="path">an asset path, format: {mod_id}/{asset_bundle}/{asset_path}</param>
 		/// <returns></returns>
 		public static T GetAsset<T>(string path) where T: UnityEngine.Object
 		{
 			string[] subPaths = path.Split('/', '\\');
 			if (subPaths.Length < 3)
 			{
-				throw new System.ArgumentException("Invalid path, asset paths must follow to following structure: {mod_id}/{asset_bundle}/{asset_name}");
+				throw new System.ArgumentException("Invalid path, asset paths must follow to following structure: {mod_id}/{asset_bundle}/{asset_path}");
 			}
 
 			if (!_allAssets.TryGetValue(path, out Object value))
