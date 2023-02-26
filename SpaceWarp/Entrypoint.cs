@@ -6,7 +6,7 @@ using System.Reflection;
 using UnityEngine.SceneManagement;
 namespace SpaceWarp
 {
-    public class Entrypoint : KerbalMonoBehaviour
+    public class Entrypoint
     {
         private static bool _patched;
      
