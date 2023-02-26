@@ -7,45 +7,51 @@ using UnityEngine;
 
 namespace SpaceWarp.UI
 {
-    
     public class ModListUI : KerbalMonoBehaviour
     {
-        static bool loaded = false;
-        private bool drawUI = false;
-        private Rect windowRect;
-        private int windowWidth = 350;
-        private int windowHeight = 700;
+        private static bool _loaded;
+        private bool _drawUI;
+        private Rect _windowRect;
+
+        private int _windowWidth = 350;
+        private int _windowHeight = 700;
+
+        private static GUIStyle _boxStyle;
+        private static Vector2 _scrollPositionMods;
+        private string _selectedMod;
+        private ModInfo _selectedModInfo;
+
         public void Start()
         {
-            if (loaded)
+            if (_loaded)
             {
                 Destroy(this);
             }
 
-            loaded = true;
+            _loaded = true;
         }
 
-        void Awake()
+        private void Awake()
         {
-            windowWidth = (int)(Screen.width * 0.85f);
-            windowHeight = (int)(Screen.height * 0.85f);
-            windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f),
-                0, 0);
+            _windowWidth = (int)(Screen.width * 0.85f);
+            _windowHeight = (int)(Screen.height * 0.85f);
+
+            _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f), 0, 0);
         }
 
         private void OnGUI()
         {
-            if (drawUI)
+            if (!_drawUI)
             {
-                windowRect = GUILayout.Window(
-                    GUIUtility.GetControlID(FocusType.Passive),
-                    windowRect,
-                    FillWindow,
-                    "Space Warp Mod List",
-                    GUILayout.Width((float)(windowWidth * 0.8)),
-                    GUILayout.Height((float)(windowHeight * 0.8))
-                );
+                return;
             }
+
+            int controlID = GUIUtility.GetControlID(FocusType.Passive);
+            const string header = "Space Warp Mod List";
+            GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
+            GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
+
+            _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, header, width, height);
         }
 
         private void Update()
@@ -56,18 +62,13 @@ namespace SpaceWarp.UI
             }
         }
 
-        private static GUIStyle boxStyle;
-        private static Vector2 scrollPositionMods;
-        private string selectedMod;
-        private ModInfo selectedModInfo;
-
         private void FillWindow(int windowID)
         {
-            boxStyle = GUI.skin.GetStyle("Box");
+            _boxStyle = GUI.skin.GetStyle("Box");
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
-            scrollPositionMods = GUILayout.BeginScrollView(scrollPositionMods, false, true,
-                GUILayout.Height((float)(windowHeight * 0.8)), GUILayout.Width(300));
+
+            _scrollPositionMods = GUILayout.BeginScrollView(_scrollPositionMods, false, true, GUILayout.Height((float)(_windowHeight * 0.8)), GUILayout.Width(300));
             SpaceWarpManager manager;
             if (ManagerLocator.TryGet(out manager))
             {
@@ -75,8 +76,8 @@ namespace SpaceWarp.UI
                 {
                     if (GUILayout.Button(modID))
                     {
-                        selectedMod = modID;
-                        selectedModInfo = modInfo;
+                        _selectedMod = modID;
+                        _selectedModInfo = modInfo;
                     }
                 }
             }
@@ -84,48 +85,65 @@ namespace SpaceWarp.UI
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
             GUILayout.BeginVertical();
-            if (selectedModInfo != null)
+
+            if (_selectedModInfo != null)
             {
-                GUILayout.Label(selectedModInfo.name);
-                GUILayout.Label($"Author: {selectedModInfo.author}");
-                GUILayout.Label($"Version: {selectedModInfo.version}");
-                GUILayout.Label($"Description: {selectedModInfo.description}");
-                GUILayout.Label($"KSP2 Version: {selectedModInfo.supported_ksp2_versions.min} - {selectedModInfo.supported_ksp2_versions.max}");
-                GUILayout.Label($"Dependencies");
-                foreach (var dependency in selectedModInfo.dependencies)
-                {
-                    GUILayout.Label($"{dependency.id}: {dependency.version.min} - {dependency.version.max}");
-                }
-                
-                if (ManagerLocator.TryGet(out ConfigurationManager configManager))
-                {
-                    if (configManager.TryGet(selectedModInfo.mod_id, out var config))
-                    {
-                        if (GUILayout.Button("Configure"))
-                        {
-                            GameObject go = new GameObject(selectedModInfo.mod_id);
-                            go.transform.SetParent(transform);
-                            ModConfigurationUI configUI = go.AddComponent<ModConfigurationUI>();
-                            configUI.configurationType = config.configType;
-                            configUI.configurationObject = config.configObject;
-                            configUI.name = selectedModInfo.name;
-                            configUI.modID = selectedModInfo.mod_id;
-                            go.SetActive(true);
-                        }
-                    }
-                }
+                CreateModConfigurationUI();
             }
             else
             {
                 GUILayout.Label("No mod selected");
             }
+
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
             GUI.DragWindow(new Rect(0, 0, 10000, 500));
         }
 
-        public void ToggleVisible() {
-            this.drawUI = !this.drawUI;
+        private void CreateModConfigurationUI()
+        {
+            GUILayout.Label(_selectedModInfo.name);
+            GUILayout.Label($"Author: {_selectedModInfo.author}");
+            GUILayout.Label($"Version: {_selectedModInfo.version}");
+            GUILayout.Label($"Description: {_selectedModInfo.description}");
+            GUILayout.Label($"KSP2 Version: {_selectedModInfo.supported_ksp2_versions.min} - {_selectedModInfo.supported_ksp2_versions.max}");
+            GUILayout.Label($"Dependencies");
+
+            foreach (DependencyInfo dependency in _selectedModInfo.dependencies)
+            {
+                GUILayout.Label($"{dependency.id}: {dependency.version.min} - {dependency.version.max}");
+            }
+
+            if (!ManagerLocator.TryGet(out ConfigurationManager configManager))
+            {
+                return;
+            }
+
+            if (!configManager.TryGet(_selectedModInfo.mod_id, out (Type configType, object configObject, string path) config))
+            {
+                return;
+            }
+
+            if (!GUILayout.Button("Configure"))
+            {
+                return;
+            }
+
+            GameObject go = new GameObject(_selectedModInfo.mod_id);
+            go.transform.SetParent(transform);
+
+            ModConfigurationUI configUI = go.AddComponent<ModConfigurationUI>();
+
+            configUI.ConfigurationType = config.configType;
+            configUI.ConfigurationObject = config.configObject;
+            configUI.name = _selectedModInfo.name;
+
+            go.SetActive(true);
+        }
+
+        public void ToggleVisible()
+        {
+            _drawUI = !_drawUI;
         }
     }
 }

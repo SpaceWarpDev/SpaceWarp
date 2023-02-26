@@ -65,8 +65,9 @@ namespace SpaceWarp.API
         ///</summary>
         public void InitializeConfigManager()
         {
-            var confManagerObject = new GameObject("Configuration Manager");
+            GameObject confManagerObject = new GameObject("Configuration Manager");
             DontDestroyOnLoad(confManagerObject);
+
             confManagerObject.AddComponent<ConfigurationManager>();
             confManagerObject.SetActive(true);
         }
@@ -579,8 +580,9 @@ namespace SpaceWarp.API
         {
             GameObject modUIObject = new GameObject("Space Warp Mod UI");
             DontDestroyOnLoad(modUIObject);
+
             modUIObject.transform.SetParent(transform.parent);
-            this.ModListUI = modUIObject.AddComponent<ModListUI>();
+            modUIObject.AddComponent<ModListUI>();
             
             modUIObject.SetActive(true);
 
