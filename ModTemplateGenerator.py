@@ -3,6 +3,7 @@
 # -------------------------------------- #
 import shutil, json
 from xml.dom import minidom
+
 # Generates a structure like the following
 # mod_project
 #   mod_id
@@ -23,7 +24,7 @@ from xml.dom import minidom
 #   .gitignore
 #
 #
-#.gitignore
+# .gitignore
 # *.rsuser
 # *.suo
 # *.user
@@ -45,7 +46,7 @@ from xml.dom import minidom
 # [Ll]og/
 # [Ll]ogs/
 #
-#external_dlls/.gitignore
+# external_dlls/.gitignore
 # *
 # !.gitignore
 
@@ -54,27 +55,50 @@ from os.path import expanduser
 
 
 def find_ksp2_install_path():
-    # Look for the game in Steam library folders
-    steam_path = os.path.join(os.getenv("ProgramFiles(x86)"), "Steam")
-    steam_library_folders_file = os.path.join(steam_path, "steamapps", "libraryfolders.vdf")
-    steam_install_folder = os.path.join(steam_path, "steamapps", "common", "Kerbal Space Program 2")
+    # Checks if Operating System is NOT Windows
+    if os.path != "nt":
+        steam_install_folder = ""
+        return steam_install_folder
+    else:
+        # Look for the game in Steam library folders
+        steam_path = os.path.join(os.getenv("ProgramFiles(x86)"), "Steam")
+        steam_library_folders_file = os.path.join(
+            steam_path, "steamapps", "libraryfolders.vdf"
+        )
+        steam_install_folder = os.path.join(
+            steam_path, "steamapps", "common", "Kerbal Space Program 2"
+        )
 
-    if os.path.exists(steam_library_folders_file):
-        with open(steam_library_folders_file) as f:
-            for line in f:
-                if "BaseInstallFolder" in line:
-                    steam_library_path = line.strip().split("\"")[3]
-                    if os.path.exists(os.path.join(steam_library_path, "steamapps", "appmanifest_1406800.acf")):
-                        steam_install_folder = os.path.join(steam_library_path, "steamapps", "common", "Kerbal Space Program 2")
-                        break
+        if os.path.exists(steam_library_folders_file):
+            with open(steam_library_folders_file) as f:
+                for line in f:
+                    if "BaseInstallFolder" in line:
+                        steam_library_path = line.strip().split('"')[3]
+                        if os.path.exists(
+                            os.path.join(
+                                steam_library_path,
+                                "steamapps",
+                                "appmanifest_1406800.acf",
+                            )
+                        ):
+                            steam_install_folder = os.path.join(
+                                steam_library_path,
+                                "steamapps",
+                                "common",
+                                "Kerbal Space Program 2",
+                            )
+                            break
 
-    # Look for the game in default installation path
-    if not os.path.exists(steam_install_folder):
-        default_install_folder = os.path.join(os.getenv("ProgramFiles"), "Private Division", "Kerbal Space Program 2")
-        if os.path.exists(default_install_folder):
-            steam_install_folder = default_install_folder
+        # Look for the game in default installation path
+        if not os.path.exists(steam_install_folder):
+            default_install_folder = os.path.join(
+                os.getenv("ProgramFiles"), "Private Division", "Kerbal Space Program 2"
+            )
+            if os.path.exists(default_install_folder):
+                steam_install_folder = default_install_folder
 
-    return steam_install_folder
+        return steam_install_folder
+
 
 print("Space Warp Mod Setup Wizard")
 
@@ -109,15 +133,21 @@ while True:
 mod_description = input("What is a short description of the mod: ")
 mod_source = input("What is the source link of the mod: ")
 mod_version = input("What is the starting version of the mod: ")
-mod_ksp_min_version = input("What is the minimum version of KSP2 this mod will accept: ")
-mod_ksp_max_version = input("What is the maximum version of KSP2 this mod will accept: ")
+mod_ksp_min_version = input(
+    "What is the minimum version of KSP2 this mod will accept: "
+)
+mod_ksp_max_version = input(
+    "What is the maximum version of KSP2 this mod will accept: "
+)
 
 steam_install_folder = find_ksp2_install_path()
 
 if os.path.exists(steam_install_folder):
     print(f"Kerbal Space Program 2 is installed at {steam_install_folder}")
 else:
-    steam_install_folder = input("Could not find the installation path for Kerbal Space Program 2.\n Please enter the path to the KSP2 installation folder manually: ")
+    steam_install_folder = input(
+        "Could not find the installation path for Kerbal Space Program 2.\nPlease enter the path to the KSP2 installation folder manually: "
+    )
 
 managed_path = os.path.join(steam_install_folder, "KSP2_x64_Data", "Managed")
 space_warp_path = os.path.join(steam_install_folder, "SpaceWarp", "core")
@@ -138,20 +168,20 @@ os.mkdir(f"{mod_id}/external_dlls")
 external_dlls = f"{mod_id}/external_dlls"
 release_folder = f"{mod_id}/{mod_id}"
 
-shutil.copy2(space_warp_path,external_dlls)
+shutil.copy2(space_warp_path, external_dlls)
 
 for filename in os.listdir(space_warp_path):
     if filename.endswith(".dll"):
-        shutil.copy2(os.path.join(space_warp_path,filename),external_dlls)
+        shutil.copy2(os.path.join(space_warp_path, filename), external_dlls)
 
 for filename in os.listdir(managed_path):
     if filename.endswith(".dll"):
-        shutil.copy2(os.path.join(managed_path,filename),external_dlls)
+        shutil.copy2(os.path.join(managed_path, filename), external_dlls)
 
-with open(f"{external_dlls}/.gitignore","w") as external_gitignore:
+with open(f"{external_dlls}/.gitignore", "w") as external_gitignore:
     external_gitignore.write("*\n!.gitignore")
 
-with open(f"{mod_id}/.gitignore","w") as main_gitignore:
+with open(f"{mod_id}/.gitignore", "w") as main_gitignore:
     main_gitignore.writelines(
         [
             "*.rsuser",
@@ -177,58 +207,77 @@ with open(f"{mod_id}/.gitignore","w") as main_gitignore:
         ]
     )
 
-with open(f"{release_folder}/modinfo.json","w") as modinfo:
+with open(f"{release_folder}/modinfo.json", "w") as modinfo:
     modinfo.write(
-        json.dumps({
-            "mod_id": mod_id,
-            "author": mod_author,
-            "name": mod_name,
-            "description": mod_description,
-            "source": mod_source,
-            "version": mod_version,
-            "dependencies": [],
-            "ksp2_version": {
-                "min": mod_ksp_min_version,
-                "max": mod_ksp_max_version
-            }
-        },indent=4)
+        json.dumps(
+            {
+                "mod_id": mod_id,
+                "author": mod_author,
+                "name": mod_name,
+                "description": mod_description,
+                "source": mod_source,
+                "version": mod_version,
+                "dependencies": [],
+                "ksp2_version": {
+                    "min": mod_ksp_min_version,
+                    "max": mod_ksp_max_version,
+                },
+            },
+            indent=4,
+        )
     )
-with open(f"{release_folder}README.json","w") as readme:
+with open(f"{release_folder}README.json", "w") as readme:
     readme.write("# Usage")
-    readme.write("Any code compiled in the csproj's dll should be moved to the /bin folder of the mod")
+    readme.write(
+        "Any code compiled in the csproj's dll should be moved to the /bin folder of the mod"
+    )
 
-with open(f"{release_folder}/README.json","w") as readme:
+with open(f"{release_folder}/README.json", "w") as readme:
     readme.write("# Default Readme")
 
 code_folder = f"{mod_id}/{mod_id_title}/{mod_id_title}"
 
-with open(f"{code_folder}/{mod_id_title}Mod.cs","w") as default_code:
-    default_code.write("using SpaceWarp.API.Mods;\n\nnamespace " + mod_id_title + "\n{\n    [MainMod]\n     public class " + mod_id_title + "Mod : Mod\n    {\n        public override void OnInitialized()\n        {\n            Logger.Info(\"Mod is initialized\");\n        }\n    }\n}")
+with open(f"{code_folder}/{mod_id_title}Mod.cs", "w") as default_code:
+    default_code.write(
+        "using SpaceWarp.API.Mods;\n\nnamespace "
+        + mod_id_title
+        + "\n{\n    [MainMod]\n     public class "
+        + mod_id_title
+        + 'Mod : Mod\n    {\n        public override void OnInitialized()\n        {\n            Logger.Info("Mod is initialized");\n        }\n    }\n}'
+    )
 
-with open(f"{code_folder}/{mod_id_title}Config.cs","w") as default_config:
-    default_config.write("using SpaceWarp.API.Configuration;\nusing Newtonsoft.Json;\n\nnamespace " + mod_id_title + "\n{\n    [JsonObject(MemberSerialization.OptOut)]\n    [ModConfig]\n    public class " + mod_id_title + "Config\n    {\n         [ConfigField(\"pi\")] [ConfigDefaultValue(3.14159)] public double pi;\n    }\n}")
+with open(f"{code_folder}/{mod_id_title}Config.cs", "w") as default_config:
+    default_config.write(
+        "using SpaceWarp.API.Configuration;\nusing Newtonsoft.Json;\n\nnamespace "
+        + mod_id_title
+        + "\n{\n    [JsonObject(MemberSerialization.OptOut)]\n    [ModConfig]\n    public class "
+        + mod_id_title
+        + 'Config\n    {\n         [ConfigField("pi")] [ConfigDefaultValue(3.14159)] public double pi;\n    }\n}'
+    )
 
 
-def quickCreateProperty(root,name,text):
+def quickCreateProperty(root, name, text):
     a = root.createElement(name)
     b = root.createTextNode(text)
     a.appendChild(b)
     return a
 
 
-with open(f"{mod_id}/{mod_id_title}/{mod_id_title}.csproj","w") as csproj:
+with open(f"{mod_id}/{mod_id_title}/{mod_id_title}.csproj", "w") as csproj:
     root = minidom.Document()
-    xml = root.createElement('Project')
-    xml.setAttribute('Sdk','Microsoft.NET.Sdk')
+    xml = root.createElement("Project")
+    xml.setAttribute("Sdk", "Microsoft.NET.Sdk")
     root.appendChild(xml)
-    propertyGroup = root.createElement('PropertyGroup')
+    propertyGroup = root.createElement("PropertyGroup")
     xml.appendChild(propertyGroup)
-    propertyGroup.appendChild(quickCreateProperty(root,"TargetFramework","netstandard2.0"))
-    propertyGroup.appendChild(quickCreateProperty(root,"AllowUnsafeBlocks","true"))
-    propertyGroup.appendChild(quickCreateProperty(root,"LangVersion","11"))
-    propertyGroup.appendChild(quickCreateProperty(root,"ImplicitUsings","true"))
-    
-    itemGroup = root.createElement('ItemGroup')
+    propertyGroup.appendChild(
+        quickCreateProperty(root, "TargetFramework", "netstandard2.0")
+    )
+    propertyGroup.appendChild(quickCreateProperty(root, "AllowUnsafeBlocks", "true"))
+    propertyGroup.appendChild(quickCreateProperty(root, "LangVersion", "11"))
+    propertyGroup.appendChild(quickCreateProperty(root, "ImplicitUsings", "true"))
+
+    itemGroup = root.createElement("ItemGroup")
     xml.appendChild(itemGroup)
 
     refs = [
@@ -237,13 +286,13 @@ with open(f"{mod_id}/{mod_id_title}/{mod_id_title}.csproj","w") as csproj:
         "..\\external_dlls\\UnityEngine.CoreModule.dll",
         "..\\external_dlls\\Assembly-CSharp.dll",
         "..\\external_dlls\\NewtonSoft.Json.dll",
-        "..\\external_dlls\\NewtonSoft.Json.dll"
+        "..\\external_dlls\\NewtonSoft.Json.dll",
     ]
 
     for ref in refs:
-        element = root.createElement('Reference')
+        element = root.createElement("Reference")
         element.setAttribute("Include", ref[0])
         itemGroup.appendChild(element)
 
-    xml_str = root.toprettyxml(indent = '  ')
+    xml_str = root.toprettyxml(indent="  ")
     csproj.write(xml_str)
