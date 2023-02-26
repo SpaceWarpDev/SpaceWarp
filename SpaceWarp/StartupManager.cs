@@ -3,9 +3,45 @@ using UnityEngine;
 using System.IO;
 using SpaceWarp.API;
 using Object = UnityEngine.Object;
+using UnityEngine.SceneManagement;
+using HarmonyLib;
+
+namespace Doorstop {
+
+    public class Entrypoint {
+        /// <summary>
+        /// EntryPoint for Spacewarp, called from Doorstop
+        /// </summary>
+        public static void Start()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        static bool patched = false;
+
+        /// <summary>
+        /// Add OnGameStarted as postfix to StartGame
+        /// </summary>
+        static void OnSceneLoaded(Scene unused1, LoadSceneMode unused2)
+        {
+            if (!patched) {
+
+                Harmony harmony = new Harmony("com.github.celisium.spacewarp-doorstop");
+
+                var original = typeof(KSP.Game.GameManager).GetMethod(nameof(KSP.Game.GameManager.StartGame));
+                var postfix = typeof(SpaceWarp.StartupManager).GetMethod(nameof(SpaceWarp.StartupManager.OnGameStarted));
+
+                harmony.Patch(original, postfix: new HarmonyMethod(postfix));
+
+                patched = true;
+            }
+        }
+    }
+}
 
 namespace SpaceWarp
 {
+
     /// <summary>
     /// Starts the SpaceWarm mod manager
     /// </summary>
@@ -20,8 +56,8 @@ namespace SpaceWarp
         /// <returns></returns>
         public static void OnGameStarted()
         {
-			// since OnGameStarted could be called multiple times, we want to make sure we only do anything on first call.
-			if (_hasInitialized)
+            // since OnGameStarted could be called multiple times, we want to make sure we only do anything on first call.
+            if (_hasInitialized)
             {
                 return;
             }

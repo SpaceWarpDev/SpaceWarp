@@ -61,21 +61,35 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\external_dlls\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\external_dlls\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\external_dlls\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\AssetBundles\ResourceManager.cs" />
+    <Compile Include="API\Configuration\ConfigDefaultValueAttribute.cs" />
+    <Compile Include="API\Configuration\ConfigFieldAttribute.cs" />
+    <Compile Include="API\Configuration\ConfigSectionAttribute.cs" />
+    <Compile Include="API\Configuration\ConfigurationManager.cs" />
     <Compile Include="API\Configuration\DependencyInfo.cs" />
+    <Compile Include="API\Configuration\ModConfigAttribute.cs" />
     <Compile Include="API\Configuration\ModInfo.cs" />
     <Compile Include="API\Configuration\SupportedVersionsInfo.cs" />
-    <Compile Include="API\GlobalModDefines.cs" />
-    <Compile Include="API\MainModAttribute.cs" />
-    <Compile Include="API\ModLocator.cs" />
+    <Compile Include="API\Managers\Manager.cs" />
+    <Compile Include="API\Managers\ManagerLocator.cs" />
+    <Compile Include="API\Mods\GlobalModDefines.cs" />
+    <Compile Include="API\Mods\MainModAttribute.cs" />
+    <Compile Include="API\Mods\Mod.cs" />
+    <Compile Include="API\Mods\ModLocator.cs" />
     <Compile Include="API\SpaceWarpGlobalConfiguration.cs" />
     <Compile Include="API\Logging\BaseModLogger.cs" />
     <Compile Include="API\Logging\LogLevel.cs" />
     <Compile Include="API\Logging\ModLogger.cs" />
-    <Compile Include="API\Mod.cs" />
     <Compile Include="API\SpaceWarpManager.cs" />
+    <Compile Include="API\Versions\VersionUtility.cs" />
     <Compile Include="Patching\LoadingActions\AfterModsLoadedAction.cs" />
     <Compile Include="Patching\LoadingActions\LoadAssetsAction.cs" />
     <Compile Include="Patching\LoadingActions\LoadModsAction.cs" />
@@ -83,6 +97,9 @@
     <Compile Include="Patching\LoadingScreenPatcher.cs" />
     <Compile Include="StartupManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\ModConfigurationUI.cs" />
+    <Compile Include="UI\ModListUI.cs" />
+    <Compile Include="UI\SpaceWarpConsole.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

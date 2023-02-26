@@ -68,7 +68,7 @@ namespace ksp2_mod_loader_patcher
 					do
 					{
 						Console.WriteLine("SpaceWard is already patched into the game, do you want to unpatch? y/n");
-						response = Console.ReadLine();
+						response = Console.ReadLine().ToLowerInvariant();
 					} while (response != "y" && response != "n");
 
 					if (response == "y")
@@ -107,7 +107,7 @@ namespace ksp2_mod_loader_patcher
 				do
 				{
 					Console.WriteLine($"Found kerbal installation at \"{path}\", install Space Warp here? y/n");
-					result = Console.ReadLine();
+					result = Console.ReadLine().ToLowerInvariant();
 				}
 				while (result != "y" && result != "n");
 

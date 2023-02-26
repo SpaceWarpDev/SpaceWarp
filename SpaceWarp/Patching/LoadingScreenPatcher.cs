@@ -1,28 +1,25 @@
 ﻿using HarmonyLib;
+using KSP.Game;
 using SpaceWarp.API;
+using SpaceWarp.API.Managers;
 using SpaceWarp.Patching.LoadingActions;
 
 
 namespace SpaceWarp.Patching
 {
-    // [HarmonyPatch(typeof(KSP.Game.GameManager),nameof(KSP.Game.GameManager.StartBootstrap))]
-    // public class LoadingScreenPatcher
-    // {
-    //     public static SpaceWarpManager Manager;
-    //     static void Postfix(KSP.Game.GameManager __instance)
-    //     {
-    //         __instance.LoadingFlow.AddAction(new LoadModsAction("Loading Space Warp Mods",Manager));
-    //         __instance.LoadingFlow.AddAction(new AfterModsLoadedAction("Doing Mod Finalization",Manager));
-    //     }
-    // }
+    /// <summary>
+    /// Patches the loading screen to add the mod loading
+    /// </summary>
     public class LoadingScreenPatcher
     {
-        public static void AddScreens(KSP.Game.GameManager gameManager, SpaceWarpManager spaceWarpManager)
-        {
-            gameManager.LoadingFlow.AddAction(new ReadingModsAction("Resolving Space Warp Mod Load Order",spaceWarpManager));
-			gameManager.LoadingFlow.AddAction(new LoadAssetsAction("Loading Space Warp Assets", spaceWarpManager));
-			gameManager.LoadingFlow.AddAction(new LoadModsAction("Loading Space Warp Mods",spaceWarpManager));
-            gameManager.LoadingFlow.AddAction(new AfterModsLoadedAction("Space Warp Mod Post-Initialization",spaceWarpManager));
+        public static void AddModLoadingScreens()
+        {	
+            GameManager gameManager = GameManager.Instance;
+
+            gameManager.LoadingFlow.AddAction(new ReadingModsAction("Resolving Space Warp Mod Load Order"));
+            gameManager.LoadingFlow.AddAction(new LoadAssetsAction("Loading Space Warp Assets"));
+			gameManager.LoadingFlow.AddAction(new LoadModsAction("Loading Space Warp Mods"));
+            gameManager.LoadingFlow.AddAction(new AfterModsLoadedAction("Space Warp Mod Post-Initialization"));
         }
     }
 }
