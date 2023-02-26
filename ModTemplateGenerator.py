@@ -120,7 +120,7 @@ else:
     managed_path = input("Could not find the installation path for Kerbal Space Program 2.\n Please enter the path to the KSP2 installation folder manually: ")
 
 managed_path = os.path.join(steam_install_folder, "KSP2_x64_Data", "Managed")
-
+space_warp_path = os.path.join(steam_install_folder, "SpaceWarp", "core")
 
 mod_id_title = mod_id.replace("_", " ").title().replace(" ", "")
 os.mkdir(mod_id)
@@ -138,9 +138,11 @@ os.mkdir(f"{mod_id}/external_dlls")
 external_dlls = f"{mod_id}/external_dlls"
 release_folder = f"{mod_id}/{mod_id}"
 
-space_warp_path = os.path.join(managed_path, "SpaceWarp.dll")
-
 shutil.copy2(space_warp_path,external_dlls)
+
+for filename in os.listdir(space_warp_path):
+    if filename.endswith(".dll"):
+        shutil.copy2(os.path.join(space_warp_path,filename),external_dlls)
 
 for filename in os.listdir(managed_path):
     if filename.endswith(".dll"):
