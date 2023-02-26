@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using SpaceWarp.API.Logging;
 using UnityEngine;
 
 namespace SpaceWarp.API.AssetBundles
@@ -10,20 +11,23 @@ namespace SpaceWarp.API.AssetBundles
 
 		internal static void RegisterAssetBundle(string modId, string assetBundleName, AssetBundle assetBundle)
 		{
+			assetBundleName = assetBundleName.Replace(".bundle", "");
+			ModLogger logger = new ModLogger($"{modId}/{assetBundleName}");
 			// TODO: use async loading instead?
 
 			Object[] bundleObjects = assetBundle.LoadAllAssets();
 			string[] names = assetBundle.GetAllAssetNames();
-
+			
 			if (bundleObjects.Length != names.Length)
 			{
+				logger.Critical("bundle objects length and name lengths do not match");
 				throw new System.Exception("bundle objects length and name lengths do not match");
 			}
 
 			for(int i = 0; i < bundleObjects.Length; i++)
 			{
 				List<string> assetNamePath = names[i].Split('/').ToList();
-				if (assetNamePath[0] == "Assets")
+				if (assetNamePath[0].ToLower() == "assets")
 				{
 					assetNamePath.RemoveAt(0);
 				}
@@ -40,9 +44,10 @@ namespace SpaceWarp.API.AssetBundles
 				
 				
 				string path = modId + "/" + assetBundleName + "/" + assetName;
+				path = path.ToLower();
 				Object bundleObject = bundleObjects[i];
 
-				System.Console.WriteLine($"registering path \"{path}\"");
+				logger.Info($"registering path \"{path}\"");
 
 				AllAssets.Add(path, bundleObject);
 			}
@@ -56,6 +61,7 @@ namespace SpaceWarp.API.AssetBundles
 		/// <returns></returns>
 		public static T GetAsset<T>(string path) where T: UnityEngine.Object
 		{
+			path = path.ToLower();
 			string[] subPaths = path.Split('/', '\\');
 			if (subPaths.Length < 3)
 			{
@@ -84,6 +90,7 @@ namespace SpaceWarp.API.AssetBundles
 		/// <returns>Whether or not the asset exists and is loaded</returns>
 		public static bool TryGetAsset<T>(string path, out T asset) where T : Object
 		{
+			path = path.ToLower();
 			asset = null;
 			string[] subPaths = path.Split('/', '\\');
 			if (subPaths.Length < 3)

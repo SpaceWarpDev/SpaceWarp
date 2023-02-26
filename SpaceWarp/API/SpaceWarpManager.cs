@@ -260,7 +260,9 @@ namespace SpaceWarp.API
             {
                 foreach (string file in Directory.GetFiles(bundlesPath))
                 {
-                    string assetBundleName = Path.GetFileName(file);
+                    string assetBundleName = Path.GetFileNameWithoutExtension(file);
+                    if (Path.GetExtension(file) != ".bundle") continue;
+                    
 
                     AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
 
@@ -269,13 +271,13 @@ namespace SpaceWarp.API
                         _modLogger.Error($"Failed to load AssetBundle {info.mod_id}/{assetBundleName}");
                         continue;
                     }
-
                     ResourceManager.RegisterAssetBundle(info.mod_id, assetBundleName, assetBundle);
                     _modLogger.Info($"Loaded AssetBundle {info.mod_id}/{assetBundleName}");
                 }
             }
             else
             {
+                _modLogger.Info($"Did not load assets for {modName} as no assets folder existed!");
             }
 
             // TODO: load part specific json stuff
