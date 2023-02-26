@@ -57,7 +57,7 @@ namespace SpaceWarp.API
             
             InitializeModLogger();
 
-			LoadingScreenPatcher.AddModLoadingScreens();
+            LoadingScreenPatcher.AddModLoadingScreens();
 		}
 
         ///<summary>
@@ -262,7 +262,7 @@ namespace SpaceWarp.API
 
                 if (Directory.Exists(codePath))
                 {
-                    if (!TryLoadMod(codePath, modName, out Type mainModType))
+                    if (!TryLoadMod(codePath, modName, info, out Type mainModType))
                     {
 						// error logging is done inside TryLoadMod
 						continue;
@@ -284,7 +284,7 @@ namespace SpaceWarp.API
         /// <param name="modName">The mod name</param>
         /// <param name="mainModType">The Mod type found</param>
         /// <returns>If the mod was successfully found.</returns>
-        private bool TryLoadMod(string codePath, string modName, out Type mainModType)
+        private bool TryLoadMod(string codePath, string modName, ModInfo modInfo, out Type mainModType)
         {
             string[] files;
             try
@@ -360,7 +360,14 @@ namespace SpaceWarp.API
 				return false;
             }
 
-            return true;
+			// Harmony patch everything in the current mod!
+			Harmony harmony = new Harmony($"com.mod.{modInfo.author}.{modInfo.mod_id}");
+			foreach (Assembly asm in modAssemblies)
+            {
+                harmony.PatchAll(asm);
+            }
+
+			return true;
 
         }
 
