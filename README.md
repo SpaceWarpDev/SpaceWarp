@@ -21,7 +21,7 @@ Mods are currently implemented as monobehaviours with two fields: a `Logger` for
 
 The mod structure is still a work in progress. However, the current structure is as follows:
 
-* KSP2_directory/KSP2_x64_Data/Mods
+* [KSP_ROOT]/SpaceWarp/Mods
   * example_mod
     * modinfo.json
     * README.md
