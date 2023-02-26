@@ -34,5 +34,8 @@ The mod structure is still a work in progress. However, the current structure is
             * *.json
         * resources/
             * *.json
+        * bundles/
+            * *.bundle
     * bin/
     * config/
+    * .ignore (optional, if this file is present, the mod will be skipped!)
