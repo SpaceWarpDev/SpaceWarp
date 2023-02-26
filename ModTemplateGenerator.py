@@ -50,21 +50,77 @@ from xml.dom import minidom
 # !.gitignore
 
 import os
+from os.path import expanduser
+
+
+def find_ksp2_install_path():
+    # Look for the game in Steam library folders
+    steam_path = os.path.join(os.getenv("ProgramFiles(x86)"), "Steam")
+    steam_library_folders_file = os.path.join(steam_path, "steamapps", "libraryfolders.vdf")
+    steam_install_folder = os.path.join(steam_path, "steamapps", "common", "Kerbal Space Program 2")
+
+    if os.path.exists(steam_library_folders_file):
+        with open(steam_library_folders_file) as f:
+            for line in f:
+                if "BaseInstallFolder" in line:
+                    steam_library_path = line.strip().split("\"")[3]
+                    if os.path.exists(os.path.join(steam_library_path, "steamapps", "appmanifest_1406800.acf")):
+                        steam_install_folder = os.path.join(steam_library_path, "steamapps", "common", "Kerbal Space Program 2")
+                        break
+
+    # Look for the game in default installation path
+    if not os.path.exists(steam_install_folder):
+        default_install_folder = os.path.join(os.getenv("ProgramFiles"), "Private Division", "Kerbal Space Program 2")
+        if os.path.exists(default_install_folder):
+            steam_install_folder = default_install_folder
+
+    return steam_install_folder
 
 print("Space Warp Mod Setup Wizard")
-project_name = input("What would you like to name the project: ")
-mod_id = input("What is the ID of the mod: ")
-mod_author = input("Who is the author of the mod: ")
-mod_name = input("What is the name of the mod: ")
+
+while True:
+    project_name = input("What would you like to name the project: ")
+    if not project_name:
+        print("Project name cannot be empty, please try again.")
+    else:
+        break
+
+while True:
+    mod_id = input("What is the ID of the mod: ")
+    if not mod_id:
+        print("Mod ID cannot be empty, please try again.")
+    else:
+        break
+
+while True:
+    mod_author = input("Who is the author of the mod: ")
+    if not mod_author:
+        print("Mod author cannot be empty, please try again.")
+    else:
+        break
+
+while True:
+    mod_name = input("What is the name of the mod: ")
+    if not mod_name:
+        print("Mod name cannot be empty, please try again.")
+    else:
+        break
+
 mod_description = input("What is a short description of the mod: ")
 mod_source = input("What is the source link of the mod: ")
 mod_version = input("What is the starting version of the mod: ")
 mod_ksp_min_version = input("What is the minimum version of KSP2 this mod will accept: ")
 mod_ksp_max_version = input("What is the maximum version of KSP2 this mod will accept: ")
 
-# Now we copy all the game directories
-space_warp_path = input("What is the path to spacewarp.dll: ")
-managed_path = input("What is the path to the KSP managed dlls: ")
+steam_install_folder = find_ksp2_install_path()
+
+if os.path.exists(steam_install_folder):
+    print(f"Kerbal Space Program 2 is installed at {steam_install_folder}")
+else:
+    print("Could not find the installation path for Kerbal Space Program 2.\n Please enter the path to the KSP2 installation folder manually.: ")
+
+managed_path = os.path.join(steam_install_folder, "KSP2_x64_Data", "Managed")
+
 
 os.mkdir(project_name)
 os.mkdir(f"{project_name}/{mod_id}")
@@ -75,12 +131,14 @@ os.mkdir(f"{project_name}/{mod_id}/assets/resources")
 os.mkdir(f"{project_name}/{mod_id}/bin")
 os.mkdir(f"{project_name}/{mod_id}/config")
 namespace = mod_id.replace("_", " ").title().replace(" ", "")
-os.mkdir(f"{project_name}/{mod_id}project_name")
-os.mkdir(f"{project_name}/{mod_id}/namespace")
+os.mkdir(f"{project_name}/{project_name}")
+os.mkdir(f"{project_name}/{project_name}/{namespace}")
 os.mkdir(f"{project_name}/external_dlls")
 
 external_dlls = f"{project_name}/external_dlls"
 release_folder = f"{project_name}/{mod_id}"
+
+space_warp_path = os.path.join(managed_path, "SpaceWarp.dll")
 
 shutil.copy2(space_warp_path,external_dlls)
 
