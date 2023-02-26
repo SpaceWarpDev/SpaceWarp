@@ -1,10 +1,10 @@
 using HarmonyLib;
-using KSP.Game;
 using KSP.Logging;
 using SpaceWarp.UI;
 using System.Reflection;
 using UnityEngine.SceneManagement;
-namespace SpaceWarp
+
+namespace Doorstop
 {
     public class Entrypoint
     {
