@@ -327,7 +327,21 @@ namespace SpaceWarp.API
             mainModType = null;
             foreach (Assembly asm in modAssemblies)
             {
-                mainModType = asm.GetTypes().FirstOrDefault(type => type.GetCustomAttribute<MainModAttribute>() != null);
+                Type[] types;
+                try
+                {
+                    types = asm.GetTypes();
+                }
+                catch
+                {
+                    _modLogger.Error($"Could not load mod: {modName}, Unable to get types out of assembly {asm.FullName}");
+
+                    mainModType = null;
+                    return false;
+                }
+
+
+				mainModType = types.FirstOrDefault(type => type.GetCustomAttribute<MainModAttribute>() != null);
                 if (mainModType != null) break;
             }
 
