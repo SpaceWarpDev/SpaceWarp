@@ -9,6 +9,7 @@ using UnityEngine;
 using Newtonsoft.Json;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
+using SpaceWarp.API.AssetBundles;
 using SpaceWarp.Patching;
 
 namespace SpaceWarp.API
@@ -219,10 +220,48 @@ namespace SpaceWarp.API
             }
         }
 
-        /// <summary>
-        /// Runs the mod initialization procedures.
-        /// </summary>
-        internal void InitializeMods()
+        internal void InitializeAssets()
+        {
+            _modLogger.Info("Initializing mod assets");
+
+            foreach ((string modName, ModInfo info) in modLoadOrder)
+            {
+                string modFolder = MODS_FULL_PATH + "/" + modName;
+
+                // Now we load all asset bundles under the asset/bundles folder of the mod
+                string bundlesPath = modFolder + GlobalModDefines.ASSET_BUNDLES_FOLDER;
+                if (Directory.Exists(bundlesPath))
+                {
+                    foreach (string file in Directory.GetFiles(bundlesPath))
+                    {
+                        string assetBundleName = Path.GetFileName(file);
+
+                        AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
+
+                        if (assetBundle == null)
+                        {
+                            _modLogger.Error($"Failed to load AssetBundle {info.mod_id}/{assetBundleName}");
+                            continue;
+                        }
+
+                        AssetManager.RegisterAssetBundle(info.mod_id, assetBundleName, assetBundle);
+						_modLogger.Info($"Loaded AssetBundle {info.mod_id}/{assetBundleName}");
+					}
+                }
+                else
+                {
+                    
+                }
+
+                // TODO: load part specific json stuff
+            }
+
+        }
+
+		/// <summary>
+		/// Runs the mod initialization procedures.
+		/// </summary>
+		internal void InitializeMods()
         {
             _modLogger.Info("Initializing mods");
             

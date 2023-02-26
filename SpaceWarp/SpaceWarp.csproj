@@ -54,11 +54,16 @@
     <Reference Include="UnityEngine">
       <HintPath>..\external_dlls\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ksp_console_opener\external_dlls\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\external_dlls\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\AssetBundles\ResourceManager.cs" />
     <Compile Include="API\Configuration\DependencyInfo.cs" />
     <Compile Include="API\Configuration\ModInfo.cs" />
     <Compile Include="API\Configuration\SupportedVersionsInfo.cs" />
@@ -72,6 +77,7 @@
     <Compile Include="API\Mod.cs" />
     <Compile Include="API\SpaceWarpManager.cs" />
     <Compile Include="Patching\LoadingActions\AfterModsLoadedAction.cs" />
+    <Compile Include="Patching\LoadingActions\LoadAssetsAction.cs" />
     <Compile Include="Patching\LoadingActions\LoadModsAction.cs" />
     <Compile Include="Patching\LoadingActions\ReadingModsAction.cs" />
     <Compile Include="Patching\LoadingScreenPatcher.cs" />
@@ -82,7 +88,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="API\Loading" />
+    <Folder Include="API\Loading\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
