@@ -4,6 +4,7 @@
     <Import Project="..\packages\BepInEx.PluginInfoProps.2.1.0\build\BepInEx.PluginInfoProps.props" Condition="Exists('..\packages\BepInEx.PluginInfoProps.2.1.0\build\BepInEx.PluginInfoProps.props')"/>
     <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
     <PropertyGroup>
+        <Version>0.2.0</Version>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <ProjectGuid>{42FA2F7B-A595-44E8-8CD5-A9C30B80A667}</ProjectGuid>
