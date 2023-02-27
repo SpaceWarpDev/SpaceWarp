@@ -20,7 +20,6 @@ namespace SpaceWarp.UI
         private static GUIStyle _boxStyle;
         private static Vector2 _scrollPosition;
 
-        private readonly List<string> _debugMessages = new List<string>();
 
         public void Start()
         {
@@ -34,7 +33,6 @@ namespace SpaceWarp.UI
 
         private void Awake()
         {
-            KspLogManager.AddLogCallback(LogCallback);
 
             _windowWidth = (int)(Screen.width * 0.5f);
             _windowHeight = (int)(Screen.height * 0.5f);
@@ -56,30 +54,7 @@ namespace SpaceWarp.UI
 
             _windowRect = GUILayout.Window(controlID, _windowRect, DrawConsole, header, width, height);
         }
-
-        private void LogCallback(string condition, string stackTrace, LogType type)
-        {
-            switch (type)
-            {
-                case LogType.Error:
-                    _debugMessages.Add($"[ERR] {condition}");
-                    break;
-                case LogType.Assert:
-                    _debugMessages.Add($"[AST] {condition}");
-                    break;
-                case LogType.Warning:
-                    _debugMessages.Add($"[WRN] {condition}");
-                    break;
-                case LogType.Log:
-                    _debugMessages.Add($"[LOG] {condition}");
-                    break;
-                case LogType.Exception:
-                    _debugMessages.Add($"[EXC] {condition}");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
-        }
+        
         private void Update()
         {
             if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))
@@ -94,7 +69,7 @@ namespace SpaceWarp.UI
             GUILayout.BeginVertical();
             _scrollPosition = GUILayout.BeginScrollView(_scrollPosition, false, true);
             
-            foreach (string debugMessage in _debugMessages)
+            foreach (string debugMessage in SpaceWarpConsoleLogListener.DebugMessages)
             {
                 GUILayout.Label(debugMessage);
             }
