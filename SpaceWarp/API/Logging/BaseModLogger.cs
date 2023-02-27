@@ -1,11 +1,13 @@
-﻿namespace SpaceWarp.API.Logging
+﻿using System.Threading.Tasks;
+
+namespace SpaceWarp.API.Logging
 {
     /// <summary>
     /// Used to print logs on each mod.
     /// </summary>
     public abstract class BaseModLogger
     {
-        protected abstract void Log(LogLevel level, string message, params object[] args);
+        protected abstract Task Log(LogLevel level, string message, params object[] args);
 
         public void Trace(string message, params object[] args) => Log(LogLevel.Trace, message, args);
         public void Debug(string message, params object[] args) => Log(LogLevel.Debug, message, args);
