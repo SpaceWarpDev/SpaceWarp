@@ -41,7 +41,7 @@ namespace SpaceWarp.UI
 
             _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f), 0, 0);
 
-            ResourceManager.TryGetAsset($"space_warp/swconsoleui/spacewarpConsole.guiskin", out _spaceWarpUISkin);
+            ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
         }
 
         private void OnGUI()
