@@ -18,6 +18,12 @@ parser.add_argument("-a", "--all", help="Build all targets", action="store_true"
 def clean():
     if os.path.exists(BUILD_DIR):
         shutil.rmtree(BUILD_DIR)
+    
+    if os.path.exists(os.path.join(SPACEWARP_DIR, "bin")):
+        shutil.rmtree(os.path.join(SPACEWARP_DIR, "bin"))
+    
+    if os.path.exists(os.path.join(SPACEWARP_DIR, "obj")):
+        shutil.rmtree(os.path.join(SPACEWARP_DIR, "obj"))
 
 def build(release = False, doorstop = False):
     build_type = "Doorstop" if doorstop else "BepInEx"
@@ -41,7 +47,17 @@ def build(release = False, doorstop = False):
     
     print(f"=> Executing: {' '.join(dotnet_args)}")
     
-    subprocess.run(args=dotnet_args, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    output = subprocess.run(args=dotnet_args, capture_output=True)
+    
+    print("    |=>| STDOUT")
+    
+    for line in str(output.stdout, "utf-8").splitlines():
+        print(f"        {line}")
+        
+    print("    |=>| STDERR")
+    
+    for line in str(output.stderr, "utf-8").splitlines():
+        print(f"        {line}")
     
     print("=> Copying build outputs...")
     
@@ -56,7 +72,7 @@ def build(release = False, doorstop = False):
         shutil.copyfile(os.path.join(build_output_dir, "MonoMod.RuntimeDetour.dll"), os.path.join(output_dir, "MonoMod.RuntimeDetour.dll"))
         shutil.copyfile(os.path.join(build_output_dir, "MonoMod.Utils.dll"), os.path.join(output_dir, "MonoMod.Utils.dll"))
         
-    if not release:
+    if not release and os.path.exists(os.path.join(build_output_dir, "SpaceWarp.pdb")):
         shutil.copyfile(os.path.join(build_output_dir, "SpaceWarp.pdb"), os.path.join(output_dir, "SpaceWarp.pdb"))
     
     shutil.copyfile(os.path.join(build_output_dir, "SpaceWarp.dll"), os.path.join(output_dir, "SpaceWarp.dll"))
