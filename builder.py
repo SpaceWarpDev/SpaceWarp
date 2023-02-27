@@ -47,7 +47,17 @@ def build(release = False, doorstop = False):
     
     print(f"=> Executing: {' '.join(dotnet_args)}")
     
-    subprocess.run(args=dotnet_args, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    output = subprocess.run(args=dotnet_args, capture_output=True)
+    
+    print("    |=>| STDOUT")
+    
+    for line in str(output.stdout, "utf-8").splitlines():
+        print(f"        {line}")
+        
+    print("    |=>| STDERR")
+    
+    for line in str(output.stderr, "utf-8").splitlines():
+        print(f"        {line}")
     
     print("=> Copying build outputs...")
     
