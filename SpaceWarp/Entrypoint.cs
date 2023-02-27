@@ -4,10 +4,15 @@ using SpaceWarp.UI;
 using System.Reflection;
 using UnityEngine.SceneManagement;
 
+#if DOORSTOP_BUILD
 namespace Doorstop
 {
     public class Entrypoint
-    {
+#else
+namespace SpaceWarp {
+    public class SpaceWarpEntrypoint
+#endif
+{
         private static bool _patched;
      
         private const string HARMONY_PACKAGE_URL = "com.github.x606.spacewarp";
