@@ -14,8 +14,13 @@ jobs:
           dotnet-version: 5.0.x
       
       - name: Setup .NET 4.7.2
-        run: choco install netfx-4.7.2-devpack -y
+        run: |
+          choco install netfx-4.7.2-devpack -y
+          choco install nuget.commandline -y
       
+      - name: Restore
+        run: nuget restore
+
       - name: Build
         run: .\build.ps1 --all
       
