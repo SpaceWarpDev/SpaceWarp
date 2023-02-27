@@ -15,28 +15,10 @@ namespace SpaceWarp.API.AssetBundles
 			ModLogger logger = new ModLogger($"{modId}/{assetBundleName}");
 			// TODO: use async loading instead?
 
-			Object[] bundleObjects = assetBundle.LoadAllAssets();
+			// Object[] bundleObjects = assetBundle.LoadAllAssets();
 			string[] names = assetBundle.GetAllAssetNames();
-			
-			if (bundleObjects.Length != names.Length)
-			{
-				logger.Critical("bundle objects length and name lengths do not match");
-				logger.Info("going to dump objects and names");
-				logger.Info("Names");
-				for (int i = 0; i < names.Length; i++)
-				{
-					logger.Info($"{i} - {names[i]}");
-				}
 
-				logger.Info("Objects");
-				for (int i = 0; i < bundleObjects.Length; i++)
-				{
-						logger.Info($"{i} - {bundleObjects[i]}");
-				}
-				throw new System.Exception("bundle objects length and name lengths do not match");
-			}
-
-			for(int i = 0; i < bundleObjects.Length; i++)
+			for (int i = 0; i < names.Length; i++)
 			{
 				List<string> assetNamePath = names[i].Split('/').ToList();
 				if (assetNamePath[0].ToLower() == "assets")
@@ -57,12 +39,30 @@ namespace SpaceWarp.API.AssetBundles
 				
 				string path = modId + "/" + assetBundleName + "/" + assetName;
 				path = path.ToLower();
-				Object bundleObject = bundleObjects[i];
+				Object bundleObject = assetBundle.LoadAsset(names[i]);
 
 				logger.Info($"registering path \"{path}\"");
 
 				AllAssets.Add(path, bundleObject);
 			}
+			
+			// if (bundleObjects.Length != names.Length)
+			// {
+			// 	logger.Critical("bundle objects length and name lengths do not match");
+			// 	logger.Info("going to dump objects and names");
+			// 	logger.Info("Names");
+			// 	for (int i = 0; i < names.Length; i++)
+			// 	{
+			// 		logger.Info($"{i} - {names[i]}");
+			// 	}
+			//
+			// 	logger.Info("Objects");
+			// 	for (int i = 0; i < bundleObjects.Length; i++)
+			// 	{
+			// 			logger.Info($"{i} - {bundleObjects[i]}");
+			// 	}
+			// 	throw new System.Exception("bundle objects length and name lengths do not match");
+			// }
 		}
 
 		/// <summary>
