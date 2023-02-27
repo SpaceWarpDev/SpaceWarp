@@ -45,9 +45,13 @@ namespace SpaceWarp.UI
 
             _windowWidth = (int)(Screen.width * 0.5f);
             _windowHeight = (int)(Screen.height * 0.5f);
+
             _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f), 0, 0);
             _scrollPosition = Vector2.zero;
             ResourceManager.TryGetAsset($"space_warp/swconsoleui/spacewarpConsole.guiskin", out _spaceWarpUISkin);
+
+            // [FORMAT]: space_warp/[assetbundle_name]/[folder_in_assetbundle]/[file.type]
+            ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
 
         }
 
