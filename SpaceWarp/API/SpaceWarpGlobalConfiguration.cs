@@ -60,9 +60,19 @@ namespace SpaceWarp.API
         [DefaultValue((int)Logging.LogLevel.Info)]
         public int LogLevel { get; set; }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        [DefaultValue((bool)false)]
+        public bool HarmonyLoggin { get; set; }
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        [DefaultValue((int)Logging.LogLevel.Info)]
+        public int HarmonyLogLevel { get; set; }
+
         public void ApplyDefaultValues()
         {
             LogLevel = (int)Logging.LogLevel.Info;
+            HarmonyLoggin = false;
+            HarmonyLogLevel = (int)Logging.LogLevel.Info;
         }
     }
 }
