@@ -32,9 +32,6 @@ namespace SpaceWarp.API
         public static string SPACE_WARP_PATH = Directory.GetCurrentDirectory() + "/SpaceWarp/";
         public static string MODS_FULL_PATH = SPACE_WARP_PATH + MODS_FOLDER_NAME;
 
-        private const string SPACE_WARP_CONFIG_FILE_NAME = "space_warp_config.json";
-        private static string SPACEWARP_CONFIG_FULL_PATH = MODS_FULL_PATH + "/" + SPACE_WARP_CONFIG_FILE_NAME;
-
         public SpaceWarpGlobalConfiguration SpaceWarpConfiguration;
 
         private readonly List<Mod> _allModScripts = new List<Mod>();
@@ -56,7 +53,6 @@ namespace SpaceWarp.API
         private void Initialize()
         {
             InitializeConfigManager();
-            InitializeSpaceWarpConfig();
             
             InitializeModLogger();
 
@@ -481,7 +477,7 @@ namespace SpaceWarp.API
                     _modLogger.Error($"Loading mod config failed\nException: {exception}");
 
                     File.Delete(config_path);
-                    InitializeSpaceWarpConfig();
+                    InitializeModConfig(config_type, mod_id);
                     return;
                 }
             }
@@ -499,46 +495,6 @@ namespace SpaceWarp.API
             {
                 configurationManager.Add(mod_id,(config_type,modConfiguration,config_path));
             }
-        }
-        
-        /// <summary>
-        /// Tried to find the SpaceWarp config file in the game, if none is found one is created.
-        /// </summary>
-        /// <param name="spaceWarpGlobalConfiguration"></param>
-        private void InitializeSpaceWarpConfig()
-        {
-            if (!File.Exists(SPACEWARP_CONFIG_FULL_PATH))
-            {
-                SpaceWarpConfiguration = new SpaceWarpGlobalConfiguration();
-                SpaceWarpConfiguration.ApplyDefaultValues();
-            }
-            else
-            {
-                try
-                {
-                    string json = File.ReadAllText(SPACEWARP_CONFIG_FULL_PATH);
-                    SpaceWarpConfiguration = JsonConvert.DeserializeObject<SpaceWarpGlobalConfiguration>(json);
-                }
-                catch (Exception exception)
-                {
-                    //TODO: log this in a nicer way, for now I guess we can just construct a new logger
-                    new ModLogger("Space Warp").Error($"Loading space warp config failed\nException: {exception}");
-
-                    File.Delete(SPACEWARP_CONFIG_FULL_PATH);
-                    InitializeSpaceWarpConfig();
-                    return;
-                }
-            }
-            
-            try
-            {
-				File.WriteAllLines(SPACEWARP_CONFIG_FULL_PATH, new[] { JsonConvert.SerializeObject(SpaceWarpConfiguration) });
-			}
-            catch(Exception exception)
-            {
-                //TODO: log this in a nicer way, for now I guess we can just construct a new logger
-                new ModLogger("Space Warp").Error($"Saving the spacewarp config failed\nException: {exception}");
-			}
         }
 
         /// <summary>
