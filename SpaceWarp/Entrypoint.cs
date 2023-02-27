@@ -2,7 +2,6 @@ using HarmonyLib;
 using KSP.Logging;
 using SpaceWarp.API;
 using SpaceWarp.UI;
-using System.Diagnostics;
 using System.Reflection;
 using UnityEngine.SceneManagement;
 
@@ -24,11 +23,11 @@ namespace SpaceWarp {
         /// </summary>
         public static void Start()
         {
+            SpaceWarpGlobalConfiguration.Init();
 
             SceneManager.sceneLoaded += OnSceneLoaded;
 
             KspLogManager.AddLogCallback(SpaceWarpConsoleLogListener.LogCallback);
-            SpaceWarpGlobalConfiguration.Init();
         }
 
         /// <summary>
