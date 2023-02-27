@@ -3,8 +3,13 @@ using System.Collections.Generic;
 using KSP.Game;
 using KSP.Sim.impl;
 using UnityEngine;
-
+using SpaceWarp.API.AssetBundles;
 using KSP.Logging;
+using static KSP.Map.impl.Targeting.Sample;
+using static RTG.Object2ObjectSnap;
+using UnityEngine.UI;
+using BepInEx.Logging;
+
 namespace SpaceWarp.UI
 {
     public class SpaceWarpConsole : KerbalBehavior
@@ -19,6 +24,8 @@ namespace SpaceWarp.UI
 
         private static GUIStyle _boxStyle;
         private static Vector2 _scrollPosition;
+
+        public GUISkin _spaceWarpUISkin;
 
         private readonly List<string> _debugMessages = new List<string>();
 
@@ -38,19 +45,21 @@ namespace SpaceWarp.UI
 
             _windowWidth = (int)(Screen.width * 0.5f);
             _windowHeight = (int)(Screen.height * 0.5f);
-            _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f),
-                0, 0);
+            _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f),0, 0);
+
+            ResourceManager.TryGetAsset($"space_warp/swconsoleui/spacewarpConsole.guiskin", out _spaceWarpUISkin);
         }
 
         private void OnGUI()
         {
+            GUI.skin = _spaceWarpUISkin;
             if (!_drawUI)
             {
                 return;
             }
 
             int controlID = GUIUtility.GetControlID(FocusType.Passive);
-            string header = $"Space Warp Console";
+            string header = $"spacewarp.console";
             GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
             GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
 
@@ -93,15 +102,15 @@ namespace SpaceWarp.UI
             _boxStyle = GUI.skin.GetStyle("Box");
             GUILayout.BeginVertical();
             _scrollPosition = GUILayout.BeginScrollView(_scrollPosition, false, true);
-            
+
             foreach (string debugMessage in _debugMessages)
             {
                 GUILayout.Label(debugMessage);
             }
-            
+
             GUILayout.EndScrollView();
             GUILayout.BeginHorizontal();
-            
+
             if (GUILayout.Button("Close"))
             {
                 _drawUI = false;
@@ -116,7 +125,7 @@ namespace SpaceWarp.UI
             {
                 GameManager.Instance.Game.ViewController.inputLockManager.ClearControlLocks();
             }
-            
+
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
             GUI.DragWindow(new Rect(0, 0, 10000, 500));
