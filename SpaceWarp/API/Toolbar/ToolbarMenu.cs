@@ -31,9 +31,9 @@ namespace SpaceWarp.API.Toolbar
             
         }
 
-        internal void ToggleGUI()
+        internal void ToggleGUI(bool drawing)
         {
-            _drawing = !_drawing;
+            _drawing = drawing;
         }
         
         public abstract void DrawWindow();
