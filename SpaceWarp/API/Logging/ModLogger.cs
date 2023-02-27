@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace SpaceWarp.API.Logging
 {
@@ -18,22 +19,24 @@ namespace SpaceWarp.API.Logging
             _moduleName = moduleName;
         }
 
-        private void InternalLog(LogLevel level, string message)
+        private void InternalLog(LogLevel level, string message, params object[] args)
         {
             StringBuilder sb = new StringBuilder();
+            string formattedMessage = string.Format(message, args);
 
+            sb.Append($"[{DateTime.Now:HH:mm:ss.fff}] ");
             sb.Append($"[{_moduleName}] ");
             sb.Append($"[{level}] ");
-            sb.Append(message);
+            sb.Append(formattedMessage);
 
             UnityEngine.Debug.Log(sb.ToString());
         }
 
-        protected override void Log(LogLevel level, string message)
+        protected override void Log(LogLevel level, string message, params object[] args)
         {
             if ((int)level >= SpaceWarpGlobalConfiguration.Instance.LogLevel)
             {
-                InternalLog(level,message);
+                InternalLog(level, message);
             }
         }
     }
