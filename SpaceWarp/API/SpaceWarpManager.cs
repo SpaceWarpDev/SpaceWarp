@@ -15,6 +15,7 @@ using SpaceWarp.API.Managers;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
+using SpaceWarp.Compilation;
 using SpaceWarp.Patching;
 using SpaceWarp.UI;
 
@@ -28,7 +29,8 @@ namespace SpaceWarp.API
         private BaseModLogger _modLogger;
 
         private const string MODS_FOLDER_NAME = "Mods";
-        public static string MODS_FULL_PATH = Directory.GetCurrentDirectory() + "/SpaceWarp/" + MODS_FOLDER_NAME;
+        public static string SPACE_WARP_PATH = Directory.GetCurrentDirectory() + "/SpaceWarp/";
+        public static string MODS_FULL_PATH = SPACE_WARP_PATH + MODS_FOLDER_NAME;
 
         private const string SPACE_WARP_CONFIG_FILE_NAME = "space_warp_config.json";
         private static string SPACEWARP_CONFIG_FULL_PATH = MODS_FULL_PATH + "/" + SPACE_WARP_CONFIG_FILE_NAME;
@@ -372,6 +374,18 @@ namespace SpaceWarp.API
                 }
 
 				modAssemblies.Add(asm);
+            }
+            
+            
+            string modFolder = MODS_FULL_PATH + "/" + modName;
+            string srcPath = modFolder + "/src/";
+            if (Directory.Exists(srcPath) && Directory.GetFiles(srcPath, "*",SearchOption.AllDirectories).Length > 0)
+            {
+                var result = ModCompiler.CompileMod(modInfo.mod_id, srcPath);
+                if (result != null)
+                {
+                    modAssemblies.Add(result);
+                }
             }
 
             mainModType = null;

@@ -61,17 +61,35 @@ def build(release = False, doorstop = False):
     
     print("=> Copying build outputs...")
     
+    def shutil_copy(file):
+        shutil.copyfile(os.path.join(build_output_dir,file),os.path.join(output_dir,file))
+
+    to_transfer = [
+        "0Harmony.dll",
+        "0Harmony.xml",
+        "Mono.Cecil.dll",
+        "Mono.Cecil.Mdb.dll",
+        "Mono.Cecil.Pdb.dll",
+        "Mono.Cecil.Rocks.dll",
+        "MonoMod.RuntimeDetour.dll",
+        "MonoMod.Utils.dll",
+        "Microsoft.CodeAnalysis.dll",
+        "Microsoft.CodeAnalysis.CSharp.dll",
+        "System.Collections.Immutable.dll",
+        "System.Buffers.dll",
+        "System.Memory.dll",
+        "System.Reflection.Metadata.dll",
+        "System.Runtime.CompilerServices.Unsafe.dll",
+        "System.Text.Encoding.CodePages.dll",
+        "System.Threading.Tasks.Extensions.dll",
+        "System.Numerics.Vectors.dll",
+    ]
+
     if doorstop:
-        shutil.copyfile(os.path.join(build_output_dir, "0Harmony.dll"), os.path.join(output_dir, "0Harmony.dll"))
-        shutil.copyfile(os.path.join(build_output_dir, "0Harmony.xml"), os.path.join(output_dir, "0Harmony.xml"))
+        for file in to_transfer:
+            shutil_copy(file)
         
-        shutil.copyfile(os.path.join(build_output_dir, "Mono.Cecil.dll"), os.path.join(output_dir, "Mono.Cecil.dll"))
-        shutil.copyfile(os.path.join(build_output_dir, "Mono.Cecil.Mdb.dll"), os.path.join(output_dir, "Mono.Cecil.Mdb.dll"))
-        shutil.copyfile(os.path.join(build_output_dir, "Mono.Cecil.Pdb.dll"), os.path.join(output_dir, "Mono.Cecil.Pdb.dll"))
-        shutil.copyfile(os.path.join(build_output_dir, "Mono.Cecil.Rocks.dll"), os.path.join(output_dir, "Mono.Cecil.Rocks.dll"))
-        shutil.copyfile(os.path.join(build_output_dir, "MonoMod.RuntimeDetour.dll"), os.path.join(output_dir, "MonoMod.RuntimeDetour.dll"))
-        shutil.copyfile(os.path.join(build_output_dir, "MonoMod.Utils.dll"), os.path.join(output_dir, "MonoMod.Utils.dll"))
-        
+
     if not release and os.path.exists(os.path.join(build_output_dir, "SpaceWarp.pdb")):
         shutil.copyfile(os.path.join(build_output_dir, "SpaceWarp.pdb"), os.path.join(output_dir, "SpaceWarp.pdb"))
     
