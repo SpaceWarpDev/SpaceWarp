@@ -1,13 +1,63 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.IO;
 using Newtonsoft.Json;
+using UnityEngine;
 
 namespace SpaceWarp.API
 {
     [JsonObject(MemberSerialization.OptIn)]
     public class SpaceWarpGlobalConfiguration
     {
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)] 
-        [DefaultValue((int)Logging.LogLevel.Info)] 
+        public static SpaceWarpGlobalConfiguration Instance;
+        private const string MODS_FOLDER_NAME = "Mods";
+        public static string SPACE_WARP_PATH = Directory.GetCurrentDirectory() + "/SpaceWarp/";
+        public static string MODS_FULL_PATH = SPACE_WARP_PATH + MODS_FOLDER_NAME;
+
+        private static string SPACEWARP_CONFIG_FULL_PATH = MODS_FULL_PATH + "/" + SPACE_WARP_CONFIG_FILE_NAME;
+        private const string SPACE_WARP_CONFIG_FILE_NAME = "space_warp_config.json";
+
+        /// <summary>
+        /// Loading Global Configuration and puting it into Instance.
+        /// </summary>
+        public static void Init()
+        {
+            if (!File.Exists(SPACEWARP_CONFIG_FULL_PATH))
+            {
+                Instance = new SpaceWarpGlobalConfiguration();
+                Instance.ApplyDefaultValues();
+            }
+            else
+            {
+                try
+                {
+                    string json = File.ReadAllText(SPACEWARP_CONFIG_FULL_PATH);
+                    Instance = JsonConvert.DeserializeObject<SpaceWarpGlobalConfiguration>(json);
+                }
+                catch (Exception exception)
+                {
+                    //TODO: log this in a nicer way, for now I guess we can just construct a new logger
+                    Debug.LogError($"Loading space warp config failed\nException: {exception}");
+
+                    File.Delete(SPACEWARP_CONFIG_FULL_PATH);
+                    Init();
+                    return;
+                }
+            }
+
+            try
+            {
+                File.WriteAllLines(SPACEWARP_CONFIG_FULL_PATH, new[] { JsonConvert.SerializeObject(Instance) });
+            }
+            catch (Exception exception)
+            {
+                //TODO: log this in a nicer way, for now I guess we can just construct a new logger
+                Debug.LogError($"Saving the spacewarp config failed\nException: {exception}");
+            }
+        }
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        [DefaultValue((int)Logging.LogLevel.Info)]
         public int LogLevel { get; set; }
 
         public void ApplyDefaultValues()
