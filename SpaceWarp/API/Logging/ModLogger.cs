@@ -31,7 +31,7 @@ namespace SpaceWarp.API.Logging
 
         protected override void Log(LogLevel level, string message)
         {
-            if ((int)level >= StartupManager.SpaceWarpObject.SpaceWarpConfiguration.LogLevel)
+            if ((int)level >= SpaceWarpGlobalConfiguration.Instance.LogLevel)
             {
                 InternalLog(level,message);
             }
