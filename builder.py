@@ -18,6 +18,12 @@ parser.add_argument("-a", "--all", help="Build all targets", action="store_true"
 def clean():
     if os.path.exists(BUILD_DIR):
         shutil.rmtree(BUILD_DIR)
+    
+    if os.path.exists(os.path.join(SPACEWARP_DIR, "bin")):
+        shutil.rmtree(os.path.join(SPACEWARP_DIR, "bin"))
+    
+    if os.path.exists(os.path.join(SPACEWARP_DIR, "obj")):
+        shutil.rmtree(os.path.join(SPACEWARP_DIR, "obj"))
 
 def build(release = False, doorstop = False):
     build_type = "Doorstop" if doorstop else "BepInEx"
