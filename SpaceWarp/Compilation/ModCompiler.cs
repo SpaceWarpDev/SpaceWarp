@@ -107,8 +107,26 @@ namespace SpaceWarp.Compilation
 
             var compilation = CSharpCompilation.Create(modID + ".dll", trees, references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));
+            
             var result = compilation.Emit(CACHE_LOCATION + modID + ".dll");
-            return Assembly.LoadFile(CACHE_LOCATION + modID + ".dll");
+            foreach (Diagnostic diagnostic in result.Diagnostics)
+            {
+                if (diagnostic.WarningLevel == 0)
+                {
+                    _logger.Error(diagnostic.ToString());
+                }
+                else
+                {
+                    _logger.Info(diagnostic.ToString());
+                }
+            }
+
+            _logger.Info(result.ToString());
+            if (!result.Success)
+            {
+                File.Delete(CACHE_LOCATION + modID + ".dll");
+            }
+            return !result.Success ? null : Assembly.LoadFile(CACHE_LOCATION + modID + ".dll");
         }
     }
 }
