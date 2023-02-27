@@ -1,11 +1,13 @@
 ﻿using System;
 using KSP.Game;
 using SpaceWarp.API;
+using SpaceWarp.API.AssetBundles;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Managers;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.AssetBundles;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SpaceWarp.UI
 {
@@ -23,6 +25,7 @@ namespace SpaceWarp.UI
         private static Vector2 _scrollPositionMods;
         private string _selectedMod;
         private ModInfo _selectedModInfo;
+        private GUISkin _spaceWarpUISkin;
 
         public void Start()
         {
@@ -40,8 +43,7 @@ namespace SpaceWarp.UI
             _windowHeight = (int)(Screen.height * 0.85f);
 
             _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f), 0, 0);
-
-            ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
+            ResourceManager.TryGetAsset($"space_warp/swconsoleui/spacewarpConsole.guiskin", out _spaceWarpUISkin);
         }
 
         private void OnGUI()
@@ -56,6 +58,7 @@ namespace SpaceWarp.UI
             const string header = "spacewarp.modlist";
             GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
             GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
+            GUI.skin = _spaceWarpUISkin;
 
             _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, header, width, height);
         }
@@ -111,6 +114,7 @@ namespace SpaceWarp.UI
             GUILayout.Label(_selectedModInfo.name);
             GUILayout.Label($"Author: {_selectedModInfo.author}");
             GUILayout.Label($"Version: {_selectedModInfo.version}");
+            GUILayout.Label($"Source: {_selectedModInfo.source}");
             GUILayout.Label($"Description: {_selectedModInfo.description}");
             GUILayout.Label($"KSP2 Version: {_selectedModInfo.supported_ksp2_versions.min} - {_selectedModInfo.supported_ksp2_versions.max}");
             GUILayout.Label($"Dependencies");
