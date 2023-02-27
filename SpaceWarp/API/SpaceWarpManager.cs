@@ -229,7 +229,7 @@ namespace SpaceWarp.API
             {
                 foreach (string file in Directory.GetFiles(bundlesPath))
                 {
-
+                    _modLogger.Info($"Found space warp asset file {file}");
                     string assetBundleName = Path.GetFileNameWithoutExtension(file);
                     if (Path.GetExtension(file) != ".bundle") continue;
                     
