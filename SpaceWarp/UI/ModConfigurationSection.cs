@@ -8,7 +8,7 @@ namespace SpaceWarp.UI
     {
         public bool Open = false;
         
-        public readonly List<(string name, FieldInfo info, object confAttribute)> Properties = new List<(string name, FieldInfo info, object confAttribute)>();
+        public readonly List<(string name, FieldInfo info, object confAttribute, string currentStringValue)> Properties = new List<(string name, FieldInfo info, object confAttribute, string currentStringValue)>();
         public readonly List<(string path, ModConfigurationSection section)> SubSections = new List<(string path, ModConfigurationSection section)>();
 
         private ModConfigurationSection TouchSubSection(string subsection)
@@ -25,7 +25,7 @@ namespace SpaceWarp.UI
             return sub2;
 
         }
-        public void Insert(string[] path, (string name, FieldInfo info, object confAttribute) property)
+        public void Insert(string[] path, (string name, FieldInfo info, object confAttribute, string currentStringValue) property)
         {
             StringBuilder sb = new StringBuilder();
             foreach (string t in path)

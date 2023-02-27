@@ -5,6 +5,7 @@ using KSP.Game;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Managers;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SpaceWarp.UI
 {
@@ -14,8 +15,7 @@ namespace SpaceWarp.UI
         public Type ConfigurationType;
         public object ConfigurationObject;
 
-        public string ModName;
-        public string ModID;
+        [FormerlySerializedAs("ModID")] public string modID;
 
         private int _windowWidth = 350;
         private int _windowHeight = 700;
@@ -23,7 +23,7 @@ namespace SpaceWarp.UI
 
         private static GUIStyle _boxStyle;
 
-        private readonly ModConfigurationSection _rootSection = new ModConfigurationSection();
+        private ModConfigurationSection _rootSection;
 
         private void Awake()
         {
@@ -33,6 +33,7 @@ namespace SpaceWarp.UI
 
         public void Start()
         {
+            _rootSection = new ModConfigurationSection();
             foreach (FieldInfo field in ConfigurationType.GetFields(BindingFlags.Instance | BindingFlags.Public))
             {
                 object attribute;
@@ -48,17 +49,19 @@ namespace SpaceWarp.UI
                 
                 ConfigFieldAttribute fieldAttribute = field.GetCustomAttribute<ConfigFieldAttribute>();
                 
-                if (fieldAttribute != null)
+                if (fieldAttribute == null)
                 {
-                    attribute = fieldAttribute;
-                    attributeName = fieldAttribute.Name;
-                    _rootSection.Insert(section.Split(new []{'/'},StringSplitOptions.RemoveEmptyEntries), (attributeName, field, attribute));
+                    // attribute = fieldAttribute;
+                    // attributeName = fieldAttribute.Name;
+                    // _rootSection.Insert(section.Split(new []{'/'},StringSplitOptions.RemoveEmptyEntries), (attributeName, field, attribute, field.GetValue(ConfigurationObject).ToString()));
+                    continue;
                 }
-
                 attribute = fieldAttribute;
-                attributeName = fieldAttribute?.Name;
+                attributeName = fieldAttribute.Name;
 
-                _rootSection.Insert(section.Split(new []{'/'},StringSplitOptions.RemoveEmptyEntries), (attributeName, field, attribute));
+                var value = field.GetValue(ConfigurationObject);
+                _rootSection.Insert(section.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries),
+                    (attributeName, field, attribute, value != null ? value.ToString() : ""));
             }
 
             _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f), 0, 0);
@@ -67,7 +70,7 @@ namespace SpaceWarp.UI
         public void OnGUI()
         {
             int controlID = GUIUtility.GetControlID(FocusType.Passive);
-            string header = $"{ModID} configuration";
+            string header = $"{modID} configuration";
            
             GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.5));
             GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.5));
@@ -75,34 +78,48 @@ namespace SpaceWarp.UI
             _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, header, width, height);
         }
 
-        private void EditorInputField(string fieldName, FieldInfo info)
+        private string EditorInputField(string fieldName, FieldInfo info, string current)
         {
+            var result = "";
             GUILayout.BeginHorizontal();
 
             if (info.FieldType != typeof(bool))
             {
                 GUILayout.Label(fieldName);
 
-                string rawInputValue = GUILayout.TextField(info.GetValue(ConfigurationObject).ToString());
-                object convertedInputValue = TypeDescriptor.GetConverter(info.FieldType).ConvertFromInvariantString(rawInputValue);
-
-                info.SetValue(ConfigurationObject, convertedInputValue);
+                string rawInputValue = GUILayout.TextField(current);
+                result = rawInputValue;
+                try
+                {
+                    object convertedInputValue = TypeDescriptor.GetConverter(info.FieldType)
+                        .ConvertFromInvariantString(rawInputValue);
+                    info.SetValue(ConfigurationObject, convertedInputValue);
+                }
+                catch
+                {
+                    // ignored
+                }
             }
             else
             {
                 bool toggleValue = GUILayout.Toggle((bool)info.GetValue(ConfigurationObject), fieldName);
-
+                result = toggleValue.ToString();
                 info.SetValue(ConfigurationObject, toggleValue);
             }
 
             GUILayout.EndHorizontal();
+            return result;
         }
 
-        private void EditorForField((string name, FieldInfo info, object confAttribute) field)
+        private string EditorForField((string name, FieldInfo info, object confAttribute, string currentStringValue) field)
         {
             if (field.confAttribute is ConfigFieldAttribute)
             {
-                EditorInputField(field.name, field.info);
+                return EditorInputField(field.name, field.info, field.currentStringValue);
+            }
+            else
+            {
+                return "";
             }
         }
 
@@ -118,9 +135,13 @@ namespace SpaceWarp.UI
                 return;
             }
 
-            foreach ((string name, FieldInfo info, object confAttribute) property in section.Properties)
+
+            for (int i = 0; i < section.Properties.Count; i++)
             {
-                EditorForField(property);
+                var prop = section.Properties[i];
+                var str = EditorForField(prop);
+                prop.currentStringValue = str;
+                section.Properties[i] = prop;
             }
 
             foreach ((string path, ModConfigurationSection section) sub in section.SubSections)
@@ -140,9 +161,12 @@ namespace SpaceWarp.UI
             GUILayout.BeginVertical();
 
             // These are the root properties
-            foreach ((string name, FieldInfo info, object confAttribute) field in _rootSection.Properties)
+            for (int i = 0; i < _rootSection.Properties.Count; i++)
             {
-                EditorForField(field);
+                var prop = _rootSection.Properties[i];
+                var str = EditorForField(prop);
+                prop.currentStringValue = str;
+                _rootSection.Properties[i] = prop;
             }
 
             foreach ((string path, ModConfigurationSection section) section in _rootSection.SubSections)
@@ -155,7 +179,7 @@ namespace SpaceWarp.UI
                 //Run saving code from the configuration manager
                 if (ManagerLocator.TryGet(out ConfigurationManager configurationManager))
                 {
-                    configurationManager.UpdateConfiguration(ModID);
+                    configurationManager.UpdateConfiguration(modID);
                 }
                 Destroy(this);
             }

@@ -137,7 +137,7 @@ namespace SpaceWarp.UI
 
             configUI.ConfigurationType = config.configType;
             configUI.ConfigurationObject = config.configObject;
-            configUI.name = _selectedModInfo.name;
+            configUI.modID = _selectedMod;
 
             go.SetActive(true);
         }
