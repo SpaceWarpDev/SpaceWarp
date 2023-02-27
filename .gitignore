@@ -355,3 +355,4 @@ build/
 
 # Idea folder
 .idea
+nuget.exe
