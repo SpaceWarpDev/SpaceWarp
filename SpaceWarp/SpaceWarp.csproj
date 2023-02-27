@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.props')"/>
-    <Import Project="..\packages\BepInEx.PluginInfoProps.2.1.0\build\BepInEx.PluginInfoProps.props" Condition="Exists('..\packages\BepInEx.PluginInfoProps.2.1.0\build\BepInEx.PluginInfoProps.props')"/>
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
+    <Import Project="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.props')" />
+    <Import Project="..\packages\BepInEx.PluginInfoProps.2.1.0\build\BepInEx.PluginInfoProps.props" Condition="Exists('..\packages\BepInEx.PluginInfoProps.2.1.0\build\BepInEx.PluginInfoProps.props')" />
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
     <PropertyGroup>
         <Version>0.2.0</Version>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -75,7 +75,7 @@
         <Reference Include="MonoMod.Utils, Version=22.3.23.4, Culture=neutral, processorArchitecture=MSIL">
             <HintPath>..\packages\MonoMod.Utils.22.3.23.4\lib\net452\MonoMod.Utils.dll</HintPath>
         </Reference>
-        <Reference Include="mscorlib"/>
+        <Reference Include="mscorlib" />
         <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
             <SpecificVersion>False</SpecificVersion>
             <HintPath>..\external_dlls\Newtonsoft.Json.dll</HintPath>
@@ -84,18 +84,18 @@
             <SpecificVersion>False</SpecificVersion>
             <HintPath>..\external_dlls\Newtonsoft.Json.UnityConverters.dll</HintPath>
         </Reference>
-        <Reference Include="System"/>
+        <Reference Include="System" />
         <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
             <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
         </Reference>
         <Reference Include="System.Collections.Immutable, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
             <HintPath>..\packages\System.Collections.Immutable.6.0.0\lib\net461\System.Collections.Immutable.dll</HintPath>
         </Reference>
-        <Reference Include="System.Core"/>
+        <Reference Include="System.Core" />
         <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
             <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
         </Reference>
-        <Reference Include="System.Numerics"/>
+        <Reference Include="System.Numerics" />
         <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
             <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
         </Reference>
@@ -111,12 +111,12 @@
         <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
             <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
         </Reference>
-        <Reference Include="System.Xml.Linq"/>
-        <Reference Include="System.Data.DataSetExtensions"/>
-        <Reference Include="Microsoft.CSharp"/>
-        <Reference Include="System.Data"/>
-        <Reference Include="System.Net.Http"/>
-        <Reference Include="System.Xml"/>
+        <Reference Include="System.Xml.Linq" />
+        <Reference Include="System.Data.DataSetExtensions" />
+        <Reference Include="Microsoft.CSharp" />
+        <Reference Include="System.Data" />
+        <Reference Include="System.Net.Http" />
+        <Reference Include="System.Xml" />
         <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
             <SpecificVersion>False</SpecificVersion>
             <HintPath>..\external_dlls\Unity.TextMeshPro.dll</HintPath>
@@ -147,70 +147,71 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="API\AssetBundles\ResourceManager.cs"/>
-        <Compile Include="API\Configuration\ConfigDefaultValueAttribute.cs"/>
-        <Compile Include="API\Configuration\ConfigFieldAttribute.cs"/>
-        <Compile Include="API\Configuration\ConfigSectionAttribute.cs"/>
-        <Compile Include="API\Configuration\ConfigurationManager.cs"/>
-        <Compile Include="API\Configuration\ModConfigAttribute.cs"/>
-        <Compile Include="API\Managers\Manager.cs"/>
-        <Compile Include="API\Managers\ManagerLocator.cs"/>
-        <Compile Include="API\Mods\GlobalModDefines.cs"/>
-        <Compile Include="API\Mods\JSON\DependencyInfo.cs"/>
-        <Compile Include="API\Mods\JSON\ModInfo.cs"/>
-        <Compile Include="API\Mods\JSON\SupportedVersionsInfo.cs"/>
-        <Compile Include="API\Mods\MainModAttribute.cs"/>
-        <Compile Include="API\Mods\Mod.cs"/>
-        <Compile Include="API\Mods\ModLocator.cs"/>
-        <Compile Include="API\SpaceWarpGlobalConfiguration.cs"/>
-        <Compile Include="API\Logging\BaseModLogger.cs"/>
-        <Compile Include="API\Logging\LogLevel.cs"/>
-        <Compile Include="API\Logging\ModLogger.cs"/>
-        <Compile Include="API\SpaceWarpManager.cs"/>
-        <Compile Include="API\Versions\VersionUtility.cs"/>
-        <Compile Include="Compilation\ModCompiler.cs"/>
-        <Compile Include="BepInExEntrypoint.cs"/>
-        <Compile Include="Patching\LoadingActions\LoadAssetAction.cs"/>
-        <Compile Include="Patching\LoadingActions\LoadModAction.cs"/>
-        <Compile Include="Patching\LoadingActions\SpaceWarpAssetInitializationAction.cs"/>
-        <Compile Include="Entrypoint.cs"/>
-        <Compile Include="Patching\MainMenuPatcher.cs"/>
-        <Compile Include="Patching\LoadingActions\AfterModsLoadedAction.cs"/>
-        <Compile Include="Patching\LoadingActions\LoadAssetsAction.cs"/>
-        <Compile Include="Patching\LoadingActions\LoadModsAction.cs"/>
-        <Compile Include="Patching\LoadingActions\ReadingModsAction.cs"/>
-        <Compile Include="Patching\LoadingScreenPatcher.cs"/>
-        <Compile Include="Patching\StartGamePatch.cs"/>
-        <Compile Include="StartupManager.cs"/>
-        <Compile Include="Properties\AssemblyInfo.cs"/>
-        <Compile Include="UI\ModConfigurationSection.cs"/>
-        <Compile Include="UI\ModConfigurationUI.cs"/>
-        <Compile Include="UI\ModListUI.cs"/>
-        <Compile Include="UI\SpaceWarpConsole.cs"/>
-        <Compile Include="UI\SpaceWarpConsoleLogListener.cs"/>
+        <Compile Include="API\AssetBundles\ResourceManager.cs" />
+        <Compile Include="API\Configuration\ConfigDefaultValueAttribute.cs" />
+        <Compile Include="API\Configuration\ConfigFieldAttribute.cs" />
+        <Compile Include="API\Configuration\ConfigSectionAttribute.cs" />
+        <Compile Include="API\Configuration\ConfigurationManager.cs" />
+        <Compile Include="API\Configuration\ModConfigAttribute.cs" />
+        <Compile Include="API\Managers\Manager.cs" />
+        <Compile Include="API\Managers\ManagerLocator.cs" />
+        <Compile Include="API\Mods\GlobalModDefines.cs" />
+        <Compile Include="API\Mods\JSON\DependencyInfo.cs" />
+        <Compile Include="API\Mods\JSON\ModInfo.cs" />
+        <Compile Include="API\Mods\JSON\SupportedVersionsInfo.cs" />
+        <Compile Include="API\Mods\MainModAttribute.cs" />
+        <Compile Include="API\Mods\Mod.cs" />
+        <Compile Include="API\Mods\ModLocator.cs" />
+        <Compile Include="API\SpaceWarpGlobalConfiguration.cs" />
+        <Compile Include="API\Logging\BaseModLogger.cs" />
+        <Compile Include="API\Logging\LogLevel.cs" />
+        <Compile Include="API\Logging\ModLogger.cs" />
+        <Compile Include="API\SpaceWarpManager.cs" />
+        <Compile Include="API\Toolbar\Toolbar.cs" />
+        <Compile Include="API\Versions\VersionUtility.cs" />
+        <Compile Include="Compilation\ModCompiler.cs" />
+        <Compile Include="BepInExEntrypoint.cs" />
+        <Compile Include="Patching\LoadingActions\LoadAssetAction.cs" />
+        <Compile Include="Patching\LoadingActions\LoadModAction.cs" />
+        <Compile Include="Patching\LoadingActions\SpaceWarpAssetInitializationAction.cs" />
+        <Compile Include="Entrypoint.cs" />
+        <Compile Include="Patching\MainMenuPatcher.cs" />
+        <Compile Include="Patching\LoadingActions\AfterModsLoadedAction.cs" />
+        <Compile Include="Patching\LoadingActions\LoadAssetsAction.cs" />
+        <Compile Include="Patching\LoadingActions\LoadModsAction.cs" />
+        <Compile Include="Patching\LoadingActions\ReadingModsAction.cs" />
+        <Compile Include="Patching\LoadingScreenPatcher.cs" />
+        <Compile Include="Patching\StartGamePatch.cs" />
+        <Compile Include="StartupManager.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="UI\ModConfigurationSection.cs" />
+        <Compile Include="UI\ModConfigurationUI.cs" />
+        <Compile Include="UI\ModListUI.cs" />
+        <Compile Include="UI\SpaceWarpConsole.cs" />
+        <Compile Include="UI\SpaceWarpConsoleLogListener.cs" />
     </ItemGroup>
     <ItemGroup>
-        <None Include="App.config"/>
-        <None Include="packages.config"/>
+        <None Include="App.config" />
+        <None Include="packages.config" />
     </ItemGroup>
     <ItemGroup>
-        <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll"/>
-        <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll"/>
+        <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
+        <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
 
-        <Analyzer Include="..\packages\BepInEx.Analyzers.1.0.8\analyzers\dotnet\cs\BepInEx.Analyzers.CodeFixes.dll"/>
-        <Analyzer Include="..\packages\BepInEx.Analyzers.1.0.8\analyzers\dotnet\cs\BepInEx.Analyzers.dll"/>
+        <Analyzer Include="..\packages\BepInEx.Analyzers.1.0.8\analyzers\dotnet\cs\BepInEx.Analyzers.CodeFixes.dll" />
+        <Analyzer Include="..\packages\BepInEx.Analyzers.1.0.8\analyzers\dotnet\cs\BepInEx.Analyzers.dll" />
     </ItemGroup>
-    <Import Project="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets" Condition="Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets')"/>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
-    <Import Project="..\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets" Condition="Exists('..\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets')"/>
+    <Import Project="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets" Condition="Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets')" />
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <Import Project="..\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets" Condition="Exists('..\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets')" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
         <PropertyGroup>
             <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
         </PropertyGroup>
-        <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.props'))"/>
-        <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets'))"/>
+        <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.props'))" />
+        <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets'))" />
 
-        <Error Condition="!Exists('..\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets'))"/>
-        <Error Condition="!Exists('..\packages\BepInEx.PluginInfoProps.2.1.0\build\BepInEx.PluginInfoProps.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BepInEx.PluginInfoProps.2.1.0\build\BepInEx.PluginInfoProps.props'))"/>
+        <Error Condition="!Exists('..\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets'))" />
+        <Error Condition="!Exists('..\packages\BepInEx.PluginInfoProps.2.1.0\build\BepInEx.PluginInfoProps.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BepInEx.PluginInfoProps.2.1.0\build\BepInEx.PluginInfoProps.props'))" />
     </Target>
 </Project>
