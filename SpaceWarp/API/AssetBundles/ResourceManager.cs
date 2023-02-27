@@ -21,6 +21,18 @@ namespace SpaceWarp.API.AssetBundles
 			if (bundleObjects.Length != names.Length)
 			{
 				logger.Critical("bundle objects length and name lengths do not match");
+				logger.Info("going to dump objects and names");
+				logger.Info("Names");
+				for (int i = 0; i < names.Length; i++)
+				{
+					logger.Info($"{i} - {names[i]}");
+				}
+
+				logger.Info("Objects");
+				for (int i = 0; i < bundleObjects.Length; i++)
+				{
+						logger.Info($"{i} - {bundleObjects[i]}");
+				}
 				throw new System.Exception("bundle objects length and name lengths do not match");
 			}
 
