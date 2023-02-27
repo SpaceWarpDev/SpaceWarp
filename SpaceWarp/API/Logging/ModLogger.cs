@@ -19,20 +19,26 @@ namespace SpaceWarp.API.Logging
         {
             _moduleName = moduleName;
         }
+        
+        private string BuildLogMessage(LogLevel level, string message, object[] args)
+        {
+            StringBuilder sb = new StringBuilder();
+            string formattedMessage = string.Format(message, args);
+
+            sb.Append($"[{DateTime.Now:HH:mm:ss.fff}] ");
+            sb.Append($"[{_moduleName}] ");
+            sb.Append($"[{level}] ");
+            sb.Append(formattedMessage);
+
+            return sb.ToString();
+        }
 
         protected override async Task Log(LogLevel level, string message, params object[] args)
         {
             if ((int)level >= SpaceWarpGlobalConfiguration.Instance.LogLevel)
             {
-                string formattedMessage = string.Format(message, args);
-                StringBuilder sb = new StringBuilder();
-                
-                sb.Append($"[{DateTime.Now:HH:mm:ss.fff}] ");
-                sb.Append($"[{_moduleName}] ");
-                sb.Append($"[{level}] ");
-                sb.Append(formattedMessage);
-
-                await UnityEngine.Debug.LogAsync(sb.ToString());
+                string logMessage = BuildLogMessage(level, message, args);
+                await UnityEngine.Debug.LogAsync(logMessage);
             }
         }
     }
