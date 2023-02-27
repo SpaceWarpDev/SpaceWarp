@@ -5,6 +5,7 @@ using SpaceWarp.API.AssetBundles;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Managers;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.API.AssetBundles;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -18,6 +19,7 @@ namespace SpaceWarp.UI
 
         private int _windowWidth = 350;
         private int _windowHeight = 700;
+        public GUISkin _spaceWarpUISkin;
 
         private static GUIStyle _boxStyle;
         private static Vector2 _scrollPositionMods;
@@ -46,13 +48,14 @@ namespace SpaceWarp.UI
 
         private void OnGUI()
         {
+            GUI.skin = _spaceWarpUISkin;
             if (!_drawUI)
             {
                 return;
             }
 
             int controlID = GUIUtility.GetControlID(FocusType.Passive);
-            const string header = "Space Warp Mod List";
+            const string header = "spacewarp.modlist";
             GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
             GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
             GUI.skin = _spaceWarpUISkin;

@@ -4,6 +4,7 @@ using SpaceWarp.API;
 using SpaceWarp.UI;
 using System.Reflection;
 using UnityEngine.SceneManagement;
+using HarmonyLogger = HarmonyLib.Tools.Logger;
 
 #if DOORSTOP_BUILD
 namespace Doorstop
@@ -28,6 +29,11 @@ namespace SpaceWarp {
             SceneManager.sceneLoaded += OnSceneLoaded;
 
             KspLogManager.AddLogCallback(SpaceWarpConsoleLogListener.LogCallback);
+            if (SpaceWarpGlobalConfiguration.Instance.HarmonyLoggin)
+            {
+                HarmonyLogger.ChannelFilter = HarmonyLogger.LogChannel.All;
+                HarmonyLogger.MessageReceived += SpaceWarpConsoleLogListener.HarmonyLogCallback;
+            }
         }
 
         /// <summary>
