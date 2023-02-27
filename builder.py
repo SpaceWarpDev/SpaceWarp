@@ -56,7 +56,7 @@ def build(release = False, doorstop = False):
         shutil.copyfile(os.path.join(build_output_dir, "MonoMod.RuntimeDetour.dll"), os.path.join(output_dir, "MonoMod.RuntimeDetour.dll"))
         shutil.copyfile(os.path.join(build_output_dir, "MonoMod.Utils.dll"), os.path.join(output_dir, "MonoMod.Utils.dll"))
         
-    if not release:
+    if not release and os.path.exists(os.path.join(build_output_dir, "SpaceWarp.pdb")):
         shutil.copyfile(os.path.join(build_output_dir, "SpaceWarp.pdb"), os.path.join(output_dir, "SpaceWarp.pdb"))
     
     shutil.copyfile(os.path.join(build_output_dir, "SpaceWarp.dll"), os.path.join(output_dir, "SpaceWarp.dll"))
