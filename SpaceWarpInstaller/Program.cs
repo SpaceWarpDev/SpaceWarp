@@ -1,11 +1,16 @@
 ﻿namespace SpaceWarp.Installer {
     public class Program {
         public static void Main(string[] args) {
-            int? latest = Versions.GetLatestVersion();
-            string? release = Versions.GetDownloadUrl(latest);
+            Download? bepInExDownload = Versions.GetLatestDownload(ModLoader.BepInEx);
+            Download? doorstopDownload = Versions.GetLatestDownload(ModLoader.Doorstop);
 
-            Console.WriteLine($"Latest version: {latest}");
-            Console.WriteLine($"Download URL: {release}");
+            if (args.Length >= 1 && args[0].ToLower() == "doorstop" && doorstopDownload != null) {
+                Installer.Install(doorstopDownload);
+            } else if(bepInExDownload != null) {
+                Installer.Install(bepInExDownload);
+            } else {
+                Console.WriteLine("Could not find a release binary!");
+            }
         }
     }
 }
