@@ -33,12 +33,12 @@ namespace SpaceWarp.API.Logging
             return sb.ToString();
         }
 
-        protected override async Task Log(LogLevel level, string message, params object[] args)
+        protected override void Log(LogLevel level, string message, params object[] args)
         {
             if ((int)level >= SpaceWarpGlobalConfiguration.Instance.LogLevel)
             {
                 string logMessage = BuildLogMessage(level, message, args);
-                await UnityEngine.Debug.LogAsync(logMessage);
+                UnityEngine.Debug.Log(logMessage);
             }
         }
     }
