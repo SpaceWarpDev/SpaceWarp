@@ -12,7 +12,7 @@ namespace SpaceWarp.Compilation;
 
 public static class ModCompiler
 {
-    public static string CACHE_LOCATION = SpaceWarpManager.SPACE_WARP_PATH + "mod_cache/";
+    public static string CACHE_LOCATION = Path.Combine(SpaceWarpManager.SPACE_WARP_PATH,"mod_cache");
 
     private static BaseModLogger _logger = new ModLogger("Roslyn Compilation");
     public static Assembly CompileMod(string modID, string modSrcPath)
@@ -69,12 +69,12 @@ public static class ModCompiler
             return true;
         }
 
-        if (!File.Exists(CACHE_LOCATION + modID + ".dll"))
+        if (!File.Exists(Path.Combine(CACHE_LOCATION,modID + ".dll")))
         {
             return true;
         }
 
-        if (File.GetLastWriteTime(CACHE_LOCATION + modID + ".dll") < latestWriteTime)
+        if (File.GetLastWriteTime(Path.Combine(CACHE_LOCATION,modID + ".dll")) < latestWriteTime)
         {
             return true;
         }
@@ -84,7 +84,7 @@ public static class ModCompiler
 
     private static Assembly GetCachedCompilation(string modID)
     {
-        return Assembly.LoadFrom(CACHE_LOCATION + modID + ".dll");
+        return Assembly.LoadFrom(Path.Combine(CACHE_LOCATION,modID + ".dll"));
     }
 
     private static Assembly CompileNewAssemblyAndCache(string modID, string modSrcPath)
@@ -108,7 +108,7 @@ public static class ModCompiler
         var compilation = CSharpCompilation.Create(modID + ".dll", trees, references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));
             
-        var result = compilation.Emit(CACHE_LOCATION + modID + ".dll");
+        var result = compilation.Emit(Path.Combine(CACHE_LOCATION,modID + ".dll"));
         foreach (Diagnostic diagnostic in result.Diagnostics)
         {
             if (diagnostic.WarningLevel == 0)
@@ -124,8 +124,8 @@ public static class ModCompiler
         _logger.Info(result.ToString());
         if (!result.Success)
         {
-            File.Delete(CACHE_LOCATION + modID + ".dll");
+            File.Delete(Path.Combine(CACHE_LOCATION,modID + ".dll"));
         }
-        return !result.Success ? null : Assembly.LoadFile(CACHE_LOCATION + modID + ".dll");
+        return !result.Success ? null : Assembly.LoadFile(Path.Combine(CACHE_LOCATION,modID + ".dll"));
     }
 }
