@@ -12,7 +12,7 @@ namespace SpaceWarp.Patching.LoadingActions
             //
         }
 
-        protected override void DoAction(Action resolve, Action<string> reject)
+        public override void DoAction(Action resolve, Action<string> reject)
         {
             ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager);
 

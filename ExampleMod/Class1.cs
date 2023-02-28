@@ -1,4 +1,4 @@
-﻿using SpaceWarp.API;
+﻿using SpaceWarp.API.Mods;
 
 namespace ExampleMod
 {

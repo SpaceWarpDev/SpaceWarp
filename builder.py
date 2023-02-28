@@ -25,45 +25,11 @@ def clean():
     if os.path.exists(os.path.join(SPACEWARP_DIR, "obj")):
         shutil.rmtree(os.path.join(SPACEWARP_DIR, "obj"))
 
-def do_nuget_source():
-    sources_output = subprocess.run(["nuget", "sources", "list"], capture_output=True)
-    
-    if not "bepinex" in str(sources_output.stdout, "utf-8").lower():
-        print("=> Adding BepInEx source to Nuget config...")
-        
-        nuget_src_out = subprocess.run(["nuget", "sources", "add", "-Name", "BepInEx", "-Source", "https://nuget.bepinex.dev/v3/index.json"], capture_output=True)
-        
-        print("    |=>| STDOUT")
-    
-        for line in str(nuget_src_out.stdout, "utf-8").splitlines():
-            print(f"        {line}")
-        
-        print("    |=>| STDERR")
-    
-        for line in str(nuget_src_out.stderr, "utf-8").splitlines():
-            print(f"        {line}")
-    
-    print("=> Restoring project dependencies...")
-    
-    nuget_out = subprocess.run(["nuget", "restore"], capture_output=True)
-    
-    print("    |=>| STDOUT")
-    
-    for line in str(nuget_out.stdout, "utf-8").splitlines():
-        print(f"        {line}")
-        
-    print("    |=>| STDERR")
-    
-    for line in str(nuget_out.stderr, "utf-8").splitlines():
-        print(f"        {line}")
-
 def build(release = False, doorstop = False):
     build_type = "Doorstop" if doorstop else "BepInEx"
     dotnet_args = ["dotnet", "build", os.path.join(SPACEWARP_DIR, "SpaceWarp.csproj"), "-c", "Release" if release else "Debug"]
     build_output_dir = os.path.join(SPACEWARP_DIR, "bin", "Release" if release else "Debug")
     output_dir = os.path.join(BUILD_DIR, build_type, "BepInEx", "plugins", "SpaceWarp")
-    
-    do_nuget_source()
     
     if doorstop:
         dotnet_args.append("-p:DefineConstants=\"DOORSTOP_BUILD\"")
@@ -100,7 +66,6 @@ def build(release = False, doorstop = False):
 
     to_transfer = [
         "0Harmony.dll",
-        "0Harmony.xml",
         "Mono.Cecil.dll",
         "Mono.Cecil.Mdb.dll",
         "Mono.Cecil.Pdb.dll",
