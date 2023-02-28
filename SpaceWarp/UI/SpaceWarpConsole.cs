@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using KSP.Game;
+﻿using System.Collections.Generic;
 using KSP.Sim.impl;
 using UnityEngine;
-using SpaceWarp.API.AssetBundles;
-using KSP.Logging;
-using static KSP.Map.impl.Targeting.Sample;
-using static RTG.Object2ObjectSnap;
-using UnityEngine.UI;
-using BepInEx.Logging;
 using SpaceWarp.API;
 
 namespace SpaceWarp.UI

@@ -1,6 +1,4 @@
-﻿using System;
-using KSP.Game;
-using SpaceWarp.API.Configuration;
+﻿using KSP.Game;
 using SpaceWarp.API.Logging;
 using SpaceWarp.API.Mods.JSON;
 using UnityEngine;

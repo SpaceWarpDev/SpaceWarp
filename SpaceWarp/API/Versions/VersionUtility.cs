@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SpaceWarp.API.Versions
+﻿namespace SpaceWarp.API.Versions
 {
     public static class VersionUtility
     {

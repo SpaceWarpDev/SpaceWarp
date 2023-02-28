@@ -8,8 +8,6 @@ using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Managers;
 using SpaceWarp.API.Mods.JSON;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using Object = UnityEngine.Object;
 
 namespace SpaceWarp.UI
 {

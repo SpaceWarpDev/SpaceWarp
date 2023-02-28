@@ -1,7 +1,6 @@
 using System;
 using KSP.Game.Flow;
 using SpaceWarp.API;
-using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Managers;
 using SpaceWarp.API.Mods.JSON;
 

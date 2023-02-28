@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using KSP.Api.CoreTypes;
-using KSP.Game;
 using SpaceWarp.API;
 using SpaceWarp.API.Managers;
 using TMPro;

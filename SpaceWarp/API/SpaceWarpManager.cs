@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
-using KSP;
-using KSP.Game;
 using UnityEngine;
 using Newtonsoft.Json;
 using SpaceWarp.API.Configuration;
@@ -19,7 +17,6 @@ using SpaceWarp.API.Versions;
 using SpaceWarp.Compilation;
 using SpaceWarp.Patching;
 using SpaceWarp.UI;
-using UnityEngine.UI;
 
 namespace SpaceWarp.API
 {
