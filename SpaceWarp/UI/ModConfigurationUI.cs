@@ -2,10 +2,12 @@
 using System.ComponentModel;
 using System.Reflection;
 using KSP.Game;
+using SpaceWarp.API.AssetBundles;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Managers;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Object = UnityEngine.Object;
 
 namespace SpaceWarp.UI
 {
@@ -24,11 +26,15 @@ namespace SpaceWarp.UI
         private static GUIStyle _boxStyle;
 
         private ModConfigurationSection _rootSection;
-
+        private GUISkin _spaceWarpUISkin;
+        private GUIStyle _spaceWarpUISkinToggled;
+        private bool hasGUIStyles = false;
+        
         private void Awake()
         {
             _windowWidth = (int)(Screen.width * 0.5f);
             _windowHeight = (int)(Screen.height * 0.5f);
+            ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
         }
 
         public void Start()
@@ -67,11 +73,33 @@ namespace SpaceWarp.UI
             _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f), 0, 0);
         }
 
+        private void GetGUIStyles()
+        {
+            _spaceWarpUISkinToggled = new GUIStyle(_spaceWarpUISkin.button);
+            var oldNormal = _spaceWarpUISkinToggled.normal;
+            var oldHover = _spaceWarpUISkinToggled.hover;
+            var oldActive = _spaceWarpUISkinToggled.active;
+            var oldFocused = _spaceWarpUISkinToggled.focused;
+            _spaceWarpUISkinToggled.normal = _spaceWarpUISkinToggled.onNormal;
+            _spaceWarpUISkinToggled.hover = _spaceWarpUISkinToggled.onHover;
+            _spaceWarpUISkinToggled.active = _spaceWarpUISkinToggled.onActive;
+            _spaceWarpUISkinToggled.focused = _spaceWarpUISkinToggled.onFocused;
+            _spaceWarpUISkinToggled.onNormal = oldNormal;
+            _spaceWarpUISkinToggled.onHover = oldHover;
+            _spaceWarpUISkinToggled.onActive = oldActive;
+            _spaceWarpUISkinToggled.onFocused = oldFocused;
+            hasGUIStyles = true;
+        }
         public void OnGUI()
         {
+            GUI.skin = _spaceWarpUISkin;
+            if (!hasGUIStyles)
+            {
+                
+            }
             int controlID = GUIUtility.GetControlID(FocusType.Passive);
             string header = $"{modID} configuration";
-           
+            
             GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.5));
             GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.5));
 
@@ -125,7 +153,9 @@ namespace SpaceWarp.UI
 
         private void SectionPropertyViewer(string sectionName, ModConfigurationSection section, string parent)
         {
-            if (GUILayout.Button(parent == "" ? sectionName : parent + "/" + sectionName))
+            
+
+            if (GUILayout.Button((section.Open ? "V " : "> ") + (parent == "" ? sectionName : parent + "/" + sectionName)))
             {
                 section.Open = !section.Open;
             }

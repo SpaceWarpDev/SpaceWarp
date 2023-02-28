@@ -167,6 +167,8 @@
         <Compile Include="API\Logging\LogLevel.cs" />
         <Compile Include="API\Logging\ModLogger.cs" />
         <Compile Include="API\SpaceWarpManager.cs" />
+        <Compile Include="API\Toolbar\ToolbarBackend.cs" />
+        <Compile Include="API\Toolbar\ToolbarMenu.cs" />
         <Compile Include="API\Versions\VersionUtility.cs" />
         <Compile Include="Compilation\ModCompiler.cs" />
         <Compile Include="BepInExEntrypoint.cs" />

@@ -19,7 +19,6 @@ namespace SpaceWarp.UI
 
         private int _windowWidth = 350;
         private int _windowHeight = 700;
-        public GUISkin _spaceWarpUISkin;
 
         private static GUIStyle _boxStyle;
         private static Vector2 _scrollPositionMods;
@@ -43,7 +42,7 @@ namespace SpaceWarp.UI
             _windowHeight = (int)(Screen.height * 0.85f);
 
             _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f), 0, 0);
-            ResourceManager.TryGetAsset($"space_warp/swconsoleui/spacewarpConsole.guiskin", out _spaceWarpUISkin);
+            ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
         }
 
         private void OnGUI()
@@ -148,6 +147,7 @@ namespace SpaceWarp.UI
             configUI.ConfigurationObject = config.configObject;
             configUI.modID = _selectedMod;
 
+            
             go.SetActive(true);
         }
 

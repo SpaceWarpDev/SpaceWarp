@@ -14,10 +14,12 @@ using SpaceWarp.API.AssetBundles;
 using SpaceWarp.API.Managers;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.API.Toolbar;
 using SpaceWarp.API.Versions;
 using SpaceWarp.Compilation;
 using SpaceWarp.Patching;
 using SpaceWarp.UI;
+using UnityEngine.UI;
 
 namespace SpaceWarp.API
 {
@@ -52,6 +54,7 @@ namespace SpaceWarp.API
         /// </summary>
         private void Initialize()
         {
+            ToolbarBackend.AppBarInFlightSubscriber.AddListener(LoadAllButtons);
             InitializeConfigManager();
             
             InitializeModLogger();
@@ -566,6 +569,28 @@ namespace SpaceWarp.API
             consoleUIObject.transform.SetParent(transform.parent);
             SpaceWarpConsole con = consoleUIObject.AddComponent<SpaceWarpConsole>();
             consoleUIObject.SetActive(true);
+        }
+
+        private List<(string text, Sprite icon, string ID, Action<bool> action)> _buttonsToBeLoaded =
+            new List<(string text, Sprite icon, string ID, Action<bool> action)>();
+        public T RegisterGameToolbarMenu<T>(string text, Sprite icon, string id) where T : ToolbarMenu
+        {
+            GameObject toolBarUIObject = new GameObject($"Toolbar: {id}");
+            DontDestroyOnLoad(toolBarUIObject);
+            ToolbarMenu menu = toolBarUIObject.AddComponent<T>();
+            menu.Name = text;
+            toolBarUIObject.transform.SetParent(transform.parent);
+            toolBarUIObject.SetActive(true);
+            _buttonsToBeLoaded.Add((text,icon,id,menu.ToggleGUI)); 
+            return menu as T;
+        }
+
+        private void LoadAllButtons()
+        {
+            foreach (var button in _buttonsToBeLoaded)
+            {
+                ToolbarBackend.AddButton(button.text, button.icon, button.ID, button.action);
+            }
         }
     }
 }
