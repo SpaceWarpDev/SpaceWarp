@@ -24,7 +24,6 @@ namespace SpaceWarp.UI
         private static Vector2 _scrollPositionMods;
         private string _selectedMod;
         private ModInfo _selectedModInfo;
-        private GUISkin _spaceWarpUISkin;
 
         public void Start()
         {
@@ -42,12 +41,11 @@ namespace SpaceWarp.UI
             _windowHeight = (int)(Screen.height * 0.85f);
 
             _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f), 0, 0);
-            ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
         }
 
         private void OnGUI()
         {
-            GUI.skin = _spaceWarpUISkin;
+            GUI.skin = SpaceWarpManager.Skin;
             if (!_drawUI)
             {
                 return;
@@ -57,7 +55,6 @@ namespace SpaceWarp.UI
             const string header = "spacewarp.modlist";
             GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
             GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
-            GUI.skin = _spaceWarpUISkin;
 
             _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, header, width, height);
         }
