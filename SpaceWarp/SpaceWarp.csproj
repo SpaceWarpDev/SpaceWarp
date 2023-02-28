@@ -145,6 +145,9 @@
             <SpecificVersion>False</SpecificVersion>
             <HintPath>..\external_dlls\UnityEngine.UI.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+            <HintPath>..\external_dlls\UnityEngine.ImageConversionModule.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
         <Compile Include="API\AssetBundles\ResourceManager.cs" />
