@@ -1,9 +1,10 @@
-﻿// Attribution Notice To Lawrence/HatBat of https://github.com/Halbann/LazyOrbit
+// Attribution Notice To Lawrence/HatBat of https://github.com/Halbann/LazyOrbit
 // This file is licensed under https://creativecommons.org/licenses/by-sa/4.0/
 
 using System;
 using System.Collections;
 using HarmonyLib;
+using I2.Loc;
 using KSP.Api;
 using KSP.Api.CoreTypes;
 using KSP.Sim.impl;
@@ -42,6 +43,10 @@ public static class ToolbarBackend
         // Change the text.
         TextMeshProUGUI text = appButton.GetChild("Content").GetChild("TXT-title").GetComponent<TextMeshProUGUI>();
         text.text = buttonText;
+
+        Localize localizer = text.gameObject.GetComponent<Localize>();
+        if (localizer)
+            Object.Destroy(localizer);
 
         // Change the icon.
         GameObject icon = appButton.GetChild("Content").GetChild("GRP-icon");
