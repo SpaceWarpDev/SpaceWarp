@@ -9,6 +9,7 @@ using static KSP.Map.impl.Targeting.Sample;
 using static RTG.Object2ObjectSnap;
 using UnityEngine.UI;
 using BepInEx.Logging;
+using SpaceWarp.API;
 
 namespace SpaceWarp.UI
 {
@@ -18,7 +19,7 @@ namespace SpaceWarp.UI
 
         private bool _drawUI;
         private Rect _windowRect;
-        bool auto_scroll = true;
+        bool _autoScroll = true;
 
         private int _windowWidth = 350;
         private int _windowHeight = 700;
@@ -27,7 +28,6 @@ namespace SpaceWarp.UI
         private static Vector2 _scrollPosition;
         private static Vector2 _scrollView;
 
-        public GUISkin _spaceWarpUISkin;
         private readonly Queue<string> _debugMessages = new Queue<string>();
 
         public void Start()
@@ -48,16 +48,13 @@ namespace SpaceWarp.UI
 
             _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f), 0, 0);
             _scrollPosition = Vector2.zero;
-            ResourceManager.TryGetAsset($"space_warp/swconsoleui/spacewarpConsole.guiskin", out _spaceWarpUISkin);
 
-            // [FORMAT]: space_warp/[assetbundle_name]/[folder_in_assetbundle]/[file.type]
-            ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
 
         }
 
         private void OnGUI()
         {
-            GUI.skin = _spaceWarpUISkin;
+            GUI.skin = SpaceWarpManager.Skin;
             if (!_drawUI)
             {
                 return;
@@ -92,7 +89,7 @@ namespace SpaceWarp.UI
             {
                 string new_message = "" + message + "\n";
                 GUILayout.Label( new_message);
-                if(auto_scroll)
+                if(_autoScroll)
                 {
                     _scrollView.Set(_scrollView.x, Mathf.Infinity );
                     _scrollPosition = _scrollView;
@@ -119,11 +116,11 @@ namespace SpaceWarp.UI
                 SpaceWarpConsoleLogListener.DebugMessages.Clear();
             }
 
-            if (GUILayout.Button( auto_scroll ? "Auto Scroll: On" : "Auto Scroll: Off" ))
+            if (GUILayout.Button( _autoScroll ? "Auto Scroll: On" : "Auto Scroll: Off" ))
             {
                 //Todo: Add proper close button to top corner and add input lock button back. 
                 // GameManager.Instance.Game.ViewController.inputLockManager.ClearControlLocks();
-                auto_scroll = !auto_scroll;
+                _autoScroll = !_autoScroll;
             }
 
             GUILayout.EndHorizontal();

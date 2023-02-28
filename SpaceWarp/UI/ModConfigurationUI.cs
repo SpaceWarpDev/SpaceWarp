@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Reflection;
 using KSP.Game;
+using SpaceWarp.API;
 using SpaceWarp.API.AssetBundles;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Managers;
@@ -26,7 +27,6 @@ namespace SpaceWarp.UI
         private static GUIStyle _boxStyle;
 
         private ModConfigurationSection _rootSection;
-        private GUISkin _spaceWarpUISkin;
         private GUIStyle _spaceWarpUISkinToggled;
         private bool hasGUIStyles = false;
         
@@ -34,7 +34,6 @@ namespace SpaceWarp.UI
         {
             _windowWidth = (int)(Screen.width * 0.5f);
             _windowHeight = (int)(Screen.height * 0.5f);
-            ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
         }
 
         public void Start()
@@ -75,7 +74,7 @@ namespace SpaceWarp.UI
 
         private void GetGUIStyles()
         {
-            _spaceWarpUISkinToggled = new GUIStyle(_spaceWarpUISkin.button);
+            _spaceWarpUISkinToggled = new GUIStyle(SpaceWarpManager.Skin.button);
             var oldNormal = _spaceWarpUISkinToggled.normal;
             var oldHover = _spaceWarpUISkinToggled.hover;
             var oldActive = _spaceWarpUISkinToggled.active;
@@ -92,7 +91,7 @@ namespace SpaceWarp.UI
         }
         public void OnGUI()
         {
-            GUI.skin = _spaceWarpUISkin;
+            GUI.skin = SpaceWarpManager.Skin;
             if (!hasGUIStyles)
             {
                 

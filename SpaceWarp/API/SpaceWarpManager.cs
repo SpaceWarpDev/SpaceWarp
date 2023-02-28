@@ -585,11 +585,29 @@ namespace SpaceWarp.API
             return menu as T;
         }
 
+        /// <summary>
+        /// Allows an object to persist through KSP 2s destruction
+        /// </summary>
+        /// <param name="toPersist">Object that should be persisted</param>
         public static void Persist(GameObject toPersist)
         {
             DontDestroyOnLoad(toPersist);
             toPersist.tag = "Game Manager";
         }
+
+        private static GUISkin _skin = null;
+
+        public static GUISkin Skin
+        {
+            get
+            {
+                if (_skin == null)
+                    ResourceManager.TryGetAsset("space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out
+                        (_skin));
+                return _skin;
+            }
+        }
+        
         
         private void LoadAllButtons()
         {
