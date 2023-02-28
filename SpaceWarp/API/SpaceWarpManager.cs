@@ -190,20 +190,26 @@ public class SpaceWarpManager : Manager
     /// </summary>
     private void ResolveLoadOrder()
     {
-        //TODO: Make this way more optimized!
         _modLogger.Info("Resolving Load Order");
+
+        HashSet<string> resolvedDependencies = new HashSet<string>();
         bool changed = true;
+
         while (changed)
         {
             changed = false;
             List<int> toRemove = new List<int>();
+
             for (int i = 0; i < AllEnabledModInfo.Count; i++)
             {
-                _modLogger.Info("Attempting to resolve dependencies for " + AllEnabledModInfo[i].Item1);
-                if (AreDependenciesResolved(AllEnabledModInfo[i].Item2))
+                ModInfo modInfo = AllEnabledModInfo[i].Item2;
+                string modName = AllEnabledModInfo[i].Item1;
+
+                if (resolvedDependencies.Contains(modName) || AreDependenciesResolved(modInfo))
                 {
                     _modLoadOrder.Add(AllEnabledModInfo[i]);
                     toRemove.Add(i);
+                    resolvedDependencies.Add(modName);
                     changed = true;
                 }
             }
@@ -221,6 +227,7 @@ public class SpaceWarpManager : Manager
                 _modLogger.Warn($"Skipping loading of {modName} as not all dependencies could be met");
             }
         }
+
         LoadingScreenPatcher.AddAllModLoadingSteps();
     }
 
