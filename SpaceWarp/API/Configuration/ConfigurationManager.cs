@@ -4,36 +4,35 @@ using System.IO;
 using SpaceWarp.API.Managers;
 using Newtonsoft.Json;
 
-namespace SpaceWarp.API.Configuration
+namespace SpaceWarp.API.Configuration;
+
+public class ConfigurationManager : Manager
 {
-    public class ConfigurationManager : Manager
-    {
-        private readonly Dictionary<string, (Type configType, object configObject, string path)> _modConfigurations = new Dictionary<string, (Type configType, object configObject, string path)>();
+    private readonly Dictionary<string, (Type configType, object configObject, string path)> _modConfigurations = new Dictionary<string, (Type configType, object configObject, string path)>();
         
-        public void Add(string id, (Type configType, object configObject, string path) configuration)
+    public void Add(string id, (Type configType, object configObject, string path) configuration)
+    {
+        if (_modConfigurations.ContainsKey(id))
         {
-            if (_modConfigurations.ContainsKey(id))
-            {
-                return;
-            }
-
-            _modConfigurations[id] = configuration;
+            return;
         }
 
-        public bool TryGet(string id, out (Type configType, object configObject, string path) config)
+        _modConfigurations[id] = configuration;
+    }
+
+    public bool TryGet(string id, out (Type configType, object configObject, string path) config)
+    {
+        return _modConfigurations.TryGetValue(id, out config);
+    }
+
+    public void UpdateConfiguration(string id)
+    {
+        if (!_modConfigurations.TryGetValue(id, out (Type, object, string) config))
         {
-            return _modConfigurations.TryGetValue(id, out config);
+            return;
         }
 
-        public void UpdateConfiguration(string id)
-        {
-            if (!_modConfigurations.TryGetValue(id, out (Type, object, string) config))
-            {
-                return;
-            }
-
-            // Saves the new configuration
-            File.WriteAllText(config.Item3,JsonConvert.SerializeObject(config.Item2));
-        }
+        // Saves the new configuration
+        File.WriteAllText(config.Item3,JsonConvert.SerializeObject(config.Item2));
     }
 }

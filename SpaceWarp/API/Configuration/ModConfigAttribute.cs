@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace SpaceWarp.API.Configuration
+namespace SpaceWarp.API.Configuration;
+
+public class ModConfigAttribute : Attribute
 {
-    public class ModConfigAttribute : Attribute
-    {
         
-    }
 }

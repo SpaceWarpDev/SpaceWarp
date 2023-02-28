@@ -25,6 +25,9 @@
         <Reference Include="Unity.ResourceManager">
             <HintPath>..\external_dlls\Unity.ResourceManager.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+            <HintPath>..\external_dlls\UnityEngine.ImageConversionModule.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" />
