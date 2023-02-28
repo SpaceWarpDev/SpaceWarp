@@ -40,6 +40,8 @@ namespace SpaceWarp.API
         internal readonly List<(string, ModInfo)> _modLoadOrder = new List<(string, ModInfo)>();
         public readonly List<(string,ModInfo)> LoadedMods = new List<(string,ModInfo)>();
         private static readonly List<(string, ModInfo)> AllEnabledModInfo = new List<(string, ModInfo)>();
+        
+        public readonly List<(string,ModInfo)> IgnoredMods = new List<(string,ModInfo)>();
 
         public ModListUI ModListUI { get; private set; }
         protected override void Start()
@@ -120,6 +122,9 @@ namespace SpaceWarp.API
                 if (File.Exists(modFolder + "\\.ignore"))
                 {
                     _modLogger.Info($"Skipping mod {modName} due to .ignore file");
+                    ModInfo ignore_info = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(modFolder + "\\modinfo.json"));
+                    string ignore_fileName = Path.GetFileName(modFolder);
+                    IgnoredMods.Add((ignore_fileName,ignore_info));
                     continue;
                 }
                 _modLogger.Info($"Found mod: {modName}, adding to enable mods");
