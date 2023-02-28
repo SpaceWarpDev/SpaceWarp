@@ -12,7 +12,7 @@ public class LoadAssetsAction : FlowAction
 		//
 	}
 
-	public override void DoAction(Action resolve, Action<string> reject)
+	protected override void DoAction(Action resolve, Action<string> reject)
 	{
 		ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager);
 

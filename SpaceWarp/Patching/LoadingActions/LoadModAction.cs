@@ -17,7 +17,7 @@ public class LoadModAction : FlowAction
         _info = info;
     }
 
-    public override void DoAction(Action resolve, Action<string> reject)
+    protected override void DoAction(Action resolve, Action<string> reject)
     {
         ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager);
 
