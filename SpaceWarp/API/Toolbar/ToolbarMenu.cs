@@ -48,7 +48,7 @@ public abstract class ToolbarMenu : KerbalBehavior
     public string Title;
     private Rect _windowRect;
 
-    public void Awake()
+    public new void Awake()
     {
         _windowRect = new Rect(X, Y, 0, 0);
     }

@@ -82,7 +82,7 @@ public static class ToolbarBackend
 
 class ToolbarBackendObject : KerbalBehavior
 {
-    public void Start()
+    public new void Start()
     {
             
         StartCoroutine(awaiter());

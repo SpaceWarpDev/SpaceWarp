@@ -20,9 +20,9 @@ public class SpaceWarpConsole : KerbalBehavior
     private static Vector2 _scrollPosition;
     private static Vector2 _scrollView;
 
-    private readonly Queue<string> _debugMessages = new Queue<string>();
+    private readonly Queue<string> _debugMessages = new();
 
-    public void Start()
+    public new void Start()
     {
         if (_loaded)
         {
@@ -32,7 +32,7 @@ public class SpaceWarpConsole : KerbalBehavior
         _loaded = true;
     }
 
-    private void Awake()
+    private new void Awake()
     {
 
         _windowWidth = (int)(Screen.width * 0.5f);
@@ -40,8 +40,7 @@ public class SpaceWarpConsole : KerbalBehavior
 
         _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f), 0, 0);
         _scrollPosition = Vector2.zero;
-
-
+        
     }
 
     private void OnGUI()
@@ -56,13 +55,10 @@ public class SpaceWarpConsole : KerbalBehavior
         string header = $"spacewarp.console";
         GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
         GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
-            
-
+        
         _windowRect = GUILayout.Window(controlID, _windowRect, DrawConsole, header, width, height);
     }
-
-       
-
+    
     private void Update()
     {
         if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))
@@ -91,9 +87,7 @@ public class SpaceWarpConsole : KerbalBehavior
                 _scrollPosition = _scrollView;
             }
         }
-            
-
-             
+        
         GUILayout.EndScrollView();
         GUILayout.BeginHorizontal();
 
