@@ -1,15 +1,14 @@
 ﻿using HarmonyLib;
 
 
-namespace SpaceWarp.Patching
+namespace SpaceWarp.Patching;
+
+[HarmonyPatch(typeof(KSP.Game.GameManager))]
+[HarmonyPatch("StartGame")]
+public class StartGamePatch
 {
-	[HarmonyPatch(typeof(KSP.Game.GameManager))]
-	[HarmonyPatch("StartGame")]
-	public class StartGamePatch
+    public static void Prefix()
     {
-        public static void Prefix()
-        {
-            StartupManager.OnGameStarted();
-        }
+        StartupManager.OnGameStarted();
     }
 }
