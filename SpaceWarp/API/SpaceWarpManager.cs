@@ -693,7 +693,7 @@ public class SpaceWarpManager : Manager
     public void LoadSpaceWarpAddressables()
     {
         string addressablesPath = Path.Combine(SPACE_WARP_PATH,"addressables");
-        string catalogPath = Path.Combine(addressablesPath,"/catalog.json");
+        string catalogPath = Path.Combine(addressablesPath,"catalog.json");
         if (File.Exists(catalogPath))
         {
             StartCoroutine(LoadAddressable(catalogPath));
