@@ -40,18 +40,18 @@ public static class ToolbarBackend
         GameObject appButton = Object.Instantiate(resourceManger, list.transform);
         appButton.name = buttonId;
 
-            // Change the text.
-            TextMeshProUGUI text = appButton.GetChild("Content").GetChild("TXT-title").GetComponent<TextMeshProUGUI>();
-            text.text = buttonText;
+        // Change the text.
+        TextMeshProUGUI text = appButton.GetChild("Content").GetChild("TXT-title").GetComponent<TextMeshProUGUI>();
+        text.text = buttonText;
 
-            Localize localizer = text.gameObject.GetComponent<Localize>();
-            if (localizer)
-                Object.Destroy(localizer);
+        Localize localizer = text.gameObject.GetComponent<Localize>();
+        if (localizer)
+            Object.Destroy(localizer);
 
-            // Change the icon.
-            GameObject icon = appButton.GetChild("Content").GetChild("GRP-icon");
-            Image image = icon.GetChild("ICO-asset").GetComponent<Image>();
-            image.sprite = buttonIcon;
+        // Change the icon.
+        GameObject icon = appButton.GetChild("Content").GetChild("GRP-icon");
+        Image image = icon.GetChild("ICO-asset").GetComponent<Image>();
+        image.sprite = buttonIcon;
 
         // Add our function call to the toggle.
         ToggleExtended utoggle = appButton.GetComponent<ToggleExtended>();
