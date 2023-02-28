@@ -31,7 +31,11 @@ namespace SpaceWarp.API
         private BaseModLogger _modLogger;
 
         private const string MODS_FOLDER_NAME = "Mods";
-        public static string SPACE_WARP_PATH = Directory.GetCurrentDirectory() + "/SpaceWarp/";
+        #if DOORSTOP_BUILD
+        public static string SPACE_WARP_PATH = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).FullName + "/";
+        #else
+        public static string SPACE_WARP_PATH = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.FullName + "/SpaceWarp/";
+        #endif
         public static string MODS_FULL_PATH = SPACE_WARP_PATH + MODS_FOLDER_NAME;
 
         public SpaceWarpGlobalConfiguration SpaceWarpConfiguration;
@@ -46,6 +50,10 @@ namespace SpaceWarp.API
         public ModListUI ModListUI { get; private set; }
         protected override void Start()
         {
+            
+            Debug.Log($"Space Warp Path {SPACE_WARP_PATH}");
+            Debug.Log($"Mods Path {MODS_FULL_PATH}");
+            
             base.Start();
 
             Initialize();
@@ -228,7 +236,7 @@ namespace SpaceWarp.API
 
         internal void LoadSpaceWarpAssets()
         {
-            string bundlesPath = Directory.GetCurrentDirectory() + "/SpaceWarp" + GlobalModDefines.ASSET_BUNDLES_FOLDER;
+            string bundlesPath = SPACE_WARP_PATH + GlobalModDefines.ASSET_BUNDLES_FOLDER;
             if (Directory.Exists(bundlesPath))
             {
                 foreach (string file in Directory.GetFiles(bundlesPath))
