@@ -238,7 +238,8 @@ public class SpaceWarpManager : Manager
 
     internal void LoadSpaceWarpAssets()
     {
-        string bundlesPath = SPACE_WARP_PATH + GlobalModDefines.ASSET_BUNDLES_FOLDER;
+        string bundlesPath = Path.Combine(SPACE_WARP_PATH, GlobalModDefines.ASSET_BUNDLES_FOLDER);
+        
         if (Directory.Exists(bundlesPath))
         {
             foreach (string file in Directory.GetFiles(bundlesPath))
