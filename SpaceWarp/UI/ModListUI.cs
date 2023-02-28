@@ -29,7 +29,7 @@ namespace SpaceWarp.UI
         
         private readonly List<(string, bool)> _toggles = new List<(string, bool)>();
         private List<(string, bool)> _initialToggles = new List<(string, bool)>();
-        private Dictionary<string, bool> _wasToggledDict = new Dictionary<string, bool>();
+        private readonly Dictionary<string, bool> _wasToggledDict = new Dictionary<string, bool>();
 
         public void Start()
         {
@@ -106,6 +106,11 @@ namespace SpaceWarp.UI
                 }
             }
             GUILayout.EndHorizontal();
+
+            if (GUILayout.Button("Revert Changes"))
+            {
+                
+            }
             
             int numChanges = 0;
             for (int i = 0; i < _toggles.Count; i++)
@@ -133,7 +138,7 @@ namespace SpaceWarp.UI
                     }
 
                     bool isToggled = _toggles[toggleIndex].Item2; // current state of the toggle
-                    bool wasToggled = _wasToggledDict.ContainsKey(modID) ? _wasToggledDict[modID] : false; // previous state of the toggle (defaults to false if not found)
+                    bool wasToggled = _wasToggledDict.ContainsKey(modID) && _wasToggledDict[modID]; // previous state of the toggle (defaults to false if not found)
 
                     GUILayout.BeginHorizontal();
                     _toggles[toggleIndex] = (modID, GUILayout.Toggle(isToggled, ""));
@@ -168,17 +173,21 @@ namespace SpaceWarp.UI
                     }
 
                     bool isToggled = _toggles[toggleIndex].Item2; // current state of the toggle
-                    bool wasToggled = _wasToggledDict.ContainsKey(modID) ? _wasToggledDict[modID] : true; // previous state of the toggle (defaults to true if not found)
-
+                    bool wasToggled = !_wasToggledDict.ContainsKey(modID) || _wasToggledDict[modID];
+                    
                     GUILayout.BeginHorizontal();
-                    _toggles[toggleIndex] = (modID, GUILayout.Toggle(isToggled, ""));
+
+                    // Add a space to vertically center the toggle button
+                    GUILayoutOption[] alignMiddleOption = { GUILayout.Height(30)};
+
+                    _toggles[toggleIndex] = (modID, GUILayout.Toggle(isToggled, "", alignMiddleOption));
                     if (GUILayout.Button(modID))
                     {
                         _selectedMod = modID;
                         _selectedModInfo = modInfo;
                     }
-                    GUILayout.EndHorizontal();
 
+                    GUILayout.EndHorizontal();
                     // Edge detection
                     if (isToggled && !wasToggled) // falling edge
                     {
