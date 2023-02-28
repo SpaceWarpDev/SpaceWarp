@@ -10,11 +10,8 @@ namespace SpaceWarp.API;
 public class SpaceWarpGlobalConfiguration
 {
     public static SpaceWarpGlobalConfiguration Instance;
-    private const string MODS_FOLDER_NAME = "Mods";
-    public static string SPACE_WARP_PATH = Directory.GetCurrentDirectory() + "/SpaceWarp/";
-    public static string MODS_FULL_PATH = SPACE_WARP_PATH + MODS_FOLDER_NAME;
 
-    private static string SPACEWARP_CONFIG_FULL_PATH = MODS_FULL_PATH + "/" + SPACE_WARP_CONFIG_FILE_NAME;
+    private static string SPACEWARP_CONFIG_FULL_PATH = Path.Combine(SpaceWarpManager.MODS_FULL_PATH,SPACE_WARP_CONFIG_FILE_NAME);
     private const string SPACE_WARP_CONFIG_FILE_NAME = "space_warp_config.json";
 
     /// <summary>

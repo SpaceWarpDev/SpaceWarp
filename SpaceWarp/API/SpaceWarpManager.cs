@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,10 @@ using SpaceWarp.API.Versions;
 using SpaceWarp.Compilation;
 using SpaceWarp.Patching;
 using SpaceWarp.UI;
+using UnityEngine.AddressableAssets;
+using UnityEngine.AddressableAssets.ResourceLocators;
+using UnityEngine.AddressableAssets.ResourceProviders;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace SpaceWarp.API;
 
@@ -27,13 +32,13 @@ public class SpaceWarpManager : Manager
 {
     private BaseModLogger _modLogger;
 
-    private const string MODS_FOLDER_NAME = "Mods";
-#if DOORSTOP_BUILD
+        private const string MODS_FOLDER_NAME = "Mods";
+        #if DOORSTOP_BUILD
         public static string SPACE_WARP_PATH = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).FullName + "/";
-#else
-    public static string SPACE_WARP_PATH = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.FullName + "/SpaceWarp/";
-#endif
-    public static string MODS_FULL_PATH = SPACE_WARP_PATH + MODS_FOLDER_NAME;
+        #else
+        public static string SPACE_WARP_PATH = Path.Combine(Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.FullName,"SpaceWarp");
+        #endif
+        public static string MODS_FULL_PATH = Path.Combine(SPACE_WARP_PATH,MODS_FOLDER_NAME);
 
     public SpaceWarpGlobalConfiguration SpaceWarpConfiguration;
 
@@ -118,13 +123,13 @@ public class SpaceWarpManager : Manager
             string modFolder = modFolderuntrimmedU.TrimEnd('/', '\\');
 
             string modName = Path.GetFileName(modFolder);
-            if (!File.Exists(modFolder + "\\modinfo.json"))
+            if (!File.Exists(Path.Combine(modFolder,"modinfo.json")))
             {
                 _modLogger.Warn($"Found mod {modName} without modinfo.json");
                 continue;
             }
 
-            if (File.Exists(modFolder + "\\.ignore"))
+            if (File.Exists(Path.Combine(modFolder,".ignore")))
             {
                 _modLogger.Info($"Skipping mod {modName} due to .ignore file");
                 ModInfo ignore_info = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(modFolder + "\\modinfo.json"));
@@ -233,7 +238,8 @@ public class SpaceWarpManager : Manager
 
     internal void LoadSpaceWarpAssets()
     {
-        string bundlesPath = SPACE_WARP_PATH + GlobalModDefines.ASSET_BUNDLES_FOLDER;
+        string bundlesPath = Path.Combine(SPACE_WARP_PATH, GlobalModDefines.ASSET_BUNDLES_FOLDER);
+        
         if (Directory.Exists(bundlesPath))
         {
             foreach (string file in Directory.GetFiles(bundlesPath))
@@ -263,7 +269,7 @@ public class SpaceWarpManager : Manager
     /// <param name="info">the mod info structure that describes the mod</param>
     internal void LoadSingleModAssets(string modName, ModInfo info)
     {
-        string modFolder = MODS_FULL_PATH + "/" + modName;
+        string modFolder = Path.Combine(MODS_FULL_PATH, modName);
 
         // Now we load all asset bundles under the asset/bundles folder of the mod
         string bundlesPath = modFolder + GlobalModDefines.ASSET_BUNDLES_FOLDER;
@@ -315,12 +321,12 @@ public class SpaceWarpManager : Manager
     /// <param name="info">the mod info structure that describes the mod</param>
     internal void InitializeSingleMod(string modName, ModInfo info)
     {
-        string modFolder = MODS_FULL_PATH + "/" + modName;
+        string modFolder = Path.Combine(MODS_FULL_PATH, modName);
 
         _modLogger.Info($"Found mod: {modName}, attempting to load mod");
 
         // Now we load all assemblies under the code folder of the mod
-        string codePath = modFolder + GlobalModDefines.BINARIES_FOLDER;
+        string codePath = Path.Combine(modFolder, GlobalModDefines.BINARIES_FOLDER);
 
         if (Directory.Exists(codePath))
         {
@@ -386,8 +392,8 @@ public class SpaceWarpManager : Manager
         }
             
             
-        string modFolder = MODS_FULL_PATH + "/" + modName;
-        string srcPath = modFolder + "/src/";
+        string modFolder = Path.Combine(MODS_FULL_PATH,modName);
+        string srcPath = Path.Combine(modFolder, "src");
         if (Directory.Exists(srcPath) && Directory.GetFiles(srcPath, "*",SearchOption.AllDirectories).Length > 0)
         {
             var result = ModCompiler.CompileMod(modInfo.mod_id, srcPath);
@@ -464,7 +470,7 @@ public class SpaceWarpManager : Manager
     private void InitializeModConfig(Type config_type, string mod_id)
     {
         object modConfiguration = null;
-        var config_path = MODS_FULL_PATH + "\\" + mod_id + "\\config\\config.json";
+        var config_path = Path.Combine(MODS_FULL_PATH, mod_id, "config","config.json");
         if (!File.Exists(config_path))
         {
             modConfiguration = Activator.CreateInstance(config_type);
@@ -659,5 +665,55 @@ public class SpaceWarpManager : Manager
         }
 
         return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
+    }
+
+    public void InitializeAddressablesFolder()
+    {
+        LoadSpaceWarpAddressables();
+    }
+
+    public IEnumerator LoadAddressable(string catalog)
+    {
+        _modLogger.Info($"Attempting to load {catalog}");
+        AsyncOperationHandle<IResourceLocator> operation = Addressables.LoadContentCatalogAsync(catalog, null);
+        yield return operation;
+        if (operation.Status == AsyncOperationStatus.Failed)
+        {
+            _modLogger.Error($"Failed to load addressables catalog {catalog}");
+        }
+        else
+        {
+            _modLogger.Info($"Loaded addressables catalog {catalog}");
+            var locator = operation.Result;
+            _modLogger.Info($"{catalog} ----- {locator.LocatorId}");
+            Game.Assets.RegisterResourceLocator(locator);
+        }
+    }
+
+    public void LoadSpaceWarpAddressables()
+    {
+        string addressablesPath = Path.Combine(SPACE_WARP_PATH,"addressables");
+        string catalogPath = Path.Combine(addressablesPath,"catalog.json");
+        if (File.Exists(catalogPath))
+        {
+            StartCoroutine(LoadAddressable(catalogPath));
+        }
+    }
+    
+    public void LoadSingleModAddressables(string modID, ModInfo info)
+    {
+        string modFolder = Path.Combine(MODS_FULL_PATH, modID);
+        string addressablesPath = Path.Combine(modFolder,"addressables");
+        _modLogger.Info($"Loading addressables for {modID}");
+        string catalogPath = Path.Combine(addressablesPath, "catalog.json");
+        if (File.Exists(catalogPath))
+        {
+            _modLogger.Info($"Found addressables for {modID}");
+            StartCoroutine(LoadAddressable(catalogPath));
+        }
+        else
+        {
+            _modLogger.Info($"Did not find addressables for {modID}");
+        }
     }
 }
