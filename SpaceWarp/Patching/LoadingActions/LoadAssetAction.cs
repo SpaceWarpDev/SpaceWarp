@@ -4,31 +4,30 @@ using SpaceWarp.API;
 using SpaceWarp.API.Managers;
 using SpaceWarp.API.Mods.JSON;
 
-namespace SpaceWarp.Patching.LoadingActions
+namespace SpaceWarp.Patching.LoadingActions;
+
+public class LoadAssetAction : FlowAction
 {
-    public class LoadAssetAction : FlowAction
+    private readonly string _modID;
+    private readonly ModInfo _info;
+    public LoadAssetAction(string name, string modID, ModInfo info) : base(name)
     {
-        private readonly string _modID;
-        private readonly ModInfo _info;
-        public LoadAssetAction(string name, string modID, ModInfo info) : base(name)
+        _modID = modID;
+        _info = info;
+    }
+
+    public override void DoAction(Action resolve, Action<string> reject)
+    {
+        ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager);
+
+        try
         {
-            _modID = modID;
-            _info = info;
+            spaceWarpManager.LoadSingleModAssets(_modID,_info);
+            resolve();
         }
-
-        public override void DoAction(Action resolve, Action<string> reject)
+        catch (Exception e)
         {
-            ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager);
-
-            try
-            {
-                spaceWarpManager.LoadSingleModAssets(_modID,_info);
-                resolve();
-            }
-            catch (Exception e)
-            {
-                reject(e.ToString());
-            }
+            reject(e.ToString());
         }
     }
 }
