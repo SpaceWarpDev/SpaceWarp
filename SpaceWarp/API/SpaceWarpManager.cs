@@ -68,7 +68,7 @@ namespace SpaceWarp.API
         public void InitializeConfigManager()
         {
             GameObject confManagerObject = new GameObject("Configuration Manager");
-            DontDestroyOnLoad(confManagerObject);
+            Persist(confManagerObject);
 
             confManagerObject.AddComponent<ConfigurationManager>();
             confManagerObject.SetActive(true);
@@ -522,7 +522,7 @@ namespace SpaceWarp.API
 			try
 			{
                 ModLocator.Add(modComponent);
-                DontDestroyOnLoad(modObject);
+                Persist(modObject);
 				modComponent.Initialize();
 			}
             catch(Exception exception)
@@ -557,7 +557,7 @@ namespace SpaceWarp.API
         private void InitModUI()
         {
             GameObject modUIObject = new GameObject("Space Warp Mod UI");
-            DontDestroyOnLoad(modUIObject);
+            Persist(modUIObject);
 
             modUIObject.transform.SetParent(transform.parent);
             ModListUI = modUIObject.AddComponent<ModListUI>();
@@ -565,7 +565,7 @@ namespace SpaceWarp.API
             modUIObject.SetActive(true);
 
             GameObject consoleUIObject = new GameObject("Space Warp Console");
-            DontDestroyOnLoad(consoleUIObject);
+            Persist(consoleUIObject);
             consoleUIObject.transform.SetParent(transform.parent);
             SpaceWarpConsole con = consoleUIObject.AddComponent<SpaceWarpConsole>();
             consoleUIObject.SetActive(true);
@@ -576,7 +576,7 @@ namespace SpaceWarp.API
         public T RegisterGameToolbarMenu<T>(string text, Sprite icon, string id) where T : ToolbarMenu
         {
             GameObject toolBarUIObject = new GameObject($"Toolbar: {id}");
-            DontDestroyOnLoad(toolBarUIObject);
+            Persist(toolBarUIObject);
             ToolbarMenu menu = toolBarUIObject.AddComponent<T>();
             menu.Name = text;
             toolBarUIObject.transform.SetParent(transform.parent);
@@ -585,6 +585,12 @@ namespace SpaceWarp.API
             return menu as T;
         }
 
+        public static void Persist(GameObject toPersist)
+        {
+            DontDestroyOnLoad(toPersist);
+            toPersist.tag = "Game Manager";
+        }
+        
         private void LoadAllButtons()
         {
             foreach (var button in _buttonsToBeLoaded)

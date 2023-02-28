@@ -43,7 +43,7 @@ namespace SpaceWarp
         private static void CreateSpaceWarpManager()
         {
             GameObject spaceWarp = new GameObject("Space Warp");
-            Object.DontDestroyOnLoad(spaceWarp);
+            SpaceWarpManager.Persist(spaceWarp);
             SpaceWarpObject = spaceWarp.AddComponent<SpaceWarpManager>();
             spaceWarp.SetActive(true);
             // SpaceWarpObject.Initialize();
