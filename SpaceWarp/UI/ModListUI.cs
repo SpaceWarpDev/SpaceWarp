@@ -8,6 +8,7 @@ using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Managers;
 using SpaceWarp.API.Mods.JSON;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace SpaceWarp.UI
@@ -27,7 +28,7 @@ namespace SpaceWarp.UI
         private ModInfo _selectedModInfo;
         private GUISkin _spaceWarpUISkin;
         
-        private readonly List<(string, bool)> _toggles = new List<(string, bool)>();
+        private List<(string, bool)> _toggles = new List<(string, bool)>();
         private List<(string, bool)> _initialToggles = new List<(string, bool)>();
         private readonly Dictionary<string, bool> _wasToggledDict = new Dictionary<string, bool>();
 
@@ -106,11 +107,28 @@ namespace SpaceWarp.UI
                 }
             }
             GUILayout.EndHorizontal();
+            
 
-            if (GUILayout.Button("Revert Changes"))
+            GUILayout.BeginHorizontal();
+            if (ManagerLocator.TryGet(out SpaceWarpManager managerRemove))
             {
-                
+                if (GUILayout.Button("Revert Changes"))
+                {
+                    // Replace _toggles list with backup copy
+                    _toggles = new List<(string, bool)>(_initialToggles);
+
+                    // Delete all ignore files
+                    foreach ((string modID, ModInfo modInfo) in managerRemove.LoadedMods)
+                    {
+                        if (File.Exists($"SpaceWarp/Mods/{modID}/.ignore"))
+                        {
+                            File.Delete($"SpaceWarp/Mods/{modID}/.ignore");
+                        }
+                    }
+                }
             }
+            GUILayout.EndHorizontal();
+
             
             int numChanges = 0;
             for (int i = 0; i < _toggles.Count; i++)
