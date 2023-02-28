@@ -3,12 +3,10 @@ using System.ComponentModel;
 using System.Reflection;
 using KSP.Game;
 using SpaceWarp.API;
-using SpaceWarp.API.AssetBundles;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Managers;
 using UnityEngine;
 using UnityEngine.Serialization;
-using Object = UnityEngine.Object;
 
 namespace SpaceWarp.UI
 {

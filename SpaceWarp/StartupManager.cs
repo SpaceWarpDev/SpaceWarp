@@ -2,11 +2,6 @@
 using UnityEngine;
 using System.IO;
 using SpaceWarp.API;
-using Object = UnityEngine.Object;
-using SpaceWarp.Patching;
-using KSP.Logging;
-using SpaceWarp.UI;
-using static UnityEngine.Application;
 
 namespace SpaceWarp
 {

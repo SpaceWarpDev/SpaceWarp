@@ -1,5 +1,4 @@
-﻿using System;
-using KSP.Game;
+﻿using KSP.Game;
 using KSP.Sim.impl;
 using SpaceWarp.API.AssetBundles;
 using UnityEngine;

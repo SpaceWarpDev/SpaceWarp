@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using KSP.Game;
+﻿using KSP.Game;
 using SpaceWarp.API;
 using SpaceWarp.API.Managers;
 using SpaceWarp.Patching.LoadingActions;

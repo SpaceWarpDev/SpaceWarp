@@ -1,5 +1,4 @@
-﻿using System;
-using KSP.Game;
+﻿using KSP.Game;
 
 namespace SpaceWarp.API.Managers
 {
