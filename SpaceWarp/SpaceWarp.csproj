@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <Version>0.2.0</Version>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <Version>0.3.0</Version>
         <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
