@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,9 @@ using SpaceWarp.API.Versions;
 using SpaceWarp.Compilation;
 using SpaceWarp.Patching;
 using SpaceWarp.UI;
+using UnityEngine.AddressableAssets;
+using UnityEngine.AddressableAssets.ResourceLocators;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace SpaceWarp.API
 {
@@ -34,6 +38,8 @@ namespace SpaceWarp.API
         public static string SPACE_WARP_PATH = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.FullName + "/SpaceWarp/";
         #endif
         public static string MODS_FULL_PATH = SPACE_WARP_PATH + MODS_FOLDER_NAME;
+        
+        public static string ADDRESSABLES_PATH = Directory.GetParent(Application.dataPath) + "/SpaceWarp/.addressables";
 
         public SpaceWarpGlobalConfiguration SpaceWarpConfiguration;
 
@@ -624,6 +630,101 @@ namespace SpaceWarp.API
             foreach (var button in _buttonsToBeLoaded)
             {
                 ToolbarBackend.AddButton(button.text, button.icon, button.ID, button.action);
+            }
+        }
+
+        public void InitializeAddressablesFolder()
+        {
+            
+
+            if (Directory.Exists(ADDRESSABLES_PATH))
+            {
+                Directory.Delete(ADDRESSABLES_PATH,true);
+            }
+
+            Directory.CreateDirectory(ADDRESSABLES_PATH);
+            LoadSpaceWarpAddressables();
+        }
+
+        public IEnumerator LoadAddressable(string catalog)
+        {
+            AsyncOperationHandle<IResourceLocator> operation = Addressables.LoadContentCatalogAsync(catalog, null);
+            yield return operation;
+            if (operation.Status == AsyncOperationStatus.Failed)
+            {
+                _modLogger.Error($"Failed to load addressables catalog {catalog}");
+            }
+            else
+            {
+                _modLogger.Info($"Loaded addressables catalog {catalog}");
+                var locator = operation.Result;
+                Game.Assets.RegisterResourceLocator(locator);
+            }
+        }
+
+        public void LoadSpaceWarpAddressables()
+        {
+            string addressablesPath = SPACE_WARP_PATH + "/assets/addressables";
+            string toCopyPath = ADDRESSABLES_PATH + "/space_warp/";
+            if (Directory.Exists(addressablesPath))
+            {
+                Directory.CreateDirectory(toCopyPath);
+
+                var paths = Directory.GetFiles(addressablesPath, "*", SearchOption.AllDirectories);
+                foreach (var path in paths)
+                {
+                    var replacedPath = path.Replace(addressablesPath, "");
+                    var copyToPath = toCopyPath + replacedPath;
+                    if (!Directory.Exists(Path.GetDirectoryName(copyToPath)))
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(copyToPath));
+                    }
+
+                    File.Copy(path, copyToPath);
+                }
+
+                if (File.Exists(toCopyPath + "catalog.json"))
+                {
+                    StartCoroutine(LoadAddressable(toCopyPath + "catalog.json"));
+                }
+            }
+            else
+            {
+                _modLogger.Info($"Did not load addressables for space warp as no assets folder existed!");
+            }
+        }
+        
+        public void LoadSingleModAddressables(string modID, ModInfo info)
+        {
+            string modFolder = MODS_FULL_PATH + "/" + modID;
+            string addressablesPath = modFolder + "/addressables";
+            string toCopyPath = ADDRESSABLES_PATH + "/" + modID + "/";
+            
+            if (Directory.Exists(addressablesPath))
+            {
+                Directory.CreateDirectory(toCopyPath);
+
+                var paths = Directory.GetFiles(addressablesPath, "*", SearchOption.AllDirectories);
+                foreach (var path in paths)
+                {
+                    var replacedPath = path.Replace(addressablesPath, "");
+                    var copyToPath = toCopyPath + replacedPath;
+                    if (!Directory.Exists(Path.GetDirectoryName(copyToPath)))
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(copyToPath));
+                    }
+
+                    File.Copy(path, copyToPath);
+                }
+
+                if (File.Exists(toCopyPath + "catalog.json"))
+                {
+                    StartCoroutine(LoadAddressable(toCopyPath + "catalog.json"));
+                }
+            }
+            else
+            {
+                _modLogger.Info($"Did not load addressables for {modID} as no assets folder existed!");
             }
         }
     }
