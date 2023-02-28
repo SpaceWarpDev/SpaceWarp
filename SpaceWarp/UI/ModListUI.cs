@@ -19,7 +19,6 @@ namespace SpaceWarp.UI
 
         private int _windowWidth = 350;
         private int _windowHeight = 700;
-        public GUISkin _spaceWarpUISkin;
 
         private static GUIStyle _boxStyle;
         private static Vector2 _scrollPositionMods;
