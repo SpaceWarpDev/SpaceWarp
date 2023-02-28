@@ -12,9 +12,10 @@ namespace SpaceWarp.Compilation;
 
 public static class ModCompiler
 {
-    public static string CACHE_LOCATION = SpaceWarpManager.SPACE_WARP_PATH + "mod_cache/";
+    public static readonly string CACHE_LOCATION = SpaceWarpManager.SPACE_WARP_PATH + "mod_cache/";
 
     private static BaseModLogger _logger = new ModLogger("Roslyn Compilation");
+    
     public static Assembly CompileMod(string modID, string modSrcPath)
     {
         try
@@ -45,15 +46,16 @@ public static class ModCompiler
         
     private static string[] AllSourceFiles(string modSrcPath)
     {
-        DirectoryInfo d = new DirectoryInfo(modSrcPath);
-        string[] sourceFiles = d.EnumerateFiles("*.cs", SearchOption.AllDirectories).Select(a => a.FullName)
+        DirectoryInfo directoryInfo = new DirectoryInfo(modSrcPath);
+        string[] sourceFiles = directoryInfo.EnumerateFiles("*.cs", SearchOption.AllDirectories)
+            .Select(fileInfo => fileInfo.FullName)
             .ToArray();
         return sourceFiles;
     }
 
     private static bool CreateNewCompilation(string modID, string modSrcPath)
     {
-        var allSourceFiles = AllSourceFiles(modSrcPath);
+        string[] allSourceFiles = AllSourceFiles(modSrcPath);
         DateTime latestWriteTime = DateTime.FromBinary(0);
         foreach (var sourceFile in allSourceFiles)
         {
@@ -89,21 +91,21 @@ public static class ModCompiler
 
     private static Assembly CompileNewAssemblyAndCache(string modID, string modSrcPath)
     {
-        var allSourceFiles = AllSourceFiles(modSrcPath);
-        List<SyntaxTree> trees = new List<SyntaxTree>();
-        foreach (string file in allSourceFiles)
-        {
-            string code = File.ReadAllText(file);
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(code);
-            trees.Add(tree);
-        }
+        string[] allSourceFiles = AllSourceFiles(modSrcPath);
+        List<SyntaxTree> trees = Enumerable.ToList(
+            Enumerable.Select(
+                Enumerable.Select(allSourceFiles, File.ReadAllText),
+                code => CSharpSyntaxTree.ParseText(code)
+            )
+        );
 
-        List<MetadataReference> references = new List<MetadataReference>();
-        foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            if (asm.IsDynamic) continue;
-            references.Add(MetadataReference.CreateFromFile(asm.Location));
-        }
+        List<MetadataReference> references = Enumerable.ToList(
+            Enumerable.Cast<MetadataReference>(
+                from asm in AppDomain.CurrentDomain.GetAssemblies() 
+                where !asm.IsDynamic 
+                select MetadataReference.CreateFromFile(asm.Location)
+            )
+        );
 
         var compilation = CSharpCompilation.Create(modID + ".dll", trees, references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));
