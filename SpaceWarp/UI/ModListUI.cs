@@ -45,7 +45,7 @@ public class ModListUI : KerbalMonoBehaviour
         _windowWidth = (int)(Screen.width * 0.85f);
         _windowHeight = (int)(Screen.height * 0.85f);
 
-        _windowRect = new Rect((Screen.width * 0.15f), (Screen.height * 0.15f), 0, 0);
+        _windowRect = new Rect(Screen.width * 0.15f, Screen.height * 0.15f, 0, 0);
         ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
     }
 
@@ -125,9 +125,9 @@ public class ModListUI : KerbalMonoBehaviour
                 }
             }
         }
+        
         GUILayout.EndHorizontal();
 
-            
         int numChanges = 0;
         for (int i = 0; i < _toggles.Count; i++)
         {
@@ -146,7 +146,7 @@ public class ModListUI : KerbalMonoBehaviour
         {
             foreach ((string modID, ModInfo modInfo) in manager.LoadedMods)
             {
-                int toggleIndex = _toggles.FindIndex((t) => t.Item1 == modID);
+                int toggleIndex = _toggles.FindIndex(t => t.Item1 == modID);
                 if (toggleIndex == -1) // Toggle not found, add a new one
                 {
                     _toggles.Add((modID, true));
