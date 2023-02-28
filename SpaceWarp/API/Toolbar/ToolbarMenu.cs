@@ -26,7 +26,7 @@ namespace SpaceWarp.API.Toolbar
             {
                 if (_spaceWarpConsoleSkin == null)
                 {
-                    ResourceManager.TryGetAsset($"space_warp/swconsoleui/spacewarpConsole.guiskin", out _spaceWarpConsoleSkin);
+                    ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpConsoleSkin);
                 }
 
                 return _spaceWarpConsoleSkin;

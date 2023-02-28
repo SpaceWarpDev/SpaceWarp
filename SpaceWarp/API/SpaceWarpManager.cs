@@ -578,6 +578,7 @@ namespace SpaceWarp.API
             GameObject toolBarUIObject = new GameObject($"Toolbar: {id}");
             DontDestroyOnLoad(toolBarUIObject);
             ToolbarMenu menu = toolBarUIObject.AddComponent<T>();
+            menu.Name = text;
             toolBarUIObject.transform.SetParent(transform.parent);
             toolBarUIObject.SetActive(true);
             _buttonsToBeLoaded.Add((text,icon,id,menu.ToggleGUI)); 
