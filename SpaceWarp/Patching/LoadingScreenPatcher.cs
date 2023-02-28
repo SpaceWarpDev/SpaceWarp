@@ -16,7 +16,7 @@ public class LoadingScreenPatcher
         GameManager gameManager = GameManager.Instance;
         gameManager.LoadingFlow.AddAction(new ReadingModsAction("Resolving Space Warp Mod Load Order"));
         gameManager.LoadingFlow.AddAction(
-            new SpaceWarpAssetInitializationAction("Initializing Space Warp Provided Assets"));
+            new LoadSpaceWarpAddressablesAction("Initializing Space Warp Provided Addressables"));
         gameManager.LoadingFlow.AddAction(
             new SpaceWarpAssetInitializationAction("Initializing Space Warp Provided Assets"));
     }
