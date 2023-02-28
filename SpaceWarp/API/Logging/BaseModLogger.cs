@@ -5,13 +5,13 @@
     /// </summary>
     public abstract class BaseModLogger
     {
-        protected abstract void Log(LogLevel level, string message);
+        protected abstract void Log(LogLevel level, string message, params object[] args);
 
-        public void Trace(string message) => Log(LogLevel.Trace, message);
-        public void Debug(string message) => Log(LogLevel.Debug, message);
-        public void Info(string message) => Log(LogLevel.Info, message);
-        public void Warn(string message) => Log(LogLevel.Warn, message);
-        public void Error(string message) => Log(LogLevel.Error, message);
-        public void Critical(string message) => Log(LogLevel.Critical, message);
+        public void Trace(string message, params object[] args) => Log(LogLevel.Trace, message, args);
+        public void Debug(string message, params object[] args) => Log(LogLevel.Debug, message, args);
+        public void Info(string message, params object[] args) => Log(LogLevel.Info, message, args);
+        public void Warn(string message, params object[] args) => Log(LogLevel.Warn, message, args);
+        public void Error(string message, params object[] args) => Log(LogLevel.Error, message, args);
+        public void Critical(string message, params object[] args) => Log(LogLevel.Critical, message, args);
     }
 }
