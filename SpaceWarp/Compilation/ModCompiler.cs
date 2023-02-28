@@ -7,7 +7,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using SpaceWarp.API;
 using SpaceWarp.API.Logging;
 using UniLinq;
-using Enumerable = System.Linq.Enumerable;
 
 namespace SpaceWarp.Compilation;
 
