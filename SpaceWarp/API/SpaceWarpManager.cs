@@ -715,4 +715,56 @@ public class SpaceWarpManager : Manager
             _modLogger.Info($"Did not find addressables for {modID}");
         }
     }
+
+    private void LoadLocalizationFromFolder(string folder)
+    {
+        _modLogger.Info($"Attempting to load localizations from {folder}");
+        I2.Loc.LanguageSourceData languageSourceData = null;
+        if (!Directory.Exists(folder))
+        {
+            _modLogger.Info($"{folder} does not exist, not loading localizations.");
+            return;
+        }
+        DirectoryInfo info = new DirectoryInfo(folder);
+        foreach (var csvFile in info.GetFiles("*.csv"))
+        {
+            languageSourceData ??= new I2.Loc.LanguageSourceData();
+            var csvData = File.ReadAllText(csvFile.FullName);
+            languageSourceData.Import_CSV("", csvData, I2.Loc.eSpreadsheetUpdateMode.AddNewTerms);
+        }
+
+        foreach (var i2csvFile in info.GetFiles("*.i2csv"))
+        {
+            languageSourceData ??= new I2.Loc.LanguageSourceData();
+            var i2csvData = File.ReadAllText(i2csvFile.FullName);
+            languageSourceData.Import_I2CSV("", i2csvData, I2.Loc.eSpreadsheetUpdateMode.AddNewTerms);
+        }
+
+        if (languageSourceData != null)
+        {
+            _modLogger.Info($"Loaded localizations from {folder}");
+            I2.Loc.LocalizationManager.AddSource(languageSourceData);
+        }
+        else
+        {
+            _modLogger.Info($"No localizations found in {folder}");
+        }
+    }
+    public void LoadSpaceWarpLocalizations()
+    {
+        if (I2.Loc.LocalizationManager.Sources.Count == 0)
+        {
+            I2.Loc.LocalizationManager.UpdateSources();
+        }
+
+        string localizationsPath = Path.Combine(SPACE_WARP_PATH, "localizations");
+        LoadLocalizationFromFolder(localizationsPath);
+    }
+
+    public void LoadSingleModLocalization(string modID, ModInfo info)
+    {
+        string modFolder = Path.Combine(MODS_FULL_PATH, modID);
+        string localizationsPath = Path.Combine(modFolder, "localizations");
+        LoadLocalizationFromFolder(localizationsPath);
+    }
 }
