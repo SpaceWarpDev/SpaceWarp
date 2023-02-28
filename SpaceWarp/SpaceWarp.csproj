@@ -19,6 +19,9 @@
         <Reference Include="UnityEngine.UI">
             <HintPath>..\external_dlls\UnityEngine.UI.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+            <HintPath>..\external_dlls\UnityEngine.ImageConversionModule.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" />

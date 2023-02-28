@@ -27,7 +27,7 @@ namespace SpaceWarp.API.Toolbar
 
             // Say the magic words...
             GameObject list = GameObject.Find("GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Popup Canvas/Container/ButtonBar/BTN-App-Tray/appbar-others-group");
-            GameObject resourceManger = list.GetChild("BTN-Resource-Manager");
+            GameObject resourceManger = list?.GetChild("BTN-Resource-Manager");
 
             if (list == null || resourceManger == null)
             {
@@ -37,12 +37,11 @@ namespace SpaceWarp.API.Toolbar
 
             // Clone the resource manager button.
             GameObject appButton = Object.Instantiate(resourceManger, list.transform);
-            appButton.name = "LazyOrbitButton";
+            appButton.name = buttonId;
 
             // Change the text.
             TextMeshProUGUI text = appButton.GetChild("Content").GetChild("TXT-title").GetComponent<TextMeshProUGUI>();
-            text.text = "Lazy Orbit";
-            //text.gameObject.SetActive(true);
+            text.text = buttonText;
 
             // Change the icon.
             GameObject icon = appButton.GetChild("Content").GetChild("GRP-icon");
@@ -53,12 +52,7 @@ namespace SpaceWarp.API.Toolbar
             ToggleExtended utoggle = appButton.GetComponent<ToggleExtended>();
             utoggle.onValueChanged.AddListener(state => function(state));
 
-            // Fix the indicator's position and orientation.
-            //GameObject indicator = icon.GetChild("ELE-state");
-            //indicator.transform.localPosition = new Vector3(-18, 0, 0);
-            //indicator.transform.eulerAngles = new Vector3(0, 0, 90);
-
-            // Set the initial state of the toggle.
+            // Set the initial state of the button.
             UIValue_WriteBool_Toggle toggle = appButton.GetComponent<UIValue_WriteBool_Toggle>();
             toggle.BindValue(new Property<bool>(false));
 
@@ -72,8 +66,6 @@ namespace SpaceWarp.API.Toolbar
         }
 
         public static UnityEvent AppBarInFlightSubscriber = new UnityEvent();
-
-
 
         internal static void SubscriberSchedulePing()
         {

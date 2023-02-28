@@ -1,4 +1,6 @@
-﻿using KSP.Game;
+using System.IO;
+using System.Reflection;
+using KSP.Game;
 using KSP.Sim.impl;
 using SpaceWarp.API.AssetBundles;
 using UnityEngine;
@@ -19,6 +21,17 @@ namespace SpaceWarp.API.Toolbar
         {
             get;
         }
+
+        public abstract float X
+        {
+            get;
+        }
+
+        public abstract float Y
+        {
+            get;
+        }
+
         public virtual GUISkin Skin
         {
             get
@@ -32,13 +45,12 @@ namespace SpaceWarp.API.Toolbar
             }
         }
 
-        public string Name;
+        public string Title;
         private Rect _windowRect;
 
         public void Awake()
         {
-            
-            _windowRect = new Rect(Width,Height, 0, 0);
+            _windowRect = new Rect(X, Y, 0, 0);
         }
 
         public void OnGUI()
@@ -52,7 +64,7 @@ namespace SpaceWarp.API.Toolbar
             GUILayoutOption width = GUILayout.Width(Width);
             GUILayoutOption height = GUILayout.Height(Height);
             
-            _windowRect = GUILayout.Window(controlID, _windowRect, DoDrawing, Name, width, height);
+            _windowRect = GUILayout.Window(controlID, _windowRect, DoDrawing, Title, width, height);
         }
 
         internal void ToggleGUI(bool drawing)

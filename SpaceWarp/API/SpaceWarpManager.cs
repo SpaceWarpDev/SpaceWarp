@@ -581,19 +581,23 @@ namespace SpaceWarp.API
             consoleUIObject.SetActive(true);
         }
 
-        private List<(string text, Sprite icon, string ID, Action<bool> action)> _buttonsToBeLoaded =
+        private static List<(string text, Sprite icon, string ID, Action<bool> action)> _buttonsToBeLoaded =
             new List<(string text, Sprite icon, string ID, Action<bool> action)>();
-        public T RegisterGameToolbarMenu<T>(string text, Sprite icon, string id) where T : ToolbarMenu
+
+        public T RegisterGameToolbarMenu<T>(string text, string title, string id, Sprite icon) where T : ToolbarMenu
         {
             GameObject toolBarUIObject = new GameObject($"Toolbar: {id}");
             Persist(toolBarUIObject);
             ToolbarMenu menu = toolBarUIObject.AddComponent<T>();
-            menu.Name = text;
+            menu.Title = title;
             toolBarUIObject.transform.SetParent(transform.parent);
             toolBarUIObject.SetActive(true);
             _buttonsToBeLoaded.Add((text,icon,id,menu.ToggleGUI)); 
             return menu as T;
         }
+
+        public static void RegisterAppButton(string text, string id, Sprite icon, Action<bool> func) =>
+            _buttonsToBeLoaded.Add((text ,icon, id, func)); 
 
         /// <summary>
         /// Allows an object to persist through KSP 2s destruction
@@ -618,13 +622,43 @@ namespace SpaceWarp.API
             }
         }
         
-        
         private void LoadAllButtons()
         {
             foreach (var button in _buttonsToBeLoaded)
             {
                 ToolbarBackend.AddButton(button.text, button.icon, button.ID, button.action);
             }
+        }
+
+        /// <summary>
+        /// Loads a png called 'icon.png' as a sprite from the same folder as the calling dll.
+        /// In our case this should be SpaceWarp\Mods\[mod]\bin\icon.png
+        /// </summary>
+        /// <param name="size">The size of the png. The appbar expects 24x24.</param>
+        public static Sprite LoadIcon(int size = 24)
+        {
+            string folderPath = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
+
+            return LoadIcon(Path.Combine(folderPath, "icon.png"), size);
+        }
+
+        /// <summary>
+        /// Loads a png at the given path as a sprite.
+        /// </summary>
+        /// <param name="path">Path to the png.</param>
+        /// <param name="size">The size of the png. The appbar expects 24x24.</param>
+        public static Sprite LoadIcon(string path, int size = 24)
+        {
+            Texture2D tex = new Texture2D(size, size, TextureFormat.ARGB32, false);
+            tex.filterMode = FilterMode.Point;
+
+            if (File.Exists(path))
+            {
+                byte[] fileContent = File.ReadAllBytes(path);
+                ImageConversion.LoadImage(tex, fileContent);
+            }
+
+            return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
         }
     }
 }
