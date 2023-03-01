@@ -29,7 +29,6 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 ###### **Link to [crashlog](https://gist.github.com/)** *[If Applicable]*
-
 Ctrl + V here
 
 ###### **Screenshots**
