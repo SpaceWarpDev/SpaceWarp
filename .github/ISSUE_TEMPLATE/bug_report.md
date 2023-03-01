@@ -8,29 +8,30 @@ labels: bug
 ## Version Information
 
 ###### **KSP 2 Version**
-> Type here
+[0.1.0]
 
 ###### **Space Warp Version**
-> Type here
+[0.3.0]
 
 ------------------------------
 
 ## Bug Information
 
 ###### **Describe the bug**
-> Type here
+[Game crashes when x]
 
 ###### **How to reproduce**
-> Type here
+[1. Install X]
 
 ###### **Link to [crashlog](https://gist.github.com/)** *[If Applicable]*
-> Type here
+[(link here)]
 
 ###### **Screenshots / Images**
-> Ctrl + V here
+[Ctrl + V here]
 
 ------------------------------
 
 ### Additional Information
 
 Please provide any additional information that might be helpful in resolving this issue.
+[Additional Information]
