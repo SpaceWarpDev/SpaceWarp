@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -7,13 +8,12 @@
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
     <ItemGroup>
-      <ProjectReference Include="..\SpaceWarp\SpaceWarp.csproj" />
-      <PackageReference Include="UnityEngine.Modules" Version="2020.3.33" />
-      <Reference Include="Assembly-CSharp">
-          <HintPath>..\external_dlls\Assembly-CSharp.dll</HintPath>
-          <Publicize>true</Publicize>
-      </Reference>
-      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all" />
+        <ProjectReference Include="..\SpaceWarp\SpaceWarp.csproj" />
+        <PackageReference Include="UnityEngine.Modules" Version="2020.3.33" />
+        <Reference Include="Assembly-CSharp">
+            <HintPath>..\external_dlls\Assembly-CSharp.dll</HintPath>
+            <Publicize>true</Publicize>
+        </Reference>
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all" />
     </ItemGroup>
-
 </Project>

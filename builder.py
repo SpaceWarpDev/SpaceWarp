@@ -99,6 +99,9 @@ def build(release = False, doorstop = False):
     os.makedirs(os.path.join(BUILD_DIR, build_type, "SpaceWarp", "assets", "bundles"))
     os.makedirs(os.path.join(BUILD_DIR, build_type, "SpaceWarp", "Mods"))
     
+    with open(os.path.join(BUILD_DIR, build_type, "SpaceWarp", "Mods","mods_folder.txt"),"w") as mods_folder_txt:
+        mods_folder_txt.write("Mods go here")
+
     for bundle in os.listdir(BUNDLES_DIR):
         if bundle.endswith(".bundle"):
             shutil.copyfile(os.path.join(BUNDLES_DIR, bundle), os.path.join(BUILD_DIR, build_type, "SpaceWarp", "assets", "bundles", bundle))
