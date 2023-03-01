@@ -7,6 +7,9 @@ Space Warp is a mod loader for Kerbal Space Program 2.
 
 Note: Use at your own risk, as this is an early version that is expected to undergo many changes.
 
+## Documentation
+[Read the docs documentation](https://spacewarpdocs.readthedocs.io/en/latest/index.html)
+
 ## Compiling
 
 To compile this project, you will need to follow these steps:
