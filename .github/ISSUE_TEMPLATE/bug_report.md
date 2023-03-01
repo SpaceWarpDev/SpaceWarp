@@ -1,37 +1,40 @@
-﻿---
+---
 name: Bug report
 about: Create a report to help us resolve a bug or issue
-title: '[BUG]'
-labels: bug
+title: "[BUG]"
+labels: ''
+assignees: ''
+
 ---
 
 ## Version Information
 
 ###### **KSP 2 Version**
-[0.1.0]
+The KSP 2 Version
 
 ###### **Space Warp Version**
-[0.3.0]
+The Space Warp Version
 
 ------------------------------
 
 ## Bug Information
 
 ###### **Describe the bug**
-[Game crashes when x]
+A clear and concise description of what the bug is.
 
-###### **How to reproduce**
-[1. Install X]
+###### **To Reproduce**
+Steps to reproduce the behavior:
+
+###### **Expected behavior**
+A clear and concise description of what you expected to happen.
 
 ###### **Link to [crashlog](https://gist.github.com/)** *[If Applicable]*
-[(link here)]
 
-###### **Screenshots / Images**
-[Ctrl + V here]
+Ctrl + V here
 
-------------------------------
+###### **Screenshots**
+If applicable, add screenshots to help explain your problem.
 
-### Additional Information
 
-Please provide any additional information that might be helpful in resolving this issue.
-[Additional Information]
+###### **Additional context**
+Add any other context about the problem here.
