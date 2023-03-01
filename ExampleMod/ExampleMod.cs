@@ -1,7 +1,6 @@
 ﻿using SpaceWarp.API.Mods;
 using SpaceWarp.API.AssetBundles;
 using SpaceWarp.API;
-using Random = UnityEngine.Random;
 using KSP.UI.Binding;
 using KSP.Sim.impl;
 using UnityEngine;
@@ -15,8 +14,7 @@ public class ExampleMod : Mod
 
     private bool drawUI;
     private Rect windowRect;
-
-    bool loaded;
+    private bool loaded;
 
     private static ExampleMod Instance { get; set; }
 
@@ -60,7 +58,7 @@ public class ExampleMod : Mod
     /// It toggles the <see cref="drawUI"/> flag and updates the button's state.
     /// </summary>
     /// <param name="toggle">The new state of the button.</param>
-    void ToggleButton(bool toggle)
+    private void ToggleButton(bool toggle)
     {
         drawUI = toggle;
         GameObject.Find("BTN-ExampleMod")?.GetComponent<UIValue_WriteBool_Toggle>()?.SetValue(toggle);
@@ -93,7 +91,7 @@ public class ExampleMod : Mod
     /// A method that is called to draw the contents of the mod's GUI window.
     /// </summary>
     /// <param name="windowID">The ID of the GUI window.</param>
-    private void FillWindow(int windowID)
+    private static void FillWindow(int windowID)
     {
         GUILayout.Label("Example Mod - Built with Space-Warp");
         GUI.DragWindow(new Rect(0, 0, 10000, 500));
@@ -102,18 +100,18 @@ public class ExampleMod : Mod
     /// <summary>
     /// Runs every frame and performs various tasks based on the game state.
     /// </summary>
-    void LateUpdate()
+    private void LateUpdate()
     {
-        // Now lets play with some Game objects, first lets mess with the audio on the main menu.
+        // Now lets play with some Game objects
         if (Instance.Game.GlobalGameState.GetState() == KSP.Game.GameState.MainMenu)
         {
-            KSP.Audio.KSPAudioEventManager.SetMasterVolume(Random.Range(1.0f, 100.0f));
+            KSP.Audio.KSPAudioEventManager.SetMasterVolume(Mathf.Sin(Time.time) * 100);
         }
         else if (Instance.Game.GlobalGameState.GetState() == KSP.Game.GameState.FlightView)
         {
             // Getting the active vessel, staging it over and over and printing out all the parts. 
             VesselComponent _activeVessel = Instance.Game.ViewController.GetActiveSimVessel();
-
+            
             if (_activeVessel != null)
             {
                 _activeVessel.ActivateNextStage();
