@@ -192,7 +192,7 @@ public class SpaceWarpManager : Manager
     {
         _modLogger.Info("Resolving Load Order");
 
-        HashSet<string> resolvedDependencies = new HashSet<string>();
+        HashSet<(string, Version)> resolvedDependencies = new HashSet<(string, Version)>();
         bool changed = true;
 
         while (changed)
@@ -204,12 +204,13 @@ public class SpaceWarpManager : Manager
             {
                 ModInfo modInfo = AllEnabledModInfo[i].Item2;
                 string modName = AllEnabledModInfo[i].Item1;
+                Version modVersion = new Version(modInfo.version);
 
-                if (resolvedDependencies.Contains(modName) || AreDependenciesResolved(modInfo))
+                if (resolvedDependencies.Contains((modName, modVersion)) || AreDependenciesResolved(modInfo))
                 {
                     _modLoadOrder.Add(AllEnabledModInfo[i]);
                     toRemove.Add(i);
-                    resolvedDependencies.Add(modName);
+                    resolvedDependencies.Add((modName, modVersion));
                     changed = true;
                 }
             }
