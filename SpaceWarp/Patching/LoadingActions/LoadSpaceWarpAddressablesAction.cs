@@ -1,19 +1,14 @@
-using System;
+﻿using System;
 using KSP.Game.Flow;
 using SpaceWarp.API;
 using SpaceWarp.API.Managers;
-using SpaceWarp.API.Mods.JSON;
 
 namespace SpaceWarp.Patching.LoadingActions;
 
-public class LoadAssetAction : FlowAction
+public class LoadSpaceWarpAddressablesAction : FlowAction
 {
-    private readonly string _modID;
-    private readonly ModInfo _info;
-    public LoadAssetAction(string name, string modID, ModInfo info) : base(name)
+    public LoadSpaceWarpAddressablesAction(string name) : base(name)
     {
-        _modID = modID;
-        _info = info;
     }
 
     public override void DoAction(Action resolve, Action<string> reject)
@@ -22,7 +17,7 @@ public class LoadAssetAction : FlowAction
 
         try
         {
-            spaceWarpManager.LoadSingleModAssets(_modID,_info);
+            spaceWarpManager.InitializeAddressablesFolder();
             resolve();
         }
         catch (Exception e)

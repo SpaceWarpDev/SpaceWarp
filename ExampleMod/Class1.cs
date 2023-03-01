@@ -1,15 +1,14 @@
-﻿using SpaceWarp.API;
+﻿using SpaceWarp.API.Mods;
 
-namespace ExampleMod
+namespace ExampleMod;
+
+[MainMod]
+public class ExampleModRunner : Mod
 {
-    [MainMod]
-    public class ExampleModRunner : Mod
+    public override void Initialize()
     {
-        public override void Initialize()
-        {
-            base.Initialize();
+        base.Initialize();
 
-            Logger.Info("Mod is initialized");
-        }
+        Logger.Info("Mod is initialized");
     }
 }

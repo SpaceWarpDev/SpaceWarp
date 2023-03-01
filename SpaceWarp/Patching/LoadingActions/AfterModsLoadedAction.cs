@@ -3,28 +3,27 @@ using KSP.Game.Flow;
 using SpaceWarp.API;
 using SpaceWarp.API.Managers;
 
-namespace SpaceWarp.Patching.LoadingActions
+namespace SpaceWarp.Patching.LoadingActions;
+
+public class AfterModsLoadedAction : FlowAction
 {
-    public class AfterModsLoadedAction : FlowAction
+    public AfterModsLoadedAction(string name) : base(name)
     {
-        public AfterModsLoadedAction(string name) : base(name)
+        //
+    }
+
+    public override void DoAction(Action resolve, Action<string> reject)
+    {
+        ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager);
+
+        try
         {
-            //
+            spaceWarpManager.InvokePostInitializeModsAfterAllModsLoaded();
+            resolve();
         }
-
-        protected override void DoAction(Action resolve, Action<string> reject)
+        catch (Exception e)
         {
-            ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager);
-
-            try
-            {
-                spaceWarpManager.InvokePostInitializeModsAfterAllModsLoaded();
-                resolve();
-            }
-            catch (Exception e)
-            {
-                reject(e.ToString());
-            }
+            reject(e.ToString());
         }
     }
 }

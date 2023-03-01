@@ -1,59 +1,56 @@
-﻿using System;
+﻿namespace SpaceWarp.API.Versions;
 
-namespace SpaceWarp.API.Versions
+public static class VersionUtility
 {
-    public static class VersionUtility
+    public static bool IsVersionAbove(string version, string toCheck)
     {
-        public static bool IsVersionAbove(string version, string toCheck)
+        if (version == "")
         {
-            if (version == "")
-            {
-                return true;
-            }
+            return true;
+        }
 
-            string[] semanticVersion = toCheck.Split('.');
-            string[] requiredVersion = version.Split('.');
+        string[] semanticVersion = toCheck.Split('.');
+        string[] requiredVersion = version.Split('.');
                 
-            for (int i = 0; i < requiredVersion.Length; i++)
-            {
-                if (requiredVersion[i] == "*")
-                {
-                    continue;
-                }
-
-                if (int.Parse(semanticVersion[i]) < int.Parse(requiredVersion[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public static bool IsVersionBellow(string version, string toCheck)
+        for (int i = 0; i < requiredVersion.Length; i++)
         {
-            if (version == "")
+            if (requiredVersion[i] == "*")
             {
-                return true;
+                continue;
             }
 
-            string[] semanticVersion = toCheck.Split('.');
-            string[] requiredVersion = version.Split('.');
-            
-            for (int i = 0; i < requiredVersion.Length; i++)
+            if (int.Parse(semanticVersion[i]) < int.Parse(requiredVersion[i]))
             {
-                if (requiredVersion[i] == "*")
-                {
-                    continue;
-                }
-
-                if (int.Parse(semanticVersion[i]) > int.Parse(requiredVersion[i]))
-                {
-                    return false;
-                }
+                return false;
             }
+        }
 
+        return true;
+    }
+
+    public static bool IsVersionBellow(string version, string toCheck)
+    {
+        if (version == "")
+        {
             return true;
         }
+
+        string[] semanticVersion = toCheck.Split('.');
+        string[] requiredVersion = version.Split('.');
+            
+        for (int i = 0; i < requiredVersion.Length; i++)
+        {
+            if (requiredVersion[i] == "*")
+            {
+                continue;
+            }
+
+            if (int.Parse(semanticVersion[i]) > int.Parse(requiredVersion[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

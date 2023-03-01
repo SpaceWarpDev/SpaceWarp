@@ -1,40 +1,42 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
-namespace SpaceWarp.API.Logging
+namespace SpaceWarp.API.Logging;
+
+/// <summary>
+/// Unique logger for each mod, each mod has its own logger to accomodate different behaviours.
+/// </summary>
+public class ModLogger : BaseModLogger
 {
+    private readonly string _moduleName;
+
     /// <summary>
-    /// Unique logger for each mod, each mod has its own logger to accomodate different behaviours.
+    /// Creates a ModLogger for a module
     /// </summary>
-    public class ModLogger : BaseModLogger
+    /// <param name="moduleName"></param>
+    public ModLogger(string moduleName)
     {
-        private readonly string _moduleName;
+        _moduleName = moduleName;
+    }
+        
+    private string BuildLogMessage(LogLevel level, string message)
+    {
+        StringBuilder sb = new StringBuilder();
 
-        /// <summary>
-        /// Creates a ModLogger for a module
-        /// </summary>
-        /// <param name="moduleName"></param>
-        public ModLogger(string moduleName)
+        sb.Append($"[{DateTime.Now:HH:mm:ss.fff}] ");
+        sb.Append($"[{_moduleName}] ");
+        sb.Append($"[{level}] ");
+        sb.Append(message);
+
+        return sb.ToString();
+    }
+
+    protected override void Log(LogLevel level, string message)
+    {
+        if ((int)level >= SpaceWarpGlobalConfiguration.Instance.LogLevel)
         {
-            _moduleName = moduleName;
-        }
-
-        private void InternalLog(LogLevel level, string message)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append($"[{_moduleName}] ");
-            sb.Append($"[{level}] ");
-            sb.Append(message);
-
-            UnityEngine.Debug.Log(sb.ToString());
-        }
-
-        protected override void Log(LogLevel level, string message)
-        {
-            if ((int)level >= SpaceWarpGlobalConfiguration.Instance.LogLevel)
-            {
-                InternalLog(level,message);
-            }
+            string logMessage = BuildLogMessage(level, message);
+            UnityEngine.Debug.Log(logMessage);
         }
     }
 }

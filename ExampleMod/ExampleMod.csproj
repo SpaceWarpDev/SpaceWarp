@@ -1,62 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{F9A01E83-FA9A-4921-BF31-DB0770A8EA54}</ProjectGuid>
-        <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>ExampleMod</RootNamespace>
-        <AssemblyName>ExampleMod</AssemblyName>
-        <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-        <FileAlignment>512</FileAlignment>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>bin\Debug\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugType>pdbonly</DebugType>
-        <Optimize>true</Optimize>
-        <OutputPath>bin\Release\</OutputPath>
-        <DefineConstants>TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>11</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="System" />
-        <Reference Include="System.Core" />
-        <Reference Include="System.Data" />
-        <Reference Include="System.Xml" />
-        <Reference Include="UnityEngine.CoreModule">
-          <HintPath>..\external_dlls\UnityEngine.CoreModule.dll</HintPath>
-        </Reference>
+      <ProjectReference Include="..\SpaceWarp\SpaceWarp.csproj" />
+      <PackageReference Include="UnityEngine.Modules" Version="2020.3.33" />
+      <Reference Include="Assembly-CSharp">
+          <HintPath>..\external_dlls\Assembly-CSharp.dll</HintPath>
+          <Publicize>true</Publicize>
+      </Reference>
+      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all" />
     </ItemGroup>
-    <ItemGroup>
-        <Compile Include="Class1.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\SpaceWarp\SpaceWarp.csproj">
-        <Project>{42fa2f7b-a595-44e8-8cd5-a9c30b80a667}</Project>
-        <Name>SpaceWarp</Name>
-      </ProjectReference>
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-         Other similar extension points exist, see Microsoft.Common.targets.
-    <Target Name="BeforeBuild">
-    </Target>
-    <Target Name="AfterBuild">
-    </Target>
-    -->
 
 </Project>

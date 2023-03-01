@@ -12,10 +12,11 @@ Note: Use at your own risk, as this is an early version that is expected to unde
 To compile this project, you will need to follow these steps:
 
 1. Install NuGet
-2. Copy everything in the `Kerbal Space Program 2\KSP2_x64_Data\Managed` folder into the `external_dlls/` folder.
-3. Run one of the build scripts (see below for more info) and copy the contents from the correct build output directory into the KSP2 root directory.
-4. Launch KSP2 and wait until the title screen appears. You should see a mods folder under the `SpaceWarp` folder.
-5. Drag any mods that follow the structure below into that mods folder.
+2. Run `nuget restore` inside the top directory to install the packages.
+3. Copy everything in the `Kerbal Space Program 2\KSP2_x64_Data\Managed` folder into the `external_dlls/` folder.
+4. Run one of the build scripts (see below for more info) and copy the contents from the correct build output directory into the KSP2 root directory.
+5. Launch KSP2 and wait until the title screen appears. You should see a mods folder under the `SpaceWarp` folder.
+6. Drag any mods that follow the structure below into that mods folder.
 
 Mods are currently implemented as monobehaviours with two fields: a `Logger` for logging and a `Manager` that points to Spacewarp. A mod template generator exists as a Python script.
 
