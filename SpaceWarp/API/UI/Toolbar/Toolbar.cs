@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using BepInEx.Bootstrap;
 using UnityEngine;
 
-namespace SpaceWarp.API.Toolbar;
+namespace SpaceWarp.API.UI.Toolbar;
 
 public static class Toolbar
 {
@@ -20,8 +20,23 @@ public static class Toolbar
         _buttonsToBeLoaded.Add((text, icon, id, menu.ToggleGUI));
         return menu as T;
     }
+
+    public static T RegisterGameToolbarMenu<T>(string text, string title, string id, Texture2D icon) where T : ToolbarMenu =>
+        RegisterGameToolbarMenu<T>(text, title, id, GetToolBarIconFromTexture(icon));
     
     public static void RegisterAppButton(string text, string id, Sprite icon, Action<bool> func) => _buttonsToBeLoaded.Add((text ,icon, id, func));
+
+    public static void RegisterAppButton(string text, string id, Texture2D icon, Action<bool> func) =>
+        RegisterAppButton(text, id, GetToolBarIconFromTexture(icon), func);
+    
+    public static Sprite GetToolBarIconFromTexture(Texture2D texture, int width=0,int height=0)
+    {
+        if (width == 0) width = texture.width;
+        if (height == 0) height = texture.height;
+
+        return Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f));
+    }
+    
     
     internal static void LoadAllButtons()
     {

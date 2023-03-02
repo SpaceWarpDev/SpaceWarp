@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using BepInEx.Logging;
 using KSP.Game.Flow;
-using SpaceWarp.API.AssetBundles;
+using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
 using UnityEngine;
 
@@ -20,7 +20,7 @@ internal sealed class SpaceWarpAssetInitializationAction : FlowAction
     {
         try
         {
-            string bundlesPath = Path.Combine(SpaceWarpManager.SpaceWarpFolder, GlobalModDefines.ASSET_BUNDLES_FOLDER);
+            string bundlesPath = Path.Combine(SpaceWarpManager.SpaceWarpFolder, GlobalModDefines.AssetBundlesFolder);
         
             if (Directory.Exists(bundlesPath))
             {

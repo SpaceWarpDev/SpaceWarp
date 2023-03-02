@@ -1,9 +1,9 @@
 using KSP.Game;
 using KSP.Sim.impl;
-using SpaceWarp.API.AssetBundles;
+using SpaceWarp.API.Assets;
 using UnityEngine;
 
-namespace SpaceWarp.API.Toolbar;
+namespace SpaceWarp.API.UI.Toolbar;
 
 public abstract class ToolbarMenu : KerbalBehavior
 {

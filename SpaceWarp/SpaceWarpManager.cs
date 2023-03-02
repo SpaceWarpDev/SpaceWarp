@@ -4,7 +4,7 @@ using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using Newtonsoft.Json;
 using UnityEngine;
-using SpaceWarp.API.AssetBundles;
+using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.UI;

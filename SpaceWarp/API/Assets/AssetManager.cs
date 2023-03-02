@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using BepInEx.Logging;
 using UnityEngine;
 
-namespace SpaceWarp.API.AssetBundles;
+namespace SpaceWarp.API.Assets;
 
 public static class AssetManager
 {
@@ -21,9 +21,9 @@ public static class AssetManager
 		for (int i = 0; i < names.Length; i++)
 		{
 			var assetName = names[i];
-			if (assetName.StartsWith("assets/"))
+			if (assetName.ToLower().StartsWith("assets/"))
 				assetName = assetName["assets/".Length..];
-			if (assetName.StartsWith(assetBundleName + "/"))
+			if (assetName.ToLower().StartsWith(assetBundleName + "/"))
 				assetName = assetName[(assetBundleName.Length + 1)..];
 				
 			string path = modId + "/" + assetBundleName + "/" + assetName;
@@ -52,6 +52,15 @@ public static class AssetManager
 		// 	}
 		// 	throw new System.Exception("bundle objects length and name lengths do not match");
 		// }
+	}
+
+	internal static void RegisterSingleAsset<T>(string modId, string internalAssetPath, T asset) where T : UnityObject
+	{
+		var path = $"{modId}/{internalAssetPath}";
+		path = path.ToLower();
+		ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource($"{path}");
+		logger.LogInfo($"registering path \"{path}\"");
+		AllAssets.Add(path,asset);
 	}
 
 	/// <summary>

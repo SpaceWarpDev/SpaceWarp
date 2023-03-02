@@ -17,7 +17,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace SpaceWarp.API.Toolbar;
+namespace SpaceWarp.API.UI.Toolbar;
 
 internal static class ToolbarBackend
 {
