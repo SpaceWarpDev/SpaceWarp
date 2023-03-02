@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using KSP.Game;
-using SpaceWarp.API.AssetBundles;
-using SpaceWarp.API.Mods.JSON;
 using UnityEngine;
 
 namespace SpaceWarp.UI;
@@ -19,7 +15,6 @@ public class ModListUI : KerbalMonoBehaviour
 
     private static GUIStyle _boxStyle;
     private static Vector2 _scrollPositionMods;
-    private GUISkin _spaceWarpUISkin;
         
     private List<(string, bool)> _toggles = new List<(string, bool)>();
     private List<(string, bool)> _initialToggles = new List<(string, bool)>();
@@ -41,12 +36,11 @@ public class ModListUI : KerbalMonoBehaviour
         _windowHeight = (int)(Screen.height * 0.85f);
 
         _windowRect = new Rect(Screen.width * 0.15f, Screen.height * 0.15f, 0, 0);
-        AssetManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
     }
 
     private void OnGUI()
     {
-        GUI.skin = _spaceWarpUISkin;
+        GUI.skin = SpaceWarpManager.Skin;
         if (!_drawUI)
         {
             return;
@@ -56,7 +50,7 @@ public class ModListUI : KerbalMonoBehaviour
         const string header = "spacewarp.modlist";
         GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
         GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
-        GUI.skin = _spaceWarpUISkin;
+        GUI.skin = SpaceWarpManager.Skin;
 
         _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, header, width, height);
     }

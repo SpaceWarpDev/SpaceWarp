@@ -8,11 +8,12 @@ using SpaceWarp.UI;
 
 namespace SpaceWarp;
 
-[BepInPlugin(ModGuid, ModName, MyPluginInfo.PLUGIN_VERSION)]
+[BepInPlugin(ModGuid, ModName, ModVer)]
 public sealed class SpaceWarpPlugin : BaseUnityPlugin
 {
     public const string ModGuid = "com.github.x606.spacewarp";
     public const string ModName = "Space Warp";
+    public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
 
     new internal ManualLogSource Logger => base.Logger;
         

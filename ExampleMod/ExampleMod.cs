@@ -2,15 +2,16 @@
 using BepInEx;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.AssetBundles;
-using SpaceWarp.API;
 using KSP.UI.Binding;
 using KSP.Sim.impl;
+using SpaceWarp;
 using SpaceWarp.API.Toolbar;
 using UnityEngine;
 
 namespace ExampleMod;
 
 [BepInPlugin("com.SpaceWarpAuthorName.ExampleMod", "ExampleMod", "3.0.0")]
+[BepInDependency(SpaceWarpPlugin.ModGuid, SpaceWarpPlugin.ModVer)]
 public class ExampleMod : BaseSpaceWarpPlugin
 {
     public GUISkin _spaceWarpUISkin;

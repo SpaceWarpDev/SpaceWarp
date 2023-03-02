@@ -34,7 +34,7 @@ internal static class SpaceWarpManager
         {
             var folderPath = Path.GetDirectoryName(plugin.Info.Location);
             plugin.PluginFolderPath = folderPath;
-            if (Path.GetFileName(Path.GetDirectoryName(folderPath)) == "plugins")
+            if (Path.GetFileName(folderPath) == "plugins")
             {
                 Logger.LogError($"Found Space Warp mod {plugin.Info.Metadata.Name} in the BepInEx/plugins directory. This mod will not be initialized.");
                 spaceWarpPlugins.Remove(plugin);
@@ -56,40 +56,17 @@ internal static class SpaceWarpManager
         Logger = sw.Logger;
 
         SpaceWarpFolder = Path.GetDirectoryName(sw.Info.Location);
-        
-        InitModUI();
     }
 
-    public static ModListUI ModListUI { get; private set; }
-    
-    /// <summary>
-    /// Initializes the UI for the mod list and configuration menu
-    /// </summary>
-    private static void InitModUI()
-    {
-        GameObject modUIObject = new GameObject("Space Warp Mod UI");
-        modUIObject.Persist();
-    
-        modUIObject.transform.SetParent(Chainloader.ManagerObject.transform);
-        ModListUI = modUIObject.AddComponent<ModListUI>();
-    
-        modUIObject.SetActive(true);
-    
-        GameObject consoleUIObject = new GameObject("Space Warp Console");
-        consoleUIObject.Persist();
-        consoleUIObject.transform.SetParent(Chainloader.ManagerObject.transform);
-        SpaceWarpConsole con = consoleUIObject.AddComponent<SpaceWarpConsole>();
-        consoleUIObject.SetActive(true);
-    }
+    public static ModListUI ModListUI { get; internal set; }
 
-    private static GUISkin _skin = null;
+    private static GUISkin _skin;
 
     public static GUISkin Skin
     {
         get
         {
-            if (_skin)
-                AssetManager.TryGetAsset("space_warp/swconsoleui/spacewarpConsole.guiskin", out _skin);
+            AssetManager.TryGetAsset("space_warp/swconsoleui/spacewarpconsole.guiskin", out _skin);
             return _skin;
         }
     }

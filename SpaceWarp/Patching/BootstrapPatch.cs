@@ -1,6 +1,5 @@
 using HarmonyLib;
 using KSP.Game;
-using KSP.Game.StartupFlow;
 using MonoMod.Cil;
 using SpaceWarp.Patching.LoadingActions;
 
@@ -35,20 +34,16 @@ internal static class BootstrapPatch
                 GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
             }
         });
-
-        c.GotoNext(MoveType.Before,
-            x => x.MatchLdarg(0),
-            x => x.MatchCallOrCallvirt(flowProp.GetMethod),
-            x => x.MatchLdloc(out _),
-            x => x.MatchNewobj(out var ctor) && ctor.DeclaringType.FullName == typeof(CreateMainMenuFlowAction).FullName
-        );
-
+        
+        c.GotoLabel(endLabel, MoveType.Before);
+        c.Index -= 1;
         c.EmitDelegate(static () =>
         {
             var flow = GameManager.Instance.LoadingFlow;
             flow.AddAction(new LoadSpaceWarpLocalizationsAction());
             flow.AddAction(new LoadSpaceWarpAddressablesAction());
             flow.AddAction(new SpaceWarpAssetInitializationAction());
+            flow.AddAction(new InitializeSpaceWarpUIAction());
 
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
@@ -61,14 +56,10 @@ internal static class BootstrapPatch
             {
                 flow.AddAction(new InitializeModAction(plugin));
             }
-        });
-
-        c.GotoLabel(endLabel);
-        c.EmitDelegate(static () =>
-        {
+            
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
-                GameManager.Instance.LoadingFlow.AddAction(new PostInitializeModAction(plugin));
+                flow.AddAction(new PostInitializeModAction(plugin));
             }
         });
     }
