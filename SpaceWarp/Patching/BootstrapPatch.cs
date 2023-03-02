@@ -1,9 +1,7 @@
 using HarmonyLib;
 using KSP.Game;
-using KSP.Messages;
 using MonoMod.Cil;
 using SpaceWarp.Patching.LoadingActions;
-using SpaceWarp.API.Game;
 
 namespace SpaceWarp.Patching;
 
@@ -42,13 +40,6 @@ internal static class BootstrapPatch
         c.EmitDelegate(static () =>
         {
             var flow = GameManager.Instance.LoadingFlow;
-            
-            GameManager.Instance.Game.Messages.Subscribe(typeof(GameStateEnteredMessage), StateChanges.OnGameStateEntered,false,true);
-            GameManager.Instance.Game.Messages.Subscribe(typeof(GameStateLeftMessage), StateChanges.OnGameStateLeft,false,true);
-            flow.AddAction(new LoadSpaceWarpLocalizationsAction());
-            flow.AddAction(new LoadSpaceWarpAddressablesAction());
-            flow.AddAction(new SpaceWarpAssetInitializationAction());
-            flow.AddAction(new InitializeSpaceWarpUIAction());
 
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
