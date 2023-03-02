@@ -56,7 +56,6 @@ internal static class SpaceWarpManager
         Logger = sw.Logger;
 
         SpaceWarpFolder = Path.GetDirectoryName(sw.Info.Location);
-        API.UI.MainMenu.RegisterMenuButton("mods",ModListUI.ToggleVisible);
     }
 
     public static ModListUI ModListUI { get; internal set; }
@@ -67,7 +66,8 @@ internal static class SpaceWarpManager
     {
         get
         {
-            AssetManager.TryGetAsset("space_warp/swconsoleui/spacewarpconsole.guiskin", out _skin);
+            if (!_skin)
+                AssetManager.TryGetAsset("spacewarp/swconsoleui/spacewarpconsole.guiskin", out _skin);
             return _skin;
         }
     }

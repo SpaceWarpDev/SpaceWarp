@@ -1,5 +1,4 @@
-﻿using System.IO;
-using BepInEx;
+﻿using BepInEx;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Assets;
 using KSP.UI.Binding;
