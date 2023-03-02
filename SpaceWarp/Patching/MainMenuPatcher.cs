@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using KSP.Api.CoreTypes;
+using SpaceWarp.API.UI;
 using TMPro;
 using UnityEngine;
 
@@ -15,21 +16,25 @@ class MainMenuPatcher
 
         Transform singleplayerButtonTransform = menuItemsGroupTransform.FindChildEx("Singleplayer");
 
-        GameObject modsButton = Object.Instantiate(singleplayerButtonTransform.gameObject, menuItemsGroupTransform, false);
-        modsButton.name = "Mods";
+        foreach (var menuButtonToBeAdded in MainMenu.MenuButtonsToBeAdded)
+        {
+            GameObject newButton =
+                Object.Instantiate(singleplayerButtonTransform.gameObject, menuItemsGroupTransform, false);
+            newButton.name = menuButtonToBeAdded.name;
 
-        // Move the button to be above the Exit button.
-        modsButton.transform.SetSiblingIndex(modsButton.transform.GetSiblingIndex() - 1);
+            // Move the button to be above the Exit button.
+            newButton.transform.SetSiblingIndex(newButton.transform.GetSiblingIndex() - 1);
 
-        // Rebind the button's action to open the mod manager dialog.
-        UIAction_Void_Button uiAction = modsButton.GetComponent<UIAction_Void_Button>();
-        DelegateAction action = new();
-        action.BindDelegate(() => SpaceWarpManager.ModListUI.ToggleVisible());
-        uiAction.BindAction(action);
+            // Rebind the button's action to call the action
+            UIAction_Void_Button uiAction = newButton.GetComponent<UIAction_Void_Button>();
+            DelegateAction action = new();
+            action.BindDelegate(() => menuButtonToBeAdded.onClicked.Invoke());
+            uiAction.BindAction(action);
 
-        // Set the label to "Mods".
-        TextMeshProUGUI tmp = modsButton.GetComponentInChildren<TextMeshProUGUI>();
+            // Set the label to "Mods".
+            TextMeshProUGUI tmp = newButton.GetComponentInChildren<TextMeshProUGUI>();
 
-        tmp.SetText("Mods");
+            tmp.SetText(menuButtonToBeAdded.name);
+        }
     }
 }

@@ -56,6 +56,7 @@ internal static class SpaceWarpManager
         Logger = sw.Logger;
 
         SpaceWarpFolder = Path.GetDirectoryName(sw.Info.Location);
+        API.UI.MainMenu.RegisterMenuButton("mods",ModListUI.ToggleVisible);
     }
 
     public static ModListUI ModListUI { get; internal set; }
