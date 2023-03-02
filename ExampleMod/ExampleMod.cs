@@ -1,20 +1,23 @@
-﻿using SpaceWarp.API.Mods;
+﻿using System.IO;
+using BepInEx;
+using SpaceWarp.API.Mods;
 using SpaceWarp.API.AssetBundles;
-using SpaceWarp.API;
 using KSP.UI.Binding;
 using KSP.Sim.impl;
+using SpaceWarp;
+using SpaceWarp.API.Toolbar;
 using UnityEngine;
 
 namespace ExampleMod;
 
-[MainMod]
-public class ExampleMod : Mod
+[BepInPlugin("com.SpaceWarpAuthorName.ExampleMod", "ExampleMod", "3.0.0")]
+[BepInDependency(SpaceWarpPlugin.ModGuid, SpaceWarpPlugin.ModVer)]
+public class ExampleMod : BaseSpaceWarpPlugin
 {
     public GUISkin _spaceWarpUISkin;
 
     private bool drawUI;
     private Rect windowRect;
-    private bool loaded;
 
     private static ExampleMod Instance { get; set; }
 
@@ -25,32 +28,39 @@ public class ExampleMod : Mod
     public override void OnInitialized()
     {
         base.OnInitialized();
-
-        if (loaded)
-        {
-            Destroy(this);
-        }
-
-        loaded = true;
         Instance = this;
 
         // Example of using the logger, Were going to log a message to the console, ALT + C to open the console.
-        Logger.Info("Hello World, Im a spacewarp Mod.");
+        Logger.LogInfo("Hello World, Im a spacewarp Mod.");
 
         // Example of using the asset loader, were going to load the SpaceWarp GUI skin.
         // [FORMAT]: space_warp/[assetbundle_name]/[folder_in_assetbundle]/[file.type]
-        ResourceManager.TryGetAsset(
+        AssetManager.TryGetAsset(
             "space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin",
             out _spaceWarpUISkin
         );
 
         // Register the mod's button on the SpaceWarp application bar.
-        SpaceWarpManager.RegisterAppButton(
+        Toolbar.RegisterAppButton(
             "Example Mod",
             "BTN-ExampleMod",
-            SpaceWarpManager.LoadIcon(),
+            LoadIcon(Path.Combine(PluginFolderPath, "icon.png")),
             ToggleButton
         );
+    }
+    
+    public static Sprite LoadIcon(string path, int size = 24)
+    {
+        Texture2D tex = new Texture2D(size, size, TextureFormat.ARGB32, false);
+        tex.filterMode = FilterMode.Point;
+
+        if (File.Exists(path))
+        {
+            byte[] fileContent = File.ReadAllBytes(path);
+            tex.LoadImage(fileContent);
+        }
+
+        return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
     }
 
     /// <summary>
@@ -115,11 +125,11 @@ public class ExampleMod : Mod
             if (_activeVessel != null)
             {
                 _activeVessel.ActivateNextStage();
-                Logger.Warn("Stagin Active Vessel: " + _activeVessel.Name);
+                Logger.LogWarning("Stagin Active Vessel: " + _activeVessel.Name);
                 VesselBehavior behavior = Game.ViewController.GetBehaviorIfLoaded(_activeVessel);
                 foreach (PartBehavior pb in behavior.parts)
                 {
-                    Logger.Warn(pb.name);
+                    Logger.LogWarning(pb.name);
                 }
             }
         }

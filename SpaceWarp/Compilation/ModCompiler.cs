@@ -2,19 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using BepInEx;
+using BepInEx.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using SpaceWarp.API;
-using SpaceWarp.API.Logging;
-using UniLinq;
 
 namespace SpaceWarp.Compilation;
 
 public static class ModCompiler
 {
-    public static readonly string CACHE_LOCATION = Path.Combine(SpaceWarpManager.SPACE_WARP_PATH,"mod_cache");
+    public static readonly string CACHE_LOCATION = Path.Combine(Paths.CachePath, "compilation_cache");
 
-    private static BaseModLogger _logger = new ModLogger("Roslyn Compilation");
+    private static ManualLogSource _logger = Logger.CreateLogSource("Roslyn Compilation");
     public static Assembly CompileMod(string modID, string modSrcPath)
     {
         try
@@ -23,22 +22,22 @@ public static class ModCompiler
             {
                 return null;
             }
-            _logger.Info($"starting compilation of {modID}");
+            _logger.LogInfo($"starting compilation of {modID}");
 
             if (!CreateNewCompilation(modID, modSrcPath))
             {
-                _logger.Info($"found cached version of {modID}");
+                _logger.LogInfo($"found cached version of {modID}");
                 return GetCachedCompilation(modID);
             }
 
-            _logger.Info($"no cached version for {modID}, generating assembly");
+            _logger.LogInfo($"no cached version for {modID}, generating assembly");
 
             // Now work on adding dependencies to the tree
             return CompileNewAssemblyAndCache(modID, modSrcPath);
         }
         catch (Exception e)
         {
-            _logger.Error($"error compiling scripts for {modID}\n{e}");
+            _logger.LogError($"error compiling scripts for {modID}\n{e}");
             return null;
         }
     }
@@ -114,15 +113,15 @@ public static class ModCompiler
         {
             if (diagnostic.WarningLevel == 0)
             {
-                _logger.Error(diagnostic.ToString());
+                _logger.LogError(diagnostic.ToString());
             }
             else
             {
-                _logger.Info(diagnostic.ToString());
+                _logger.LogInfo(diagnostic.ToString());
             }
         }
 
-        _logger.Info(result.ToString());
+        _logger.LogInfo(result.ToString());
         if (!result.Success)
         {
             File.Delete(Path.Combine(CACHE_LOCATION,modID + ".dll"));

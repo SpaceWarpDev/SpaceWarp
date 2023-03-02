@@ -1,28 +1,32 @@
 ﻿using System;
+using System.IO;
 using KSP.Game.Flow;
-using SpaceWarp.API;
-using SpaceWarp.API.Managers;
 
 namespace SpaceWarp.Patching.LoadingActions;
 
 public class LoadSpaceWarpLocalizationsAction : FlowAction
 {
-    public LoadSpaceWarpLocalizationsAction(string name) : base(name)
+    public LoadSpaceWarpLocalizationsAction() : base("Loading Space Warp localizations")
     {
     }
 
     public override void DoAction(Action resolve, Action<string> reject)
     {
-        ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager);
-
         try
         {
-            spaceWarpManager.LoadSpaceWarpLocalizations();
+            if (I2.Loc.LocalizationManager.Sources.Count == 0)
+            {
+                I2.Loc.LocalizationManager.UpdateSources();
+            }
+
+            string localizationsPath = Path.Combine(SpaceWarpManager.SpaceWarpFolder, "localizations");
+            AssetHelpers.LoadLocalizationFromFolder(localizationsPath);
             resolve();
         }
         catch (Exception e)
         {
-            reject(e.ToString());
+            SpaceWarpManager.Logger.LogError(e.ToString());
+            reject(null);
         }
     }
 }

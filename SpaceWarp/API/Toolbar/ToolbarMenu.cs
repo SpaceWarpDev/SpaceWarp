@@ -1,5 +1,3 @@
-using System.IO;
-using System.Reflection;
 using KSP.Game;
 using KSP.Sim.impl;
 using SpaceWarp.API.AssetBundles;
@@ -38,7 +36,7 @@ public abstract class ToolbarMenu : KerbalBehavior
         {
             if (_spaceWarpConsoleSkin == null)
             {
-                ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpConsoleSkin);
+                AssetManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpConsoleSkin);
             }
 
             return _spaceWarpConsoleSkin;

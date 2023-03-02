@@ -1,19 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="..\SpaceWarp\SpaceWarp.csproj" />
-        <PackageReference Include="UnityEngine.Modules" Version="2020.3.33" />
         <Reference Include="Assembly-CSharp">
             <HintPath>..\external_dlls\Assembly-CSharp.dll</HintPath>
             <Publicize>true</Publicize>
+            <Private>false</Private>
         </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SpaceWarp\SpaceWarp.csproj" Private="false" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="UnityEngine.Modules" Version="2020.3.33" />
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all" />
     </ItemGroup>
 </Project>

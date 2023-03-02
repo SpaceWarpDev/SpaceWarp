@@ -7,29 +7,29 @@ namespace SpaceWarp.API.Mods.JSON;
 /// Representation of the mod info JSON file.
 /// </summary>
 [JsonObject(MemberSerialization.OptIn)]
-public class ModInfo
+public sealed class ModInfo
 {
     [JsonProperty("mod_id")] 
-    public string mod_id { get; set; }
+    public string ModID { get; internal set; }
 
     [JsonProperty("name")]
-    public string name { get; set; }
+    public string Name { get; internal set; }
 
     [JsonProperty("author")] 
-    public string author { get; set; }
-        
+    public string Author { get; internal set; }
+
     [JsonProperty("description")] 
-    public string description { get; set; }
-        
+    public string Description { get; internal set; }
+
     [JsonProperty("source")] 
-    public string source { get; set; }
+    public string Source { get; internal set; }
 
     [JsonProperty("version")] 
-    public string version { get; set; }
+    public string Version { get; internal set; }
 
     [JsonProperty("dependencies")]
-    public List<DependencyInfo> dependencies { get; set; } = new List<DependencyInfo>();
+    public List<DependencyInfo> Dependencies { get; internal set; }
 
     [JsonProperty("ksp2_version")]
-    public SupportedVersionsInfo supported_ksp2_versions { get; set; } = new SupportedVersionsInfo();
+    public SupportedVersionsInfo SupportedKsp2Versions { get; internal set; }
 }

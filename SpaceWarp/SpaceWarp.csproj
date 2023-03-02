@@ -1,41 +1,65 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <Version>0.3.0</Version>
-        <LangVersion>latest</LangVersion>
+        <Version>0.4.0</Version>
+        <TargetFramework>net472</TargetFramework>
+        <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-        <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
+        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+        <!-- Disabled warning for publicizer attribute until the NuGet exists for KSP2  -->
+        <NoWarn>CS0436</NoWarn>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
             <HintPath>..\external_dlls\Assembly-CSharp.dll</HintPath>
             <Publicize>true</Publicize>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Unity.TextMeshPro">
             <HintPath>..\external_dlls\Unity.TextMeshPro.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.UI">
             <HintPath>..\external_dlls\UnityEngine.UI.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Unity.Addressables">
             <HintPath>..\external_dlls\Unity.Addressables.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Unity.ResourceManager">
             <HintPath>..\external_dlls\Unity.ResourceManager.dll</HintPath>
+            <Private>false</Private>
         </Reference>
-        <Reference Include="UnityEngine.ImageConversionModule">
-            <HintPath>..\external_dlls\UnityEngine.ImageConversionModule.dll</HintPath>
+        <Reference Include="KSPLogging">
+            <HintPath>..\external_dlls\KSPLogging.dll</HintPath>
+            <Private>false</Private>
         </Reference>
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" />
-      <PackageReference Include="HarmonyX" Version="2.10.1" />
-      <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all" />
-      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
-      <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-      <PackageReference Include="UnityEngine.Modules" Version="2020.3.33" />
-      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all" />
+        <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" Publicize="true" />
+        <PackageReference Include="HarmonyX" Version="2.10.1" />
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+        <PackageReference Include="UnityEngine.Modules" Version="2020.3.33" />
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all" />
     </ItemGroup>
+
+    <!--
+    Allows use of some newer C# language features that have compiler gates normally.
+    Do not modify the included types without checking that they don't require runtime support that doesn't exist. 
+    -->
+    <ItemGroup>
+        <PackageReference Include="PolySharp" Version="1.12.1" PrivateAssets="all" />
+    </ItemGroup>
+    <PropertyGroup>
+        <PolySharpIncludeGeneratedTypes>
+            System.Index;
+            System.Range;
+            System.Diagnostics.CodeAnalysis.NotNullWhenAttribute;
+            System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute;
+        </PolySharpIncludeGeneratedTypes>
+    </PropertyGroup>
 </Project>

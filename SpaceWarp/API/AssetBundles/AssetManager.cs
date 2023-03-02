@@ -1,18 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using SpaceWarp.API.Logging;
+﻿using System;
+using System.Collections.Generic;
+using BepInEx.Logging;
 using UnityEngine;
 
 namespace SpaceWarp.API.AssetBundles;
 
-public static class ResourceManager
+public static class AssetManager
 {
-	static readonly Dictionary<string, Object> AllAssets = new Dictionary<string, Object>();
+	private static readonly Dictionary<string, UnityObject> AllAssets = new();
 
 	internal static void RegisterAssetBundle(string modId, string assetBundleName, AssetBundle assetBundle)
 	{
 		assetBundleName = assetBundleName.Replace(".bundle", "");
-		ModLogger logger = new ModLogger($"{modId}/{assetBundleName}");
+		ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource($"{modId}/{assetBundleName}");
 		// TODO: use async loading instead?
 
 		// Object[] bundleObjects = assetBundle.LoadAllAssets();
@@ -20,28 +20,17 @@ public static class ResourceManager
 
 		for (int i = 0; i < names.Length; i++)
 		{
-			List<string> assetNamePath = names[i].Split('/').ToList();
-			if (assetNamePath[0].ToLower() == "assets")
-			{
-				assetNamePath.RemoveAt(0);
-			}
-
-			string assetName = "";
-			for (int j = 0; j < assetNamePath.Count; j++)
-			{
-				assetName += assetNamePath[j];
-				if (j != assetNamePath.Count - 1)
-				{
-					assetName += "/";
-				}
-			}
-				
+			var assetName = names[i];
+			if (assetName.StartsWith("assets/"))
+				assetName = assetName["assets/".Length..];
+			if (assetName.StartsWith(assetBundleName + "/"))
+				assetName = assetName[(assetBundleName.Length + 1)..];
 				
 			string path = modId + "/" + assetBundleName + "/" + assetName;
 			path = path.ToLower();
-			Object bundleObject = assetBundle.LoadAsset(names[i]);
+			var bundleObject = assetBundle.LoadAsset(names[i]);
 
-			logger.Info($"registering path \"{path}\"");
+			logger.LogInfo($"registering path \"{path}\"");
 
 			AllAssets.Add(path, bundleObject);
 		}
@@ -77,17 +66,17 @@ public static class ResourceManager
 		string[] subPaths = path.Split('/', '\\');
 		if (subPaths.Length < 3)
 		{
-			throw new System.ArgumentException("Invalid path, asset paths must follow to following structure: {mod_id}/{asset_bundle}/{asset_path}");
+			throw new ArgumentException("Invalid path, asset paths must follow to following structure: {mod_id}/{asset_bundle}/{asset_path}");
 		}
 
-		if (!AllAssets.TryGetValue(path, out Object value))
+		if (!AllAssets.TryGetValue(path, out UnityObject value))
 		{
-			throw new System.Exception($"Unable to find asset at path \"{path}\"");
+			throw new IndexOutOfRangeException($"Unable to find asset at path \"{path}\"");
 		}
 
-		if (!(value is T tValue))
+		if (value is not T tValue)
 		{
-			throw new System.Exception($"The asset at path {path} isn't of type {typeof(T).Name} but of type {value.GetType().Name}");
+			throw new InvalidCastException($"The asset at path {path} isn't of type {typeof(T).Name} but of type {value.GetType().Name}");
 		}
 
 		return tValue;
@@ -100,7 +89,7 @@ public static class ResourceManager
 	/// <param name="path">an asset path, format: {mod_id}/{asset_bundle}/{asset_name}</param>
 	/// <param name="asset">the asset output</param>
 	/// <returns>Whether or not the asset exists and is loaded</returns>
-	public static bool TryGetAsset<T>(string path, out T asset) where T : Object
+	public static bool TryGetAsset<T>(string path, out T asset) where T : UnityObject
 	{
 		path = path.ToLower();
 		asset = null;
@@ -109,11 +98,11 @@ public static class ResourceManager
 		{
 			return false;
 		}
-		if (!AllAssets.TryGetValue(path, out Object value))
+		if (!AllAssets.TryGetValue(path, out UnityObject value))
 		{
 			return false;
 		}
-		if (!(value is T tValue))
+		if (value is not T tValue)
 		{
 			return false;
 		}
