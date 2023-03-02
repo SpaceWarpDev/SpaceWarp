@@ -2,17 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using BepInEx;
 using BepInEx.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using SpaceWarp.API;
-using UniLinq;
 
 namespace SpaceWarp.Compilation;
 
 public static class ModCompiler
 {
-    public static readonly string CACHE_LOCATION = Path.Combine(SpaceWarpManager.SPACE_WARP_PATH, "mod_cache");
+    public static readonly string CACHE_LOCATION = Path.Combine(Paths.CachePath, "compilation_cache");
 
     private static ManualLogSource _logger = Logger.CreateLogSource("Roslyn Compilation");
     public static Assembly CompileMod(string modID, string modSrcPath)

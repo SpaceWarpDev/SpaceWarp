@@ -7,7 +7,7 @@ namespace SpaceWarp.API.AssetBundles;
 
 public static class AssetManager
 {
-	static readonly Dictionary<string, UnityObject> AllAssets = new Dictionary<string, UnityObject>();
+	private static readonly Dictionary<string, UnityObject> AllAssets = new();
 
 	internal static void RegisterAssetBundle(string modId, string assetBundleName, AssetBundle assetBundle)
 	{

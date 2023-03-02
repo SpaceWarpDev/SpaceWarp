@@ -26,6 +26,7 @@ public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin
 	
 	public ModInfo SpaceWarpMetadata { get; internal set; }
 	internal ManualLogSource ModLogger => base.Logger;
+	public string PluginFolderPath { get; internal set; }
 
 	public virtual void OnPreInitialized()
 	{

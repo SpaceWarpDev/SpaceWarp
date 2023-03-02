@@ -1,34 +1,31 @@
 ﻿using System;
+using System.IO;
 using KSP.Game.Flow;
-using SpaceWarp.API;
-using SpaceWarp.API.Managers;
-using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.API.Mods;
 
 namespace SpaceWarp.Patching.LoadingActions;
 
-public class LoadLocalizationAction : FlowAction
+internal sealed class LoadLocalizationAction : FlowAction
 {
-    private string _modID;
-    private ModInfo _info;
+    private readonly BaseSpaceWarpPlugin Plugin;
 
-    public LoadLocalizationAction(string name, string modID, ModInfo info) : base(name)
+    public LoadLocalizationAction(BaseSpaceWarpPlugin plugin) : base($"Loading localizations for plugin {plugin.SpaceWarpMetadata.Name}")
     {
-        _modID = modID;
-        _info = info;
+        Plugin = plugin;
     }
 
     public override void DoAction(Action resolve, Action<string> reject)
     {
-        ManagerLocator.TryGet(out SpaceWarpManager spaceWarpManager);
-
         try
         {
-            spaceWarpManager.LoadSingleModLocalization(_modID,_info);
+            string localizationsPath = Path.Combine(Plugin.PluginFolderPath, "localizations");
+            AssetHelpers.LoadLocalizationFromFolder(localizationsPath);
             resolve();
         }
         catch (Exception e)
         {
-            reject(e.ToString());
+            Plugin.ModLogger.LogError(e.ToString());
+            reject(null);
         }
     }
 }

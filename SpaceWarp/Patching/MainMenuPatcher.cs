@@ -24,22 +24,13 @@ class MainMenuPatcher
 
         // Rebind the button's action to open the mod manager dialog.
         UIAction_Void_Button uiAction = modsButton.GetComponent<UIAction_Void_Button>();
-        DelegateAction action = new DelegateAction();
-        action.BindDelegate(ModsOnClick);
+        DelegateAction action = new();
+        action.BindDelegate(() => SpaceWarpManager.ModListUI.ToggleVisible());
         uiAction.BindAction(action);
 
         // Set the label to "Mods".
         TextMeshProUGUI tmp = modsButton.GetComponentInChildren<TextMeshProUGUI>();
 
         tmp.SetText("Mods");
-
-    }
-
-    static void ModsOnClick()
-    {
-        if (ManagerLocator.TryGet(out SpaceWarpManager manager))
-        {
-            manager.ModListUI.ToggleVisible();
-        }
     }
 }

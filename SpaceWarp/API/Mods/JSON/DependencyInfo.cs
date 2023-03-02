@@ -6,11 +6,11 @@ namespace SpaceWarp.API.Mods.JSON;
 /// Represents the json property info. Properties have to use the same name as in the JSON file, that's why they break convention.
 /// </summary>
 [JsonObject(MemberSerialization.OptIn)]
-public class DependencyInfo
+public sealed class DependencyInfo
 {
     [JsonProperty("id")]
-    public string id { get; set; }
+    public string ID { get; internal set; }
 
     [JsonProperty("version")] 
-    public SupportedVersionsInfo version { get; set; }
+    public SupportedVersionsInfo Version { get; internal set; }
 }

@@ -19,9 +19,9 @@ using Object = UnityEngine.Object;
 
 namespace SpaceWarp.API.Toolbar;
 
-public static class ToolbarBackend
+internal static class ToolbarBackend
 {
-    private static ManualLogSource _logger = BepInEx.Logging.Logger.CreateLogSource("ToolbarBackend");
+    private static readonly ManualLogSource _logger = BepInEx.Logging.Logger.CreateLogSource("ToolbarBackend");
     public static GameObject AddButton(string buttonText, Sprite buttonIcon, string buttonId, Action<bool> function)
     {
         // Find the resource manager button and "others" group.

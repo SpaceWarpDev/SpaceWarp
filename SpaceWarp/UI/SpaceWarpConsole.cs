@@ -17,7 +17,7 @@ public sealed class SpaceWarpConsole : MonoBehaviour
     private static Vector2 _scrollPosition;
     private static Vector2 _scrollView;
 
-    private new void Awake()
+    private void Awake()
     {
         _windowWidth = (int)(Screen.width * 0.5f);
         _windowHeight = (int)(Screen.height * 0.5f);

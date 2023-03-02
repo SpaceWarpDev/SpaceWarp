@@ -4,7 +4,7 @@ using SpaceWarp.API.Mods;
 
 namespace SpaceWarp.Patching.LoadingActions;
 
-public class InitializeModAction : FlowAction
+internal sealed class InitializeModAction : FlowAction
 {
     private BaseSpaceWarpPlugin Plugin;
 

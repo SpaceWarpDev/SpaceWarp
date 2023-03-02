@@ -1,13 +1,16 @@
-﻿using SpaceWarp.API.Mods;
+﻿using System.IO;
+using BepInEx;
+using SpaceWarp.API.Mods;
 using SpaceWarp.API.AssetBundles;
 using SpaceWarp.API;
 using KSP.UI.Binding;
 using KSP.Sim.impl;
+using SpaceWarp.API.Toolbar;
 using UnityEngine;
 
 namespace ExampleMod;
 
-[MainMod]
+[BepInPlugin("com.SpaceWarpAuthorName.ExampleMod", "ExampleMod", "3.0.0")]
 public class ExampleMod : BaseSpaceWarpPlugin
 {
     public GUISkin _spaceWarpUISkin;
@@ -37,12 +40,26 @@ public class ExampleMod : BaseSpaceWarpPlugin
         );
 
         // Register the mod's button on the SpaceWarp application bar.
-        SpaceWarpManager.RegisterAppButton(
+        Toolbar.RegisterAppButton(
             "Example Mod",
             "BTN-ExampleMod",
-            SpaceWarpManager.LoadIcon(),
+            LoadIcon(Path.Combine(PluginFolderPath, "icon.png")),
             ToggleButton
         );
+    }
+    
+    public static Sprite LoadIcon(string path, int size = 24)
+    {
+        Texture2D tex = new Texture2D(size, size, TextureFormat.ARGB32, false);
+        tex.filterMode = FilterMode.Point;
+
+        if (File.Exists(path))
+        {
+            byte[] fileContent = File.ReadAllBytes(path);
+            tex.LoadImage(fileContent);
+        }
+
+        return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
     }
 
     /// <summary>

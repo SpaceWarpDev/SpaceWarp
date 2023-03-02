@@ -45,9 +45,21 @@ internal static class BootstrapPatch
 
         c.EmitDelegate(static () =>
         {
+            var flow = GameManager.Instance.LoadingFlow;
+            flow.AddAction(new LoadSpaceWarpLocalizationsAction());
+            flow.AddAction(new LoadSpaceWarpAddressablesAction());
+            flow.AddAction(new SpaceWarpAssetInitializationAction());
+
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
-                GameManager.Instance.LoadingFlow.AddAction(new InitializeModAction(plugin));
+                flow.AddAction(new LoadLocalizationAction(plugin));
+                flow.AddAction(new LoadAddressablesAction(plugin));
+                flow.AddAction(new LoadAssetAction(plugin));
+            }
+            
+            foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            {
+                flow.AddAction(new InitializeModAction(plugin));
             }
         });
 
