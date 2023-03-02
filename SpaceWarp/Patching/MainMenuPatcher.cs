@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using KSP.Api.CoreTypes;
 using SpaceWarp.API;
-using SpaceWarp.API.Managers;
 using TMPro;
 using UnityEngine;
 
@@ -13,7 +12,6 @@ class MainMenuPatcher
 {
     public static void Postfix(KSP.Game.StartupFlow.LandingHUD __instance)
     {
-
         Transform menuItemsGroupTransform = __instance.transform.FindChildEx("MenuItemsGroup");
 
         Transform singleplayerButtonTransform = menuItemsGroupTransform.FindChildEx("Singleplayer");
@@ -39,9 +37,7 @@ class MainMenuPatcher
 
     static void ModsOnClick()
     {
-        bool found = ManagerLocator.TryGet(out SpaceWarpManager manager);
-
-        if (found)
+        if (ManagerLocator.TryGet(out SpaceWarpManager manager))
         {
             manager.ModListUI.ToggleVisible();
         }

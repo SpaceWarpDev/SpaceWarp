@@ -6,7 +6,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-        <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
+        <TargetFramework>net472</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
@@ -24,9 +24,6 @@
         </Reference>
         <Reference Include="Unity.ResourceManager">
             <HintPath>..\external_dlls\Unity.ResourceManager.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.ImageConversionModule">
-            <HintPath>..\external_dlls\UnityEngine.ImageConversionModule.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>

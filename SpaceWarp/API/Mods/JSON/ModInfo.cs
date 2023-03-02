@@ -17,10 +17,10 @@ public class ModInfo
 
     [JsonProperty("author")] 
     public string author { get; set; }
-        
+
     [JsonProperty("description")] 
     public string description { get; set; }
-        
+
     [JsonProperty("source")] 
     public string source { get; set; }
 

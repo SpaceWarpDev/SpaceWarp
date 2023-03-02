@@ -46,7 +46,7 @@ public class ModListUI : KerbalMonoBehaviour
         _windowHeight = (int)(Screen.height * 0.85f);
 
         _windowRect = new Rect(Screen.width * 0.15f, Screen.height * 0.15f, 0, 0);
-        ResourceManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
+        AssetManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpUISkin);
     }
 
     private void OnGUI()

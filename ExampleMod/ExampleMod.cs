@@ -8,13 +8,12 @@ using UnityEngine;
 namespace ExampleMod;
 
 [MainMod]
-public class ExampleMod : Mod
+public class ExampleMod : BaseSpaceWarpPlugin
 {
     public GUISkin _spaceWarpUISkin;
 
     private bool drawUI;
     private Rect windowRect;
-    private bool loaded;
 
     private static ExampleMod Instance { get; set; }
 
@@ -25,21 +24,14 @@ public class ExampleMod : Mod
     public override void OnInitialized()
     {
         base.OnInitialized();
-
-        if (loaded)
-        {
-            Destroy(this);
-        }
-
-        loaded = true;
         Instance = this;
 
         // Example of using the logger, Were going to log a message to the console, ALT + C to open the console.
-        Logger.Info("Hello World, Im a spacewarp Mod.");
+        Logger.LogInfo("Hello World, Im a spacewarp Mod.");
 
         // Example of using the asset loader, were going to load the SpaceWarp GUI skin.
         // [FORMAT]: space_warp/[assetbundle_name]/[folder_in_assetbundle]/[file.type]
-        ResourceManager.TryGetAsset(
+        AssetManager.TryGetAsset(
             "space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin",
             out _spaceWarpUISkin
         );
@@ -115,11 +107,11 @@ public class ExampleMod : Mod
             if (_activeVessel != null)
             {
                 _activeVessel.ActivateNextStage();
-                Logger.Warn("Stagin Active Vessel: " + _activeVessel.Name);
+                Logger.LogWarning("Stagin Active Vessel: " + _activeVessel.Name);
                 VesselBehavior behavior = Game.ViewController.GetBehaviorIfLoaded(_activeVessel);
                 foreach (PartBehavior pb in behavior.parts)
                 {
-                    Logger.Warn(pb.name);
+                    Logger.LogWarning(pb.name);
                 }
             }
         }

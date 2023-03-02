@@ -14,7 +14,6 @@ public class LoadingScreenPatcher
     public static void AddModLoadingScreens()
     {
         GameManager gameManager = GameManager.Instance;
-        gameManager.LoadingFlow.AddAction(new ReadingModsAction("Resolving Space Warp Mod Load Order"));
         gameManager.LoadingFlow.AddAction(
             new LoadSpaceWarpAddressablesAction("Initializing Space Warp Provided Addressables"));
         gameManager.LoadingFlow.AddAction(
@@ -34,9 +33,9 @@ public class LoadingScreenPatcher
             gameManager.LoadingFlow.AddAction(new LoadAssetAction($"Loading assets for {mod.Item1}", mod.Item1,
                 mod.Item2));
             gameManager.LoadingFlow.AddAction(new LoadLocalizationAction($"Loading localizations for {mod.Item1}", mod.Item1, mod.Item2));
-            gameManager.LoadingFlow.AddAction(new LoadModAction($"Initializing {mod.Item1}", mod.Item1, mod.Item2));
+            gameManager.LoadingFlow.AddAction(new InitializeModAction($"Initializing {mod.Item1}", mod.Item1, mod.Item2));
         }
 
-        gameManager.LoadingFlow.AddAction(new AfterModsLoadedAction("Space Warp Mod Post-Initialization"));
+        gameManager.LoadingFlow.AddAction(new PostInitializeModsAction("Space Warp Mod Post-Initialization"));
     }
 }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using BepInEx.Logging;
 using HarmonyLib;
 using I2.Loc;
 using KSP.Api;
@@ -10,7 +11,6 @@ using KSP.Api.CoreTypes;
 using KSP.Sim.impl;
 using KSP.UI.Binding;
 using KSP.UI.Flight;
-using SpaceWarp.API.Logging;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -21,7 +21,7 @@ namespace SpaceWarp.API.Toolbar;
 
 public static class ToolbarBackend
 {
-    private static BaseModLogger _logger = new ModLogger("ToolbarBackend");
+    private static ManualLogSource _logger = BepInEx.Logging.Logger.CreateLogSource("ToolbarBackend");
     public static GameObject AddButton(string buttonText, Sprite buttonIcon, string buttonId, Action<bool> function)
     {
         // Find the resource manager button and "others" group.
@@ -32,7 +32,7 @@ public static class ToolbarBackend
 
         if (list == null || resourceManger == null)
         {
-            _logger.Info("Couldn't find appbar.");
+            _logger.LogInfo("Couldn't find appbar.");
             return null;
         }
 
@@ -65,7 +65,7 @@ public static class ToolbarBackend
         IAction action = resourceManger.GetComponent<UIAction_Void_Toggle>().Action;
         appButton.GetComponent<UIAction_Void_Toggle>().BindAction(action);
 
-        _logger.Info($"Added appbar button: {buttonId}");
+        _logger.LogInfo($"Added appbar button: {buttonId}");
 
         return appButton;
     }
