@@ -38,7 +38,7 @@ The mod structure is still a work in progress. However, the current structure is
     * addressables/
       * catalog.json
       * \*
-    * Mod.dll
+    * \*.dll
 
 ## Build Scripts
 
