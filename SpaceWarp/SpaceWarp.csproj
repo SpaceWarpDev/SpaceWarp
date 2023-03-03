@@ -36,6 +36,9 @@
             <HintPath>..\external_dlls\KSPLogging.dll</HintPath>
             <Private>false</Private>
         </Reference>
+        <Reference Include="BepInEx.ConfigurationManager">
+            <HintPath>..\ThirdParty\ConfigurationManager\ConfigurationManager.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" Publicize="true" />
