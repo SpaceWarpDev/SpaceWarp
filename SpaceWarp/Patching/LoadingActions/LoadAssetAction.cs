@@ -51,7 +51,7 @@ internal sealed class LoadAssetAction : FlowAction
             if (Directory.Exists(imagesPath))
             {
                 var directoryInfo = new DirectoryInfo(imagesPath);
-                foreach (string file in directoryInfo.EnumerateFiles("*.cs", SearchOption.AllDirectories).Select(fileInfo => fileInfo.FullName))
+                foreach (string file in directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories).Select(fileInfo => fileInfo.FullName))
                 {
                     var assetPathList = PathHelpers.GetRelativePath(imagesPath, file).Split(Path.DirectorySeparatorChar);
                     //We have to make sure it uses '/' as the path separator and toLower() the names

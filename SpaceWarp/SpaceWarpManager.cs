@@ -7,6 +7,8 @@ using UnityEngine;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.API.UI.Toolbar;
+using SpaceWarp.Backend.UI.Toolbar;
 using SpaceWarp.UI;
 
 namespace SpaceWarp;
@@ -56,6 +58,8 @@ internal static class SpaceWarpManager
         Logger = sw.Logger;
 
         SpaceWarpFolder = Path.GetDirectoryName(sw.Info.Location);
+
+        ToolbarBackend.AppBarInFlightSubscriber.AddListener(Toolbar.LoadAllButtons);
     }
 
     public static ModListUI ModListUI { get; internal set; }
