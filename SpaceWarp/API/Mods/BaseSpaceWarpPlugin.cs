@@ -28,14 +28,26 @@ public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin
 	internal ManualLogSource ModLogger => base.Logger;
 	public string PluginFolderPath { get; internal set; }
 
+	/// <summary>
+	/// 1st stage initialization
+	/// This is called before any of the game is actually loaded, it is called as early as possible in the games bootstrap process.
+	/// </summary>
 	public virtual void OnPreInitialized()
 	{
 	}
 
+	/// <summary>
+	/// 2nd stage initialization
+	/// This is called after the game is loaded, and after your mods assets are loaded.
+	/// </summary>
 	public virtual void OnInitialized()
 	{
 	}
 
+	/// <summary>
+	/// 3rd stage initialization
+	/// This is called after all mods have done first stage initialization
+	/// </summary>
 	public virtual void OnPostInitialized()
 	{
 	}
