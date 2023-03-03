@@ -16,9 +16,7 @@ To compile this project, you will need to follow these steps:
 1. Install NuGet
 2. Run `nuget restore` inside the top directory to install the packages.
 3. Copy everything in the `Kerbal Space Program 2\KSP2_x64_Data\Managed` folder into the `external_dlls/` folder.
-4. Run one of the build scripts (see below for more info) and copy the contents from the correct build output directory into the KSP2 root directory.
-5. Launch KSP2 and wait until the title screen appears. You should see a mods folder under the `SpaceWarp` folder.
-6. Drag any mods that follow the structure below into that mods folder.
+4. Run one of the build scripts (see below for more info) and copy the contents from the correct build output directory into the KSP2 root director
 
 Mods are currently implemented as monobehaviours with two fields: a `Logger` for logging and a `Manager` that points to Spacewarp. A mod template generator exists as a Python script.
 
@@ -26,23 +24,21 @@ Mods are currently implemented as monobehaviours with two fields: a `Logger` for
 
 The mod structure is still a work in progress. However, the current structure is as follows:
 
-* [KSP_ROOT]/SpaceWarp/Mods
+* [KSP_ROOT]/BepInEx/Plugins
   * example_mod
-    * modinfo.json
+    * swinfo.json
     * README.md
     * assets/
       * bundles/
+        * \*.bundle
+      * images/
         * \*
-      * assembly/
-        * parts/
-            * *.json
-        * models/
-            * *.json
-        * resources/
-            * *.json
-    * bin/
-    * config/
-    * .ignore (optional, if this file is present, the mod will be skipped!)
+    * localization/
+      * \*.csv
+    * addressables/
+      * catalog.json
+      * \*
+    * Mod.dll
 
 ## Build Scripts
 
@@ -54,9 +50,5 @@ The build scripts are:
 
 The available arguments are:
 - `-r` or `--release` to build in release mode
-- `-t [target]` or `--target [target]` to build for a specific target (accepted values: `bepinex` or `doorstop`)
-- `-a` or `--all` to build for both BepInEx and Doorstop
 
-When building for BepInEx, the build output will be in `build/BepInEx`, and the compressed version will be `build/SpaceWarp-BepInEx-[Debug|Release]-[commit].zip`.
-
-When building for Unity Doorstop (standalone), the build output will be in `build/Doorstop`, and the compressed version will be `build/SpaceWarp-Doorstop-[Debug|Release]-[commit].zip`.
+When building, the build output will be in `build/SpaceWarp`, and the compressed version will be `build/SpaceWarp-[Debug|Release]-[commit].zip`.
