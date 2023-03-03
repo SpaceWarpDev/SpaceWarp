@@ -8,6 +8,7 @@ import zipfile
 TEMPLATE_DIR = os.path.abspath("SpaceWarpBuildTemplate")
 SPACEWARP_DIR = os.path.abspath("SpaceWarp")
 BUILD_DIR = os.path.abspath("build")
+THIRD_PARTY = os.path.abspath("ThirdParty")
 
 
 parser = argparse.ArgumentParser()
@@ -29,7 +30,13 @@ def build(release = False):
     output_dir = os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "SpaceWarp")
     # copy over the internals of the template
     print("=> Creating build directory...")
-    os.makedirs(os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins"))
+    os.makedirs(os.path.join(BUILD_DIR,"SpaceWarp"),True)
+    print("=> Copying BepInEx")
+    os.makedirs(os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins"),True)
+    shutil.copytree(os.path.join(THIRD_PARTY,"BepInEx 5.4.21"),os.path.join(BUILD_DIR,"SpaceWarp"),dirs_exist_ok=True)
+    print("=> Copying BepInEx.ConfigurationManager")
+    os.makedirs(os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "ConfigurationManager"),True)
+    shutil.copytree(os.path.join(THIRD_PARTY,"ConfigurationManager"), os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "ConfigurationManager"),dirs_exist_ok=True)
 
     print("=> Copying output template")
     shutil.copytree(TEMPLATE_DIR,output_dir)

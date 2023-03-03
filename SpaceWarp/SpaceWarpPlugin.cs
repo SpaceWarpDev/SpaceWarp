@@ -12,6 +12,7 @@ using UnityEngine;
 
 namespace SpaceWarp;
 
+[BepInDependency(ConfigurationManager.ConfigurationManager.GUID,ConfigurationManager.ConfigurationManager.Version)]
 [BepInPlugin(ModGuid, ModName, ModVer)]
 public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 {

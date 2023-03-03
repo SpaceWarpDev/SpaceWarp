@@ -24,8 +24,11 @@ internal static class SpaceWarpManager
     
     internal static IReadOnlyList<BaseSpaceWarpPlugin> SpaceWarpPlugins;
 
+    internal static ConfigurationManager.ConfigurationManager _configurationManager;
+
     internal static void GetSpaceWarpPlugins()
     {
+        _configurationManager = (ConfigurationManager.ConfigurationManager)Chainloader.PluginInfos[ConfigurationManager.ConfigurationManager.GUID].Instance;
         // obsolete warning for Chainloader.Plugins, is fine since we need ordered list
         // to break this we would likely need to upgrade to BIE 6, which isn't happening
 #pragma warning disable CS0618

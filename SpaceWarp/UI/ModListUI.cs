@@ -79,6 +79,8 @@ public class ModListUI : KerbalMonoBehaviour
             _drawUI = false;
             GUIUtility.ExitGUI();
         }
+
+        GUILayout.BeginVertical();
         GUILayout.BeginHorizontal();
         GUILayout.BeginVertical();
 
@@ -114,6 +116,13 @@ public class ModListUI : KerbalMonoBehaviour
         }
         
         GUILayout.EndHorizontal();
+        if (GUILayout.Button("Open Configuration Manager"))
+        {
+            SpaceWarpManager._configurationManager.DisplayingWindow =
+                !SpaceWarpManager._configurationManager.DisplayingWindow;
+            _drawUI = false;
+        }
+        GUILayout.EndVertical();
         GUI.DragWindow();
     }
 

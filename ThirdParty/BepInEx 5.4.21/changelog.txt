@@ -1,0 +1,7 @@
+4 commits since v5.4.20
+
+Changelog (excluding merges):
+* (0d06996) [ghorsington] UnityInput: revert to null input in case of total failure
+* (ea709e2) [ghorsington] Bump version
+* (806d6d2) [ghorsington] UnityInput: remove hard dependency on Unity.InputManager (fixes #446)
+* (a79d657) [ghorsington] UnityInput: Reformat, fix LegacyInputSystemAvailable not being static
