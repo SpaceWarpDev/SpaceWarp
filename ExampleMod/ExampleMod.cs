@@ -5,7 +5,7 @@ using KSP.UI.Binding;
 using KSP.Sim.impl;
 using SpaceWarp;
 using SpaceWarp.API.UI;
-using SpaceWarp.API.UI.Toolbar;
+using SpaceWarp.API.UI.Appbar;
 using UnityEngine;
 
 namespace ExampleMod;
@@ -35,7 +35,7 @@ public class ExampleMod : BaseSpaceWarpPlugin
 
         // Register the mod's button in KSP 2s app.bar
         // This requires an `icon.png` file to exist under [plugin_folder]/assets/images
-        Toolbar.RegisterAppButton(
+        Appbar.RegisterAppButton(
             "Example Mod",
             "BTN-ExampleMod",
             // Example of using the asset loader, were going to load the apps icon

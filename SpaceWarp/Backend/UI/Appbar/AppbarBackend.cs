@@ -17,9 +17,9 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace SpaceWarp.Backend.UI.Toolbar;
+namespace SpaceWarp.Backend.UI.Appbar;
 
-internal static class ToolbarBackend
+internal static class AppbarBackend
 {
     private static readonly ManualLogSource _logger = BepInEx.Logging.Logger.CreateLogSource("ToolbarBackend");
     public static GameObject AddButton(string buttonText, Sprite buttonIcon, string buttonId, Action<bool> function)
@@ -91,7 +91,7 @@ class ToolbarBackendObject : KerbalBehavior
     private IEnumerator awaiter()
     {
         yield return new WaitForSeconds(1);
-        ToolbarBackend.AppBarInFlightSubscriber.Invoke();
+        AppbarBackend.AppBarInFlightSubscriber.Invoke();
         Destroy(this);
     }
 }
@@ -101,5 +101,5 @@ class ToolbarBackendObject : KerbalBehavior
 [HarmonyPatch("Start")]
 class ToolbarBackendAppBarPatcher
 {
-    public static void Postfix(UIFlightHud __instance) => ToolbarBackend.SubscriberSchedulePing();
+    public static void Postfix(UIFlightHud __instance) => AppbarBackend.SubscriberSchedulePing();
 }

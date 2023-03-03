@@ -2,20 +2,20 @@ using System;
 using System.Collections.Generic;
 using BepInEx.Bootstrap;
 using UnityEngine;
-using SpaceWarp.Backend.UI.Toolbar;
+using SpaceWarp.Backend.UI.Appbar;
 
 
-namespace SpaceWarp.API.UI.Toolbar;
+namespace SpaceWarp.API.UI.Appbar;
 
-public static class Toolbar
+public static class Appbar
 {
     private static readonly List<(string text, Sprite icon, string ID, Action<bool> action)> ButtonsToBeLoaded = new();
 
-    public static T RegisterGameToolbarMenu<T>(string text, string title, string id, Sprite icon) where T : ToolbarMenu
+    public static T RegisterGameToolbarMenu<T>(string text, string title, string id, Sprite icon) where T : AppbarMenu
     {
         GameObject toolBarUIObject = new GameObject($"Toolbar: {id}");
         toolBarUIObject.Persist();
-        ToolbarMenu menu = toolBarUIObject.AddComponent<T>();
+        AppbarMenu menu = toolBarUIObject.AddComponent<T>();
         menu.Title = title;
         toolBarUIObject.transform.SetParent(Chainloader.ManagerObject.transform);
         toolBarUIObject.SetActive(true);
@@ -23,7 +23,7 @@ public static class Toolbar
         return menu as T;
     }
 
-    public static T RegisterGameToolbarMenu<T>(string text, string title, string id, Texture2D icon) where T : ToolbarMenu =>
+    public static T RegisterGameToolbarMenu<T>(string text, string title, string id, Texture2D icon) where T : AppbarMenu =>
         RegisterGameToolbarMenu<T>(text, title, id, GetToolBarIconFromTexture(icon));
     
     public static void RegisterAppButton(string text, string id, Sprite icon, Action<bool> func) => ButtonsToBeLoaded.Add((text ,icon, id, func));
@@ -44,7 +44,7 @@ public static class Toolbar
     {
         foreach (var button in ButtonsToBeLoaded)
         {
-            ToolbarBackend.AddButton(button.text, button.icon, button.ID, button.action);
+            AppbarBackend.AddButton(button.text, button.icon, button.ID, button.action);
         }
     }
 }

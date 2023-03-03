@@ -1,12 +1,19 @@
-﻿using UnityEngine;
+﻿using KSP.Game;
+using KSP.Sim.impl;
+using SpaceWarp.API.Assets;
+using SpaceWarp.API.UI.Appbar;
+using UnityEngine;
 
 namespace SpaceWarp.UI;
 
-public sealed class SpaceWarpConsole : MonoBehaviour
+public sealed class SpaceWarpConsole : KerbalMonoBehaviour
 {
     private bool _drawUI;
     private Rect _windowRect;
     bool _autoScroll = true;
+
+    private const ControlTypes ConsoleLocks = ControlTypes.All;
+    private const string ConsoleLockID = "spacewarp.console";
 
     private int _windowWidth = 350;
     private int _windowHeight = 700;
@@ -23,6 +30,16 @@ public sealed class SpaceWarpConsole : MonoBehaviour
 
         _windowRect = new Rect(Screen.width * 0.15f, Screen.height * 0.15f, 0, 0);
         _scrollPosition = Vector2.zero;
+        Appbar.RegisterAppButton(
+            "Console",
+            "BTN-SWConsole",
+            // Example of using the asset loader, were going to load the apps icon
+            // Path format [mod_id]/images/filename
+            // for bundles its [mod_id]/[bundle_name]/[path to file in bundle with out assets/bundle]/filename.extension
+            // There is also a try get asset function, that returns a bool on whether or not it could grab the asset
+            AssetManager.GetAsset<Texture2D>($"spacewarp/images/console.png"),
+            ToggleVisible
+            );
     }
 
     private void OnGUI()
@@ -45,7 +62,7 @@ public sealed class SpaceWarpConsole : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))
         {
-            _drawUI = !_drawUI;
+            ToggleVisible(!_drawUI);
         }
     }
 
@@ -94,5 +111,10 @@ public sealed class SpaceWarpConsole : MonoBehaviour
         GUILayout.EndHorizontal();
         GUILayout.EndVertical();
         GUI.DragWindow(new Rect(0, 0, 10000, 500));
+    }
+    public void ToggleVisible(bool shouldDraw)
+    {
+        _drawUI = shouldDraw;
+        Game.ViewController.inputLockManager.SetControlLock(_drawUI ? ConsoleLocks : ControlTypes.None, ConsoleLockID);
     }
 }

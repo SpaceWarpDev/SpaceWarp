@@ -3,9 +3,9 @@ using KSP.Sim.impl;
 using SpaceWarp.API.Assets;
 using UnityEngine;
 
-namespace SpaceWarp.API.UI.Toolbar;
+namespace SpaceWarp.API.UI.Appbar;
 
-public abstract class ToolbarMenu : KerbalBehavior
+public abstract class AppbarMenu : KerbalBehavior
 {
     private GUISkin _spaceWarpConsoleSkin = null;
     private bool _drawing = false;
