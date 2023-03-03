@@ -1,5 +1,6 @@
 using KSP.Game;
 using KSP.Sim.impl;
+using KSP.UI.Binding;
 using SpaceWarp.API.Assets;
 using UnityEngine;
 
@@ -9,7 +10,9 @@ public abstract class AppbarMenu : KerbalBehavior
 {
     private GUISkin _spaceWarpConsoleSkin = null;
     private bool _drawing = false;
-        
+    internal string ID;
+    private GUIStyle _closeButtonStyle;
+
     public abstract float Width
     {
         get;
@@ -36,7 +39,7 @@ public abstract class AppbarMenu : KerbalBehavior
         {
             if (_spaceWarpConsoleSkin == null)
             {
-                AssetManager.TryGetAsset($"space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin", out _spaceWarpConsoleSkin);
+                _spaceWarpConsoleSkin = Skins.ConsoleSkin;
             }
 
             return _spaceWarpConsoleSkin;
@@ -55,8 +58,12 @@ public abstract class AppbarMenu : KerbalBehavior
     {
         if (!_drawing
             || GameManager.Instance.Game.GlobalGameState.GetState() != GameState.FlightView) return;
+        
         GUI.skin = Skin;
-            
+        _closeButtonStyle ??= new GUIStyle(GUI.skin.button)
+        {
+            fontSize = 8
+        };    
         int controlID = GUIUtility.GetControlID(FocusType.Passive);
 
         GUILayoutOption width = GUILayout.Width(Width);
@@ -77,9 +84,21 @@ public abstract class AppbarMenu : KerbalBehavior
 
     private void DoDrawing(int windowID)
     {
+        Rect closeButtonRect = new Rect(Width - 23, 6, 16, 16);
+        if (GUI.Button(new Rect(_windowRect.width - 18, 2, 16, 16), "x", _closeButtonStyle))
+        {
+            CloseWindow();
+            GUIUtility.ExitGUI();
+        }
         DrawWindow(windowID);
         GUI.DragWindow(new Rect(0, 0, 10000, 10000));
     }
         
     public abstract void DrawWindow(int windowID);
+
+    public void CloseWindow()
+    {
+        ToggleGUI(false);
+        GameObject.Find(ID)?.GetComponent<UIValue_WriteBool_Toggle>()?.SetValue(false);
+    }
 }

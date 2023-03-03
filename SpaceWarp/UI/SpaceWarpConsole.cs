@@ -1,5 +1,6 @@
 ﻿using KSP.Game;
 using KSP.Sim.impl;
+using KSP.UI.Binding;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.UI.Appbar;
 using UnityEngine;
@@ -22,6 +23,7 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
     private static Vector2 _scrollView;
 
     private string _search = "";
+    private GUIStyle _closeButtonStyle;
 
     private void Awake()
     {
@@ -50,6 +52,11 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
             return;
         }
 
+        _closeButtonStyle ??= new GUIStyle(GUI.skin.button)
+        {
+            fontSize = 8
+        };
+
         int controlID = GUIUtility.GetControlID(FocusType.Passive);
         string header = "spacewarp.console";
         GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
@@ -68,6 +75,12 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
 
     private void DrawConsole(int windowID)
     {
+        if (GUI.Button(new Rect(_windowRect.width - 18, 2, 16, 16), "x", _closeButtonStyle))
+        {
+            SpaceWarpManager.Logger.LogInfo("Generating console close button");
+            CloseWindow();
+            GUIUtility.ExitGUI();
+        }
         GUILayout.BeginVertical();
         _search = GUILayout.TextField(_search);
         _scrollView = GUILayout.BeginScrollView(_scrollPosition, false, true);
@@ -90,12 +103,6 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         GUILayout.EndScrollView();
         GUILayout.BeginHorizontal();
 
-        if (GUILayout.Button("Close"))
-        {
-            _drawUI = false;
-            GUIUtility.ExitGUI();
-        }
-
         if (GUILayout.Button("Clear"))
         {
             SpaceWarpConsoleLogListener.DebugMessages.Clear();
@@ -116,5 +123,11 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
     {
         _drawUI = shouldDraw;
         Game.ViewController.inputLockManager.SetControlLock(_drawUI ? ConsoleLocks : ControlTypes.None, ConsoleLockID);
+    }
+
+    public void CloseWindow()
+    {
+        ToggleVisible(false);
+        GameObject.Find("BTN-SWConsole")?.GetComponent<UIValue_WriteBool_Toggle>()?.SetValue(false);
     }
 }

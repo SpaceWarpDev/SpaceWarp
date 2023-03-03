@@ -2,6 +2,7 @@
 using KSP.Game;
 using SpaceWarp.API.Mods.JSON;
 using UnityEngine;
+using BepInEx.Configuration;
 
 namespace SpaceWarp.UI;
 
@@ -18,6 +19,8 @@ public class ModListUI : KerbalMonoBehaviour
     private static Vector2 _scrollPositionMods;
     private static Vector2 _scrollPositionInfo;
 
+    private static GUIStyle _closeButtonStyle = null;
+    
     private ModInfo _selectedMetaData = null;
 
     public void Start()
@@ -46,6 +49,11 @@ public class ModListUI : KerbalMonoBehaviour
             return;
         }
 
+        _closeButtonStyle ??= new GUIStyle(GUI.skin.button)
+        {
+            fontSize = 8
+        };
+
         int controlID = GUIUtility.GetControlID(FocusType.Passive);
         const string header = "spacewarp.modlist";
         GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
@@ -66,6 +74,11 @@ public class ModListUI : KerbalMonoBehaviour
     private void FillWindow(int windowID)
     {
         _boxStyle = GUI.skin.GetStyle("Box");
+        if (GUI.Button(new Rect(_windowRect.width - 18, 2, 16, 16), "x", _closeButtonStyle))
+        {
+            _drawUI = false;
+            GUIUtility.ExitGUI();
+        }
         GUILayout.BeginHorizontal();
         GUILayout.BeginVertical();
 
@@ -99,11 +112,8 @@ public class ModListUI : KerbalMonoBehaviour
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
         }
+        
         GUILayout.EndHorizontal();
-        if (GUILayout.Button("Close"))
-        {
-            ToggleVisible();
-        }
         GUI.DragWindow();
     }
 
