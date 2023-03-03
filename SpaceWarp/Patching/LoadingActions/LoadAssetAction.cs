@@ -83,6 +83,10 @@ internal sealed class LoadAssetAction : FlowAction
                     }
                 }
             }
+            else
+            {
+                Logger.LogInfo($"Did not load images bundles for {Plugin.SpaceWarpMetadata.Name} as no images folder existed! (should be at {imagesPath}");
+            }
             
             resolve();
         }
