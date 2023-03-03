@@ -4,10 +4,12 @@ using KSP.Messages;
 
 namespace SpaceWarp.API.Game;
 
+/// <summary>
+/// A class that contains a list of events that are published either when a state is entered or left
+/// </summary>
 public static class StateChanges
 {
     #region Entering States
-
     public static event Action<GameStateEnteredMessage> InvalidStateEntered;
     public static event System.Action<GameStateEnteredMessage> WarmUpLoadingStateEntered;
     public static event System.Action<GameStateEnteredMessage> MainMenuStateEntered;
