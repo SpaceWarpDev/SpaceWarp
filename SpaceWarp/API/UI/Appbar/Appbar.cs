@@ -26,6 +26,7 @@ public static class Appbar
         toolBarUIObject.Persist();
         AppbarMenu menu = toolBarUIObject.AddComponent<T>();
         menu.Title = title;
+        menu.ID = id;
         toolBarUIObject.transform.SetParent(Chainloader.ManagerObject.transform);
         toolBarUIObject.SetActive(true);
         ButtonsToBeLoaded.Add((text, icon, id, menu.ToggleGUI));
