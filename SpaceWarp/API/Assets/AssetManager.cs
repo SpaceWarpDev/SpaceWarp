@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BepInEx.Logging;
 using UnityEngine;
+using Logger = BepInEx.Logging.Logger;
 
 namespace SpaceWarp.API.Assets;
 
@@ -61,6 +62,32 @@ public static class AssetManager
 		ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource($"{path}");
 		logger.LogInfo($"registering path \"{path}\"");
 		AllAssets.Add(path,asset);
+	}
+
+	private static ManualLogSource PatchLogger = BepInEx.Logging.Logger.CreateLogSource($"Asset Patching");
+	
+	/// <summary>
+	/// Attempt to patch an asset at a path
+	/// </summary>
+	/// <param name="assetPath">The path to the asset to patch</param>
+	/// <param name="asset">The asset to patch with</param>
+	/// <typeparam name="T">The type of the asset that the asset is being patched with</typeparam>
+	/// <exception cref="ArgumentOutOfRangeException">Thrown if the asset does not exist</exception>
+	/// <exception cref="ArgumentException">Thrown if the type of the patching asset cannot be assigned to the type of the patched asset</exception>
+	public static void PatchAsset<T>(string assetPath, T asset) where T : UnityObject
+	{
+		if (!AllAssets.Contains<>(assetPath))
+		{
+			throw new ArgumentOutOfRangeException(nameof(assetPath));
+		}
+
+		if (AllAssets[assetPath].GetType().IsAssignableFrom(typeof(T)))
+		{
+			PatchLogger.LogError($"Attempting to patch {assetPath} which is a(n) {AllAssets[assetPath].GetType().FullName} with an object that is {typeof(T).FullName}. This is an error.");
+			throw new ArgumentException(nameof(asset));
+		}
+
+		AllAssets[assetPath] = asset;
 	}
 
 	/// <summary>
