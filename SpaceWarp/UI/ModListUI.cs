@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using KSP.Game;
+using SpaceWarp.API.Mods.JSON;
 using UnityEngine;
 
 namespace SpaceWarp.UI;
@@ -15,10 +16,9 @@ public class ModListUI : KerbalMonoBehaviour
 
     private static GUIStyle _boxStyle;
     private static Vector2 _scrollPositionMods;
-        
-    private List<(string, bool)> _toggles = new List<(string, bool)>();
-    private List<(string, bool)> _initialToggles = new List<(string, bool)>();
-    private readonly Dictionary<string, bool> _wasToggledDict = new Dictionary<string, bool>();
+    private static Vector2 _scrollPositionInfo;
+
+    private ModInfo _selectedMetaData = null;
 
     public void Start()
     {
@@ -65,54 +65,45 @@ public class ModListUI : KerbalMonoBehaviour
 
     private void FillWindow(int windowID)
     {
-        if (_initialToggles.Count == 0)
-        {
-            _initialToggles = new List<(string, bool)>(_toggles);
-        }
-            
         _boxStyle = GUI.skin.GetStyle("Box");
         GUILayout.BeginHorizontal();
         GUILayout.BeginVertical();
 
-        _scrollPositionMods = GUILayout.BeginScrollView(_scrollPositionMods, false, true,
+        _scrollPositionMods = GUILayout.BeginScrollView(_scrollPositionMods, false, false,
             GUILayout.Height((float)(_windowHeight * 0.8)), GUILayout.Width(300));
-
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Disable All"))
+        foreach (var mod in SpaceWarpManager.SpaceWarpPlugins)
         {
-            for (int i = 0; i < _toggles.Count; i++)
+            if (GUILayout.Button(mod.SpaceWarpMetadata.Name))
             {
-                _toggles[i] = (_toggles[i].Item1, false);
+                _selectedMetaData = mod.SpaceWarpMetadata;
             }
         }
-
-        if (GUILayout.Button("Enable All"))
-        {
-            for (int i = 0; i < _toggles.Count; i++)
-            {
-                _toggles[i] = (_toggles[i].Item1, true);
-            }
-        }
-        GUILayout.EndHorizontal();
-
-        int numChanges = 0;
-        for (int i = 0; i < _toggles.Count; i++)
-        {
-            if (_toggles[i].Item2 != _initialToggles[i].Item2)
-            {
-                numChanges++;
-            }
-        }
-    
-        if (numChanges > 0)
-        {
-            GUILayout.Label($"{numChanges} changes detected, please restart");
-        }
-
         GUILayout.EndScrollView();
         GUILayout.EndVertical();
-        GUILayout.EndHorizontal();
+        if (_selectedMetaData != null)
+        {
+            GUILayout.BeginVertical();
+            _scrollPositionInfo = GUILayout.BeginScrollView(_scrollPositionInfo, false, false);
+            GUILayout.Label($"{_selectedMetaData.Name} (id: {_selectedMetaData.ModID})");
+            GUILayout.Label($"Author: {_selectedMetaData.Author}");
+            GUILayout.Label($"Version: {_selectedMetaData.Version}");
+            GUILayout.Label($"Source: {_selectedMetaData.Source}");
+            GUILayout.Label($"Description: {_selectedMetaData.Description}");
+            GUILayout.Label($"KSP2 Version: {_selectedMetaData.SupportedKsp2Versions.Min} - {_selectedMetaData.SupportedKsp2Versions.Max}");
+            GUILayout.Label($"Dependencies");
 
+            foreach (DependencyInfo dependency in _selectedMetaData.Dependencies)
+            {
+                GUILayout.Label($"{dependency.ID}: {dependency.Version.Min} - {dependency.Version.Max}");
+            }
+            GUILayout.EndScrollView();
+            GUILayout.EndVertical();
+        }
+        GUILayout.EndHorizontal();
+        if (GUILayout.Button("Close"))
+        {
+            ToggleVisible();
+        }
         GUI.DragWindow();
     }
 
