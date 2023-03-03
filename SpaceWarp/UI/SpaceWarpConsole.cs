@@ -14,6 +14,8 @@ public sealed class SpaceWarpConsole : MonoBehaviour
     private static Vector2 _scrollPosition;
     private static Vector2 _scrollView;
 
+    private string _search = "";
+
     private void Awake()
     {
         _windowWidth = (int)(Screen.width * 0.5f);
@@ -50,10 +52,12 @@ public sealed class SpaceWarpConsole : MonoBehaviour
     private void DrawConsole(int windowID)
     {
         GUILayout.BeginVertical();
+        _search = GUILayout.TextField(_search);
         _scrollView = GUILayout.BeginScrollView(_scrollPosition, false, true);
  
         foreach (string message in SpaceWarpConsoleLogListener.DebugMessages)
         {
+            if (!message.ToLower().Contains(_search.ToLower())) continue;
             GUILayout.Label(message);
             if(_autoScroll)
             {
