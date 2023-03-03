@@ -5,7 +5,7 @@ using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using HarmonyLib;
 using KSP.Messages;
-using SpaceWarp.API.Game;
+using SpaceWarp.API.Game.Messages;
 using SpaceWarp.API.Mods;
 using SpaceWarp.UI;
 using UnityEngine;
@@ -37,6 +37,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         
         Game.Messages.Subscribe(typeof(GameStateEnteredMessage), StateChanges.OnGameStateEntered,false,true);
         Game.Messages.Subscribe(typeof(GameStateLeftMessage), StateChanges.OnGameStateLeft,false,true);
+        Game.Messages.Subscribe(typeof(GameStateChangedMessage), StateChanges.OnGameStateChanged,false,true);
         
         InitializeUI();
     }

@@ -2,7 +2,7 @@
 using KSP.Game;
 using KSP.Messages;
 
-namespace SpaceWarp.API.Game;
+namespace SpaceWarp.API.Game.Messages;
 
 /// <summary>
 /// A class that contains a list of events that are published either when a state is entered or left
@@ -55,6 +55,15 @@ public static class StateChanges
     public static event System.Action<GameStateLeftMessage> LaunchpadLeft;
     public static event System.Action<GameStateLeftMessage> RunwayLeft;
     public static event System.Action<GameStateLeftMessage> FlagLeft;
+
+    #endregion
+
+    #region State changing
+
+    /// <summary>
+    /// Action(Message,PreviousState,CurrentState>
+    /// </summary>
+    public static event System.Action<GameStateChangedMessage, GameState, GameState> GameStateChanged; 
 
     #endregion
 
@@ -199,6 +208,12 @@ public static class StateChanges
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    internal static void OnGameStateChanged(MessageCenterMessage message)
+    {
+        var msg = message as GameStateChangedMessage;
+        GameStateChanged?.Invoke(msg!,msg!.PreviousState,msg!.CurrentState);
     }
 
     #endregion
