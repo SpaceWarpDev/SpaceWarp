@@ -29,6 +29,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<Color> configAllColor;
     internal ConfigEntry<bool> configShowConsoleButton;
     internal ConfigEntry<bool> configShowTimeStamps;
+    internal ConfigEntry<string> configTimeStampFormat;
 
     internal new ManualLogSource Logger => base.Logger;
 
@@ -50,8 +51,10 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
                 "Show console button in app.bar, requires restart");
         configShowTimeStamps = Config.Bind("Debug Console", "Show Timestamps", false, 
             "Show time stamps in debug console");
-
-        BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener());
+        configTimeStampFormat = Config.Bind("Debug Console", "Timestamp Format", "HH:mm:ss.fff",
+            "The format for the timestamps in the debug console.");
+        
+        BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
         

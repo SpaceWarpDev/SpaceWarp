@@ -1,4 +1,5 @@
-﻿using BepInEx.Bootstrap;
+﻿using System;
+using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using KSP.Game;
 using KSP.UI.Binding;
@@ -141,9 +142,12 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         GUI.DragWindow(new Rect(0, 0, 10000, 500));
     }
 
-    private static LogLevel GetLogLevelFromMessage(string message)
+    private LogLevel GetLogLevelFromMessage(string message)
     {
-        return message.ToLower() switch
+        var logParts = message.ToLower().Replace(" ", "").Split(']');
+        var logLevelIndex = _spaceWarpPluginInstance.configShowTimeStamps.Value ? 1 : 0;
+
+        return logParts[logLevelIndex] switch
         {
             { } logMessage when logMessage.StartsWith("[fatal") => LogLevel.Fatal,
             { } logMessage when logMessage.StartsWith("[error") => LogLevel.Error,
