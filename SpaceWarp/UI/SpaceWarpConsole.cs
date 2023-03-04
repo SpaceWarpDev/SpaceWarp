@@ -1,5 +1,4 @@
-﻿using System;
-using BepInEx.Bootstrap;
+﻿using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using KSP.Game;
 using KSP.UI.Binding;

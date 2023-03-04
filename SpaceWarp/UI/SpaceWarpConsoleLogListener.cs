@@ -18,6 +18,16 @@ public sealed class SpaceWarpConsoleLogListener : ILogListener
     public void LogEvent(object sender, LogEventArgs eventArgs)
     {
         DebugMessages.Add(BuildMessage(TimestampMessage(), eventArgs.Level, eventArgs.Data, eventArgs.Source));
+        LogMessageJanitor();
+    }
+
+    private void LogMessageJanitor()
+    {
+        var configDebugMessageLimit = _spaceWarpPluginInstance.configDebugMessageLimit.Value;
+        if (DebugMessages.Count > configDebugMessageLimit)
+        {
+            DebugMessages.RemoveRange(0, DebugMessages.Count - configDebugMessageLimit);
+        }
     }
 
     private string TimestampMessage()

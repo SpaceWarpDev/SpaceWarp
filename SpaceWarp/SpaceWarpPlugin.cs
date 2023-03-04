@@ -30,6 +30,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<bool> configShowConsoleButton;
     internal ConfigEntry<bool> configShowTimeStamps;
     internal ConfigEntry<string> configTimeStampFormat;
+    internal ConfigEntry<int> configDebugMessageLimit;
 
     internal new ManualLogSource Logger => base.Logger;
 
@@ -53,6 +54,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             "Show time stamps in debug console");
         configTimeStampFormat = Config.Bind("Debug Console", "Timestamp Format", "HH:mm:ss.fff",
             "The format for the timestamps in the debug console.");
+        configDebugMessageLimit = Config.Bind("Debug Console", "Message Limit", 1000,
+            "The maximum number of messages to keep in the debug console.");
         
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
