@@ -1,4 +1,5 @@
 ﻿using KSP.Game;
+using KSP.UI.Binding;
 using SpaceWarp.API.Mods.JSON;
 using UnityEngine;
 
@@ -67,6 +68,13 @@ public class ModListUI : KerbalMonoBehaviour
         {
             ToggleVisible();
         }
+        
+        if (Input.GetKey(KeyCode.Escape) && _drawUI)
+        {
+            CloseWindow();
+            GUIUtility.ExitGUI();
+        }
+        
     }
 
     private void FillWindow(int windowID)
@@ -82,8 +90,14 @@ public class ModListUI : KerbalMonoBehaviour
         GUILayout.BeginHorizontal();
         GUILayout.BeginVertical();
 
-        _scrollPositionMods = GUILayout.BeginScrollView(_scrollPositionMods, false, false,
-            GUILayout.Height((float)(_windowHeight * 0.8)), GUILayout.Width(300));
+        _scrollPositionMods = GUILayout.BeginScrollView(
+            _scrollPositionMods, 
+            false, 
+            false,
+            GUILayout.Height((float)(_windowHeight * 0.8)), 
+            GUILayout.Width(300)
+        );
+        
         foreach (var mod in SpaceWarpManager.SpaceWarpPlugins)
         {
             if (GUILayout.Button(mod.SpaceWarpMetadata.Name))
@@ -128,4 +142,10 @@ public class ModListUI : KerbalMonoBehaviour
     {
         _drawUI = !_drawUI;
     }
+    
+    public void CloseWindow()
+    {
+        ToggleVisible();
+    }
+    
 }
