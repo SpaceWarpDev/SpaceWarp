@@ -17,17 +17,18 @@ internal static class BootstrapPatch
     
     [HarmonyILManipulator]
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.StartBootstrap))]
-    private static void PatchInitializationsIL(ILContext il, ILLabel endLabel)
+    private static void PatchInitializationsIL(ILContext ilContext, ILLabel endLabel)
     {
-        ILCursor c = new(il);
+        ILCursor ilCursor = new(ilContext);
 
         var flowProp = AccessTools.DeclaredProperty(typeof(GameManager), nameof(GameManager.LoadingFlow));
 
-        c.GotoNext(MoveType.After,
-            x => x.MatchCallOrCallvirt(flowProp.SetMethod)
+        ilCursor.GotoNext(
+            MoveType.After,
+            instruction => instruction.MatchCallOrCallvirt(flowProp.SetMethod)
         );
 
-        c.EmitDelegate(static () =>
+        ilCursor.EmitDelegate(static () =>
         {
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
@@ -35,9 +36,9 @@ internal static class BootstrapPatch
             }
         });
         
-        c.GotoLabel(endLabel, MoveType.Before);
-        c.Index -= 1;
-        c.EmitDelegate(static () =>
+        ilCursor.GotoLabel(endLabel, MoveType.Before);
+        ilCursor.Index -= 1;
+        ilCursor.EmitDelegate(static () =>
         {
             var flow = GameManager.Instance.LoadingFlow;
 
@@ -57,6 +58,7 @@ internal static class BootstrapPatch
             {
                 flow.AddAction(new PostInitializeModAction(plugin));
             }
+            
         });
     }
 }

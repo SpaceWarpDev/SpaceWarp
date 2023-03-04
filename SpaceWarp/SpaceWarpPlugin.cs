@@ -20,7 +20,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public const string ModName = "Space Warp";
     public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
 
-    new internal ManualLogSource Logger => base.Logger;
+    internal new ManualLogSource Logger => base.Logger;
 
     public void Awake()
     {

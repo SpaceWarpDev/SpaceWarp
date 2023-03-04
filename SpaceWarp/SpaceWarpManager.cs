@@ -19,22 +19,22 @@ namespace SpaceWarp;
 internal static class SpaceWarpManager
 {
     internal static ManualLogSource Logger;
-
     internal static string SpaceWarpFolder;
-    
     internal static IReadOnlyList<BaseSpaceWarpPlugin> SpaceWarpPlugins;
-
-    internal static ConfigurationManager.ConfigurationManager _configurationManager;
+    internal static ConfigurationManager.ConfigurationManager ConfigurationManager;
 
     internal static void GetSpaceWarpPlugins()
     {
-        _configurationManager = (ConfigurationManager.ConfigurationManager)Chainloader.PluginInfos[ConfigurationManager.ConfigurationManager.GUID].Instance;
+        ConfigurationManager = (ConfigurationManager.ConfigurationManager)Chainloader.PluginInfos[global::ConfigurationManager.ConfigurationManager.GUID].Instance;
+        
         // obsolete warning for Chainloader.Plugins, is fine since we need ordered list
         // to break this we would likely need to upgrade to BIE 6, which isn't happening
-#pragma warning disable CS0618
+        #pragma warning disable CS0618
         var spaceWarpPlugins = Chainloader.Plugins.OfType<BaseSpaceWarpPlugin>().ToList();
+        
         SpaceWarpPlugins = spaceWarpPlugins;
-#pragma warning restore CS0618
+        
+        #pragma warning restore CS0618
         foreach (var plugin in SpaceWarpPlugins.ToArray())
         {
             var folderPath = Path.GetDirectoryName(plugin.Info.Location);
@@ -56,11 +56,11 @@ internal static class SpaceWarpManager
         }
     }
 
-    public static void Initialize(SpaceWarpPlugin sw)
+    public static void Initialize(SpaceWarpPlugin spaceWarpPlugin)
     {
-        Logger = sw.Logger;
+        Logger = spaceWarpPlugin.Logger;
 
-        SpaceWarpFolder = Path.GetDirectoryName(sw.Info.Location);
+        SpaceWarpFolder = Path.GetDirectoryName(spaceWarpPlugin.Info.Location);
 
         AppbarBackend.AppBarInFlightSubscriber.AddListener(Appbar.LoadAllButtons);
     }
@@ -74,7 +74,9 @@ internal static class SpaceWarpManager
         get
         {
             if (!_skin)
+            {
                 AssetManager.TryGetAsset("spacewarp/swconsoleui/spacewarpconsole.guiskin", out _skin);
+            }
             return _skin;
         }
     }

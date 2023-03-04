@@ -17,21 +17,8 @@ public static class VersionUtility
 
         string[] semanticVersion = toCheck.Split('.');
         string[] requiredVersion = version.Split('.');
-                
-        for (int i = 0; i < requiredVersion.Length; i++)
-        {
-            if (requiredVersion[i] == "*")
-            {
-                continue;
-            }
 
-            if (int.Parse(semanticVersion[i]) < int.Parse(requiredVersion[i]))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return !requiredVersion.Where((t, i) => t != "*" && int.Parse(semanticVersion[i]) < int.Parse(t)).Any();
     }
 
     /// <summary>
@@ -49,20 +36,7 @@ public static class VersionUtility
 
         string[] semanticVersion = toCheck.Split('.');
         string[] requiredVersion = version.Split('.');
-            
-        for (int i = 0; i < requiredVersion.Length; i++)
-        {
-            if (requiredVersion[i] == "*")
-            {
-                continue;
-            }
 
-            if (int.Parse(semanticVersion[i]) > int.Parse(requiredVersion[i]))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return !requiredVersion.Where((t, i) => t != "*" && int.Parse(semanticVersion[i]) > int.Parse(t)).Any();
     }
 }

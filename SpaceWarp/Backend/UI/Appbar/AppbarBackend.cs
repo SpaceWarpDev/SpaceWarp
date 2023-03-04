@@ -21,14 +21,16 @@ namespace SpaceWarp.Backend.UI.Appbar;
 
 internal static class AppbarBackend
 {
+    
     private static readonly ManualLogSource _logger = BepInEx.Logging.Logger.CreateLogSource("ToolbarBackend");
+    
     public static GameObject AddButton(string buttonText, Sprite buttonIcon, string buttonId, Action<bool> function)
     {
         // Find the resource manager button and "others" group.
 
         // Say the magic words...
         GameObject list = GameObject.Find("GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Popup Canvas/Container/ButtonBar/BTN-App-Tray/appbar-others-group");
-        GameObject resourceManger = list?.GetChild("BTN-Resource-Manager");
+        GameObject resourceManger = list != null ? list.GetChild("BTN-Resource-Manager") : null;
 
         if (list == null || resourceManger == null)
         {
@@ -46,7 +48,9 @@ internal static class AppbarBackend
 
         Localize localizer = text.gameObject.GetComponent<Localize>();
         if (localizer)
+        {
             Object.Destroy(localizer);
+        }
 
         // Change the icon.
         GameObject icon = appButton.GetChild("Content").GetChild("GRP-icon");
@@ -70,7 +74,7 @@ internal static class AppbarBackend
         return appButton;
     }
 
-    public static UnityEvent AppBarInFlightSubscriber = new UnityEvent();
+    public static readonly UnityEvent AppBarInFlightSubscriber = new();
 
     internal static void SubscriberSchedulePing()
     {
@@ -80,7 +84,7 @@ internal static class AppbarBackend
     }
 }
 
-class ToolbarBackendObject : KerbalBehavior
+internal class ToolbarBackendObject : KerbalBehavior
 {
     public new void Start()
     {
@@ -99,7 +103,7 @@ class ToolbarBackendObject : KerbalBehavior
 //TODO: Much better way of doing this
 [HarmonyPatch(typeof(UIFlightHud))]
 [HarmonyPatch("Start")]
-class ToolbarBackendAppBarPatcher
+internal class ToolbarBackendAppBarPatcher
 {
     public static void Postfix(UIFlightHud __instance) => AppbarBackend.SubscriberSchedulePing();
 }

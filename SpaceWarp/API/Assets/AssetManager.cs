@@ -18,18 +18,24 @@ public static class AssetManager
 		// Object[] bundleObjects = assetBundle.LoadAllAssets();
 		string[] names = assetBundle.GetAllAssetNames();
 
-		for (int i = 0; i < names.Length; i++)
+		foreach (var name in names)
 		{
-			var assetName = names[i];
+			var assetName = name;
+
 			if (assetName.ToLower().StartsWith("assets/"))
+			{
 				assetName = assetName["assets/".Length..];
+			}
+
 			if (assetName.ToLower().StartsWith(assetBundleName + "/"))
+			{
 				assetName = assetName[(assetBundleName.Length + 1)..];
+			}
 				
 			string path = modId + "/" + assetBundleName + "/" + assetName;
 			path = path.ToLower();
-			var bundleObject = assetBundle.LoadAsset(names[i]);
-
+			
+			UnityObject bundleObject = assetBundle.LoadAsset(name);
 			logger.LogInfo($"registering path \"{path}\"");
 
 			AllAssets.Add(path, bundleObject);
@@ -103,6 +109,7 @@ public static class AssetManager
 		path = path.ToLower();
 		asset = null;
 		string[] subPaths = path.Split('/', '\\');
+		
 		if (subPaths.Length < 3)
 		{
 			return false;
