@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Collections.Generic;
+using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using Newtonsoft.Json;
@@ -22,16 +24,13 @@ internal static class SpaceWarpManager
     internal static string SpaceWarpFolder;
     internal static IReadOnlyList<BaseSpaceWarpPlugin> SpaceWarpPlugins;
     internal static ConfigurationManager.ConfigurationManager ConfigurationManager;
-
     internal static void GetSpaceWarpPlugins()
     {
-        ConfigurationManager = (ConfigurationManager.ConfigurationManager)Chainloader.PluginInfos[global::ConfigurationManager.ConfigurationManager.GUID].Instance;
         
         // obsolete warning for Chainloader.Plugins, is fine since we need ordered list
         // to break this we would likely need to upgrade to BIE 6, which isn't happening
         #pragma warning disable CS0618
         var spaceWarpPlugins = Chainloader.Plugins.OfType<BaseSpaceWarpPlugin>().ToList();
-        
         SpaceWarpPlugins = spaceWarpPlugins;
         
         #pragma warning restore CS0618

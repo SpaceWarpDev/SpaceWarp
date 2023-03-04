@@ -38,6 +38,7 @@
         </Reference>
         <Reference Include="BepInEx.ConfigurationManager">
             <HintPath>..\ThirdParty\ConfigurationManager\ConfigurationManager.dll</HintPath>
+            <Publicize>true</Publicize>
         </Reference>
     </ItemGroup>
     <ItemGroup>
