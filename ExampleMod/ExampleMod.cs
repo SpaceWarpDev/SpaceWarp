@@ -97,14 +97,14 @@ public class ExampleMod : BaseSpaceWarpPlugin
     private void LateUpdate()
     {
         // Now lets play with some Game objects
-        if (Instance.Game.GlobalGameState.GetState() == KSP.Game.GameState.MainMenu)
+        if (Game.GlobalGameState.GetState() == KSP.Game.GameState.MainMenu)
         {
             KSP.Audio.KSPAudioEventManager.SetMasterVolume(Mathf.Sin(Time.time) * 100);
         }
-        else if (Instance.Game.GlobalGameState.GetState() == KSP.Game.GameState.FlightView)
+        else if (Game.GlobalGameState.GetState() == KSP.Game.GameState.FlightView)
         {
             // Getting the active vessel, staging it over and over and printing out all the parts. 
-            VesselComponent _activeVessel = Instance.Game.ViewController.GetActiveSimVessel();
+            VesselComponent _activeVessel = Game.ViewController.GetActiveSimVessel();
             
             if (_activeVessel != null)
             {

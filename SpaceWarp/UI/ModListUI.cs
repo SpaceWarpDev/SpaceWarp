@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
-using KSP.Game;
+﻿using KSP.Game;
 using SpaceWarp.API.Mods.JSON;
 using UnityEngine;
-using BepInEx.Configuration;
 
 namespace SpaceWarp.UI;
 
 public class ModListUI : KerbalMonoBehaviour
 {
     private static bool _loaded;
+
     private bool _drawUI;
     private Rect _windowRect;
+    private ModInfo _selectedMetaData;
 
     private int _windowWidth = 350;
     private int _windowHeight = 700;
@@ -18,10 +18,9 @@ public class ModListUI : KerbalMonoBehaviour
     private static GUIStyle _boxStyle;
     private static Vector2 _scrollPositionMods;
     private static Vector2 _scrollPositionInfo;
-
-    private static GUIStyle _closeButtonStyle = null;
+    private static GUIStyle _closeButtonStyle;
     
-    private ModInfo _selectedMetaData = null;
+    private const string ModListHeader = "ModListHeader";
 
     public void Start()
     {
@@ -55,14 +54,13 @@ public class ModListUI : KerbalMonoBehaviour
         };
 
         int controlID = GUIUtility.GetControlID(FocusType.Passive);
-        const string header = "spacewarp.modlist";
         GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
         GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
         GUI.skin = SpaceWarpManager.Skin;
 
-        _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, header, width, height);
+        _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, ModListHeader, width, height);
     }
-
+    
     private void Update()
     {
         if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.M))
@@ -118,8 +116,8 @@ public class ModListUI : KerbalMonoBehaviour
         GUILayout.EndHorizontal();
         if (GUILayout.Button("Open Configuration Manager"))
         {
-            SpaceWarpManager._configurationManager.DisplayingWindow =
-                !SpaceWarpManager._configurationManager.DisplayingWindow;
+            SpaceWarpManager.ConfigurationManager.DisplayingWindow =
+                !SpaceWarpManager.ConfigurationManager.DisplayingWindow;
             _drawUI = false;
         }
         GUILayout.EndVertical();

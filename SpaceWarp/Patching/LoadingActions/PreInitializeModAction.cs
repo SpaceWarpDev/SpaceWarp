@@ -6,7 +6,7 @@ namespace SpaceWarp.Patching.LoadingActions;
 
 internal sealed class PreInitializeModAction : FlowAction
 {
-    private BaseSpaceWarpPlugin Plugin;
+    private readonly BaseSpaceWarpPlugin Plugin;
 
     public PreInitializeModAction(BaseSpaceWarpPlugin plugin) : base($"Pre-initialization for plugin {plugin.Info.Metadata.Name}")
     {

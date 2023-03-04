@@ -1,5 +1,4 @@
 ﻿using KSP.Game;
-using KSP.Sim.impl;
 using KSP.UI.Binding;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.UI.Appbar;

@@ -4,9 +4,9 @@ namespace SpaceWarp;
 
 internal static class InternalExtensions
 {
-    public static void Persist(this UnityObject o)
+    public static void Persist(this UnityObject obj)
     {
-        UnityObject.DontDestroyOnLoad(o);
-        o.hideFlags |= HideFlags.HideAndDontSave;
+        UnityObject.DontDestroyOnLoad(obj);
+        obj.hideFlags |= HideFlags.HideAndDontSave;
     }
 }

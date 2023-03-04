@@ -18,12 +18,12 @@ internal static class PathHelpers
     {
         if (string.IsNullOrEmpty(fromPath))
         {
-            throw new ArgumentNullException("fromPath");
+            throw new ArgumentNullException(nameof(fromPath));
         }
 
         if (string.IsNullOrEmpty(toPath))
         {
-            throw new ArgumentNullException("toPath");
+            throw new ArgumentNullException(nameof(toPath));
         }
 
         Uri fromUri = new Uri(AppendDirectorySeparatorChar(fromPath));
@@ -48,8 +48,7 @@ internal static class PathHelpers
     private static string AppendDirectorySeparatorChar(string path)
     {
         // Append a slash only if the path is a directory and does not have a slash.
-        if (!Path.HasExtension(path) &&
-            !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+        if (!Path.HasExtension(path) && !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
         {
             return path + Path.DirectorySeparatorChar;
         }

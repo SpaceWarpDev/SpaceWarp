@@ -1,15 +1,14 @@
 using KSP.Game;
 using KSP.Sim.impl;
 using KSP.UI.Binding;
-using SpaceWarp.API.Assets;
 using UnityEngine;
 
 namespace SpaceWarp.API.UI.Appbar;
 
 public abstract class AppbarMenu : KerbalBehavior
 {
-    private GUISkin _spaceWarpConsoleSkin = null;
-    private bool _drawing = false;
+    private GUISkin _spaceWarpConsoleSkin;
+    private bool _drawing;
     internal string ID;
     private GUIStyle _closeButtonStyle;
 

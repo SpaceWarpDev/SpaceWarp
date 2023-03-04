@@ -8,18 +8,16 @@ namespace SpaceWarp.Patching;
 
 [HarmonyPatch(typeof(KSP.Game.StartupFlow.LandingHUD))]
 [HarmonyPatch("Start")]
-class MainMenuPatcher
+internal class MainMenuPatcher
 {
     public static void Postfix(KSP.Game.StartupFlow.LandingHUD __instance)
     {
         Transform menuItemsGroupTransform = __instance.transform.FindChildEx("MenuItemsGroup");
-
         Transform singleplayerButtonTransform = menuItemsGroupTransform.FindChildEx("Singleplayer");
 
         foreach (var menuButtonToBeAdded in MainMenu.MenuButtonsToBeAdded)
         {
-            GameObject newButton =
-                Object.Instantiate(singleplayerButtonTransform.gameObject, menuItemsGroupTransform, false);
+            GameObject newButton = Object.Instantiate(singleplayerButtonTransform.gameObject, menuItemsGroupTransform, false);
             newButton.name = menuButtonToBeAdded.name;
 
             // Move the button to be above the Exit button.

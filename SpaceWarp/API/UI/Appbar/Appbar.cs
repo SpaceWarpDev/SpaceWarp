@@ -42,9 +42,11 @@ public static class Appbar
     /// <param name="icon">A Texture2D for the icon in the appbar</param>
     /// <typeparam name="T">The type of the appbar menu, must extend AppbarMenu</typeparam>
     /// <returns>An instance of T which has been added to a GameObject</returns>
-    public static T RegisterGameAppbarMenu<T>(string text, string title, string id, Texture2D icon) where T : AppbarMenu =>
-        RegisterGameAppbarMenu<T>(text, title, id, GetAppBarIconFromTexture(icon));
-    
+    public static T RegisterGameAppbarMenu<T>(string text, string title, string id, Texture2D icon) where T : AppbarMenu
+    {
+        return RegisterGameAppbarMenu<T>(text, title, id, GetAppBarIconFromTexture(icon));
+    }
+
     /// <summary>
     /// Register a button on the games AppBar
     /// </summary>
@@ -52,8 +54,11 @@ public static class Appbar
     /// <param name="id">A unique id for the appbar menu eg: "BTN-Example"</param>
     /// <param name="icon">A Sprite for the icon in the appbar</param>
     /// <param name="func">The function to be called when this button is clicked</param>
-    public static void RegisterAppButton(string text, string id, Sprite icon, Action<bool> func) => ButtonsToBeLoaded.Add((text ,icon, id, func));
-    
+    public static void RegisterAppButton(string text, string id, Sprite icon, Action<bool> func)
+    {
+        ButtonsToBeLoaded.Add((text, icon, id, func));
+    }
+
     /// <summary>
     /// Register a button on the games AppBar
     /// </summary>
@@ -61,10 +66,12 @@ public static class Appbar
     /// <param name="id">A unique id for the appbar menu eg: "BTN-Example"</param>
     /// <param name="icon">A Texture2D for the icon in the appbar</param>
     /// <param name="func">The function to be called when this button is clicked</param>
-    public static void RegisterAppButton(string text, string id, Texture2D icon, Action<bool> func) =>
+    public static void RegisterAppButton(string text, string id, Texture2D icon, Action<bool> func)
+    {
         RegisterAppButton(text, id, GetAppBarIconFromTexture(icon), func);
-    
-    
+    }
+
+
     /// <summary>
     /// Convert a Texture2D to a Sprite
     /// </summary>
@@ -72,7 +79,7 @@ public static class Appbar
     /// <param name="width">The width of the sprite, 0 for inferring</param>
     /// <param name="height">The height of the sprite, 0 for inferring</param>
     /// <returns>The Texture2D converted to a Sprite</returns>
-    public static Sprite GetAppBarIconFromTexture(Texture2D texture, int width=0,int height=0)
+    public static Sprite GetAppBarIconFromTexture(Texture2D texture, int width=0, int height=0)
     {
         if (width == 0) width = texture.width;
         if (height == 0) height = texture.height;

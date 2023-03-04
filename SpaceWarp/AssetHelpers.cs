@@ -11,7 +11,7 @@ internal static class AssetHelpers
     public static void LoadAddressable(string catalog)
     {
         SpaceWarpManager.Logger.LogInfo($"Attempting to load {catalog}");
-        AsyncOperationHandle<IResourceLocator> operation = Addressables.LoadContentCatalogAsync(catalog, null);
+        AsyncOperationHandle<IResourceLocator> operation = Addressables.LoadContentCatalogAsync(catalog);
         operation.WaitForCompletion();
         if (operation.Status == AsyncOperationStatus.Failed)
         {
