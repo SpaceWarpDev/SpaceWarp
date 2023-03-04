@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using BepInEx.Bootstrap;
 using BepInEx.Logging;
+using UnityEngine;
 
 namespace SpaceWarp.UI;
 
@@ -14,8 +16,8 @@ public sealed class SpaceWarpConsoleLogListener : ILogListener
 
     private static string BuildMessage(LogLevel level, object data, ILogSource source)
     {
-        return level == LogLevel.None 
-            ? $"[{(object) source.SourceName}] {data}" 
+        return level == LogLevel.None
+            ? $"[{(object) source.SourceName}] {data}"
             : $"[{(object) level} : {(object) source.SourceName}] {data}";
     }
 

@@ -12,6 +12,7 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
 {
     private bool _drawUI;
     private Rect _windowRect;
+    private string _search = "";
     private bool _autoScroll = true;
 
     private const ControlTypes ConsoleLocks = ControlTypes.All;
@@ -23,9 +24,7 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
     private static Vector2 _scrollPosition;
     private static Vector2 _scrollView;
 
-    private string _search = "";
     private GUIStyle _closeButtonStyle;
-
     private SpaceWarpPlugin _spaceWarpPluginInstance;
 
 

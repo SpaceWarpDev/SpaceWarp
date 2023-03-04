@@ -1,7 +1,5 @@
 ﻿global using UnityObject = UnityEngine.Object;
 global using System.Linq;
-using System;
-using System.ComponentModel;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
@@ -23,7 +21,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public const string ModName = "Space Warp";
     public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
 
-
     internal ConfigEntry<Color> configErrorColor;
     internal ConfigEntry<Color> configWarningColor;
     internal ConfigEntry<Color> configMessageColor;
@@ -37,23 +34,22 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     public void Awake()
     {
-        configErrorColor = Config.Bind("DebugConsole", "ErrorColor", Color.red,
+        configErrorColor = Config.Bind("Debug Console", "Color Error", Color.red,
             "The color for log messages that have the level: Error/Fatal (bolded)");
-        configWarningColor = Config.Bind("DebugConsole", "WarningColor", Color.yellow,
+        configWarningColor = Config.Bind("Debug Console", "Color Warning", Color.yellow,
             "The color for log messages that have the level: Warning");
-        configMessageColor = Config.Bind("DebugConsole", "MessageColor", Color.white,
+        configMessageColor = Config.Bind("Debug Console", "Color Message", Color.white,
             "The color for log messages that have the level: Message");
-        configInfoColor = Config.Bind("DebugConsole", "InfoColor", Color.cyan,
+        configInfoColor = Config.Bind("Debug Console", "Color Info", Color.cyan,
             "The color for log messages that have the level: Info");
-        configDebugColor = Config.Bind("DebugConsole", "DebugColor", Color.green,
+        configDebugColor = Config.Bind("Debug Console", "Color Debug", Color.green,
             "The color for log messages that have the level: Debug");
-        configAllColor = Config.Bind("DebugConsole", "AllColor", Color.magenta,
+        configAllColor = Config.Bind("Debug Console", "Color All", Color.magenta,
             "The color for log messages that have the level: All");
-        configShowConsoleButton =
-            Config.Bind("DebugConsole", "ShowConsoleButton", false,
+        configShowConsoleButton = Config.Bind("Debug Console", "Show Console Button", false,
                 "Show console button in app.bar, requires restart");
-        configShowTimeStamps =
-            Config.Bind("DebugConsole", "ShowTimeStamps", false, "Show time stamps in debug console");
+        configShowTimeStamps = Config.Bind("Debug Console", "Show Timestamps", false, 
+            "Show time stamps in debug console");
 
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener());
 
@@ -66,8 +62,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public override void OnInitialized()
     {
         base.OnInitialized();
-        
-        
         
         Game.Messages.Subscribe(typeof(GameStateEnteredMessage), StateChanges.OnGameStateEntered,false,true);
         Game.Messages.Subscribe(typeof(GameStateLeftMessage), StateChanges.OnGameStateLeft,false,true);
