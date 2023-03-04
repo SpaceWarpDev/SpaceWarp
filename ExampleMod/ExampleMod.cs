@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Logging;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Assets;
 using KSP.UI.Binding;
@@ -90,6 +91,9 @@ public class ExampleMod : BaseSpaceWarpPlugin
         GUILayout.Label("Example Mod - Built with Space-Warp");
         GUI.DragWindow(new Rect(0, 0, 10000, 500));
     }
+    
+    private float lastUpdateTime = 0.0f;
+    private float updateInterval = 1.0f;
 
     /// <summary>
     /// Runs every frame and performs various tasks based on the game state.
@@ -97,9 +101,26 @@ public class ExampleMod : BaseSpaceWarpPlugin
     private void LateUpdate()
     {
         // Now lets play with some Game objects
-        if (Game.GlobalGameState.GetState() == KSP.Game.GameState.MainMenu)
+        // Check if the specified interval has elapsed
+        if (Time.time - lastUpdateTime >= updateInterval)
         {
-            KSP.Audio.KSPAudioEventManager.SetMasterVolume(Mathf.Sin(Time.time) * 100);
+            // Update the last update time to the current time
+            lastUpdateTime = Time.time;
+
+            // Now lets play with some Game objects
+            if (Game.GlobalGameState.GetState() == KSP.Game.GameState.MainMenu)
+            {
+                Logger.Log(LogLevel.None, "This is log level none");
+                Logger.Log(LogLevel.Debug, "This is log level debug");
+                Logger.Log(LogLevel.Info, "This is log level info");
+                Logger.Log(LogLevel.Warning, "This is log level warning");
+                Logger.Log(LogLevel.Error, "This is log level error");
+                Logger.Log(LogLevel.Fatal, "This is log level fatal");
+                Logger.Log(LogLevel.Message, "This is log level message");
+                Logger.Log(LogLevel.All, "This is log level all");
+
+                KSP.Audio.KSPAudioEventManager.SetMasterVolume(Mathf.Sin(Time.time) * 100);
+            }
         }
         else if (Game.GlobalGameState.GetState() == KSP.Game.GameState.FlightView)
         {

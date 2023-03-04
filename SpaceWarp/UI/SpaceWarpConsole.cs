@@ -1,4 +1,5 @@
-﻿using KSP.Game;
+﻿using BepInEx.Logging;
+using KSP.Game;
 using KSP.UI.Binding;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.UI.Appbar;
@@ -95,7 +96,17 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         foreach (string message in SpaceWarpConsoleLogListener.DebugMessages)
         {
             if (!message.ToLower().Contains(_search.ToLower())) continue;
-            GUILayout.Label(message);
+         
+            // Parse the log level from the message string
+            LogLevel logType = GetLogLevelFromMessage(message);
+
+            // Apply a different color style based on the log level
+            GUIStyle style = GetLogStyle(logType);
+            
+            if (logType == LogLevel.Fatal) style.fontStyle = FontStyle.Bold;
+
+            GUILayout.Label(message, style);
+            
             if(_autoScroll)
             {
                 _scrollView.Set(_scrollView.x, Mathf.Infinity);
@@ -126,6 +137,41 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         GUILayout.EndVertical();
         GUI.DragWindow(new Rect(0, 0, 10000, 500));
     }
+    
+    private static LogLevel GetLogLevelFromMessage(string message)
+    {
+        return message.ToLower() switch
+        {
+            string logMessage when logMessage.StartsWith("[fatal") => LogLevel.Fatal,
+            string logMessage when logMessage.StartsWith("[error") => LogLevel.Error,
+            string logMessage when logMessage.StartsWith("[warn") => LogLevel.Warning,
+            string logMessage when logMessage.StartsWith("[message") => LogLevel.Message,
+            string logMessage when logMessage.StartsWith("[info") => LogLevel.Info,
+            string logMessage when logMessage.StartsWith("[debug") => LogLevel.Debug,
+            string logMessage when logMessage.StartsWith("[all") => LogLevel.All,
+            _ => LogLevel.None
+        };
+    }
+    
+    private static GUIStyle GetLogStyle(LogLevel logLevel)
+    {
+        GUIStyle style = new GUIStyle(GUI.skin.label);
+
+        style.normal.textColor = logLevel switch
+        {
+            LogLevel.Fatal => Color.red,
+            LogLevel.Error => Color.red,
+            LogLevel.Warning => Color.yellow,
+            LogLevel.Message => Color.white,
+            LogLevel.Info => Color.cyan,
+            LogLevel.Debug => Color.green,
+            LogLevel.All => Color.magenta,
+            _ => style.normal.textColor
+        };
+
+        return style;
+    }
+    
     public void ToggleVisible(bool shouldDraw)
     {
         _drawUI = shouldDraw;

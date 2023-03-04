@@ -1,5 +1,4 @@
 ﻿using KSP.Game;
-using KSP.UI.Binding;
 using SpaceWarp.API.Mods.JSON;
 using UnityEngine;
 
