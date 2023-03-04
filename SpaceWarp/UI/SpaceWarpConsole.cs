@@ -10,7 +10,7 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
 {
     private bool _drawUI;
     private Rect _windowRect;
-    bool _autoScroll = true;
+    private bool _autoScroll = true;
 
     private const ControlTypes ConsoleLocks = ControlTypes.All;
     private const string ConsoleLockID = "spacewarp.console";
@@ -28,9 +28,9 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
     {
         _windowWidth = (int)(Screen.width * 0.5f);
         _windowHeight = (int)(Screen.height * 0.5f);
-
         _windowRect = new Rect(Screen.width * 0.15f, Screen.height * 0.15f, 0, 0);
         _scrollPosition = Vector2.zero;
+        
         Appbar.RegisterAppButton(
             "Console",
             "BTN-SWConsole",
@@ -38,14 +38,15 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
             // Path format [mod_id]/images/filename
             // for bundles its [mod_id]/[bundle_name]/[path to file in bundle with out assets/bundle]/filename.extension
             // There is also a try get asset function, that returns a bool on whether or not it could grab the asset
-            AssetManager.GetAsset<Texture2D>($"spacewarp/images/console.png"),
+            AssetManager.GetAsset<Texture2D>("spacewarp/images/console.png"),
             ToggleVisible
-            );
+        );
     }
 
     private void OnGUI()
     {
         GUI.skin = SpaceWarpManager.Skin;
+        
         if (!_drawUI)
         {
             return;
@@ -57,19 +58,26 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         };
 
         int controlID = GUIUtility.GetControlID(FocusType.Passive);
-        string header = "spacewarp.console";
         GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
         GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
         
-        _windowRect = GUILayout.Window(controlID, _windowRect, DrawConsole, header, width, height);
+        _windowRect = GUILayout.Window(controlID, _windowRect, DrawConsole, ConsoleLockID, width, height);
     }
     
     private void Update()
     {
+        
         if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))
         {
             ToggleVisible(!_drawUI);
         }
+        
+        if (Input.GetKey(KeyCode.Escape) && _drawUI)
+        {
+            CloseWindow();
+            GUIUtility.ExitGUI();
+        }
+        
     }
 
     private void DrawConsole(int windowID)
