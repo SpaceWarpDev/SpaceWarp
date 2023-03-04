@@ -49,7 +49,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             "The color for log messages that have the level: All");
         configShowConsoleButton = Config.Bind("Debug Console", "Show Console Button", false,
                 "Show console button in app.bar, requires restart");
-        configShowTimeStamps = Config.Bind("Debug Console", "Show Timestamps", false, 
+        configShowTimeStamps = Config.Bind("Debug Console", "Show Timestamps", true, 
             "Show time stamps in debug console");
         configTimeStampFormat = Config.Bind("Debug Console", "Timestamp Format", "HH:mm:ss.fff",
             "The format for the timestamps in the debug console.");
@@ -79,7 +79,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         GameObject modUIObject = new("Space Warp Mod UI");
         modUIObject.Persist();
 
-        modUIObject.transform.SetParent(this.transform);
+        modUIObject.transform.SetParent(transform);
         SpaceWarpManager.ModListUI = modUIObject.AddComponent<ModListUI>();
 
         modUIObject.SetActive(true);
