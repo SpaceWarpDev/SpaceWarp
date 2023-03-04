@@ -1,7 +1,10 @@
 ﻿global using UnityObject = UnityEngine.Object;
 global using System.Linq;
+using System;
+using System.ComponentModel;
 using BepInEx;
 using BepInEx.Bootstrap;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using KSP.Messages;
@@ -20,10 +23,38 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public const string ModName = "Space Warp";
     public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
 
+
+    internal ConfigEntry<Color> configErrorColor;
+    internal ConfigEntry<Color> configWarningColor;
+    internal ConfigEntry<Color> configMessageColor;
+    internal ConfigEntry<Color> configInfoColor;
+    internal ConfigEntry<Color> configDebugColor;
+    internal ConfigEntry<Color> configAllColor;
+    internal ConfigEntry<bool> configShowConsoleButton;
+    internal ConfigEntry<bool> configShowTimeStamps;
+
     internal new ManualLogSource Logger => base.Logger;
 
     public void Awake()
     {
+        configErrorColor = Config.Bind("DebugConsole", "ErrorColor", Color.red,
+            "The color for log messages that have the level: Error/Fatal (bolded)");
+        configWarningColor = Config.Bind("DebugConsole", "WarningColor", Color.yellow,
+            "The color for log messages that have the level: Warning");
+        configMessageColor = Config.Bind("DebugConsole", "MessageColor", Color.white,
+            "The color for log messages that have the level: Message");
+        configInfoColor = Config.Bind("DebugConsole", "InfoColor", Color.cyan,
+            "The color for log messages that have the level: Info");
+        configDebugColor = Config.Bind("DebugConsole", "DebugColor", Color.green,
+            "The color for log messages that have the level: Debug");
+        configAllColor = Config.Bind("DebugConsole", "AllColor", Color.magenta,
+            "The color for log messages that have the level: All");
+        configShowConsoleButton =
+            Config.Bind("DebugConsole", "ShowConsoleButton", false,
+                "Show console button in app.bar, requires restart");
+        configShowTimeStamps =
+            Config.Bind("DebugConsole", "ShowTimeStamps", false, "Show time stamps in debug console");
+
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener());
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
@@ -36,6 +67,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     {
         base.OnInitialized();
         
+        
+        
         Game.Messages.Subscribe(typeof(GameStateEnteredMessage), StateChanges.OnGameStateEntered,false,true);
         Game.Messages.Subscribe(typeof(GameStateLeftMessage), StateChanges.OnGameStateLeft,false,true);
         Game.Messages.Subscribe(typeof(GameStateChangedMessage), StateChanges.OnGameStateChanged,false,true);
@@ -45,6 +78,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     private void InitializeUI()
     {
+        SpaceWarpManager.ConfigurationManager = (ConfigurationManager.ConfigurationManager)Chainloader.PluginInfos[global::ConfigurationManager.ConfigurationManager.GUID].Instance;
         GameObject modUIObject = new("Space Warp Mod UI");
         modUIObject.Persist();
 
