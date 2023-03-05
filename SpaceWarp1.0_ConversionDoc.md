@@ -23,7 +23,8 @@ The previous mod structure has been replaced by the standard BepInEx layout.
         *.dll
 #
 ### swinfo.json (Your new modinfo.json)
-```{
+```
+{
   "mod_id": "mod_folder_name_here",
   "name": "full_title_here",
   "author": "your_name",
