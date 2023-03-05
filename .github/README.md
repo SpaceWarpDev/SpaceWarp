@@ -33,21 +33,25 @@ Mods are currently implemented as monobehaviours with two fields: a `Logger` for
 
 The mod structure is still a work in progress. However, the current structure is as follows:
 
-* [KSP_ROOT]/BepInEx/Plugins
-  * example_mod
-    * swinfo.json
-    * README.md
-    * assets/
-      * bundles/
-        * \*.bundle
-      * images/
-        * \*
-    * localization/
-      * \*.csv
-    * addressables/
-      * catalog.json
-      * \*
-    * \*.dll
+```
+KSP2_Root_Folder/
+├── BepInEx/
+│   ├── Plugins/
+│   │   ├── mod_id_folder_name/
+│   │   │   ├── swinfo.json
+│   │   │   ├── README.md
+│   │   │   ├── assets/
+│   │   │   │   ├── bundles/
+│   │   │   │   │   ├── *.bundle
+│   │   │   │   ├── images/
+│   │   │   │   │   ├── *
+│   │   │   ├── localization/
+│   │   │   │   ├── *.csv
+│   │   │   ├── addressables/
+│   │   │   │   ├── catalog.json
+│   │   │   │   ├── *
+│   │   │   ├── *.dll 
+```
 
 ## Build Scripts
 
