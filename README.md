@@ -11,11 +11,11 @@ Note: Use at your own risk, as this is an early version that is expected to unde
 
 ## Installation
 
-Download the latest release from this page under the "Releases" section above
+Download the latest release from this page under the [Releases](https://github.com/SpaceWarpDev/SpaceWarp/releases) section above.
 
-Drag the contents of the .zip folder into your KSP2 directory, commonly located at "C:\Steam\steamapps\common\Kerbal Space Program 2\"
+Drag the contents of the .zip folder into your KSP2 directory, commonly located at `C:\Steam\steamapps\common\Kerbal Space Program 2\` or use the [Installer](https://github.com/SpaceWarpDev/Space-Warp-Installer)
 
-Drag your downloaded mods into the folder now located at "C:\Steam\steamapps\common\Kerbal Space Program 2\SpaceWarp\Mods"
+To install the downloaded mods, simply drag them into the following directory: `{Your Game Installation Directory}\SpaceWarp\Mods`. Note that `{Your Game Installation Directory}` refers to the file path where your Kerbal Space Program 2 game is installed on your computer
 
 ## Compiling
 
