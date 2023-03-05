@@ -1,0 +1,13 @@
+{
+  "mod_id": "SpaceWarp",
+  "name": "Space Warp",
+  "author": "Space-Warp Team",
+  "description": "Space-Warp is an API for KSP2 mod developers.",
+  "source": "https://github.com/SpaceWarpDev/SpaceWarp",
+  "version": "0.4.0",
+  "dependencies": [],
+  "ksp2_version": {
+    "min": "0",
+    "max": "*"
+  }
+}

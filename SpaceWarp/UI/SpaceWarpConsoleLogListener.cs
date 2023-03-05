@@ -1,67 +1,51 @@
-using SpaceWarp.API;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using HarmonyLogger = HarmonyLib.Tools.Logger;
+using BepInEx.Logging;
+
 namespace SpaceWarp.UI;
 
-public class SpaceWarpConsoleLogListener
+public sealed class SpaceWarpConsoleLogListener : ILogListener
 {
-    internal static readonly List<string> DebugMessages = new List<string>();
-    internal static SpaceWarpGlobalConfiguration config = SpaceWarpGlobalConfiguration.Instance;
+    private readonly SpaceWarpPlugin _spaceWarpPluginInstance;
 
-    public static void LogCallback(string condition, string stackTrace, LogType type)
+    internal static readonly List<string> DebugMessages = new();
+
+    public SpaceWarpConsoleLogListener(SpaceWarpPlugin spaceWarpPluginInstance)
     {
-        switch (type)
+        _spaceWarpPluginInstance = spaceWarpPluginInstance;
+    }
+
+    public void LogEvent(object sender, LogEventArgs eventArgs)
+    {
+        DebugMessages.Add(BuildMessage(TimestampMessage(), eventArgs.Level, eventArgs.Data, eventArgs.Source));
+        LogMessageJanitor();
+    }
+
+    private void LogMessageJanitor()
+    {
+        var configDebugMessageLimit = _spaceWarpPluginInstance.configDebugMessageLimit.Value;
+        if (DebugMessages.Count > configDebugMessageLimit)
         {
-            case LogType.Error:
-                if (config.LogLevel >= (int)LogType.Error)
-                    DebugMessages.Add($"[ERR] {condition}");
-                break;
-            case LogType.Assert:
-                if (config.LogLevel >= (int)LogType.Assert)
-                    DebugMessages.Add($"[AST] {condition}");
-                break;
-            case LogType.Warning:
-                if (config.LogLevel >= (int)LogType.Warning)
-                    DebugMessages.Add($"[WRN] {condition}");
-                break;
-            case LogType.Log:
-                if (config.LogLevel >= (int)LogType.Log)
-                    DebugMessages.Add($"[LOG] {condition}");
-                break;
-            case LogType.Exception:
-                if (config.LogLevel >= (int)LogType.Exception)
-                    DebugMessages.Add($"[EXC] {condition}");
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            DebugMessages.RemoveRange(0, DebugMessages.Count - configDebugMessageLimit);
         }
     }
 
-    public static void HarmonyLogCallback(object sender, HarmonyLogger.LogEventArgs e)
+    private string TimestampMessage()
     {
-        switch (e.LogChannel)
-        {
-            case HarmonyLogger.LogChannel.Info:
-                if (config.HarmonyLogLevel >= (int)LogType.Log)
-                    DebugMessages.Add($"[HINF] {e.Message}");
-                break;
-            case HarmonyLogger.LogChannel.Warn:
-                if (config.HarmonyLogLevel >= (int)LogType.Warning)
-                    DebugMessages.Add($"[HWRN] {e.Message}");
-                break;
-            case HarmonyLogger.LogChannel.Error:
-                if (config.HarmonyLogLevel >= (int)LogType.Error)
-                    DebugMessages.Add($"[HERR] {e.Message}");
-                break;
-            case HarmonyLogger.LogChannel.IL:
-                if (config.HarmonyLogLevel >= (int)LogType.Exception)
-                    DebugMessages.Add($"[HIL] {e.Message}");
-                break;
-            default:
-                DebugMessages.Add($"[HARM] {e.Message}");
-                break;
-        }
+        return _spaceWarpPluginInstance.configShowTimeStamps.Value
+            ? "[" + DateTime.Now.ToString(_spaceWarpPluginInstance.configTimeStampFormat.Value) + "] "
+            : "";
+    }
+
+    private static string BuildMessage(string timestamp, LogLevel level, object data, ILogSource source)
+    {
+        return level == LogLevel.None
+            ? $"{timestamp}[{source.SourceName}] {data}"
+            : $"{timestamp}[{level} : {source.SourceName}] {data}";
+    }
+
+    public void Dispose()
+    {
+        DebugMessages.Clear();
     }
 }

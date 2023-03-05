@@ -1,20 +1,23 @@
-﻿using SpaceWarp.API.Mods;
-using SpaceWarp.API.AssetBundles;
-using SpaceWarp.API;
+﻿using BepInEx;
+using BepInEx.Logging;
+using SpaceWarp.API.Mods;
+using SpaceWarp.API.Assets;
 using KSP.UI.Binding;
 using KSP.Sim.impl;
+using SpaceWarp;
+using SpaceWarp.API.UI;
+using SpaceWarp.API.UI.Appbar;
 using UnityEngine;
 
 namespace ExampleMod;
 
-[MainMod]
-public class ExampleMod : Mod
+[BepInPlugin("com.SpaceWarpAuthorName.ExampleMod", "ExampleMod", "3.0.0")]
+[BepInDependency(SpaceWarpPlugin.ModGuid, SpaceWarpPlugin.ModVer)]
+public class ExampleMod : BaseSpaceWarpPlugin
 {
-    public GUISkin _spaceWarpUISkin;
 
     private bool drawUI;
     private Rect windowRect;
-    private bool loaded;
 
     private static ExampleMod Instance { get; set; }
 
@@ -25,30 +28,22 @@ public class ExampleMod : Mod
     public override void OnInitialized()
     {
         base.OnInitialized();
-
-        if (loaded)
-        {
-            Destroy(this);
-        }
-
-        loaded = true;
         Instance = this;
 
         // Example of using the logger, Were going to log a message to the console, ALT + C to open the console.
-        Logger.Info("Hello World, Im a spacewarp Mod.");
+        Logger.LogInfo("Hello World, Im a spacewarp Mod.");
 
-        // Example of using the asset loader, were going to load the SpaceWarp GUI skin.
-        // [FORMAT]: space_warp/[assetbundle_name]/[folder_in_assetbundle]/[file.type]
-        ResourceManager.TryGetAsset(
-            "space_warp/swconsoleui/swconsoleUI/spacewarpConsole.guiskin",
-            out _spaceWarpUISkin
-        );
 
-        // Register the mod's button on the SpaceWarp application bar.
-        SpaceWarpManager.RegisterAppButton(
+        // Register the mod's button in KSP 2s app.bar
+        // This requires an `icon.png` file to exist under [plugin_folder]/assets/images
+        Appbar.RegisterAppButton(
             "Example Mod",
             "BTN-ExampleMod",
-            SpaceWarpManager.LoadIcon(),
+            // Example of using the asset loader, were going to load the apps icon
+            // Path format [mod_id]/images/filename
+            // for bundles its [mod_id]/[bundle_name]/[path to file in bundle with out assets/bundle]/filename.extension
+            // There is also a try get asset function, that returns a bool on whether or not it could grab the asset
+            AssetManager.GetAsset<Texture2D>($"{SpaceWarpMetadata.ModID}/images/icon.png"),
             ToggleButton
         );
     }
@@ -72,7 +67,7 @@ public class ExampleMod : Mod
     public void OnGUI()
     {
         // Set the GUI skin to the SpaceWarp GUI skin.
-        GUI.skin = _spaceWarpUISkin;
+        GUI.skin = Skins.ConsoleSkin;
 
         if (drawUI)
         {
@@ -96,6 +91,9 @@ public class ExampleMod : Mod
         GUILayout.Label("Example Mod - Built with Space-Warp");
         GUI.DragWindow(new Rect(0, 0, 10000, 500));
     }
+    
+    private float lastUpdateTime = 0.0f;
+    private float updateInterval = 1.0f;
 
     /// <summary>
     /// Runs every frame and performs various tasks based on the game state.
@@ -103,23 +101,40 @@ public class ExampleMod : Mod
     private void LateUpdate()
     {
         // Now lets play with some Game objects
-        if (Instance.Game.GlobalGameState.GetState() == KSP.Game.GameState.MainMenu)
+        // Check if the specified interval has elapsed
+        if (Time.time - lastUpdateTime >= updateInterval)
         {
-            KSP.Audio.KSPAudioEventManager.SetMasterVolume(Mathf.Sin(Time.time) * 100);
+            // Update the last update time to the current time
+            lastUpdateTime = Time.time;
+
+            // Now lets play with some Game objects
+            if (Game.GlobalGameState.GetState() == KSP.Game.GameState.MainMenu)
+            {
+                Logger.Log(LogLevel.None, "This is log level none");
+                Logger.Log(LogLevel.Debug, "This is log level debug");
+                Logger.Log(LogLevel.Info, "This is log level info");
+                Logger.Log(LogLevel.Warning, "This is log level warning");
+                Logger.Log(LogLevel.Error, "This is log level error");
+                Logger.Log(LogLevel.Fatal, "This is log level fatal");
+                Logger.Log(LogLevel.Message, "This is log level message");
+                Logger.Log(LogLevel.All, "This is log level all");
+
+                KSP.Audio.KSPAudioEventManager.SetMasterVolume(Mathf.Sin(Time.time) * 100);
+            }
         }
-        else if (Instance.Game.GlobalGameState.GetState() == KSP.Game.GameState.FlightView)
+        else if (Game.GlobalGameState.GetState() == KSP.Game.GameState.FlightView)
         {
             // Getting the active vessel, staging it over and over and printing out all the parts. 
-            VesselComponent _activeVessel = Instance.Game.ViewController.GetActiveSimVessel();
+            VesselComponent _activeVessel = Game.ViewController.GetActiveSimVessel();
             
             if (_activeVessel != null)
             {
                 _activeVessel.ActivateNextStage();
-                Logger.Warn("Stagin Active Vessel: " + _activeVessel.Name);
+                Logger.LogWarning("Stagin Active Vessel: " + _activeVessel.Name);
                 VesselBehavior behavior = Game.ViewController.GetBehaviorIfLoaded(_activeVessel);
                 foreach (PartBehavior pb in behavior.parts)
                 {
-                    Logger.Warn(pb.name);
+                    Logger.LogWarning(pb.name);
                 }
             }
         }
