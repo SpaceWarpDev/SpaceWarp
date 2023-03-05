@@ -20,6 +20,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using static SpaceWarp.Backend.UI.Appbar.AppbarBackend;
 using Object = UnityEngine.Object;
 
 namespace SpaceWarp.Backend.UI.Appbar;
@@ -31,19 +32,23 @@ internal static class AppbarBackend
 
     #region Flight App Bar
 
+    private static UIValue_WriteBool_Toggle trayState;
+
     public static GameObject AddButton(string buttonText, Sprite buttonIcon, string buttonId, Action<bool> function)
     {
         // Find the resource manager button and "others" group.
 
         // Say the magic words...
         GameObject list = GameObject.Find("GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Popup Canvas/Container/ButtonBar/BTN-App-Tray/appbar-others-group");
-        GameObject resourceManger = list != null ? list.GetChild("BTN-Resource-Manager") : null;
+        GameObject resourceManger = list?.GetChild("BTN-Resource-Manager");
 
         if (list == null || resourceManger == null)
         {
             _logger.LogInfo("Couldn't find appbar.");
             return null;
         }
+
+        trayState = list.transform.parent.gameObject.GetComponent<UIValue_WriteBool_Toggle>();
 
         // Clone the resource manager button.
         GameObject appButton = Object.Instantiate(resourceManger, list.transform);
@@ -67,18 +72,23 @@ internal static class AppbarBackend
         // Add our function call to the toggle.
         ToggleExtended utoggle = appButton.GetComponent<ToggleExtended>();
         utoggle.onValueChanged.AddListener(state => function(state));
+        utoggle.onValueChanged.AddListener(state => SetTrayState(false));
 
         // Set the initial state of the button.
         UIValue_WriteBool_Toggle toggle = appButton.GetComponent<UIValue_WriteBool_Toggle>();
         toggle.BindValue(new Property<bool>(false));
 
-        // Bind the action to close the tray after pressing the button.
-        IAction action = resourceManger.GetComponent<UIAction_Void_Toggle>().Action;
-        appButton.GetComponent<UIAction_Void_Toggle>().BindAction(action);
-
         _logger.LogInfo($"Added appbar button: {buttonId}");
 
         return appButton;
+    }
+
+    public static void SetTrayState(bool state)
+    {
+        if (trayState == null)
+            return;
+
+        trayState.SetValue(state);
     }
 
     #endregion
@@ -260,6 +270,7 @@ internal static class AppbarBackend
                 break;
         }
 
+        waiterObject.type = type;
         gameObject.SetActive(true);
     }
 
@@ -273,6 +284,7 @@ internal static class AppbarBackend
 internal class ToolbarBackendObject : KerbalBehavior
 {
     internal UnityEvent creationEvent;
+    internal AppbarEvent type;
 
     public new void Start()
     {
@@ -281,7 +293,19 @@ internal class ToolbarBackendObject : KerbalBehavior
 
     private IEnumerator awaiter()
     {
-        yield return new WaitForSeconds(1);
+        switch (type)
+        {
+            case AppbarEvent.Flight:
+                yield return new WaitForSeconds(1);
+                break;
+            case AppbarEvent.OAB:
+                yield return new WaitForFixedUpdate();
+                break;
+            default:
+                yield return new WaitForSeconds(1);
+                break;
+        }
+
         creationEvent.Invoke();
         Destroy(this);
     }
