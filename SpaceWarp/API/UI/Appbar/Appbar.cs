@@ -10,6 +10,7 @@ namespace SpaceWarp.API.UI.Appbar;
 public static class Appbar
 {
     private static readonly List<(string text, Sprite icon, string ID, Action<bool> action)> ButtonsToBeLoaded = new();
+    private static readonly List<(string text, Sprite icon, string ID, Action<bool> action)> OABButtonsToBeLoaded = new();
     
     /// <summary>
     /// Register a appbar menu for the game
@@ -71,6 +72,30 @@ public static class Appbar
         RegisterAppButton(text, id, GetAppBarIconFromTexture(icon), func);
     }
 
+    /// <summary>
+    /// Register a button on the OAB AppBar
+    /// </summary>
+    /// <param name="text">The text in the appbar menu</param>
+    /// <param name="id">A unique id for the appbar menu eg: "BTN-ExampleOAB"</param>
+    /// <param name="icon">A Sprite for the icon in the appbar</param>
+    /// <param name="func">The function to be called when this button is clicked</param>
+    public static void RegisterOABAppButton(string text, string id, Sprite icon, Action<bool> func)
+    {
+        OABButtonsToBeLoaded.Add((text, icon, id, func));
+    }
+
+    /// <summary>
+    /// Register a button on the OAB AppBar
+    /// </summary>
+    /// <param name="text">The text in the appbar menu</param>
+    /// <param name="id">A unique id for the appbar menu eg: "BTN-ExampleOAB"</param>
+    /// <param name="icon">A Texture2D for the icon in the appbar</param>
+    /// <param name="func">The function to be called when this button is clicked</param>
+    public static void RegisterOABAppButton(string text, string id, Texture2D icon, Action<bool> func)
+    {
+        RegisterOABAppButton(text, id, GetAppBarIconFromTexture(icon), func);
+    }
+
 
     /// <summary>
     /// Convert a Texture2D to a Sprite
@@ -87,12 +112,19 @@ public static class Appbar
         return Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f));
     }
     
-    
     internal static void LoadAllButtons()
     {
         foreach (var button in ButtonsToBeLoaded)
         {
             AppbarBackend.AddButton(button.text, button.icon, button.ID, button.action);
+        }
+    }
+    
+    internal static void LoadOABButtons()
+    {
+        foreach (var button in OABButtonsToBeLoaded)
+        {
+            AppbarBackend.AddOABButton(button.text, button.icon, button.ID, button.action);
         }
     }
 }
