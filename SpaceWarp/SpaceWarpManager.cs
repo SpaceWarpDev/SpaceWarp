@@ -62,6 +62,7 @@ internal static class SpaceWarpManager
         SpaceWarpFolder = Path.GetDirectoryName(spaceWarpPlugin.Info.Location);
 
         AppbarBackend.AppBarInFlightSubscriber.AddListener(Appbar.LoadAllButtons);
+        AppbarBackend.AppBarOABSubscriber.AddListener(Appbar.LoadOABButtons);
     }
 
     public static ModListUI ModListUI { get; internal set; }
