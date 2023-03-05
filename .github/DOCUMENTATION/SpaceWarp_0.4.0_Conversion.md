@@ -21,7 +21,7 @@ The previous mod structure has been replaced by the standard BepInEx layout.
             catalog.json
             *
         *.dll
-#
+####
 ### swinfo.json (Your new modinfo.json)
 ```
 {
@@ -38,7 +38,7 @@ The previous mod structure has been replaced by the standard BepInEx layout.
   }
 }
 ```
-#
+####
 ### Required References
 * We now REQUIRE BepInEx 5.4.21 referenced when building your package. This can be included by added this reference line to your .csproj or other build reference manager
 ```
@@ -49,14 +49,14 @@ The previous mod structure has been replaced by the standard BepInEx layout.
 
 ### Conversion Process
 1. At the top of your main class file, you will need to add ```using BepInEx;```
-#
+####
 2. Replace the ```[Mod]``` tag with two lines containing the correct BepInEx mod information
 a. 
     ```[BepInPlugin("com.location.name.modid", "modID"", "x.x.x")]``` (This should match the swinfo.json file)
     ```[BepInDependency(SpaceWarpPlugin.ModGuid, SpaceWarpPlugin.ModVer)]``` (You do not need to change this line)
-#
+####
 3. Change ```public class yourModName : Mod``` to the new plugin type ```public class yourModName : BaseSpaceWarpPlugin```
-#
+####
 4. Create an Instance of the mod as a variable at the top of your mod function
 ```
 public class youModName : BaseSpaceWarpPlugin
@@ -66,7 +66,7 @@ public class youModName : BaseSpaceWarpPlugin
         ...all your other code...
     }
 ```
-#
+####
 5. Override the BaseSpaceWarpPlugin OnInitialized function can set your instance
 ```
 public override void OnInitialized()
@@ -75,9 +75,9 @@ public override void OnInitialized()
             Instance = this;
         }
 ```
-#
+####
 6. If you are using the SpaceWarpUI Skin, you will need to add ```using SpaceWarp.API.UI;``` to the top of your file and set ```GUI.skin = Skins.ConsoleSkin;``` in the ```OnGUI()``` function
-#
+####
 7. If you are using the AppBar
 a. Add your icon to the assets/images folder in the file tree as a .png file
 b. Add ```using SpaceWarp.API.UI.Appbar``` to the top of your project
@@ -98,8 +98,7 @@ private void ToggleButton(bool toggle)
         GameObject.Find("BTN-ExampleMod")?.GetComponent<UIValue_WriteBool_Toggle>()?.SetValue(toggle);
     }
 ```
-#
-#
+
 #
 #### Feel free to add comments and feedback!
 
