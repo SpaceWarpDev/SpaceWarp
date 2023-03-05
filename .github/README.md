@@ -1,7 +1,8 @@
-![Cool Banner](Cool_Banner.png)
+![Cool Banner](assets/cool_banner.png)
 
 # Space Warp
-![Downloads](https://img.shields.io/github/downloads/X606/SpaceWarp/latest/total.svg?label=%E2%A4%93%20Downloads&style=plastic)
+[![Curseforge](http://cf.way2muchnoise.eu/full_831005_downloads.svg?badge_style=plastic)](https://www.curseforge.com/kerbal-space-program-2/mods/space-warp)
+![Downloads](https://img.shields.io/github/downloads/X606/SpaceWarp/latest/total.svg?label=%E2%A4%93%20Downloads&style=plastic)  
 
 [Documentation](https://spacewarpdocs.readthedocs.io/en/latest/index.html)
 
