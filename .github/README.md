@@ -1,7 +1,8 @@
-![Cool Banner](Cool_Banner.png)
+![Cool Banner](assets/cool_banner.png)
 
 # Space Warp
-![Downloads](https://img.shields.io/github/downloads/X606/SpaceWarp/latest/total.svg?label=%E2%A4%93%20Downloads&style=plastic)
+[![Curseforge](http://cf.way2muchnoise.eu/full_831005_downloads.svg?badge_style=plastic)](https://www.curseforge.com/kerbal-space-program-2/mods/space-warp)
+![Downloads](https://img.shields.io/github/downloads/X606/SpaceWarp/latest/total.svg?label=%E2%A4%93%20Downloads&style=plastic)  
 
 [Documentation](https://spacewarpdocs.readthedocs.io/en/latest/index.html)
 
@@ -32,21 +33,25 @@ Mods are currently implemented as monobehaviours with two fields: a `Logger` for
 
 The mod structure is still a work in progress. However, the current structure is as follows:
 
-* [KSP_ROOT]/BepInEx/Plugins
-  * example_mod
-    * swinfo.json
-    * README.md
-    * assets/
-      * bundles/
-        * \*.bundle
-      * images/
-        * \*
-    * localization/
-      * \*.csv
-    * addressables/
-      * catalog.json
-      * \*
-    * \*.dll
+```
+KSP2_Root_Folder/
+├── BepInEx/
+│   ├── Plugins/
+│   │   ├── mod_id_folder_name/
+│   │   │   ├── swinfo.json
+│   │   │   ├── README.md
+│   │   │   ├── assets/
+│   │   │   │   ├── bundles/
+│   │   │   │   │   ├── *.bundle
+│   │   │   │   ├── images/
+│   │   │   │   │   ├── *
+│   │   │   ├── localization/
+│   │   │   │   ├── *.csv
+│   │   │   ├── addressables/
+│   │   │   │   ├── catalog.json
+│   │   │   │   ├── *
+│   │   │   ├── *.dll 
+```
 
 ## Build Scripts
 
