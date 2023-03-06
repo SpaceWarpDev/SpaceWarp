@@ -1,7 +1,7 @@
 import os
 import re
-import platform
 import shutil
+import platform
 
 def get_steam_dir():
     if platform.system() == "Windows":
@@ -23,6 +23,17 @@ def find_game_dir(game_name):
                     manifest_data = f.read()
                     if game_name in manifest_data:
                         return os.path.join(library_folder, "steamapps", "common", game_name)
+    epic_dir = os.path.join(os.getenv("ProgramData"), "Epic", "EpicGamesLauncher", "Data", "Manifests")
+    app_info_pattern = re.compile(r"([^/]+)\.item")
+    for app_info_file in os.listdir(epic_dir):
+        with open(os.path.join(epic_dir, app_info_file), "r") as f:
+            app_info_data = f.read()
+            match = app_info_pattern.search(app_info_data)
+            if match is not None and match.group(1) == game_name:
+                return os.path.join(os.path.dirname(epic_dir), "Installation", match.group(0), "KSP2")
+    private_division_dir = os.path.join(os.getenv("LOCALAPPDATA"), "PrivateDivision", game_name)
+    if os.path.exists(private_division_dir):
+        return private_division_dir
     return None
 
 def get_library_folders(vdf_path):
@@ -32,8 +43,6 @@ def get_library_folders(vdf_path):
         for match in re.finditer(r'"[A-Za-z]:\\[^"]*"', vdf_data):
             library_folders.append(match.group(0)[1:-1])
     return library_folders
-
-print("Searching for game directory")
 
 game_name = "Kerbal Space Program 2"
 game_dir = find_game_dir(game_name)
