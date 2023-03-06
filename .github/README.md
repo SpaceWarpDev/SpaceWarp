@@ -13,11 +13,13 @@ Note: Use at your own risk, as this is an early version that is expected to unde
 
 ## Installation
 
+Ensure you have BepInEx correctly installed, it is required for SpaceWarp!
+
 Download the latest release from this page under the [Releases](https://github.com/SpaceWarpDev/SpaceWarp/releases) section above.
 
-Drag the contents of the .zip folder into your KSP2 directory, commonly located at `C:\Steam\steamapps\common\Kerbal Space Program 2` or use the [Installer](https://github.com/SpaceWarpDev/Space-Warp-Installer)
+Drag the contents of the .zip folder into your KSP2 directory underneath BepInEx as a plugin, commonly located at `C:\Steam\steamapps\common\Kerbal Space Program 2\BepInEx\plugins` or use the [Installer](https://github.com/SpaceWarpDev/Space-Warp-Installer)
 
-To install the downloaded mods, simply drag them into the following directory: `{Your Game Installation Directory}\SpaceWarp\Mods`. Note that `{Your Game Installation Directory}` refers to the file path where your Kerbal Space Program 2 game is installed on your computer
+To install the downloaded mods, simply drag them into the same location: `C:\Steam\steamapps\common\Kerbal Space Program 2\BepInEx\plugins`. Note that with the latest SpaceWarp update, mods are not loaded within the SpaceWarp folder itself.
 
 ## Compiling
 
