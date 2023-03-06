@@ -67,4 +67,7 @@ The build scripts are:
 The available arguments are:
 - `-r` or `--release` to build in release mode
 
+Alternatively, if you do not have python already installed as a windows user, you can run the Build application `build.exe`.
+Just as the other script files, the build executable application was built off of `builder.py`.
+
 When building, the build output will be in `build/SpaceWarp`, and the compressed version will be `build/SpaceWarp-[Debug|Release]-[commit].zip`.
