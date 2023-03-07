@@ -74,6 +74,7 @@ public abstract class AppbarMenu : KerbalBehavior
     internal void ToggleGUI(bool drawing)
     {
         _drawing = drawing;
+        Appbar.SetAppBarButtonIndicator(ID, drawing);
     }
 
     public void ToggleGUI()
@@ -98,6 +99,5 @@ public abstract class AppbarMenu : KerbalBehavior
     public void CloseWindow()
     {
         ToggleGUI(false);
-        GameObject.Find(ID)?.GetComponent<UIValue_WriteBool_Toggle>()?.SetValue(false);
     }
 }
