@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BepInEx.Bootstrap;
+using KSP.UI.Binding;
 using UnityEngine;
 using SpaceWarp.Backend.UI.Appbar;
 
@@ -96,7 +97,6 @@ public static class Appbar
         RegisterOABAppButton(text, id, GetAppBarIconFromTexture(icon), func);
     }
 
-
     /// <summary>
     /// Convert a Texture2D to a Sprite
     /// </summary>
@@ -110,6 +110,17 @@ public static class Appbar
         if (height == 0) height = texture.height;
 
         return Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f));
+    }
+
+
+    /// <summary>
+    /// Sets an app bar buttons indicator (the green sprite to the side of it)
+    /// </summary>
+    /// <param name="id">The id of the button, what you set when registering the app bar button</param>
+    /// <param name="indicator">The state of the indicator, true for on, false for off</param>
+    public static void SetAppBarButtonIndicator(string id, bool indicator)
+    {
+        GameObject.Find(id)?.GetComponent<UIValue_WriteBool_Toggle>()?.SetValue(indicator);
     }
     
     internal static void LoadAllButtons()
