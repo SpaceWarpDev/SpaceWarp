@@ -44,10 +44,12 @@ internal static class BootstrapPatch
 
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
-                flow.AddAction(new LoadLocalizationAction(plugin));
                 flow.AddAction(new LoadAddressablesAction(plugin));
+                flow.AddAction(new LoadLocalizationAction(plugin));
                 flow.AddAction(new LoadAssetAction(plugin));
             }
+            
+            flow.AddAction(new LoadAddressablesLocalizationsAction());
             
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
