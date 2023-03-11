@@ -8,7 +8,6 @@ using BepInEx.Logging;
 using HarmonyLib;
 using I2.Loc;
 using KSP;
-using KSP.Api;
 using KSP.Api.CoreTypes;
 using KSP.Game;
 using KSP.OAB;
@@ -40,7 +39,7 @@ internal static class AppbarBackend
 
         // Say the magic words...
         GameObject list = GameObject.Find("GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Popup Canvas/Container/ButtonBar/BTN-App-Tray/appbar-others-group");
-        GameObject resourceManger = list?.GetChild("BTN-Resource-Manager");
+        GameObject resourceManger = list != null ? list.GetChild("BTN-Resource-Manager") : null;
 
         if (list == null || resourceManger == null)
         {
@@ -118,7 +117,7 @@ internal static class AppbarBackend
 
         // Say the magic words...
         GameObject oabAppBar = GameObject.Find("OAB(Clone)/HUDSpawner/HUD/widget_SideBar/widget_sidebarNav");
-        GameObject kerbalManager = oabAppBar?.GetChild("button_kerbal-manager");
+        GameObject kerbalManager = oabAppBar != null ? oabAppBar.GetChild("button_kerbal-manager") : null;
 
         if (oabAppBar == null || kerbalManager == null)
         {
@@ -160,7 +159,7 @@ internal static class AppbarBackend
 
         // Create the tooltip itself.
         tooltip = tooltipObject.AddComponent<ObjectAssemblyBuilderTooltipDisplay>();
-        tooltip.GetType().GetField("tooltipText", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(tooltip, "App Tray");
+        tooltip.GetType().GetField("tooltipText", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(tooltip, "App Tray");
 
         // Clone the tray from the flight UI.
         GameObject trayButton = GameManager.Instance.Game.UI.GetPopupCanvas().gameObject.GetChild("BTN-App-Tray");
@@ -179,8 +178,7 @@ internal static class AppbarBackend
         {
             var child = oabTray.transform.GetChild(i);
 
-            if (child.name.Contains("ELE-border"))
-                continue;
+            if (child.name.Contains("ELE-border")) continue;
 
             Object.Destroy(child.gameObject);
         }
@@ -196,7 +194,7 @@ internal static class AppbarBackend
 
         // Find the resource manager button.
         GameObject list = GameObject.Find("GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Popup Canvas/Container/ButtonBar/BTN-App-Tray/appbar-others-group");
-        GameObject resourceManger = list?.GetChild("BTN-Resource-Manager");
+        GameObject resourceManger = list != null ? list.GetChild("BTN-Resource-Manager") : null;
 
         if (resourceManger == null)
         {
@@ -213,8 +211,7 @@ internal static class AppbarBackend
         text.text = buttonText;
 
         Localize localizer = text.gameObject.GetComponent<Localize>();
-        if (localizer)
-            Object.Destroy(localizer);
+        if (localizer) Object.Destroy(localizer);
 
         // Change the icon.
         GameObject icon = appButton.GetChild("Content").GetChild("GRP-icon");
@@ -240,8 +237,7 @@ internal static class AppbarBackend
 
     public static void SetOABTrayState(bool state)
     {
-        if (_oabTray == null)
-            return;
+        if (_oabTray == null) return;
 
         _oabState.SetValue(state);
     }
@@ -258,17 +254,12 @@ internal static class AppbarBackend
         GameObject gameObject = new GameObject();
         ToolbarBackendObject waiterObject = gameObject.AddComponent<ToolbarBackendObject>();
 
-        switch (type)
+        waiterObject.creationEvent = type switch
         {
-            case AppbarEvent.Flight:
-                waiterObject.creationEvent = AppBarInFlightSubscriber;
-                break;
-            case AppbarEvent.OAB:
-                waiterObject.creationEvent = AppBarOABSubscriber;
-                break;
-            default:
-                break;
-        }
+            AppbarEvent.Flight => AppBarInFlightSubscriber,
+            AppbarEvent.OAB => AppBarOABSubscriber,
+            _ => waiterObject.creationEvent
+        };
 
         waiterObject.type = type;
         gameObject.SetActive(true);
@@ -288,23 +279,17 @@ internal class ToolbarBackendObject : KerbalBehavior
 
     public new void Start()
     {
-        StartCoroutine(awaiter());
+        StartCoroutine(Awaiter());
     }
 
-    private IEnumerator awaiter()
+    private IEnumerator Awaiter()
     {
-        switch (type)
+        yield return type switch
         {
-            case AppbarEvent.Flight:
-                yield return new WaitForSeconds(1);
-                break;
-            case AppbarEvent.OAB:
-                yield return new WaitForFixedUpdate();
-                break;
-            default:
-                yield return new WaitForSeconds(1);
-                break;
-        }
+            AppbarEvent.Flight => new WaitForSeconds(1),
+            AppbarEvent.OAB => new WaitForFixedUpdate(),
+            _ => new WaitForSeconds(1)
+        };
 
         creationEvent.Invoke();
         Destroy(this);
@@ -316,14 +301,12 @@ internal class ToolbarBackendObject : KerbalBehavior
 [HarmonyPatch("Start")]
 internal class ToolbarBackendAppBarPatcher
 {
-    public static void Postfix(UIFlightHud __instance) =>
-        AppbarBackend.SubscriberSchedulePing(AppbarBackend.AppbarEvent.Flight);
+    public static void Postfix(UIFlightHud __instance) => SubscriberSchedulePing(AppbarEvent.Flight);
 }
 
 [HarmonyPatch(typeof(OABSideBar))]
 [HarmonyPatch("Start")]
 internal class ToolbarBackendOABSideBarPatcher
 {
-    public static void Postfix(OABSideBar __instance) =>
-        AppbarBackend.SubscriberSchedulePing(AppbarBackend.AppbarEvent.OAB);
+    public static void Postfix(OABSideBar __instance) => SubscriberSchedulePing(AppbarEvent.OAB);
 }
