@@ -33,7 +33,6 @@ public class ExampleMod : BaseSpaceWarpPlugin
         // Example of using the logger, Were going to log a message to the console, ALT + C to open the console.
         Logger.LogInfo("Hello World, Im a spacewarp Mod.");
 
-
         // Register the mod's button in KSP 2s app.bar
         // This requires an `icon.png` file to exist under [plugin_folder]/assets/images
         Appbar.RegisterAppButton(

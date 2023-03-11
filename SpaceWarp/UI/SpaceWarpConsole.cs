@@ -27,26 +27,36 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
     private GUIStyle _closeButtonStyle;
     private SpaceWarpPlugin _spaceWarpPluginInstance;
 
+    private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("SpaceWarpConsole");
+
 
     private void Awake()
     {
-        _windowWidth = (int)(Screen.width * 0.5f);
-        _windowHeight = (int)(Screen.height * 0.5f);
-        _windowRect = new Rect(Screen.width * 0.15f, Screen.height * 0.15f, 0, 0);
+        float minResolution = 1280f / 720f; 
+        float maxResolution = 2048f / 1080f;
+        float screenRatio = (float) Screen.width / (float) Screen.height;
+        float scaleFactor = Mathf.Clamp(screenRatio, minResolution, maxResolution);
+
+        _windowWidth = (int) (Screen.width * 0.5f * scaleFactor);
+        _windowHeight = (int) (Screen.height * 0.5f * scaleFactor);
+        _windowRect = new Rect(
+            Screen.width * 0.15f, 
+            Screen.height * 0.15f, 
+            Screen.width * 0.5f * scaleFactor, 
+            Screen.height * 0.5f * scaleFactor
+        );
         _scrollPosition = Vector2.zero;
         _spaceWarpPluginInstance = (Chainloader.PluginInfos[SpaceWarpPlugin.ModGuid].Instance as SpaceWarpPlugin)!;
 
         if (_spaceWarpPluginInstance.configShowConsoleButton.Value)
+        {
             Appbar.RegisterAppButton(
                 "Console",
                 "BTN-SWConsole",
-                // Example of using the asset loader, were going to load the apps icon
-                // Path format [mod_id]/images/filename
-                // for bundles its [mod_id]/[bundle_name]/[path to file in bundle with out assets/bundle]/filename.extension
-                // There is also a try get asset function, that returns a bool on whether or not it could grab the asset
                 AssetManager.GetAsset<Texture2D>("spacewarp/images/console.png"),
                 ToggleVisible
             );
+        }
     }
 
     private void OnGUI()
@@ -67,9 +77,9 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
         GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
 
-        _windowRect = GUILayout.Window(controlID, _windowRect, DrawConsole, ConsoleLockID, width, height);
+        _windowRect = GUILayout.Window(controlID, _windowRect, DrawConsole, "SPACE WARP - Console", width, height);
     }
-
+    
     private void Update()
     {
         if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))
@@ -81,6 +91,11 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         {
             CloseWindow();
             GUIUtility.ExitGUI();
+        }
+
+        if (Input.mouseScrollDelta.y + Input.GetAxis("Vertical") > 0)
+        {
+            _autoScroll = false;
         }
     }
 

@@ -34,10 +34,19 @@ public class ModListUI : KerbalMonoBehaviour
 
     private void Awake()
     {
-        _windowWidth = (int)(Screen.width * 0.85f);
-        _windowHeight = (int)(Screen.height * 0.85f);
+        float minResolution = 1280f / 720f; 
+        float maxResolution = 2048f / 1080f;
+        float screenRatio = (float) Screen.width / (float) Screen.height;
+        float scaleFactor = Mathf.Clamp(screenRatio, minResolution, maxResolution);
 
-        _windowRect = new Rect(Screen.width * 0.15f, Screen.height * 0.15f, 0, 0);
+        _windowWidth = (int) (Screen.width * 0.5f * scaleFactor);
+        _windowHeight = (int) (Screen.height * 0.5f * scaleFactor);
+        _windowRect = new Rect(
+            Screen.width * 0.15f,
+            Screen.height * 0.15f,
+            Screen.width * 0.5f * scaleFactor,
+            Screen.height * 0.5f * scaleFactor
+        );
     }
 
     private void OnGUI()
@@ -73,7 +82,6 @@ public class ModListUI : KerbalMonoBehaviour
             CloseWindow();
             GUIUtility.ExitGUI();
         }
-        
     }
 
     private void FillWindow(int windowID)
