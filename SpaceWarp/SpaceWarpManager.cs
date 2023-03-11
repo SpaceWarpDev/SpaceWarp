@@ -1,7 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
-using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using Newtonsoft.Json;

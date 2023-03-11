@@ -1,6 +1,5 @@
 using KSP.Game;
 using KSP.Sim.impl;
-using KSP.UI.Binding;
 using UnityEngine;
 
 namespace SpaceWarp.API.UI.Appbar;

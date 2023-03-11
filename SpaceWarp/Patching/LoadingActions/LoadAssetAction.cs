@@ -18,7 +18,7 @@ internal sealed class LoadAssetAction : FlowAction
         Plugin = plugin;
     }
 
-    public override void DoAction(Action resolve, Action<string> reject)
+    public override async void DoAction(Action resolve, Action<string> reject)
     {
         try
         {
@@ -30,7 +30,6 @@ internal sealed class LoadAssetAction : FlowAction
                     string assetBundleName = Path.GetFileNameWithoutExtension(file);
                     if (Path.GetExtension(file) != ".bundle") continue;
                     
-
                     AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
 
                     if (assetBundle == null)
@@ -38,7 +37,7 @@ internal sealed class LoadAssetAction : FlowAction
                         Logger.LogError($"Failed to load AssetBundle {Plugin.SpaceWarpMetadata.ModID}/{assetBundleName}");
                         continue;
                     }
-                    AssetManager.RegisterAssetBundle(Plugin.SpaceWarpMetadata.ModID, assetBundleName, assetBundle);
+                    await AssetManager.RegisterAssetBundle(Plugin.SpaceWarpMetadata.ModID, assetBundleName, assetBundle);
                     Logger.LogInfo($"Loaded AssetBundle {Plugin.SpaceWarpMetadata.ModID}/{assetBundleName}");
                 }
             }
@@ -53,9 +52,10 @@ internal sealed class LoadAssetAction : FlowAction
                 var directoryInfo = new DirectoryInfo(imagesPath);
                 foreach (string file in directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories).Select(fileInfo => fileInfo.FullName))
                 {
-                    var assetPathList = PathHelpers.GetRelativePath(imagesPath, file).Split(Path.DirectorySeparatorChar);
                     //We have to make sure it uses '/' as the path separator and toLower() the names
+                    var assetPathList = PathHelpers.GetRelativePath(imagesPath, file).Split(Path.DirectorySeparatorChar);
                     var assetPath = "";
+                    
                     for (int i = 0; i < assetPathList.Length; i++)
                     {
                         assetPath += assetPathList[i].ToLower();
@@ -71,6 +71,7 @@ internal sealed class LoadAssetAction : FlowAction
                     {
                         filterMode = FilterMode.Point
                     };
+                    
                     try
                     {
                         var fileData = File.ReadAllBytes(file);
