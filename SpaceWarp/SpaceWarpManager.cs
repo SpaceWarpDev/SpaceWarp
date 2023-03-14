@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Collections.Generic;
+using System.Reflection;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using KSP.Game;
@@ -84,8 +85,8 @@ internal static class SpaceWarpManager
 
     
     internal static void CheckKspVersions()
-    {
-        const string kspVersion = VersionID.VERSION_TEXT;
+    { 
+        var kspVersion = typeof(VersionID).GetField("VERSION_TEXT",BindingFlags.Static | BindingFlags.Public)?.GetValue(null) as string;
         foreach (var plugin in SpaceWarpPlugins)
         {
             ModsUnsupported[plugin.SpaceWarpMetadata.ModID] =
