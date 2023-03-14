@@ -22,6 +22,7 @@ internal static class SpaceWarpManager
     internal static string SpaceWarpFolder;
     internal static IReadOnlyList<BaseSpaceWarpPlugin> SpaceWarpPlugins;
     internal static ConfigurationManager.ConfigurationManager ConfigurationManager;
+    internal static Dictionary<string,bool> ModsOutdated = new();
     internal static void GetSpaceWarpPlugins()
     {
         

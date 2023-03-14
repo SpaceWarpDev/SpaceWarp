@@ -1,15 +1,21 @@
 ﻿global using UnityObject = UnityEngine.Object;
 global using System.Linq;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using KSP.Messages;
+using Newtonsoft.Json;
 using SpaceWarp.API.Game.Messages;
 using SpaceWarp.API.Mods;
+using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.UI;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace SpaceWarp;
 
@@ -31,6 +37,9 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<bool> configShowTimeStamps;
     internal ConfigEntry<string> configTimeStampFormat;
     internal ConfigEntry<int> configDebugMessageLimit;
+    internal ConfigEntry<bool> configFirstLaunch;
+    internal ConfigEntry<bool> configCheckVersions;
+
 
     internal new ManualLogSource Logger => base.Logger;
 
@@ -56,6 +65,10 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             "The format for the timestamps in the debug console.");
         configDebugMessageLimit = Config.Bind("Debug Console", "Message Limit", 1000,
             "The maximum number of messages to keep in the debug console.");
+        configFirstLaunch = Config.Bind("Version Checking", "First Launch", true,
+            "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user.");
+        configCheckVersions = Config.Bind("Version Checking", "Check Versions", false,
+            "Whether or not Space Warp should check mod versions using their swinfo.json files");
         
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
@@ -76,6 +89,91 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         InitializeUI();
     }
 
+    public override void OnPostInitialized()
+    {
+        base.OnPostInitialized();
+        if (configFirstLaunch.Value)
+        {
+            configFirstLaunch.Value = false;
+            // Generate a prompt for whether or not space warp should check mod versions
+            GameObject o = new GameObject();
+            VersionCheckPrompt prompt = o.AddComponent<VersionCheckPrompt>();
+            prompt.spaceWarpPlugin = this;
+        }
+
+        if (configCheckVersions.Value)
+        {
+            CheckVersions();
+        }
+        else
+        {
+            
+        }
+    }
+
+    public void ClearVersions()
+    {
+        foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+        {
+            SpaceWarpManager.ModsOutdated[plugin.SpaceWarpMetadata.ModID] = false;
+        }
+    }
+    public void CheckVersions()
+    {
+        ClearVersions();
+        foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+        {
+            if (plugin.SpaceWarpMetadata.VersionCheck != null)
+            {
+                StartCoroutine(CheckVersion(plugin.SpaceWarpMetadata));
+            }
+        }
+    }
+
+    static bool OlderThan(string currentVersion, string onlineVersion)
+    {
+        try
+        {
+            var currentList = currentVersion.Split('.');
+            var onlineList = onlineVersion.Split('.');
+            var minLength = Math.Min(currentList.Length, onlineList.Length);
+            for (var i = 0; i < minLength; i++)
+            {
+                if (int.Parse(currentList[i]) < int.Parse(onlineList[i]))
+                {
+                    return true;
+                }
+
+                if (int.Parse(currentList[i]) > int.Parse(onlineList[i]))
+                {
+                    return false;
+                }
+            }
+
+            return onlineList.Length > currentList.Length;
+        } catch (Exception e)
+        {
+            Debug.Log(e);
+            return false;
+        }
+    }
+    IEnumerator CheckVersion(ModInfo pluginInfo)
+    {
+        var www = new UnityWebRequest(pluginInfo.VersionCheck);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Logger.LogInfo($"Unable to check version for {pluginInfo.ModID} due to error {www.error}");
+        }
+        else
+        {
+            var results = www.downloadHandler.text;
+            var checkInfo = JsonConvert.DeserializeObject<ModInfo>(results);
+            SpaceWarpManager.ModsOutdated[pluginInfo.ModID] = OlderThan(pluginInfo.Version, checkInfo.Version);
+        }
+    }
+    
     private void InitializeUI()
     {
         SpaceWarpManager.ConfigurationManager = (ConfigurationManager.ConfigurationManager)Chainloader.PluginInfos[global::ConfigurationManager.ConfigurationManager.GUID].Instance;

@@ -19,6 +19,7 @@ public class ModListUI : KerbalMonoBehaviour
     private static Vector2 _scrollPositionMods;
     private static Vector2 _scrollPositionInfo;
     private static GUIStyle _closeButtonStyle;
+    private static GUIStyle _outdatedModStyle;
     
     private const string ModListHeader = "ModListHeader";
 
@@ -62,10 +63,48 @@ public class ModListUI : KerbalMonoBehaviour
             fontSize = 8
         };
 
+        if (_outdatedModStyle != null)
+        {
+            _outdatedModStyle = new GUIStyle(GUI.skin.button)
+            {
+                normal =
+                {
+                    textColor = Color.yellow
+                },
+                active =
+                {
+                    textColor = Color.yellow
+                },
+                hover =
+                {
+                    textColor = Color.yellow
+                },
+                focused =
+                {
+                    textColor = Color.yellow
+                },
+                onActive =
+                {
+                    textColor = Color.yellow
+                },
+                onFocused =
+                {
+                    textColor = Color.yellow
+                },
+                onHover =
+                {
+                    textColor = Color.yellow
+                },
+                onNormal =
+                {
+                    textColor = Color.yellow
+                }
+            };
+        }
+
         int controlID = GUIUtility.GetControlID(FocusType.Passive);
         GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
         GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
-        GUI.skin = SpaceWarpManager.Skin;
 
         _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, ModListHeader, width, height);
     }
@@ -107,9 +146,19 @@ public class ModListUI : KerbalMonoBehaviour
         
         foreach (var mod in SpaceWarpManager.SpaceWarpPlugins)
         {
-            if (GUILayout.Button(mod.SpaceWarpMetadata.Name))
+            if (SpaceWarpManager.ModsOutdated[mod.SpaceWarpMetadata.ModID])
             {
-                _selectedMetaData = mod.SpaceWarpMetadata;
+                if (GUILayout.Button(mod.SpaceWarpMetadata.Name, _outdatedModStyle))
+                {
+                    _selectedMetaData = mod.SpaceWarpMetadata;
+                }
+            }
+            else
+            {
+                if (GUILayout.Button(mod.SpaceWarpMetadata.Name))
+                {
+                    _selectedMetaData = mod.SpaceWarpMetadata;
+                }
             }
         }
         GUILayout.EndScrollView();
@@ -120,7 +169,9 @@ public class ModListUI : KerbalMonoBehaviour
             _scrollPositionInfo = GUILayout.BeginScrollView(_scrollPositionInfo, false, false);
             GUILayout.Label($"{_selectedMetaData.Name} (id: {_selectedMetaData.ModID})");
             GUILayout.Label($"Author: {_selectedMetaData.Author}");
-            GUILayout.Label($"Version: {_selectedMetaData.Version}");
+            GUILayout.Label(SpaceWarpManager.ModsOutdated[_selectedMetaData.ModID]
+                ? $"Version: {_selectedMetaData.Version} (outdated)"
+                : $"Version: {_selectedMetaData.Version}");
             GUILayout.Label($"Source: {_selectedMetaData.Source}");
             GUILayout.Label($"Description: {_selectedMetaData.Description}");
             GUILayout.Label($"KSP2 Version: {_selectedMetaData.SupportedKsp2Versions.Min} - {_selectedMetaData.SupportedKsp2Versions.Max}");
