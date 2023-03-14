@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
+using KSP.Game;
 using Newtonsoft.Json;
 using UnityEngine;
 using SpaceWarp.API.Assets;
@@ -23,6 +24,7 @@ internal static class SpaceWarpManager
     internal static IReadOnlyList<BaseSpaceWarpPlugin> SpaceWarpPlugins;
     internal static ConfigurationManager.ConfigurationManager ConfigurationManager;
     internal static Dictionary<string,bool> ModsOutdated = new();
+    internal static Dictionary<string, bool> ModsUnsupported = new();
     internal static void GetSpaceWarpPlugins()
     {
         
@@ -77,6 +79,17 @@ internal static class SpaceWarpManager
                 AssetManager.TryGetAsset("spacewarp/swconsoleui/spacewarpconsole.guiskin", out _skin);
             }
             return _skin;
+        }
+    }
+
+    
+    internal static void CheckKspVersions()
+    {
+        const string kspVersion = VersionID.VERSION_TEXT;
+        foreach (var plugin in SpaceWarpPlugins)
+        {
+            ModsUnsupported[plugin.SpaceWarpMetadata.ModID] =
+                !plugin.SpaceWarpMetadata.SupportedKsp2Versions.IsSupported(kspVersion);
         }
     }
 }

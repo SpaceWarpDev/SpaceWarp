@@ -87,11 +87,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         Game.Messages.Subscribe(typeof(GameStateChangedMessage), StateChanges.OnGameStateChanged,false,true);
         
         InitializeUI();
-    }
-
-    public override void OnPostInitialized()
-    {
-        base.OnPostInitialized();
         if (configFirstLaunch.Value)
         {
             configFirstLaunch.Value = false;
@@ -107,8 +102,10 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
         else
         {
-            
+            ClearVersions();
         }
+        
+        SpaceWarpManager.CheckKspVersions();
     }
 
     public void ClearVersions()
@@ -159,7 +156,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     }
     IEnumerator CheckVersion(ModInfo pluginInfo)
     {
-        var www = new UnityWebRequest(pluginInfo.VersionCheck);
+        var www = UnityWebRequest.Get(pluginInfo.VersionCheck);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
@@ -168,6 +165,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
         else
         {
+            
             var results = www.downloadHandler.text;
             var checkInfo = JsonConvert.DeserializeObject<ModInfo>(results);
             SpaceWarpManager.ModsOutdated[pluginInfo.ModID] = OlderThan(pluginInfo.Version, checkInfo.Version);

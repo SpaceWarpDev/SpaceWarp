@@ -18,8 +18,8 @@ internal class VersionCheckPrompt : MonoBehaviour
         float screenRatio = (float) Screen.width / (float) Screen.height;
         float scaleFactor = Mathf.Clamp(screenRatio, minResolution, maxResolution);
 
-        _windowWidth = (int) (Screen.width * 0.5f * scaleFactor);
-        _windowHeight = (int) (Screen.height * 0.5f * scaleFactor);
+        _windowWidth = (int) (Screen.width * 0.2f * scaleFactor);
+        _windowHeight = 0;
         _windowRect = new Rect(
             Screen.width * 0.15f,
             Screen.height * 0.15f,
