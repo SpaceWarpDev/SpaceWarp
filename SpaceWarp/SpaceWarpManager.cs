@@ -1,8 +1,10 @@
 ﻿using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
+using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
+using HarmonyLib;
 using KSP.Game;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -23,6 +25,8 @@ internal static class SpaceWarpManager
     internal static ManualLogSource Logger;
     internal static string SpaceWarpFolder;
     internal static IReadOnlyList<BaseSpaceWarpPlugin> SpaceWarpPlugins;
+    internal static IReadOnlyList<BaseUnityPlugin> NonSpaceWarpPlugins;
+    internal static IReadOnlyList<ModInfo> NonSpaceWarpInfos;
     internal static ConfigurationManager.ConfigurationManager ConfigurationManager;
     internal static Dictionary<string,bool> ModsOutdated = new();
     internal static Dictionary<string, bool> ModsUnsupported = new();
@@ -35,7 +39,6 @@ internal static class SpaceWarpManager
         var spaceWarpPlugins = Chainloader.Plugins.OfType<BaseSpaceWarpPlugin>().ToList();
         SpaceWarpPlugins = spaceWarpPlugins;
         
-        #pragma warning restore CS0618
         foreach (var plugin in SpaceWarpPlugins.ToArray())
         {
             var folderPath = Path.GetDirectoryName(plugin.Info.Location);
@@ -55,6 +58,28 @@ internal static class SpaceWarpManager
             }
             plugin.SpaceWarpMetadata = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(modInfoPath));
         }
+        
+        var allPlugins = Chainloader.Plugins.ToList();
+        List<BaseUnityPlugin> nonSWPlugins = new();
+        List<ModInfo> nonSWInfos = new();
+        foreach (var plugin in allPlugins)
+        {
+            if (spaceWarpPlugins.Contains(plugin as BaseSpaceWarpPlugin)) continue;
+            var folderPath = Path.GetDirectoryName(plugin.Info.Location);
+            var modInfoPath = Path.Combine(folderPath!, "swinfo.json");
+            if (File.Exists(modInfoPath))
+            {
+                var info = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(modInfoPath));
+                nonSWInfos.Add(info);
+            }
+            else
+            {
+                nonSWPlugins.Add(plugin);
+            }
+        }
+        #pragma warning restore CS0618
+        NonSpaceWarpPlugins = nonSWPlugins;
+        NonSpaceWarpInfos = nonSWInfos;
     }
 
     public static void Initialize(SpaceWarpPlugin spaceWarpPlugin)
@@ -91,6 +116,11 @@ internal static class SpaceWarpManager
         {
             ModsUnsupported[plugin.SpaceWarpMetadata.ModID] =
                 !plugin.SpaceWarpMetadata.SupportedKsp2Versions.IsSupported(kspVersion);
+        }
+
+        foreach (var info in NonSpaceWarpInfos)
+        {
+            ModsUnsupported[info.ModID] = !info.SupportedKsp2Versions.IsSupported(kspVersion);
         }
     }
 }
