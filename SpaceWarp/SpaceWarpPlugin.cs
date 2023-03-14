@@ -114,6 +114,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         {
             SpaceWarpManager.ModsOutdated[plugin.SpaceWarpMetadata.ModID] = false;
         }
+
+        foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
+        {
+            SpaceWarpManager.ModsOutdated[info.ModID] = false;
+        }
     }
     public void CheckVersions()
     {
@@ -123,6 +128,14 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             if (plugin.SpaceWarpMetadata.VersionCheck != null)
             {
                 StartCoroutine(CheckVersion(plugin.SpaceWarpMetadata));
+            }
+        }
+
+        foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
+        {
+            if (info.VersionCheck != null)
+            {
+                StartCoroutine(CheckVersion(info));
             }
         }
     }
