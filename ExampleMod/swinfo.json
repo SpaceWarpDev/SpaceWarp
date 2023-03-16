@@ -4,6 +4,7 @@
     "author": "Space-Warp Team",
     "description": "A Example Mod for Space-Warp",
     "source": "https://github.com/SpaceWarpDev/SpaceWarp/tree/main/ExampleMod",
+    "version_check": "https://raw.githubusercontent.com/SpaceWarpDev/SpaceWarp/main/ExampleMod/swinfo.json",
     "version": "0.4.0",
     "dependencies": [],
     "ksp2_version": {

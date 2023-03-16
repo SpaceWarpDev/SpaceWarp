@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BepInEx.Logging;
 using UnityEngine;
 
@@ -9,13 +10,11 @@ public static class AssetManager
 {
 	private static readonly Dictionary<string, UnityObject> AllAssets = new();
 
-	internal static void RegisterAssetBundle(string modId, string assetBundleName, AssetBundle assetBundle)
+	internal static async Task RegisterAssetBundle(string modId, string assetBundleName, AssetBundle assetBundle)
 	{
 		assetBundleName = assetBundleName.Replace(".bundle", "");
 		ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource($"{modId}/{assetBundleName}");
-		// TODO: use async loading instead?
 
-		// Object[] bundleObjects = assetBundle.LoadAllAssets();
 		string[] names = assetBundle.GetAllAssetNames();
 
 		foreach (var name in names)
@@ -31,34 +30,37 @@ public static class AssetManager
 			{
 				assetName = assetName[(assetBundleName.Length + 1)..];
 			}
-				
+
 			string path = modId + "/" + assetBundleName + "/" + assetName;
 			path = path.ToLower();
-			
-			UnityObject bundleObject = assetBundle.LoadAsset(name);
+
+			await assetBundle.LoadAssetAsync(name);
+
+			UnityObject bundleObject = assetBundle.LoadAssetAsync(name).asset;
 			logger.LogInfo($"registering path \"{path}\"");
 
 			AllAssets.Add(path, bundleObject);
 		}
-			
-		// if (bundleObjects.Length != names.Length)
-		// {
-		// 	logger.Critical("bundle objects length and name lengths do not match");
-		// 	logger.Info("going to dump objects and names");
-		// 	logger.Info("Names");
-		// 	for (int i = 0; i < names.Length; i++)
-		// 	{
-		// 		logger.Info($"{i} - {names[i]}");
-		// 	}
-		//
-		// 	logger.Info("Objects");
-		// 	for (int i = 0; i < bundleObjects.Length; i++)
-		// 	{
-		// 			logger.Info($"{i} - {bundleObjects[i]}");
-		// 	}
-		// 	throw new System.Exception("bundle objects length and name lengths do not match");
-		// }
 	}
+			
+	// if (bundleObjects.Length != names.Length)
+	// {
+	// 	logger.Critical("bundle objects length and name lengths do not match");
+	// 	logger.Info("going to dump objects and names");
+	// 	logger.Info("Names");
+	// 	for (int i = 0; i < names.Length; i++)
+	// 	{
+	// 		logger.Info($"{i} - {names[i]}");
+	// 	}
+	//
+	// 	logger.Info("Objects");
+	// 	for (int i = 0; i < bundleObjects.Length; i++)
+	// 	{
+	// 			logger.Info($"{i} - {bundleObjects[i]}");
+	// 	}
+	// 	throw new System.Exception("bundle objects length and name lengths do not match");
+	// }
+	
 
 	internal static void RegisterSingleAsset<T>(string modId, string internalAssetPath, T asset) where T : UnityObject
 	{

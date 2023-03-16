@@ -61,7 +61,8 @@ public static class StateChanges
     #region State changing
 
     /// <summary>
-    /// Action(Message,PreviousState,CurrentState>
+    /// Invoked when the game state is changed
+    /// <para>Action(Message,PreviousState,CurrentState)</para>
     /// </summary>
     public static event System.Action<GameStateChangedMessage, GameState, GameState> GameStateChanged; 
 
@@ -213,7 +214,7 @@ public static class StateChanges
     internal static void OnGameStateChanged(MessageCenterMessage message)
     {
         var msg = message as GameStateChangedMessage;
-        GameStateChanged?.Invoke(msg!,msg!.PreviousState,msg!.CurrentState);
+        GameStateChanged?.Invoke(msg!, msg!.PreviousState, msg!.CurrentState);
     }
 
     #endregion

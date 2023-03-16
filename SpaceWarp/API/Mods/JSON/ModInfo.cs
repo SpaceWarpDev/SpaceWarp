@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Mods.JSON;
 
@@ -32,4 +33,8 @@ public sealed class ModInfo
 
     [JsonProperty("ksp2_version")]
     public SupportedVersionsInfo SupportedKsp2Versions { get; internal set; }
+
+    [JsonProperty("version_check", Required = Required.AllowNull)]
+    [CanBeNull]
+    public string VersionCheck { get; internal set; }
 }
