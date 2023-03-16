@@ -34,7 +34,7 @@ public sealed class ModInfo
     [JsonProperty("ksp2_version")]
     public SupportedVersionsInfo SupportedKsp2Versions { get; internal set; }
 
-    [JsonProperty("version_check", Required = Required.AllowNull)]
+    [JsonProperty("version_check", Required = Required.Default)]
     [CanBeNull]
     public string VersionCheck { get; internal set; }
 }
