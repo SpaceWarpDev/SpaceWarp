@@ -28,11 +28,8 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch]
 class ColorsPatch
 {
-    public static bool LoadOnInit = true; ///TODO: Add config for this
-    /// <summary>
-    /// Only parts in this list will be modified.
-    /// </summary>
-    public readonly static Dictionary<string, string[]> DeclaredParts = new();
+    private static bool LoadOnInit = true; ///TODO: Implement false behaviour
+    public static Dictionary<string, string[]> DeclaredParts { get; private set; } = new();
     private static string[] allParts;
 
     private static Dictionary<string, Texture[]> partHash;
@@ -273,7 +270,7 @@ class ColorsPatch
 
 
     private const string displayName = "TTR"; //Taste the Rainbow - name by munix
-    private static ManualLogSource Logger;
+    public static ManualLogSource Logger;
     private static void LogMessage(object data) => Logger.LogMessage($"{data}");
     private static void LogWarning(object data) => Logger.LogWarning($"{data}");
     private static void LogError(object data) => Logger.LogError($"{data}");
