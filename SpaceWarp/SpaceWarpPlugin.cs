@@ -3,6 +3,7 @@ global using System.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
@@ -13,6 +14,7 @@ using Newtonsoft.Json;
 using SpaceWarp.API.Game.Messages;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.API.Versions;
 using SpaceWarp.UI;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -39,12 +41,13 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<int> configDebugMessageLimit;
     internal ConfigEntry<bool> configFirstLaunch;
     internal ConfigEntry<bool> configCheckVersions;
-
+    internal string KSPVersion;
 
     internal new ManualLogSource Logger => base.Logger;
 
     public void Awake()
     {
+        KSPVersion = typeof(VersionID).GetField("VERSION_TEXT",BindingFlags.Static | BindingFlags.Public)?.GetValue(null) as string;
         configErrorColor = Config.Bind("Debug Console", "Color Error", Color.red,
             "The color for log messages that have the level: Error/Fatal (bolded)");
         configWarningColor = Config.Bind("Debug Console", "Color Warning", Color.yellow,
@@ -140,32 +143,9 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
     }
 
-    static bool OlderThan(string currentVersion, string onlineVersion)
+    private static bool OlderThan(string currentVersion, string onlineVersion)
     {
-        try
-        {
-            var currentList = currentVersion.Split('.');
-            var onlineList = onlineVersion.Split('.');
-            var minLength = Math.Min(currentList.Length, onlineList.Length);
-            for (var i = 0; i < minLength; i++)
-            {
-                if (int.Parse(currentList[i]) < int.Parse(onlineList[i]))
-                {
-                    return true;
-                }
-
-                if (int.Parse(currentList[i]) > int.Parse(onlineList[i]))
-                {
-                    return false;
-                }
-            }
-
-            return onlineList.Length > currentList.Length;
-        } catch (Exception e)
-        {
-            Debug.Log(e);
-            return false;
-        }
+        return VersionUtility.CompareSemanticVersionStrings(currentVersion, onlineVersion) < 0;
     }
     IEnumerator CheckVersion(ModInfo pluginInfo)
     {
@@ -180,8 +160,16 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         {
             
             var results = www.downloadHandler.text;
-            var checkInfo = JsonConvert.DeserializeObject<ModInfo>(results);
-            SpaceWarpManager.ModsOutdated[pluginInfo.ModID] = OlderThan(pluginInfo.Version, checkInfo.Version);
+            try
+            {
+                var checkInfo = JsonConvert.DeserializeObject<ModInfo>(results);
+                if (!checkInfo.SupportedKsp2Versions.IsSupported(KSPVersion)) yield break;
+                SpaceWarpManager.ModsOutdated[pluginInfo.ModID] = OlderThan(pluginInfo.Version, checkInfo.Version);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError($"Unable to check version for {pluginInfo.ModID} due to error {e}");
+            }
         }
     }
     

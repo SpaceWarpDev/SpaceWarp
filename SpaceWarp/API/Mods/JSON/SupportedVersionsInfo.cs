@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using SpaceWarp.API.Versions;
 
 namespace SpaceWarp.API.Mods.JSON;
 
@@ -17,50 +18,11 @@ public sealed class SupportedVersionsInfo
 
     public bool IsSupported(string toCheck)
     {
-        try
+        if (VersionUtility.CompareSemanticVersionStrings(toCheck, Min) < 0)
         {
-            var minList = Min.Split('.');
-            var maxList = Max.Split('.');
-            var checkList = toCheck.Split('.');
-            var minMin = Math.Min(minList.Length, checkList.Length);
-            var minMax = Math.Max(maxList.Length, checkList.Length);
-            for (var i = 0; i < minMin; i++)
-            {
-                if (minList[i] == "*")
-                {
-                    break;
-                }
-                if (int.Parse(checkList[i]) < int.Parse(minList[i]))
-                {
-                    return false;
-                }
-                if (int.Parse(checkList[i]) > int.Parse(minList[i]))
-                {
-                    break;
-                }
-            }
-
-            for (var i = 0; i < minMax; i++)
-            {
-                if (maxList[i] == "*")
-                {
-                    break;
-                }
-                if (int.Parse(checkList[i]) > int.Parse(minList[i]))
-                {
-                    return false;
-                }
-                if (int.Parse(checkList[i]) < int.Parse(minList[i]))
-                {
-                    break;
-                }
-            }
-
-            return true;
+            return false;
         }
-        catch
-        {
-            return true;
-        }
+
+        return VersionUtility.CompareSemanticVersionStrings(toCheck, Max) <= 0;
     }
 }
