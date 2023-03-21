@@ -17,7 +17,9 @@ Ensure you have BepInEx correctly installed, it is required for SpaceWarp!
 
 Download the latest release from this page under the [Releases](https://github.com/SpaceWarpDev/SpaceWarp/releases) section above.
 
-Drag the contents of the .zip folder into your KSP2 directory underneath BepInEx as a plugin, commonly located at `C:\Steam\steamapps\common\Kerbal Space Program 2\BepInEx\plugins` or use the [Installer](https://github.com/SpaceWarpDev/Space-Warp-Installer)
+Drag the contents of the .zip folder into your KSP2 directory underneath BepInEx as a plugin, commonly located at `C:\Steam\steamapps\common\Kerbal Space Program 2\BepInEx\plugins` or use the [Installer](https://github.com/SpaceWarpDev/Space-Warp-Installer).
+
+In case of installing on Linux under Wine/Proton, you need to override winhttp DLL in winecfg, as described [in BepInEx documentation](https://docs.bepinex.dev/articles/advanced/proton_wine.html).
 
 To install the downloaded mods, simply drag them into the same location: `C:\Steam\steamapps\common\Kerbal Space Program 2\BepInEx\plugins`. Note that with the latest SpaceWarp update, mods are not loaded within the SpaceWarp folder itself.
 
