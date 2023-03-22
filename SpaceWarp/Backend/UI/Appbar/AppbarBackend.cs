@@ -298,7 +298,7 @@ internal class ToolbarBackendObject : KerbalBehavior
 [HarmonyPatch("Start")]
 internal class ToolbarBackendAppBarPatcher
 {
-    public static void Postfix(UIFlightHud instance)
+    public static void Postfix()
     {
         SubscriberSchedulePing(AppbarEvent.Flight);
     }
@@ -308,7 +308,7 @@ internal class ToolbarBackendAppBarPatcher
 [HarmonyPatch("Start")]
 internal class ToolbarBackendOABSideBarPatcher
 {
-    public static void Postfix(OABSideBar instance)
+    public static void Postfix()
     {
         SubscriberSchedulePing(AppbarEvent.OAB);
     }

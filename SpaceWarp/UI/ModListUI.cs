@@ -19,13 +19,16 @@ public class ModListUI : KerbalMonoBehaviour
     private static GUIStyle _unmanagedHeaderStyle;
 
     private bool _drawUI;
+    private bool _showSupportList = true;
+    private bool _showUnmanagedMods = true;
+    
     private bool _selectedBepIn;
     private BepInPlugin _selectedBepInMetadata;
     private ModInfo _selectedMetaData;
+    
     private int _windowHeight = 700;
-    private Rect _windowRect;
-
     private int _windowWidth = 350;
+    private Rect _windowRect;
 
     private void Awake()
     {
@@ -173,56 +176,89 @@ public class ModListUI : KerbalMonoBehaviour
             GUILayout.Width(300)
         );
 
-        GUILayout.Label("SpaceWarp Mods", _unmanagedHeaderStyle);
+        GUILayout.Label("");
+        if (_showSupportList)
+        {
+            if (GUILayout.Button("SpaceWarp Mods ▼", _unmanagedHeaderStyle))
+            {
+                _showSupportList = !_showSupportList;
+            }
+        }
+        else
+        {
+            if (GUILayout.Button("SpaceWarp Mods ▲", _unmanagedHeaderStyle))
+            {
+                _showSupportList = !_showSupportList;
+            }
+        }
 
-        foreach (var mod in SpaceWarpManager.SpaceWarpPlugins)
-            if (SpaceWarpManager.ModsUnsupported[mod.SpaceWarpMetadata.ModID])
-            {
-                if (!GUILayout.Button(mod.SpaceWarpMetadata.Name, _unsupportedModStyle)) continue;
-                _selectedBepIn = false;
-                _selectedMetaData = mod.SpaceWarpMetadata;
-            }
-            else if (SpaceWarpManager.ModsOutdated[mod.SpaceWarpMetadata.ModID])
-            {
-                if (!GUILayout.Button(mod.SpaceWarpMetadata.Name, _outdatedModStyle)) continue;
-                _selectedBepIn = false;
-                _selectedMetaData = mod.SpaceWarpMetadata;
-            }
-            else
-            {
-                if (!GUILayout.Button(mod.SpaceWarpMetadata.Name)) continue;
-                _selectedBepIn = false;
-                _selectedMetaData = mod.SpaceWarpMetadata;
-            }
+        if (_showSupportList)
+        {
+            foreach (var mod in SpaceWarpManager.SpaceWarpPlugins)
+                if (SpaceWarpManager.ModsUnsupported[mod.SpaceWarpMetadata.ModID])
+                {
+                    if (!GUILayout.Button(mod.SpaceWarpMetadata.Name, _unsupportedModStyle)) continue;
+                    _selectedBepIn = false;
+                    _selectedMetaData = mod.SpaceWarpMetadata;
+                }
+                else if (SpaceWarpManager.ModsOutdated[mod.SpaceWarpMetadata.ModID])
+                {
+                    if (!GUILayout.Button(mod.SpaceWarpMetadata.Name, _outdatedModStyle)) continue;
+                    _selectedBepIn = false;
+                    _selectedMetaData = mod.SpaceWarpMetadata;
+                }
+                else
+                {
+                    if (!GUILayout.Button(mod.SpaceWarpMetadata.Name)) continue;
+                    _selectedBepIn = false;
+                    _selectedMetaData = mod.SpaceWarpMetadata;
+                }
+        }
 
         GUILayout.Label("");
-        GUILayout.Label("Unmanaged Mods", _unmanagedHeaderStyle);
-
-        foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
-            if (SpaceWarpManager.ModsUnsupported[info.ModID])
-            {
-                if (!GUILayout.Button(info.Name, _unsupportedModStyle)) continue;
-                _selectedBepIn = false;
-                _selectedMetaData = info;
-            }
-            else if (SpaceWarpManager.ModsOutdated[info.ModID])
-            {
-                if (!GUILayout.Button(info.Name, _outdatedModStyle)) continue;
-                _selectedBepIn = false;
-                _selectedMetaData = info;
-            }
-            else
-            {
-                if (!GUILayout.Button(info.Name)) continue;
-                _selectedBepIn = false;
-                _selectedMetaData = info;
-            }
-
-        foreach (var mod in SpaceWarpManager.NonSpaceWarpPlugins)
+        if (_showUnmanagedMods)
         {
-            if (!GUILayout.Button(mod.Info.Metadata.Name)) continue;
-            _selectedBepIn = true;
-            _selectedBepInMetadata = mod.Info.Metadata;
+            if (GUILayout.Button("Unmanaged Mods ▼", _unmanagedHeaderStyle))
+            {
+                _showUnmanagedMods = !_showUnmanagedMods;
+            }
+        }
+        else
+        {
+            if (GUILayout.Button("Unmanaged Mods ▲", _unmanagedHeaderStyle))
+            {
+                _showUnmanagedMods = !_showUnmanagedMods;
+            }
+        }
+
+        if (_showUnmanagedMods)
+        {
+            foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
+                if (SpaceWarpManager.ModsUnsupported[info.ModID])
+                {
+                    if (!GUILayout.Button(info.Name, _unsupportedModStyle)) continue;
+                    _selectedBepIn = false;
+                    _selectedMetaData = info;
+                }
+                else if (SpaceWarpManager.ModsOutdated[info.ModID])
+                {
+                    if (!GUILayout.Button(info.Name, _outdatedModStyle)) continue;
+                    _selectedBepIn = false;
+                    _selectedMetaData = info;
+                }
+                else
+                {
+                    if (!GUILayout.Button(info.Name)) continue;
+                    _selectedBepIn = false;
+                    _selectedMetaData = info;
+                }
+
+            foreach (var mod in SpaceWarpManager.NonSpaceWarpPlugins)
+            {
+                if (!GUILayout.Button(mod.Info.Metadata.Name)) continue;
+                _selectedBepIn = true;
+                _selectedBepInMetadata = mod.Info.Metadata;
+            }
         }
 
         GUILayout.EndScrollView();
