@@ -14,7 +14,7 @@ internal static class BootstrapPatch
     {
         SpaceWarpManager.GetSpaceWarpPlugins();
     }
-
+    
     [HarmonyILManipulator]
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.StartBootstrap))]
     private static void PatchInitializationsIL(ILContext ilContext, ILLabel endLabel)
@@ -31,9 +31,11 @@ internal static class BootstrapPatch
         ilCursor.EmitDelegate(static () =>
         {
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            {
                 GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
+            }
         });
-
+        
         ilCursor.GotoLabel(endLabel, MoveType.Before);
         ilCursor.Index -= 1;
         ilCursor.EmitDelegate(static () =>
@@ -46,13 +48,19 @@ internal static class BootstrapPatch
                 flow.AddAction(new LoadLocalizationAction(plugin));
                 flow.AddAction(new LoadAssetAction(plugin));
             }
-
+            
             flow.AddAction(new LoadAddressablesLocalizationsAction());
-
-            foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins) flow.AddAction(new InitializeModAction(plugin));
-
+            
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            {
+                flow.AddAction(new InitializeModAction(plugin));
+            }
+            
+            foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            {
                 flow.AddAction(new PostInitializeModAction(plugin));
+            }
+            
         });
     }
 }

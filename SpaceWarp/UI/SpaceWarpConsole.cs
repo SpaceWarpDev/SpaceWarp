@@ -10,54 +10,82 @@ namespace SpaceWarp.UI;
 
 public sealed class SpaceWarpConsole : KerbalMonoBehaviour
 {
+    private bool _drawUI;
+    private Rect _windowRect;
+    private string _search = "";
+    private bool _autoScroll = true;
+
     private const ControlTypes ConsoleLocks = ControlTypes.All;
     private const string ConsoleLockID = "spacewarp.console";
 
+    private int _windowWidth = 350;
+    private int _windowHeight = 700;
+
     private static Vector2 _scrollPosition;
     private static Vector2 _scrollView;
-    
-    private bool _autoScroll = true;
 
     private GUIStyle _closeButtonStyle;
-    private bool _drawUI;
-    private string _search = "";
     private SpaceWarpPlugin _spaceWarpPluginInstance;
-    private int _windowHeight = 700;
-    private Rect _windowRect;
 
-    private int _windowWidth = 350;
+    private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("SpaceWarpConsole");
 
 
     private void Awake()
     {
-        const float minResolution = 1280f / 720f;
-        const float maxResolution = 2048f / 1080f;
-        var screenRatio = Screen.width / (float)Screen.height;
-        var scaleFactor = Mathf.Clamp(screenRatio, minResolution, maxResolution);
+        float minResolution = 1280f / 720f; 
+        float maxResolution = 2048f / 1080f;
+        float screenRatio = (float) Screen.width / (float) Screen.height;
+        float scaleFactor = Mathf.Clamp(screenRatio, minResolution, maxResolution);
 
-        _windowWidth = (int)(Screen.width * 0.5f * scaleFactor);
-        _windowHeight = (int)(Screen.height * 0.5f * scaleFactor);
+        _windowWidth = (int) (Screen.width * 0.5f * scaleFactor);
+        _windowHeight = (int) (Screen.height * 0.5f * scaleFactor);
         _windowRect = new Rect(
-            Screen.width * 0.15f,
-            Screen.height * 0.15f,
-            Screen.width * 0.5f * scaleFactor,
+            Screen.width * 0.15f, 
+            Screen.height * 0.15f, 
+            Screen.width * 0.5f * scaleFactor, 
             Screen.height * 0.5f * scaleFactor
         );
         _scrollPosition = Vector2.zero;
         _spaceWarpPluginInstance = (Chainloader.PluginInfos[SpaceWarpPlugin.ModGuid].Instance as SpaceWarpPlugin)!;
 
-        if (_spaceWarpPluginInstance.ConfigShowConsoleButton.Value)
+        if (_spaceWarpPluginInstance.configShowConsoleButton.Value)
+        {
             Appbar.RegisterAppButton(
                 "Console",
                 "BTN-SWConsole",
                 AssetManager.GetAsset<Texture2D>("spacewarp/images/console.png"),
                 ToggleVisible
             );
+        }
     }
 
+    private void OnGUI()
+    {
+        GUI.skin = SpaceWarpManager.Skin;
+
+        if (!_drawUI)
+        {
+            return;
+        }
+
+        _closeButtonStyle ??= new GUIStyle(GUI.skin.button)
+        {
+            fontSize = 8
+        };
+
+        int controlID = GUIUtility.GetControlID(FocusType.Passive);
+        GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
+        GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
+
+        _windowRect = GUILayout.Window(controlID, _windowRect, DrawConsole, "SPACE WARP - Console", width, height);
+    }
+    
     private void Update()
     {
-        if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C)) ToggleVisible(!_drawUI);
+        if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))
+        {
+            ToggleVisible(!_drawUI);
+        }
 
         if (Input.GetKey(KeyCode.Escape) && _drawUI)
         {
@@ -65,25 +93,10 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
             GUIUtility.ExitGUI();
         }
 
-        if (Input.mouseScrollDelta.y + Input.GetAxis("Vertical") > 0) _autoScroll = false;
-    }
-
-    private void OnGUI()
-    {
-        GUI.skin = SpaceWarpManager.Skin;
-
-        if (!_drawUI) return;
-
-        _closeButtonStyle ??= new GUIStyle(GUI.skin.button)
+        if (Input.mouseScrollDelta.y + Input.GetAxis("Vertical") > 0)
         {
-            fontSize = 8
-        };
-
-        var controlID = GUIUtility.GetControlID(FocusType.Passive);
-        var width = GUILayout.Width((float)(_windowWidth * 0.8));
-        var height = GUILayout.Height((float)(_windowHeight * 0.8));
-
-        _windowRect = GUILayout.Window(controlID, _windowRect, DrawConsole, "SPACE WARP - Console", width, height);
+            _autoScroll = false;
+        }
     }
 
     private void DrawConsole(int windowID)
@@ -98,15 +111,15 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         _search = GUILayout.TextField(_search);
         _scrollView = GUILayout.BeginScrollView(_scrollPosition, false, true);
 
-        foreach (var message in SpaceWarpConsoleLogListener.DebugMessages)
+        foreach (string message in SpaceWarpConsoleLogListener.DebugMessages)
         {
             if (!message.ToLower().Contains(_search.ToLower())) continue;
 
             // Parse the log level from the message string
-            var logType = GetLogLevelFromMessage(message);
+            LogLevel logType = GetLogLevelFromMessage(message);
 
             // Apply a different color style based on the log level
-            var style = GetLogStyle(logType);
+            GUIStyle style = GetLogStyle(logType);
 
             if (logType == LogLevel.Fatal) style.fontStyle = FontStyle.Bold;
 
@@ -126,12 +139,17 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         GUILayout.EndScrollView();
         GUILayout.BeginHorizontal();
 
-        if (GUILayout.Button("Clear")) SpaceWarpConsoleLogListener.DebugMessages.Clear();
+        if (GUILayout.Button("Clear"))
+        {
+            SpaceWarpConsoleLogListener.DebugMessages.Clear();
+        }
 
         if (GUILayout.Button(_autoScroll ? "Auto Scroll: On" : "Auto Scroll: Off"))
+        {
             //Todo: Add proper close button to top corner and add input lock button back. 
             // GameManager.Instance.Game.ViewController.inputLockManager.ClearControlLocks();
             _autoScroll = !_autoScroll;
+        }
 
         GUILayout.EndHorizontal();
         GUILayout.EndVertical();
@@ -141,7 +159,7 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
     private LogLevel GetLogLevelFromMessage(string message)
     {
         var logParts = message.ToLower().Replace(" ", "").Split(']');
-        var logLevelIndex = _spaceWarpPluginInstance.ConfigShowTimeStamps.Value ? 1 : 0;
+        var logLevelIndex = _spaceWarpPluginInstance.configShowTimeStamps.Value ? 1 : 0;
 
         return logParts[logLevelIndex] switch
         {
@@ -158,17 +176,17 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
 
     private GUIStyle GetLogStyle(LogLevel logLevel)
     {
-        var style = new GUIStyle(GUI.skin.label);
+        GUIStyle style = new GUIStyle(GUI.skin.label);
 
         style.normal.textColor = logLevel switch
         {
-            LogLevel.Fatal => _spaceWarpPluginInstance.ConfigErrorColor.Value,
-            LogLevel.Error => _spaceWarpPluginInstance.ConfigErrorColor.Value,
-            LogLevel.Warning => _spaceWarpPluginInstance.ConfigWarningColor.Value,
-            LogLevel.Message => _spaceWarpPluginInstance.ConfigMessageColor.Value,
-            LogLevel.Info => _spaceWarpPluginInstance.ConfigInfoColor.Value,
-            LogLevel.Debug => _spaceWarpPluginInstance.ConfigDebugColor.Value,
-            LogLevel.All => _spaceWarpPluginInstance.ConfigAllColor.Value,
+            LogLevel.Fatal => _spaceWarpPluginInstance.configErrorColor.Value,
+            LogLevel.Error => _spaceWarpPluginInstance.configErrorColor.Value,
+            LogLevel.Warning => _spaceWarpPluginInstance.configWarningColor.Value,
+            LogLevel.Message => _spaceWarpPluginInstance.configMessageColor.Value,
+            LogLevel.Info => _spaceWarpPluginInstance.configInfoColor.Value,
+            LogLevel.Debug => _spaceWarpPluginInstance.configDebugColor.Value,
+            LogLevel.All => _spaceWarpPluginInstance.configAllColor.Value,
             _ => style.normal.textColor
         };
 

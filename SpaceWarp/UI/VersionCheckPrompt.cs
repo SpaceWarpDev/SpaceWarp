@@ -1,4 +1,4 @@
-﻿using SpaceWarp.API.UI;
+﻿using System;
 using UnityEngine;
 
 namespace SpaceWarp.UI;
@@ -7,18 +7,18 @@ internal class VersionCheckPrompt : MonoBehaviour
 {
     public SpaceWarpPlugin spaceWarpPlugin;
     private GUIStyle _closeButtonStyle;
-    private float _windowHeight;
     private Rect _windowRect;
     private float _windowWidth;
+    private float _windowHeight;
 
     private void Awake()
     {
-        const float minResolution = 1280f / 720f;
-        const float maxResolution = 2048f / 1080f;
-        var screenRatio = Screen.width / (float)Screen.height;
-        var scaleFactor = Mathf.Clamp(screenRatio, minResolution, maxResolution);
+        float minResolution = 1280f / 720f; 
+        float maxResolution = 2048f / 1080f;
+        float screenRatio = (float) Screen.width / (float) Screen.height;
+        float scaleFactor = Mathf.Clamp(screenRatio, minResolution, maxResolution);
 
-        _windowWidth = (int)(Screen.width * 0.2f * scaleFactor);
+        _windowWidth = (int) (Screen.width * 0.2f * scaleFactor);
         _windowHeight = 0;
         _windowRect = new Rect(
             Screen.width * 0.15f,
@@ -27,14 +27,13 @@ internal class VersionCheckPrompt : MonoBehaviour
             Screen.height * 0.5f * scaleFactor
         );
     }
-
     public void OnGUI()
     {
-        GUI.skin = Skins.ConsoleSkin;
+        GUI.skin = SpaceWarp.API.UI.Skins.ConsoleSkin;
 
-        var controlID = GUIUtility.GetControlID(FocusType.Passive);
-        var width = GUILayout.Width((float)(_windowWidth * 0.8));
-        var height = GUILayout.Height((float)(_windowHeight * 0.8));
+        int controlID = GUIUtility.GetControlID(FocusType.Passive);
+        GUILayoutOption width = GUILayout.Width((float)(_windowWidth * 0.8));
+        GUILayoutOption height = GUILayout.Height((float)(_windowHeight * 0.8));
 
         _closeButtonStyle ??= new GUIStyle(GUI.skin.button)
         {
@@ -57,12 +56,15 @@ internal class VersionCheckPrompt : MonoBehaviour
         if (GUILayout.Button("Yes"))
         {
             spaceWarpPlugin.CheckVersions();
-            spaceWarpPlugin.ConfigCheckVersions.Value = true;
+            spaceWarpPlugin.configCheckVersions.Value = true;
             Destroy(this);
         }
 
-        if (GUILayout.Button("No")) Destroy(this);
-
+        if (GUILayout.Button("No"))
+        {
+            Destroy(this);
+        }
+        
         GUILayout.EndHorizontal();
         GUILayout.EndVertical();
         GUI.DragWindow();

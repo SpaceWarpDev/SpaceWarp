@@ -6,24 +6,23 @@ namespace SpaceWarp.Patching.LoadingActions;
 
 internal sealed class InitializeModAction : FlowAction
 {
-    private readonly BaseSpaceWarpPlugin _plugin;
+    private readonly BaseSpaceWarpPlugin Plugin;
 
-    public InitializeModAction(BaseSpaceWarpPlugin plugin) : base(
-        $"Initialization for plugin {plugin.Info.Metadata.Name}")
+    public InitializeModAction(BaseSpaceWarpPlugin plugin) : base($"Initialization for plugin {plugin.Info.Metadata.Name}")
     {
-        _plugin = plugin;
+        Plugin = plugin;
     }
 
     public override void DoAction(Action resolve, Action<string> reject)
     {
         try
         {
-            _plugin.OnInitialized();
+            Plugin.OnInitialized();
             resolve();
         }
         catch (Exception e)
         {
-            _plugin.ModLogger.LogError(e.ToString());
+            Plugin.ModLogger.LogError(e.ToString());
             reject(null);
         }
     }

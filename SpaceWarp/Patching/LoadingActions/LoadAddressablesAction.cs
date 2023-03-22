@@ -8,37 +8,35 @@ namespace SpaceWarp.Patching.LoadingActions;
 
 internal sealed class LoadAddressablesAction : FlowAction
 {
+    private readonly BaseSpaceWarpPlugin Plugin;
     private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("Addressables Loader");
-    private readonly BaseSpaceWarpPlugin _plugin;
 
-    public LoadAddressablesAction(BaseSpaceWarpPlugin plugin) : base(
-        $"Loading addressables for {plugin.SpaceWarpMetadata.Name}")
+    public LoadAddressablesAction(BaseSpaceWarpPlugin plugin) : base($"Loading addressables for {plugin.SpaceWarpMetadata.Name}")
     {
-        _plugin = plugin;
+        Plugin = plugin;
     }
 
     public override void DoAction(Action resolve, Action<string> reject)
     {
         try
         {
-            var addressablesPath = Path.Combine(_plugin.PluginFolderPath, "addressables");
-            Logger.LogInfo($"Loading addressables for {_plugin.SpaceWarpMetadata.Name}");
-            var catalogPath = Path.Combine(addressablesPath, "catalog.json");
+            string addressablesPath = Path.Combine(Plugin.PluginFolderPath, "addressables");
+            Logger.LogInfo($"Loading addressables for {Plugin.SpaceWarpMetadata.Name}");
+            string catalogPath = Path.Combine(addressablesPath, "catalog.json");
             if (File.Exists(catalogPath))
             {
-                Logger.LogInfo($"Found addressables for {_plugin.SpaceWarpMetadata.Name}");
+                Logger.LogInfo($"Found addressables for {Plugin.SpaceWarpMetadata.Name}");
                 AssetHelpers.LoadAddressable(catalogPath);
             }
             else
             {
-                Logger.LogInfo($"Did not find addressables for {_plugin.SpaceWarpMetadata.Name}");
+                Logger.LogInfo($"Did not find addressables for {Plugin.SpaceWarpMetadata.Name}");
             }
-
             resolve();
         }
         catch (Exception e)
         {
-            _plugin.ModLogger.LogError(e.ToString());
+            Plugin.ModLogger.LogError(e.ToString());
             reject(null);
         }
     }

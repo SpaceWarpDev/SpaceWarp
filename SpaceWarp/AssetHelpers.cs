@@ -1,7 +1,7 @@
 using System.IO;
-using I2.Loc;
 using KSP.Game;
 using UnityEngine.AddressableAssets;
+using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace SpaceWarp;
@@ -11,7 +11,7 @@ internal static class AssetHelpers
     public static void LoadAddressable(string catalog)
     {
         SpaceWarpManager.Logger.LogInfo($"Attempting to load {catalog}");
-        var operation = Addressables.LoadContentCatalogAsync(catalog);
+        AsyncOperationHandle<IResourceLocator> operation = Addressables.LoadContentCatalogAsync(catalog);
         operation.WaitForCompletion();
         if (operation.Status == AsyncOperationStatus.Failed)
         {
@@ -29,32 +29,31 @@ internal static class AssetHelpers
     internal static void LoadLocalizationFromFolder(string folder)
     {
         SpaceWarpManager.Logger.LogInfo($"Attempting to load localizations from {folder}");
-        LanguageSourceData languageSourceData = null;
+        I2.Loc.LanguageSourceData languageSourceData = null;
         if (!Directory.Exists(folder))
         {
             SpaceWarpManager.Logger.LogInfo($"{folder} does not exist, not loading localizations.");
             return;
         }
-
-        var info = new DirectoryInfo(folder);
+        DirectoryInfo info = new DirectoryInfo(folder);
         foreach (var csvFile in info.GetFiles("*.csv"))
         {
-            languageSourceData ??= new LanguageSourceData();
+            languageSourceData ??= new I2.Loc.LanguageSourceData();
             var csvData = File.ReadAllText(csvFile.FullName);
-            languageSourceData.Import_CSV("", csvData, eSpreadsheetUpdateMode.AddNewTerms);
+            languageSourceData.Import_CSV("", csvData, I2.Loc.eSpreadsheetUpdateMode.AddNewTerms);
         }
 
-        foreach (var i2CsvFile in info.GetFiles("*.i2csv"))
+        foreach (var i2csvFile in info.GetFiles("*.i2csv"))
         {
-            languageSourceData ??= new LanguageSourceData();
-            var i2CsvData = File.ReadAllText(i2CsvFile.FullName);
-            languageSourceData.Import_I2CSV("", i2CsvData, eSpreadsheetUpdateMode.AddNewTerms);
+            languageSourceData ??= new I2.Loc.LanguageSourceData();
+            var i2csvData = File.ReadAllText(i2csvFile.FullName);
+            languageSourceData.Import_I2CSV("", i2csvData, I2.Loc.eSpreadsheetUpdateMode.AddNewTerms);
         }
 
         if (languageSourceData != null)
         {
             SpaceWarpManager.Logger.LogInfo($"Loaded localizations from {folder}");
-            LocalizationManager.AddSource(languageSourceData);
+            I2.Loc.LocalizationManager.AddSource(languageSourceData);
         }
         else
         {
