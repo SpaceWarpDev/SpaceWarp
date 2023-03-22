@@ -11,12 +11,12 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch(nameof(Utils.FindPlugins))]
 public class ConfigurationPatch
 {
-    private static void Postfix([NotNull] ref BaseUnityPlugin[] result)
+    static void PostFix(ref BaseUnityPlugin[] __result)
     {
-        if (result == null) throw new ArgumentNullException(nameof(result));
+        if (__result == null) throw new ArgumentNullException(nameof(__result));
         //Disable because I know what I am doing.
         #pragma warning disable CS0618
-        result = Chainloader.Plugins.ToArray();
+        __result = Chainloader.Plugins.ToArray();
         #pragma warning restore CS0618
     }
 }

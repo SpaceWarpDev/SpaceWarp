@@ -244,18 +244,18 @@ internal class ColorsPatch
 
     [HarmonyPatch(typeof(Module_Color),
         nameof(Module_Color.OnInitialize))]
-    public static void Postfix(Module_Color instance)
+    public static void Postfix(Module_Color __instance)
     {
         if (DeclaredParts.Count == 0) return;
 
-        var partName = instance.OABPart is not null ? instance.OABPart.PartName : instance.part.Name;
+        var partName = __instance.OABPart is not null ? __instance.OABPart.PartName : __instance.part.Name;
         var trimmedPartName = TrimPartName(partName);
 
         if (!_allParts.Contains(trimmedPartName))
             //SpaceWarpManager.Logger.LogError($"{partName} is not declared and onlyDeclareParts is enabled. Skipping."); //This will generate a LOT of logs
             return;
 
-        foreach (var renderer in instance.GetComponentsInChildren<MeshRenderer>(true))
+        foreach (var renderer in __instance.GetComponentsInChildren<MeshRenderer>(true))
         {
             if (renderer.material.shader.name != _unityStandard.name)
                 continue;
@@ -269,7 +269,7 @@ internal class ColorsPatch
                 renderer.SetMaterial(mat); //Sometimes the material Set doesn't work, this seems to be more reliable.
         }
 
-        instance.SomeColorUpdated();
+        __instance.SomeColorUpdated();
     }
 
     private static void LogMessage(object data)

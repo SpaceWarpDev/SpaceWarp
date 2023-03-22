@@ -26,8 +26,8 @@ namespace SpaceWarp;
 public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 {
     public const string ModGuid = "com.github.x606.spacewarp";
-    private const string ModName = "Space Warp";
-    private const string ModVer = MyPluginInfo.PLUGIN_VERSION;
+    public const string ModName = "Space Warp";
+    public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
     internal ConfigEntry<Color> ConfigAllColor;
     internal ConfigEntry<bool> ConfigCheckVersions;
     internal ConfigEntry<Color> ConfigDebugColor;

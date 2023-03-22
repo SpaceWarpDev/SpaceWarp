@@ -10,9 +10,9 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch("Start")]
 internal class MainMenuPatcher
 {
-    public static void Postfix(LandingHUD instance)
+    public static void Postfix(LandingHUD __instance)
     {
-        var menuItemsGroupTransform = instance.transform.FindChildEx("MenuItemsGroup");
+        var menuItemsGroupTransform = __instance.transform.FindChildEx("MenuItemsGroup");
         var singleplayerButtonTransform = menuItemsGroupTransform.FindChildEx("Singleplayer");
 
         foreach (var menuButtonToBeAdded in MainMenu.MenuButtonsToBeAdded)
