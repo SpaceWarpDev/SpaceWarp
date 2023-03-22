@@ -5,66 +5,67 @@ using KSP.Messages;
 namespace SpaceWarp.API.Game.Messages;
 
 /// <summary>
-/// A class that contains a list of events that are published either when a state is entered or left
+///     A class that contains a list of events that are published either when a state is entered or left
 /// </summary>
 public static class StateChanges
 {
+    #region State changing
+
+    /// <summary>
+    ///     Invoked when the game state is changed
+    ///     <para>Action(Message,PreviousState,CurrentState)</para>
+    /// </summary>
+    public static event Action<GameStateChangedMessage, GameState, GameState> GameStateChanged;
+
+    #endregion
+
     #region Entering States
+
     public static event Action<GameStateEnteredMessage> InvalidStateEntered;
-    public static event System.Action<GameStateEnteredMessage> WarmUpLoadingStateEntered;
-    public static event System.Action<GameStateEnteredMessage> MainMenuStateEntered;
-    public static event System.Action<GameStateEnteredMessage> KerbalSpaceCenterStateEntered;
-    public static event System.Action<GameStateEnteredMessage> VehicleAssemblyBuilderEntered;
-    public static event System.Action<GameStateEnteredMessage> BaseAssemblyEditorEntered;
-    public static event System.Action<GameStateEnteredMessage> FlightViewEntered;
-    public static event System.Action<GameStateEnteredMessage> ColonyViewEntered;
-    public static event System.Action<GameStateEnteredMessage> Map3DViewEntered;
-    public static event System.Action<GameStateEnteredMessage> PhotoModeEntered;
-    public static event System.Action<GameStateEnteredMessage> MetricsModeEntered;
-    public static event System.Action<GameStateEnteredMessage> PlanetViewerEntered;
-    public static event System.Action<GameStateEnteredMessage> LoadingEntered;
-    public static event System.Action<GameStateEnteredMessage> TrainingCenterEntered;
-    public static event System.Action<GameStateEnteredMessage> MissionControlEntered;
-    public static event System.Action<GameStateEnteredMessage> TrackingStationEntered;
-    public static event System.Action<GameStateEnteredMessage> ResearchAndDevelopmentEntered;
-    public static event System.Action<GameStateEnteredMessage> LaunchpadEntered;
-    public static event System.Action<GameStateEnteredMessage> RunwayEntered;
-    public static event System.Action<GameStateEnteredMessage> FlagEntered;
+    public static event Action<GameStateEnteredMessage> WarmUpLoadingStateEntered;
+    public static event Action<GameStateEnteredMessage> MainMenuStateEntered;
+    public static event Action<GameStateEnteredMessage> KerbalSpaceCenterStateEntered;
+    public static event Action<GameStateEnteredMessage> VehicleAssemblyBuilderEntered;
+    public static event Action<GameStateEnteredMessage> BaseAssemblyEditorEntered;
+    public static event Action<GameStateEnteredMessage> FlightViewEntered;
+    public static event Action<GameStateEnteredMessage> ColonyViewEntered;
+    public static event Action<GameStateEnteredMessage> Map3DViewEntered;
+    public static event Action<GameStateEnteredMessage> PhotoModeEntered;
+    public static event Action<GameStateEnteredMessage> MetricsModeEntered;
+    public static event Action<GameStateEnteredMessage> PlanetViewerEntered;
+    public static event Action<GameStateEnteredMessage> LoadingEntered;
+    public static event Action<GameStateEnteredMessage> TrainingCenterEntered;
+    public static event Action<GameStateEnteredMessage> MissionControlEntered;
+    public static event Action<GameStateEnteredMessage> TrackingStationEntered;
+    public static event Action<GameStateEnteredMessage> ResearchAndDevelopmentEntered;
+    public static event Action<GameStateEnteredMessage> LaunchpadEntered;
+    public static event Action<GameStateEnteredMessage> RunwayEntered;
+    public static event Action<GameStateEnteredMessage> FlagEntered;
 
     #endregion
 
     #region Leaving States
 
-    public static event System.Action<GameStateLeftMessage> InvalidStateLeft;
-    public static event System.Action<GameStateLeftMessage> WarmUpLoadingStateLeft;
-    public static event System.Action<GameStateLeftMessage> MainMenuStateLeft;
-    public static event System.Action<GameStateLeftMessage> KerbalSpaceCenterStateLeft;
-    public static event System.Action<GameStateLeftMessage> VehicleAssemblyBuilderLeft;
-    public static event System.Action<GameStateLeftMessage> BaseAssemblyEditorLeft;
-    public static event System.Action<GameStateLeftMessage> FlightViewLeft;
-    public static event System.Action<GameStateLeftMessage> ColonyViewLeft;
-    public static event System.Action<GameStateLeftMessage> PhotoModeLeft;
-    public static event System.Action<GameStateLeftMessage> Map3DViewLeft;
-    public static event System.Action<GameStateLeftMessage> MetricsModeLeft;
-    public static event System.Action<GameStateLeftMessage> PlanetViewerLeft;
-    public static event System.Action<GameStateLeftMessage> LoadingLeft;
-    public static event System.Action<GameStateLeftMessage> TrainingCenterLeft;
-    public static event System.Action<GameStateLeftMessage> MissionControlLeft;
-    public static event System.Action<GameStateLeftMessage> TrackingStationLeft;
-    public static event System.Action<GameStateLeftMessage> ResearchAndDevelopmentLeft;
-    public static event System.Action<GameStateLeftMessage> LaunchpadLeft;
-    public static event System.Action<GameStateLeftMessage> RunwayLeft;
-    public static event System.Action<GameStateLeftMessage> FlagLeft;
-
-    #endregion
-
-    #region State changing
-
-    /// <summary>
-    /// Invoked when the game state is changed
-    /// <para>Action(Message,PreviousState,CurrentState)</para>
-    /// </summary>
-    public static event System.Action<GameStateChangedMessage, GameState, GameState> GameStateChanged; 
+    public static event Action<GameStateLeftMessage> InvalidStateLeft;
+    public static event Action<GameStateLeftMessage> WarmUpLoadingStateLeft;
+    public static event Action<GameStateLeftMessage> MainMenuStateLeft;
+    public static event Action<GameStateLeftMessage> KerbalSpaceCenterStateLeft;
+    public static event Action<GameStateLeftMessage> VehicleAssemblyBuilderLeft;
+    public static event Action<GameStateLeftMessage> BaseAssemblyEditorLeft;
+    public static event Action<GameStateLeftMessage> FlightViewLeft;
+    public static event Action<GameStateLeftMessage> ColonyViewLeft;
+    public static event Action<GameStateLeftMessage> PhotoModeLeft;
+    public static event Action<GameStateLeftMessage> Map3DViewLeft;
+    public static event Action<GameStateLeftMessage> MetricsModeLeft;
+    public static event Action<GameStateLeftMessage> PlanetViewerLeft;
+    public static event Action<GameStateLeftMessage> LoadingLeft;
+    public static event Action<GameStateLeftMessage> TrainingCenterLeft;
+    public static event Action<GameStateLeftMessage> MissionControlLeft;
+    public static event Action<GameStateLeftMessage> TrackingStationLeft;
+    public static event Action<GameStateLeftMessage> ResearchAndDevelopmentLeft;
+    public static event Action<GameStateLeftMessage> LaunchpadLeft;
+    public static event Action<GameStateLeftMessage> RunwayLeft;
+    public static event Action<GameStateLeftMessage> FlagLeft;
 
     #endregion
 
@@ -72,7 +73,7 @@ public static class StateChanges
 
     internal static void OnGameStateEntered(MessageCenterMessage message)
     {
-        GameStateEnteredMessage msg = message as GameStateEnteredMessage;
+        var msg = message as GameStateEnteredMessage;
         switch (msg!.StateBeingEntered)
         {
             case GameState.Invalid:
@@ -143,7 +144,7 @@ public static class StateChanges
 
     internal static void OnGameStateLeft(MessageCenterMessage message)
     {
-        GameStateLeftMessage msg = message as GameStateLeftMessage;
+        var msg = message as GameStateLeftMessage;
         switch (msg!.StateBeingLeft)
         {
             case GameState.Invalid:
