@@ -6,9 +6,8 @@ namespace SpaceWarp.UI;
 
 public sealed class SpaceWarpConsoleLogListener : ILogListener
 {
-    private readonly SpaceWarpPlugin _spaceWarpPluginInstance;
-
     internal static readonly List<string> DebugMessages = new();
+    private readonly SpaceWarpPlugin _spaceWarpPluginInstance;
 
     public SpaceWarpConsoleLogListener(SpaceWarpPlugin spaceWarpPluginInstance)
     {
@@ -21,19 +20,22 @@ public sealed class SpaceWarpConsoleLogListener : ILogListener
         LogMessageJanitor();
     }
 
+    public void Dispose()
+    {
+        DebugMessages.Clear();
+    }
+
     private void LogMessageJanitor()
     {
-        var configDebugMessageLimit = _spaceWarpPluginInstance.configDebugMessageLimit.Value;
+        var configDebugMessageLimit = _spaceWarpPluginInstance.ConfigDebugMessageLimit.Value;
         if (DebugMessages.Count > configDebugMessageLimit)
-        {
             DebugMessages.RemoveRange(0, DebugMessages.Count - configDebugMessageLimit);
-        }
     }
 
     private string TimestampMessage()
     {
-        return _spaceWarpPluginInstance.configShowTimeStamps.Value
-            ? "[" + DateTime.Now.ToString(_spaceWarpPluginInstance.configTimeStampFormat.Value) + "] "
+        return _spaceWarpPluginInstance.ConfigShowTimeStamps.Value
+            ? "[" + DateTime.Now.ToString(_spaceWarpPluginInstance.ConfigTimeStampFormat.Value) + "] "
             : "";
     }
 
@@ -42,10 +44,5 @@ public sealed class SpaceWarpConsoleLogListener : ILogListener
         return level == LogLevel.None
             ? $"{timestamp}[{source.SourceName}] {data}"
             : $"{timestamp}[{level} : {source.SourceName}] {data}";
-    }
-
-    public void Dispose()
-    {
-        DebugMessages.Clear();
     }
 }

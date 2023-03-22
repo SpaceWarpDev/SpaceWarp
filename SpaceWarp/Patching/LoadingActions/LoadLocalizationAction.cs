@@ -7,24 +7,25 @@ namespace SpaceWarp.Patching.LoadingActions;
 
 internal sealed class LoadLocalizationAction : FlowAction
 {
-    private readonly BaseSpaceWarpPlugin Plugin;
+    private readonly BaseSpaceWarpPlugin _plugin;
 
-    public LoadLocalizationAction(BaseSpaceWarpPlugin plugin) : base($"Loading localizations for plugin {plugin.SpaceWarpMetadata.Name}")
+    public LoadLocalizationAction(BaseSpaceWarpPlugin plugin) : base(
+        $"Loading localizations for plugin {plugin.SpaceWarpMetadata.Name}")
     {
-        Plugin = plugin;
+        _plugin = plugin;
     }
 
     public override void DoAction(Action resolve, Action<string> reject)
     {
         try
         {
-            string localizationsPath = Path.Combine(Plugin.PluginFolderPath, "localizations");
+            var localizationsPath = Path.Combine(_plugin.PluginFolderPath, "localizations");
             AssetHelpers.LoadLocalizationFromFolder(localizationsPath);
             resolve();
         }
         catch (Exception e)
         {
-            Plugin.ModLogger.LogError(e.ToString());
+            _plugin.ModLogger.LogError(e.ToString());
             reject(null);
         }
     }
