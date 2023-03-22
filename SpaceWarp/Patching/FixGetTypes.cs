@@ -10,21 +10,17 @@ internal static class FixGetTypes
     [HarmonyFinalizer]
     [HarmonyPatch(typeof(Assembly), nameof(Assembly.GetTypes), new Type[0])]
     [HarmonyPatch(typeof(Assembly), nameof(Assembly.GetExportedTypes))]
-    private static Exception GetTypesFix(Exception __exception, Assembly __instance, ref Type[] __result)
+    private static Exception GetTypesFix(Exception typeException, Assembly instance, ref Type[] result)
     {
-        if (__exception is ReflectionTypeLoadException reflectionTypeLoadException)
-        {
-            SpaceWarpManager.Logger.LogWarning($"Types failed to load from assembly {__instance.FullName} due to the reasons below, continuing anyway.");
-            SpaceWarpManager.Logger.LogWarning($"Exception: {__exception}");
-            
-            foreach (var exception in reflectionTypeLoadException.LoaderExceptions)
-            {
-                SpaceWarpManager.Logger.LogWarning(exception.ToString());
-            }
-            __result = reflectionTypeLoadException.Types.Where(type => type != null).ToArray();
-            return null;
-        }
-        
-        return __exception;
+        if (typeException is not ReflectionTypeLoadException reflectionTypeLoadException) return typeException;
+        SpaceWarpManager.Logger.LogWarning(
+            $"Types failed to load from assembly {instance.FullName} due to the reasons below, continuing anyway.");
+        SpaceWarpManager.Logger.LogWarning($"Exception: {typeException}");
+
+        foreach (var exception in reflectionTypeLoadException.LoaderExceptions)
+            SpaceWarpManager.Logger.LogWarning(exception.ToString());
+        result = reflectionTypeLoadException.Types.Where(type => type != null).ToArray();
+        return null;
+
     }
 }
