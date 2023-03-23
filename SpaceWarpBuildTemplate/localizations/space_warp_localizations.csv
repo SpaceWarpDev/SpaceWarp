@@ -1,23 +1,23 @@
-Key,Type,Description,English
-SpaceWarp/ModList/Header,Text,,spacewarp.modlist
-SpaceWarp/ModList/SpaceWarpMods,Text,,SpaceWarp Mods
-SpaceWarp/ModList/UnmanagedMods,Text,,Unmanaged Mods
-SpaceWarp/ModList/Version,Text,,Version
-SpaceWarp/ModList/Author,Text,,Author
-SpaceWarp/ModList/outdated,Text,,outdated
-SpaceWarp/ModList/Source,Text,,Source
-SpaceWarp/ModList/Description,Text,,Description
-SpaceWarp/ModList/KSP2Version,Text,,KSP2 Version
-SpaceWarp/ModList/Dependencies,Text,,Dependencies
-SpaceWarp/ModList/OpenConfigManager,Text,,Open Configuration Manager
-SpaceWarp/ModList/unsupported,Text,,unsupported
-SpaceWarp/Mods,Text,,Mods
-SpaceWarp,Text,,Space Warp
-SpaceWarp/VersionChecking,Text,,Allow Space Warp to check versions for mods over the network?
-SpaceWarp/Yes,Text,,Yes
-SpaceWarp/No,Text,,No
-SpaceWarp/Console/Header,Text,,SPACE WARP - Console
-SpaceWarp/Console/Clear,Text,,Clear
-SpaceWarp/Console/AutoScroll,Text,,Auto Scroll
-SpaceWarp/Console/On,Text,,On
-SpaceWarp/Console/Off,Text,,Off
+Key,Type,Description,English,Portuguese BR
+SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist
+SpaceWarp/ModList/SpaceWarpMods,Text,,SpaceWarp Mods,Mods de SpaceWarp
+SpaceWarp/ModList/UnmanagedMods,Text,,Unmanaged Mods,Mods externos
+SpaceWarp/ModList/Version,Text,,Version,Versão
+SpaceWarp/ModList/Author,Text,,Author,Autor
+SpaceWarp/ModList/outdated,Text,,outdated,Desatualizado
+SpaceWarp/ModList/Source,Text,,Source,Fonte
+SpaceWarp/ModList/Description,Text,,Description,Descrição
+SpaceWarp/ModList/KSP2Version,Text,,KSP2 Version,Versão do jogo
+SpaceWarp/ModList/Dependencies,Text,,Dependencies,Dependencias
+SpaceWarp/ModList/OpenConfigManager,Text,,Open Configuration Manager,Abrir gestor de configurações
+SpaceWarp/ModList/unsupported,Text,,unsupported,Não suportado
+SpaceWarp/Mods,Text,,Mods,Mods
+SpaceWarp,Text,,Space Warp,Space Warp
+SpaceWarp/VersionChecking,Text,,Allow Space Warp to check versions for mods over the network?,Deixar o SpaceWarp verificar a versão dos mods na internet?
+SpaceWarp/Yes,Text,,Yes,Sim
+SpaceWarp/No,Text,,No,Não
+SpaceWarp/Console/Header,Text,,SPACE WARP - Console, SPACE WARP - Consola
+SpaceWarp/Console/Clear,Text,,Clear,Limpar
+SpaceWarp/Console/AutoScroll,Text,,Auto Scroll,Scroll automatico
+SpaceWarp/Console/On,Text,,On,On
+SpaceWarp/Console/Off,Text,,Off,Off
