@@ -12,3 +12,12 @@ SpaceWarp/ModList/Dependencies,Text,,Dependencies
 SpaceWarp/ModList/OpenConfigManager,Text,,Open Configuration Manager
 SpaceWarp/ModList/unsupported,Text,,unsupported
 SpaceWarp/Mods,Text,,Mods
+SpaceWarp,Text,,Space Warp
+SpaceWarp/VersionChecking,Text,,Allow Space Warp to check versions for mods over the network?
+SpaceWarp/Yes,Text,,Yes
+SpaceWarp/No,Text,,No
+SpaceWarp/Console/Header,Text,,SPACE WARP - Console
+SpaceWarp/Console/Clear,Text,,Clear
+SpaceWarp/Console/AutoScroll,Text,,Auto Scroll
+SpaceWarp/Console/On,Text,,On
+SpaceWarp/Console/Off,Text,,Off
