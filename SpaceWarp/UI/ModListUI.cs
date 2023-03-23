@@ -155,6 +155,15 @@ public class ModListUI : KerbalMonoBehaviour
         _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, ModListHeader, width, height);
     }
 
+    private static string Trim(string name)
+    {
+        if (name.Length > 25)
+        {
+            name = name[..22] + "...";
+        }
+
+        return name;
+    }
     private void FillWindow(int windowID)
     {
         _boxStyle = GUI.skin.GetStyle("Box");
@@ -175,8 +184,6 @@ public class ModListUI : KerbalMonoBehaviour
             GUILayout.Height((float)(_windowHeight * 0.8)),
             GUILayout.Width(300)
         );
-
-        GUILayout.Label("");
         if (_showSupportList)
         {
             if (GUILayout.Button("SpaceWarp Mods ▼", _unmanagedHeaderStyle))
@@ -197,19 +204,19 @@ public class ModListUI : KerbalMonoBehaviour
             foreach (var mod in SpaceWarpManager.SpaceWarpPlugins)
                 if (SpaceWarpManager.ModsUnsupported[mod.SpaceWarpMetadata.ModID])
                 {
-                    if (!GUILayout.Button(mod.SpaceWarpMetadata.Name, _unsupportedModStyle)) continue;
+                    if (!GUILayout.Button(Trim(mod.SpaceWarpMetadata.Name), _unsupportedModStyle)) continue;
                     _selectedBepIn = false;
                     _selectedMetaData = mod.SpaceWarpMetadata;
                 }
                 else if (SpaceWarpManager.ModsOutdated[mod.SpaceWarpMetadata.ModID])
                 {
-                    if (!GUILayout.Button(mod.SpaceWarpMetadata.Name, _outdatedModStyle)) continue;
+                    if (!GUILayout.Button(Trim(mod.SpaceWarpMetadata.Name), _outdatedModStyle)) continue;
                     _selectedBepIn = false;
                     _selectedMetaData = mod.SpaceWarpMetadata;
                 }
                 else
                 {
-                    if (!GUILayout.Button(mod.SpaceWarpMetadata.Name)) continue;
+                    if (!GUILayout.Button(Trim(mod.SpaceWarpMetadata.Name))) continue;
                     _selectedBepIn = false;
                     _selectedMetaData = mod.SpaceWarpMetadata;
                 }
@@ -236,26 +243,26 @@ public class ModListUI : KerbalMonoBehaviour
             foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
                 if (SpaceWarpManager.ModsUnsupported[info.ModID])
                 {
-                    if (!GUILayout.Button(info.Name, _unsupportedModStyle)) continue;
+                    if (!GUILayout.Button(Trim(info.Name), _unsupportedModStyle)) continue;
                     _selectedBepIn = false;
                     _selectedMetaData = info;
                 }
                 else if (SpaceWarpManager.ModsOutdated[info.ModID])
                 {
-                    if (!GUILayout.Button(info.Name, _outdatedModStyle)) continue;
+                    if (!GUILayout.Button(Trim(info.Name), _outdatedModStyle)) continue;
                     _selectedBepIn = false;
                     _selectedMetaData = info;
                 }
                 else
                 {
-                    if (!GUILayout.Button(info.Name)) continue;
+                    if (!GUILayout.Button(Trim(info.Name))) continue;
                     _selectedBepIn = false;
                     _selectedMetaData = info;
                 }
 
             foreach (var mod in SpaceWarpManager.NonSpaceWarpPlugins)
             {
-                if (!GUILayout.Button(mod.Info.Metadata.Name)) continue;
+                if (!GUILayout.Button(Trim(mod.Info.Metadata.Name))) continue;
                 _selectedBepIn = true;
                 _selectedBepInMetadata = mod.Info.Metadata;
             }
