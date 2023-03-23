@@ -54,7 +54,7 @@ internal static class AssetHelpers
 
         if (languageSourceData != null)
         {
-            languageSourceData.OnMissingTranslation = LanguageSourceData.MissingTranslationAction.ShowWarning;
+            languageSourceData.OnMissingTranslation = LanguageSourceData.MissingTranslationAction.ShowTerm;
             //Debug dump all the terms
             SpaceWarpManager.Logger.LogInfo("Dumping language source data");
             foreach (var term in languageSourceData.mTerms)
