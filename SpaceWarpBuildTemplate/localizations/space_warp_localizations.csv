@@ -1,0 +1,14 @@
+Key,Type,Description,English
+SpaceWarp/ModList/Header,Text,,spacewarp.modlist
+SpaceWarp/ModList/SpaceWarpMods,Text,,SpaceWarp Mods
+SpaceWarp/ModList/UnmanagedMods,Text,,Unmanaged Mods
+SpaceWarp/ModList/Version,Text,,Version
+SpaceWarp/ModList/Author,Text,,Author
+SpaceWarp/ModList/outdated,Text,,outdated
+SpaceWarp/ModList/Source,Text,,Source
+SpaceWarp/ModList/Description,Text,,Description
+SpaceWarp/ModList/KSP2Version,Text,,KSP2 Version
+SpaceWarp/ModList/Dependencies,Text,,Dependencies
+SpaceWarp/ModList/OpenConfigManager,Text,,Open Configuration Manager
+SpaceWarp/ModList/unsupported,Text,,unsupported
+SpaceWarp/Mods,Text,,Mods

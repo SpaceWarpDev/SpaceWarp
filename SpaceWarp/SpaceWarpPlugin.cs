@@ -8,6 +8,7 @@ using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using I2.Loc;
 using KSP.Messages;
 using Newtonsoft.Json;
 using SpaceWarp.API.Game.Messages;
@@ -177,6 +178,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         consoleUIObject.AddComponent<SpaceWarpConsole>();
         consoleUIObject.SetActive(true);
 
-        MainMenu.RegisterMenuButton("mods", SpaceWarpManager.ModListUI.ToggleVisible);
+        MainMenu.RegisterLocalizedMenuButton("SpaceWarp/Mods", SpaceWarpManager.ModListUI.ToggleVisible);
     }
 }
