@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using I2.Loc;
 using KSP.Game;
 using SpaceWarp.API.Mods.JSON;
 using UnityEngine;
@@ -7,7 +8,19 @@ namespace SpaceWarp.UI;
 
 public class ModListUI : KerbalMonoBehaviour
 {
-    private const string ModListHeader = "spacewarp.modlist";
+    // private const string ModListHeader = "spacewarp.modlist";
+    private static LocalizedString _modListHeader = "SpaceWarp/ModList/Header";
+    private static LocalizedString _spaceWarpMods = "SpaceWarp/ModList/SpaceWarpMods";
+    private static LocalizedString _unmanagedMods = "SpaceWarp/ModList/UnmanagedMods";
+    private static LocalizedString _version = "SpaceWarp/ModList/Version";
+    private static LocalizedString _author = "SpaceWarp/ModList/Author";
+    private static LocalizedString _outdated = "SpaceWarp/ModList/outdated";
+    private static LocalizedString _source = "SpaceWarp/ModList/Source";
+    private static LocalizedString _description = "SpaceWarp/ModList/Description";
+    private static LocalizedString _ksp2Version = "SpaceWarp/ModList/KSP2Version";
+    private static LocalizedString _dependencies = "SpaceWarp/ModList/Dependencies";
+    private static LocalizedString _openConfigManager = "SpaceWarp/ModList/OpenConfigManager";
+    private static LocalizedString _unsupported = "SpaceWarp/ModList/unsupported";
     private static bool _loaded;
 
     private static GUIStyle _boxStyle;
@@ -152,7 +165,7 @@ public class ModListUI : KerbalMonoBehaviour
         var width = GUILayout.Width((float)(_windowWidth * 0.8));
         var height = GUILayout.Height((float)(_windowHeight * 0.8));
 
-        _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, ModListHeader, width, height);
+        _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, _modListHeader, width, height);
     }
 
     private static string Trim(string name)
@@ -186,14 +199,14 @@ public class ModListUI : KerbalMonoBehaviour
         );
         if (_showSupportList)
         {
-            if (GUILayout.Button("SpaceWarp Mods ▼", _unmanagedHeaderStyle))
+            if (GUILayout.Button($"{_spaceWarpMods} ▼", _unmanagedHeaderStyle))
             {
                 _showSupportList = !_showSupportList;
             }
         }
         else
         {
-            if (GUILayout.Button("SpaceWarp Mods ▲", _unmanagedHeaderStyle))
+            if (GUILayout.Button($"{_spaceWarpMods} ▲", _unmanagedHeaderStyle))
             {
                 _showSupportList = !_showSupportList;
             }
@@ -225,14 +238,14 @@ public class ModListUI : KerbalMonoBehaviour
         GUILayout.Label("");
         if (_showUnmanagedMods)
         {
-            if (GUILayout.Button("Unmanaged Mods ▼", _unmanagedHeaderStyle))
+            if (GUILayout.Button($"{_unmanagedMods} ▼", _unmanagedHeaderStyle))
             {
                 _showUnmanagedMods = !_showUnmanagedMods;
             }
         }
         else
         {
-            if (GUILayout.Button("Unmanaged Mods ▲", _unmanagedHeaderStyle))
+            if (GUILayout.Button($"{_unmanagedMods} ▲", _unmanagedHeaderStyle))
             {
                 _showUnmanagedMods = !_showUnmanagedMods;
             }
@@ -277,7 +290,7 @@ public class ModListUI : KerbalMonoBehaviour
                 GUILayout.BeginVertical();
                 _scrollPositionInfo = GUILayout.BeginScrollView(_scrollPositionInfo, false, false);
                 GUILayout.Label($"{_selectedBepInMetadata.Name} (guid: {_selectedBepInMetadata.GUID})");
-                GUILayout.Label($"Version: {_selectedBepInMetadata.Version}");
+                GUILayout.Label($"{_version}: {_selectedBepInMetadata.Version}");
                 GUILayout.EndScrollView();
                 GUILayout.EndVertical();
             }
@@ -289,16 +302,16 @@ public class ModListUI : KerbalMonoBehaviour
                 GUILayout.BeginVertical();
                 _scrollPositionInfo = GUILayout.BeginScrollView(_scrollPositionInfo, false, false);
                 GUILayout.Label($"{_selectedMetaData.Name} (id: {_selectedMetaData.ModID})");
-                GUILayout.Label($"Author: {_selectedMetaData.Author}");
+                GUILayout.Label($"{_author}: {_selectedMetaData.Author}");
                 GUILayout.Label(SpaceWarpManager.ModsOutdated[_selectedMetaData.ModID]
-                    ? $"Version: {_selectedMetaData.Version} (outdated)"
-                    : $"Version: {_selectedMetaData.Version}");
+                    ? $"{_version}: {_selectedMetaData.Version} ({_outdated})"
+                    : $"{_version}: {_selectedMetaData.Version}");
                 GUILayout.Label($"Source: {_selectedMetaData.Source}");
                 GUILayout.Label($"Description: {_selectedMetaData.Description}");
                 GUILayout.Label(SpaceWarpManager.ModsUnsupported[_selectedMetaData.ModID]
-                    ? $"KSP2 Version: {_selectedMetaData.SupportedKsp2Versions.Min} - {_selectedMetaData.SupportedKsp2Versions.Max} (unsupported)"
-                    : $"KSP2 Version: {_selectedMetaData.SupportedKsp2Versions.Min} - {_selectedMetaData.SupportedKsp2Versions.Max}");
-                GUILayout.Label("Dependencies");
+                    ? $"{_ksp2Version}: {_selectedMetaData.SupportedKsp2Versions.Min} - {_selectedMetaData.SupportedKsp2Versions.Max} ({_unsupported})"
+                    : $"{_ksp2Version}: {_selectedMetaData.SupportedKsp2Versions.Min} - {_selectedMetaData.SupportedKsp2Versions.Max}");
+                GUILayout.Label(_dependencies);
 
                 foreach (var dependency in _selectedMetaData.Dependencies)
                     GUILayout.Label($"{dependency.ID}: {dependency.Version.Min} - {dependency.Version.Max}");
@@ -309,7 +322,7 @@ public class ModListUI : KerbalMonoBehaviour
         }
 
         GUILayout.EndHorizontal();
-        if (GUILayout.Button("Open Configuration Manager"))
+        if (GUILayout.Button(_openConfigManager))
         {
             SpaceWarpManager.ConfigurationManager.DisplayingWindow =
                 !SpaceWarpManager.ConfigurationManager.DisplayingWindow;

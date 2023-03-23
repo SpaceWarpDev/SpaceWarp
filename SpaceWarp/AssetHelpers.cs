@@ -50,9 +50,11 @@ internal static class AssetHelpers
             var i2CsvData = File.ReadAllText(i2CsvFile.FullName);
             languageSourceData.Import_I2CSV("", i2CsvData, eSpreadsheetUpdateMode.AddNewTerms);
         }
+        
 
         if (languageSourceData != null)
         {
+            languageSourceData.OnMissingTranslation = LanguageSourceData.MissingTranslationAction.ShowTerm;
             SpaceWarpManager.Logger.LogInfo($"Loaded localizations from {folder}");
             LocalizationManager.AddSource(languageSourceData);
         }

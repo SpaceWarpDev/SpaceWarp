@@ -1,5 +1,6 @@
 ﻿using BepInEx.Bootstrap;
 using BepInEx.Logging;
+using I2.Loc;
 using KSP.Game;
 using KSP.UI.Binding;
 using SpaceWarp.API.Assets;
@@ -26,6 +27,12 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
     private Rect _windowRect;
 
     private int _windowWidth = 350;
+
+    private static LocalizedString _header = "SpaceWarp/Console/Header";
+    private static LocalizedString _clear = "SpaceWarp/Console/Clear";
+    private static LocalizedString _autoScrollText = "SpaceWarp/Console/AutoScroll";
+    private static LocalizedString _on = "SpaceWarp/Console/On";
+    private static LocalizedString _off = "SpaceWarp/Console/Off";
 
 
     private void Awake()
@@ -83,7 +90,7 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         var width = GUILayout.Width((float)(_windowWidth * 0.8));
         var height = GUILayout.Height((float)(_windowHeight * 0.8));
 
-        _windowRect = GUILayout.Window(controlID, _windowRect, DrawConsole, "SPACE WARP - Console", width, height);
+        _windowRect = GUILayout.Window(controlID, _windowRect, DrawConsole, _header, width, height);
     }
 
     private void DrawConsole(int windowID)
@@ -126,9 +133,9 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         GUILayout.EndScrollView();
         GUILayout.BeginHorizontal();
 
-        if (GUILayout.Button("Clear")) SpaceWarpConsoleLogListener.DebugMessages.Clear();
+        if (GUILayout.Button(_clear)) SpaceWarpConsoleLogListener.DebugMessages.Clear();
 
-        if (GUILayout.Button(_autoScroll ? "Auto Scroll: On" : "Auto Scroll: Off"))
+        if (GUILayout.Button(_autoScroll ? $"{_autoScrollText}: {_on}" : $"{_autoScrollText}: {_off}"))
             //Todo: Add proper close button to top corner and add input lock button back. 
             // GameManager.Instance.Game.ViewController.inputLockManager.ClearControlLocks();
             _autoScroll = !_autoScroll;
