@@ -21,7 +21,10 @@ internal sealed class LoadAddressablesLocalizationsAction : FlowAction
             GameManager.Instance.Game.Assets.LoadByLabel("language_source",
                 OnLanguageSourceAssetLoaded, delegate(IList<LanguageSourceAsset> languageAssetLocations)
                 {
-                    if (languageAssetLocations != null) Addressables.Release(languageAssetLocations);
+                    if (languageAssetLocations != null)
+                    {
+                        Addressables.Release(languageAssetLocations);
+                    }
 
                     resolve();
                 });
@@ -35,7 +38,11 @@ internal sealed class LoadAddressablesLocalizationsAction : FlowAction
 
     private static void OnLanguageSourceAssetLoaded(LanguageSourceAsset asset)
     {
-        if (!asset || LocalizationManager.Sources.Contains(asset.mSource)) return;
+        if (!asset || LocalizationManager.Sources.Contains(asset.mSource))
+        {
+            return;
+        }
+
         asset.mSource.owner = asset;
         LocalizationManager.AddSource(asset.mSource);
     }

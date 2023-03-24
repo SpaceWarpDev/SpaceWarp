@@ -12,7 +12,10 @@ public static class VersionUtility
     /// <returns>toCheck >= version</returns>
     public static bool IsVersionAbove(string version, string toCheck)
     {
-        if (version == "") return true;
+        if (version == "")
+        {
+            return true;
+        }
 
         var semanticVersion = toCheck.Split('.');
         var requiredVersion = version.Split('.');
@@ -28,7 +31,10 @@ public static class VersionUtility
     /// <returns>toCheck is less than or equal to version</returns>
     public static bool IsVersionBelow(string version, string toCheck)
     {
-        if (version == "") return true;
+        if (version == "")
+        {
+            return true;
+        }
 
         var semanticVersion = toCheck.Split('.');
         var requiredVersion = version.Split('.');
@@ -54,14 +60,23 @@ public static class VersionUtility
             var version1PartString = i < version1Parts.Length ? version1Parts[i] : "0";
             var version2PartString = i < version2Parts.Length ? version2Parts[i] : "0";
 
-            if (version1PartString == "*" || version2PartString == "*") break;
+            if (version1PartString == "*" || version2PartString == "*")
+            {
+                break;
+            }
 
             var version1Part = int.Parse(version1PartString);
             var version2Part = int.Parse(version2PartString);
 
-            if (version1Part > version2Part) return 1;
+            if (version1Part > version2Part)
+            {
+                return 1;
+            }
 
-            if (version1Part < version2Part) return -1;
+            if (version1Part < version2Part)
+            {
+                return -1;
+            }
         }
 
         return 0;

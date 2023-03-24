@@ -8,7 +8,6 @@ using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
-using I2.Loc;
 using KSP.Messages;
 using Newtonsoft.Json;
 using SpaceWarp.API.Game.Messages;
@@ -17,6 +16,7 @@ using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI;
 using SpaceWarp.API.Versions;
 using SpaceWarp.UI;
+using SpaceWarp.UI.Debug;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -102,9 +102,13 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
 
         if (ConfigCheckVersions.Value)
+        {
             CheckVersions();
+        }
         else
+        {
             ClearVersions();
+        }
 
         SpaceWarpManager.CheckKspVersions();
     }
@@ -112,21 +116,34 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public void ClearVersions()
     {
         foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+        {
             SpaceWarpManager.ModsOutdated[plugin.SpaceWarpMetadata.ModID] = false;
+        }
 
-        foreach (var info in SpaceWarpManager.NonSpaceWarpInfos) SpaceWarpManager.ModsOutdated[info.ModID] = false;
+        foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
+        {
+            SpaceWarpManager.ModsOutdated[info.ModID] = false;
+        }
     }
 
     public void CheckVersions()
     {
         ClearVersions();
         foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+        {
             if (plugin.SpaceWarpMetadata.VersionCheck != null)
+            {
                 StartCoroutine(CheckVersion(plugin.SpaceWarpMetadata));
+            }
+        }
 
         foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
+        {
             if (info.VersionCheck != null)
+            {
                 StartCoroutine(CheckVersion(info));
+            }
+        }
     }
 
     private static bool OlderThan(string currentVersion, string onlineVersion)
@@ -149,7 +166,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             try
             {
                 var checkInfo = JsonConvert.DeserializeObject<ModInfo>(results);
-                if (!checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion)) yield break;
+                if (!checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion))
+                {
+                    yield break;
+                }
+
                 SpaceWarpManager.ModsOutdated[pluginInfo.ModID] = OlderThan(pluginInfo.Version, checkInfo.Version);
             }
             catch (Exception e)

@@ -107,8 +107,15 @@ public static class Appbar
     /// <returns>The Texture2D converted to a Sprite</returns>
     public static Sprite GetAppBarIconFromTexture(Texture2D texture, int width = 0, int height = 0)
     {
-        if (width == 0) width = texture.width;
-        if (height == 0) height = texture.height;
+        if (width == 0)
+        {
+            width = texture.width;
+        }
+
+        if (height == 0)
+        {
+            height = texture.height;
+        }
 
         return Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f));
     }
@@ -127,12 +134,16 @@ public static class Appbar
     internal static void LoadAllButtons()
     {
         foreach (var button in ButtonsToBeLoaded)
+        {
             AppbarBackend.AddButton(button.text, button.icon, button.ID, button.action);
+        }
     }
 
     internal static void LoadOABButtons()
     {
         foreach (var button in OABButtonsToBeLoaded)
+        {
             AppbarBackend.AddOABButton(button.text, button.icon, button.ID, button.action);
+        }
     }
 }

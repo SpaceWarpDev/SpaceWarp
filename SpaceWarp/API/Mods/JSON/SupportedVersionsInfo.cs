@@ -15,7 +15,10 @@ public sealed class SupportedVersionsInfo
 
     public bool IsSupported(string toCheck)
     {
-        if (VersionUtility.CompareSemanticVersionStrings(toCheck, Min) < 0) return false;
+        if (VersionUtility.CompareSemanticVersionStrings(toCheck, Min) < 0)
+        {
+            return false;
+        }
 
         return VersionUtility.CompareSemanticVersionStrings(toCheck, Max) <= 0;
     }

@@ -21,10 +21,15 @@ public static class AssetManager
         {
             var assetName = name;
 
-            if (assetName.ToLower().StartsWith("assets/")) assetName = assetName["assets/".Length..];
+            if (assetName.ToLower().StartsWith("assets/"))
+            {
+                assetName = assetName["assets/".Length..];
+            }
 
             if (assetName.ToLower().StartsWith(assetBundleName + "/"))
+            {
                 assetName = assetName[(assetBundleName.Length + 1)..];
+            }
 
             var path = modId + "/" + assetBundleName + "/" + assetName;
             path = path.ToLower();
@@ -77,15 +82,21 @@ public static class AssetManager
         path = path.ToLower();
         var subPaths = path.Split('/', '\\');
         if (subPaths.Length < 3)
+        {
             throw new ArgumentException(
                 "Invalid path, asset paths must follow to following structure: {mod_id}/{asset_bundle}/{asset_path}");
+        }
 
         if (!AllAssets.TryGetValue(path, out var value))
+        {
             throw new IndexOutOfRangeException($"Unable to find asset at path \"{path}\"");
+        }
 
         if (value is not T tValue)
+        {
             throw new InvalidCastException(
                 $"The asset at path {path} isn't of type {typeof(T).Name} but of type {value.GetType().Name}");
+        }
 
         return tValue;
     }
@@ -103,9 +114,20 @@ public static class AssetManager
         asset = null;
         var subPaths = path.Split('/', '\\');
 
-        if (subPaths.Length < 3) return false;
-        if (!AllAssets.TryGetValue(path, out var value)) return false;
-        if (value is not T tValue) return false;
+        if (subPaths.Length < 3)
+        {
+            return false;
+        }
+
+        if (!AllAssets.TryGetValue(path, out var value))
+        {
+            return false;
+        }
+
+        if (value is not T tValue)
+        {
+            return false;
+        }
 
         asset = tValue;
 

@@ -20,7 +20,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using static SpaceWarp.Backend.UI.Appbar.AppbarBackend;
-using Logger = BepInEx.Logging.Logger;
 
 namespace SpaceWarp.Backend.UI.Appbar;
 
@@ -85,7 +84,10 @@ internal static class AppbarBackend
         text.text = buttonText;
 
         var localizer = text.gameObject.GetComponent<Localize>();
-        if (localizer) UnityObject.Destroy(localizer);
+        if (localizer)
+        {
+            UnityObject.Destroy(localizer);
+        }
 
         // Change the icon.
         var icon = appButton.GetChild("Content").GetChild("GRP-icon");
@@ -109,7 +111,9 @@ internal static class AppbarBackend
     public static void SetTrayState(bool state)
     {
         if (_trayState == null)
+        {
             return;
+        }
 
         _trayState.SetValue(state);
     }
@@ -125,7 +129,9 @@ internal static class AppbarBackend
         get
         {
             if (_oabTray == null)
+            {
                 return _oabTray = CreateOABTray();
+            }
 
             return _oabTray;
         }
@@ -203,7 +209,10 @@ internal static class AppbarBackend
         {
             var child = oabTray.transform.GetChild(i);
 
-            if (child.name.Contains("ELE-border")) continue;
+            if (child.name.Contains("ELE-border"))
+            {
+                continue;
+            }
 
             UnityObject.Destroy(child.gameObject);
         }
@@ -237,7 +246,10 @@ internal static class AppbarBackend
         text.text = buttonText;
 
         var localizer = text.gameObject.GetComponent<Localize>();
-        if (localizer) UnityObject.Destroy(localizer);
+        if (localizer)
+        {
+            UnityObject.Destroy(localizer);
+        }
 
         // Change the icon.
         var icon = appButton.GetChild("Content").GetChild("GRP-icon");
@@ -261,7 +273,10 @@ internal static class AppbarBackend
 
     private static void SetOABTrayState(bool state)
     {
-        if (_oabTray == null) return;
+        if (_oabTray == null)
+        {
+            return;
+        }
 
         _oabState.SetValue(state);
     }
