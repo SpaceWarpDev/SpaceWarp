@@ -58,6 +58,9 @@
     <ItemGroup>
         <PackageReference Include="PolySharp" Version="1.12.1" PrivateAssets="all" />
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\ChainloaderPatcher\ChainloaderPatcher.csproj" />
+    </ItemGroup>
     <PropertyGroup>
         <PolySharpIncludeGeneratedTypes>
             System.Index;

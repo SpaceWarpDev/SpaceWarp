@@ -1,7 +1,11 @@
 Key,Type,Description,English,Portuguese BR
+SpaceWarp/ModList/EnableAll,Text,,Enable All,EnableAll
+SpaceWarp/ModList/DisableAll,Text,,Disable All,DisableAll
+SpaceWarp/ModList/RevertChanges,Text,,Revert Changes,RevertChanges
 SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist
 SpaceWarp/ModList/SpaceWarpMods,Text,,SpaceWarp Mods,Mods de SpaceWarp
 SpaceWarp/ModList/UnmanagedMods,Text,,Unmanaged Mods,Mods externos
+SpaceWarp/ModList/DisabledMods,Text,,Disabled Mods,DisabledMods
 SpaceWarp/ModList/Version,Text,,Version,Versão
 SpaceWarp/ModList/Author,Text,,Author,Autor
 SpaceWarp/ModList/outdated,Text,,outdated,Desatualizado
