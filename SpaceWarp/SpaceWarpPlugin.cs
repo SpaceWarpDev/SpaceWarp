@@ -114,7 +114,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             SpaceWarpManager.ModsOutdated[plugin.SpaceWarpMetadata.ModID] = false;
 
-        foreach (var info in SpaceWarpManager.NonSpaceWarpInfos) SpaceWarpManager.ModsOutdated[info.ModID] = false;
+        foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
+            SpaceWarpManager.ModsOutdated[info.Item2.ModID] = false;
     }
 
     public void CheckVersions()
@@ -125,8 +126,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
                 StartCoroutine(CheckVersion(plugin.SpaceWarpMetadata));
 
         foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
-            if (info.VersionCheck != null)
-                StartCoroutine(CheckVersion(info));
+            if (info.Item2.VersionCheck != null)
+                StartCoroutine(CheckVersion(info.Item2));
     }
 
     private static bool OlderThan(string currentVersion, string onlineVersion)

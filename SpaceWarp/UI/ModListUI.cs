@@ -1,4 +1,8 @@
-﻿using BepInEx;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using BepInEx;
+using ChainloaderPatcher;
 using I2.Loc;
 using KSP.Game;
 using SpaceWarp.API.Mods.JSON;
@@ -9,9 +13,13 @@ namespace SpaceWarp.UI;
 public class ModListUI : KerbalMonoBehaviour
 {
     // private const string ModListHeader = "spacewarp.modlist";
+    private static LocalizedString _enableAll = "SpaceWarp/ModList/EnableAll";
+    private static LocalizedString _disableAll = "SpaceWarp/ModList/DisableAll";
+    private static LocalizedString _revertChanges = "SpaceWarp/ModList/RevertChanges";
     private static LocalizedString _modListHeader = "SpaceWarp/ModList/Header";
     private static LocalizedString _spaceWarpMods = "SpaceWarp/ModList/SpaceWarpMods";
     private static LocalizedString _unmanagedMods = "SpaceWarp/ModList/UnmanagedMods";
+    private static LocalizedString _disabledMods = "SpaceWarp/ModList/DisabledMods";
     private static LocalizedString _version = "SpaceWarp/ModList/Version";
     private static LocalizedString _author = "SpaceWarp/ModList/Author";
     private static LocalizedString _outdated = "SpaceWarp/ModList/outdated";
@@ -21,7 +29,13 @@ public class ModListUI : KerbalMonoBehaviour
     private static LocalizedString _dependencies = "SpaceWarp/ModList/Dependencies";
     private static LocalizedString _openConfigManager = "SpaceWarp/ModList/OpenConfigManager";
     private static LocalizedString _unsupported = "SpaceWarp/ModList/unsupported";
+    
     private static bool _loaded;
+    
+    private bool _drawUI;
+    private int _windowHeight = 700;
+    private int _windowWidth = 350;
+    private Rect _windowRect;
 
     private static GUIStyle _boxStyle;
     private static Vector2 _scrollPositionMods;
@@ -29,19 +43,19 @@ public class ModListUI : KerbalMonoBehaviour
     private static GUIStyle _closeButtonStyle;
     private static GUIStyle _outdatedModStyle;
     private static GUIStyle _unsupportedModStyle;
-    private static GUIStyle _unmanagedHeaderStyle;
+    private static GUIStyle _headerStyle;
 
-    private bool _drawUI;
-    private bool _showSupportList = true;
+    private bool _showSupportedMods = true;
     private bool _showUnmanagedMods = true;
-    
+    private bool _showDisabledMods = true;
+
     private bool _selectedBepIn;
     private BepInPlugin _selectedBepInMetadata;
     private ModInfo _selectedMetaData;
     
-    private int _windowHeight = 700;
-    private int _windowWidth = 350;
-    private Rect _windowRect;
+    private List<(string, bool)> _toggles = new();
+    private List<(string, bool)> _initialToggles = new();
+    private readonly Dictionary<string, bool> _wasToggledDict = new();
 
     private void Awake()
     {
@@ -65,6 +79,8 @@ public class ModListUI : KerbalMonoBehaviour
         if (_loaded) Destroy(this);
 
         _loaded = true;
+        _initialToggles = SpaceWarpManager.PluginGuidEnabledStatus.ToList();
+        _toggles = _initialToggles;
     }
 
     private void Update()
@@ -156,7 +172,7 @@ public class ModListUI : KerbalMonoBehaviour
                 textColor = Color.red
             }
         };
-        _unmanagedHeaderStyle ??= new GUIStyle(GUI.skin.label)
+        _headerStyle ??= new GUIStyle(GUI.skin.label)
         {
             fontStyle = FontStyle.Bold,
             alignment = TextAnchor.MiddleCenter
@@ -177,6 +193,7 @@ public class ModListUI : KerbalMonoBehaviour
 
         return name;
     }
+    
     private void FillWindow(int windowID)
     {
         _boxStyle = GUI.skin.GetStyle("Box");
@@ -197,55 +214,91 @@ public class ModListUI : KerbalMonoBehaviour
             GUILayout.Height((float)(_windowHeight * 0.8)),
             GUILayout.Width(300)
         );
-        if (_showSupportList)
+        
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button(_disableAll))
         {
-            if (GUILayout.Button($"{_spaceWarpMods} ▼", _unmanagedHeaderStyle))
+            for (int i = 0; i < _toggles.Count; i++)
             {
-                _showSupportList = !_showSupportList;
+                _toggles[i] = (_toggles[i].Item1, false);
+            }
+        }
+        
+        if (GUILayout.Button(_enableAll))
+        {
+            for (int i = 0; i < _toggles.Count; i++)
+            {
+                _toggles[i] = (_toggles[i].Item1, true);
+            }
+        }
+        GUILayout.EndHorizontal();
+        
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button(_revertChanges))
+        {
+            // Replace _toggles list with backup copy
+            _toggles = new List<(string, bool)>(_initialToggles);
+            UpdateDisabledFile();
+        }
+        GUILayout.EndHorizontal();
+        
+        int numChanges = 0;
+        for (int i = 0; i < _toggles.Count; i++)
+        {
+            if (_toggles[i].Item2 != _initialToggles[i].Item2)
+            {
+                numChanges++;
+            }
+        }
+    
+        if (numChanges > 0)
+        {
+            GUILayout.Label($"{numChanges} changes detected, please restart to apply them");
+        }
+
+        
+        if (_showSupportedMods)
+        {
+            if (GUILayout.Button($"{_spaceWarpMods} ▼", _headerStyle))
+            {
+                _showSupportedMods = !_showSupportedMods;
             }
         }
         else
         {
-            if (GUILayout.Button($"{_spaceWarpMods} ▲", _unmanagedHeaderStyle))
+            if (GUILayout.Button($"{_spaceWarpMods} ▲", _headerStyle))
             {
-                _showSupportList = !_showSupportList;
+                _showSupportedMods = !_showSupportedMods;
             }
         }
 
-        if (_showSupportList)
+        if (_showSupportedMods)
         {
             foreach (var mod in SpaceWarpManager.SpaceWarpPlugins)
-                if (SpaceWarpManager.ModsUnsupported[mod.SpaceWarpMetadata.ModID])
+            {
+                var style = SpaceWarpManager.ModsUnsupported[mod.SpaceWarpMetadata.ModID] ? _unsupportedModStyle
+                    : SpaceWarpManager.ModsOutdated[mod.SpaceWarpMetadata.ModID] ? _outdatedModStyle
+                    : null;
+
+                DrawModListItem(mod.Info.Metadata.GUID, mod.SpaceWarpMetadata.Name, () =>
                 {
-                    if (!GUILayout.Button(Trim(mod.SpaceWarpMetadata.Name), _unsupportedModStyle)) continue;
                     _selectedBepIn = false;
                     _selectedMetaData = mod.SpaceWarpMetadata;
-                }
-                else if (SpaceWarpManager.ModsOutdated[mod.SpaceWarpMetadata.ModID])
-                {
-                    if (!GUILayout.Button(Trim(mod.SpaceWarpMetadata.Name), _outdatedModStyle)) continue;
-                    _selectedBepIn = false;
-                    _selectedMetaData = mod.SpaceWarpMetadata;
-                }
-                else
-                {
-                    if (!GUILayout.Button(Trim(mod.SpaceWarpMetadata.Name))) continue;
-                    _selectedBepIn = false;
-                    _selectedMetaData = mod.SpaceWarpMetadata;
-                }
+                }, style);
+            }
         }
 
         GUILayout.Label("");
         if (_showUnmanagedMods)
         {
-            if (GUILayout.Button($"{_unmanagedMods} ▼", _unmanagedHeaderStyle))
+            if (GUILayout.Button($"{_unmanagedMods} ▼", _headerStyle))
             {
                 _showUnmanagedMods = !_showUnmanagedMods;
             }
         }
         else
         {
-            if (GUILayout.Button($"{_unmanagedMods} ▲", _unmanagedHeaderStyle))
+            if (GUILayout.Button($"{_unmanagedMods} ▲", _headerStyle))
             {
                 _showUnmanagedMods = !_showUnmanagedMods;
             }
@@ -253,31 +306,67 @@ public class ModListUI : KerbalMonoBehaviour
 
         if (_showUnmanagedMods)
         {
-            foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
-                if (SpaceWarpManager.ModsUnsupported[info.ModID])
+            foreach (var (plugin, info) in SpaceWarpManager.NonSpaceWarpInfos)
+            {
+                var style = SpaceWarpManager.ModsUnsupported[info.ModID] ? _unsupportedModStyle
+                    : SpaceWarpManager.ModsOutdated[info.ModID] ? _outdatedModStyle
+                    : null;
+
+                DrawModListItem(plugin.Info.Metadata.GUID, info.Name, () =>
                 {
-                    if (!GUILayout.Button(Trim(info.Name), _unsupportedModStyle)) continue;
                     _selectedBepIn = false;
                     _selectedMetaData = info;
-                }
-                else if (SpaceWarpManager.ModsOutdated[info.ModID])
-                {
-                    if (!GUILayout.Button(Trim(info.Name), _outdatedModStyle)) continue;
-                    _selectedBepIn = false;
-                    _selectedMetaData = info;
-                }
-                else
-                {
-                    if (!GUILayout.Button(Trim(info.Name))) continue;
-                    _selectedBepIn = false;
-                    _selectedMetaData = info;
-                }
+                }, style);
+            }
 
             foreach (var mod in SpaceWarpManager.NonSpaceWarpPlugins)
             {
-                if (!GUILayout.Button(Trim(mod.Info.Metadata.Name))) continue;
-                _selectedBepIn = true;
-                _selectedBepInMetadata = mod.Info.Metadata;
+                DrawModListItem(mod.Info.Metadata.GUID, mod.Info.Metadata.Name, () =>
+                {
+                    _selectedBepIn = true;
+                    _selectedBepInMetadata = mod.Info.Metadata;
+                });
+            }
+        }
+
+        GUILayout.Label("");
+        if (_showDisabledMods)
+        {
+            if (GUILayout.Button($"{_disabledMods} ▼", _headerStyle))
+            {
+                _showDisabledMods = !_showDisabledMods;
+            }
+        }
+        else
+        {
+            if (GUILayout.Button($"{_disabledMods} ▲", _headerStyle))
+            {
+                _showDisabledMods = !_showDisabledMods;
+            }
+        }
+
+        if (_showDisabledMods)
+        {
+            foreach (var (plugin, info) in SpaceWarpManager.DisabledInfoPlugins)
+            {
+                var style = SpaceWarpManager.ModsUnsupported[info.ModID] ? _unsupportedModStyle
+                    : SpaceWarpManager.ModsOutdated[info.ModID] ? _outdatedModStyle
+                    : null;
+
+                DrawModListItem(plugin.Metadata.GUID, info.Name, () =>
+                {
+                    _selectedBepIn = false;
+                    _selectedMetaData = info;
+                }, style);
+            }
+
+            foreach (var plugin in SpaceWarpManager.DisabledNonInfoPlugins)
+            {
+                DrawModListItem(plugin.Metadata.GUID, plugin.Metadata.Name, () =>
+                {
+                    _selectedBepIn = true;
+                    _selectedBepInMetadata = plugin.Metadata;
+                });
             }
         }
 
@@ -331,6 +420,43 @@ public class ModListUI : KerbalMonoBehaviour
 
         GUILayout.EndVertical();
         GUI.DragWindow();
+    }
+
+    private void DrawModListItem(string GUID, string modName, Action onSelected, GUIStyle style = null)
+    {
+        int toggleIndex = _toggles.FindIndex(t => t.Item1 == GUID);
+        bool isToggled = _toggles[toggleIndex].Item2; // current state of the toggle
+        bool wasToggled = _wasToggledDict.ContainsKey(GUID) && _wasToggledDict[GUID]; // previous state of the toggle (defaults to false if not found)
+
+        GUILayout.BeginHorizontal();
+        _toggles[toggleIndex] = (GUID, GUILayout.Toggle(isToggled, ""));
+
+        var buttonName = Trim(modName);
+        if (style == null ? GUILayout.Button(buttonName) : GUILayout.Button(buttonName, style))
+        {
+            onSelected();
+        }
+        GUILayout.EndHorizontal();
+        
+        // Edge detection
+        if (!isToggled && wasToggled) // falling edge
+        {
+            UpdateDisabledFile();
+        }
+        else if (isToggled && !wasToggled) // rising edge
+        {
+            UpdateDisabledFile();
+        }
+
+        _wasToggledDict[GUID] = isToggled; // update the previous state of the toggle
+    }
+
+    private void UpdateDisabledFile()
+    {
+        File.WriteAllLines(
+            ChainloaderPatch.DisabledPluginsFilepath,
+            _toggles.Where(item => !item.Item2).Select(item => item.Item1)
+        );
     }
 
     public void ToggleVisible()

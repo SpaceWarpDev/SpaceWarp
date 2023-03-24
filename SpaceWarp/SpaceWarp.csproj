@@ -42,13 +42,13 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" Publicize="true"/>
-        <PackageReference Include="HarmonyX" Version="2.10.1"/>
-        <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all"/>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.1"/>
-        <PackageReference Include="UnityEngine.Modules" Version="2020.3.33"/>
-        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all"/>
+        <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" Publicize="true" />
+        <PackageReference Include="HarmonyX" Version="2.10.1" />
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+        <PackageReference Include="UnityEngine.Modules" Version="2020.3.33" />
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all" />
     </ItemGroup>
 
     <!--
@@ -56,7 +56,10 @@
     Do not modify the included types without checking that they don't require runtime support that doesn't exist. 
     -->
     <ItemGroup>
-        <PackageReference Include="PolySharp" Version="1.12.1" PrivateAssets="all"/>
+        <PackageReference Include="PolySharp" Version="1.12.1" PrivateAssets="all" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\ChainloaderPatcher\ChainloaderPatcher.csproj" />
     </ItemGroup>
     <PropertyGroup>
         <PolySharpIncludeGeneratedTypes>
