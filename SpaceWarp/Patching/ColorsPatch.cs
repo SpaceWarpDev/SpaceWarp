@@ -75,7 +75,10 @@ internal class ColorsPatch
     private static bool Init(MethodBase original)
     {
         if (original is null)
+        {
             return true;
+        }
+
         _partHash = new Dictionary<string, Texture[]>();
         _propertyIds = new[]
         {
@@ -148,19 +151,24 @@ internal class ColorsPatch
         }
 
         if (LoadOnInit)
+        {
             foreach (var modGUID in DeclaredParts.Keys)
             {
                 LoadTextures(modGUID);
 
                 allPartsTemp.AddRange(DeclaredParts[modGUID].Select(partName => TrimPartName(partName)));
             }
+        }
 
         _allParts = allPartsTemp.ToArray();
     }
 
     private static bool TryAddUnique(string partName)
     {
-        if (_partHash.ContainsKey(partName)) return false;
+        if (_partHash.ContainsKey(partName))
+        {
+            return false;
+        }
 
         _partHash.Add(partName, new Texture[6]);
         return true;
@@ -217,20 +225,30 @@ internal class ColorsPatch
         {
             var texture = _partHash[trimmedPartName][i];
             if (texture is not null)
+            {
                 material.SetTexture(_propertyIds[i], texture);
+            }
         }
     }
 
     private static string TrimPartName(string partName)
     {
-        if (partName.Length < 3) return partName;
+        if (partName.Length < 3)
+        {
+            return partName;
+        }
+
         if (partName.EndsWith("XS")
             || partName.EndsWith("XL"))
+        {
             return partName.Remove(partName.Length - 2, 2);
+        }
 
         if (partName.EndsWith("S") || partName.EndsWith("M")
                                    || partName.EndsWith("L"))
+        {
             return partName.Remove(partName.Length - 1);
+        }
 
         return partName;
     }
@@ -246,19 +264,26 @@ internal class ColorsPatch
         nameof(Module_Color.OnInitialize))]
     public static void Postfix(Module_Color __instance)
     {
-        if (DeclaredParts.Count == 0) return;
+        if (DeclaredParts.Count == 0)
+        {
+            return;
+        }
 
         var partName = __instance.OABPart is not null ? __instance.OABPart.PartName : __instance.part.Name;
         var trimmedPartName = TrimPartName(partName);
 
         if (!_allParts.Contains(trimmedPartName))
             //SpaceWarpManager.Logger.LogError($"{partName} is not declared and onlyDeclareParts is enabled. Skipping."); //This will generate a LOT of logs
+        {
             return;
+        }
 
         foreach (var renderer in __instance.GetComponentsInChildren<MeshRenderer>(true))
         {
             if (renderer.material.shader.name != _unityStandard.name)
+            {
                 continue;
+            }
 
             var mat = new Material(_ksp2Opaque);
             SetTexturesToMaterial(trimmedPartName, ref mat);
@@ -266,7 +291,9 @@ internal class ColorsPatch
             renderer.material = mat;
 
             if (renderer.material.shader.name != _ksp2Opaque.name)
+            {
                 renderer.SetMaterial(mat); //Sometimes the material Set doesn't work, this seems to be more reliable.
+            }
         }
 
         __instance.SomeColorUpdated();

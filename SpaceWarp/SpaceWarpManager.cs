@@ -37,7 +37,11 @@ internal static class SpaceWarpManager
     {
         get
         {
-            if (!_skin) AssetManager.TryGetAsset("spacewarp/swconsoleui/spacewarpconsole.guiskin", out _skin);
+            if (!_skin)
+            {
+                AssetManager.TryGetAsset("spacewarp/swconsoleui/spacewarpconsole.guiskin", out _skin);
+            }
+
             return _skin;
         }
     }
@@ -79,7 +83,11 @@ internal static class SpaceWarpManager
         List<ModInfo> nonSWInfos = new();
         foreach (var plugin in allPlugins)
         {
-            if (spaceWarpPlugins.Contains(plugin as BaseSpaceWarpPlugin)) continue;
+            if (spaceWarpPlugins.Contains(plugin as BaseSpaceWarpPlugin))
+            {
+                continue;
+            }
+
             var folderPath = Path.GetDirectoryName(plugin.Info.Location);
             var modInfoPath = Path.Combine(folderPath!, "swinfo.json");
             if (File.Exists(modInfoPath))
@@ -113,10 +121,14 @@ internal static class SpaceWarpManager
         var kspVersion = typeof(VersionID).GetField("VERSION_TEXT", BindingFlags.Static | BindingFlags.Public)
             ?.GetValue(null) as string;
         foreach (var plugin in SpaceWarpPlugins)
+        {
             ModsUnsupported[plugin.SpaceWarpMetadata.ModID] =
                 !plugin.SpaceWarpMetadata.SupportedKsp2Versions.IsSupported(kspVersion);
+        }
 
         foreach (var info in NonSpaceWarpInfos)
+        {
             ModsUnsupported[info.ModID] = !info.SupportedKsp2Versions.IsSupported(kspVersion);
+        }
     }
 }

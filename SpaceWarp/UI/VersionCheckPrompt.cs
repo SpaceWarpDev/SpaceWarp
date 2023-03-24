@@ -11,10 +11,12 @@ internal class VersionCheckPrompt : MonoBehaviour
     private float _windowHeight;
     private Rect _windowRect;
     private float _windowWidth;
-    private static LocalizedString _spaceWarp = "SpaceWarp";
-    private static LocalizedString _versionChecking = "SpaceWarp/VersionChecking";
-    private static LocalizedString _yes = "SpaceWarp/Yes";
-    private static LocalizedString _no = "SpaceWarp/No";
+    
+    private static readonly LocalizedString SpaceWarp = "SpaceWarp";
+    private static readonly LocalizedString VersionChecking = "SpaceWarp/VersionChecking";
+    private static readonly LocalizedString Yes = "SpaceWarp/Yes";
+    private static readonly LocalizedString No = "SpaceWarp/No";
+    
     private void Awake()
     {
         const float minResolution = 1280f / 720f;
@@ -44,7 +46,7 @@ internal class VersionCheckPrompt : MonoBehaviour
         {
             fontSize = 8
         };
-        _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, _spaceWarp, width, height);
+        _windowRect = GUILayout.Window(controlID, _windowRect, FillWindow, SpaceWarp, width, height);
     }
 
     private void FillWindow(int windowID)
@@ -56,16 +58,20 @@ internal class VersionCheckPrompt : MonoBehaviour
         }
 
         GUILayout.BeginVertical();
-        GUILayout.Label(_versionChecking);
+        GUILayout.Label(VersionChecking);
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button(_yes))
+        
+        if (GUILayout.Button(Yes))
         {
             spaceWarpPlugin.CheckVersions();
             spaceWarpPlugin.ConfigCheckVersions.Value = true;
             Destroy(this);
         }
 
-        if (GUILayout.Button(_no)) Destroy(this);
+        if (GUILayout.Button(No))
+        {
+            Destroy(this);
+        }
 
         GUILayout.EndHorizontal();
         GUILayout.EndVertical();

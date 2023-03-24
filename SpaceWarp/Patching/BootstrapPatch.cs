@@ -31,7 +31,9 @@ internal static class BootstrapPatch
         ilCursor.EmitDelegate(static () =>
         {
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            {
                 GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
+            }
         });
 
         ilCursor.GotoLabel(endLabel, MoveType.Before);
@@ -49,10 +51,15 @@ internal static class BootstrapPatch
 
             flow.AddAction(new LoadAddressablesLocalizationsAction());
 
-            foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins) flow.AddAction(new InitializeModAction(plugin));
+            foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            {
+                flow.AddAction(new InitializeModAction(plugin));
+            }
 
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            {
                 flow.AddAction(new PostInitializeModAction(plugin));
+            }
         });
     }
 }

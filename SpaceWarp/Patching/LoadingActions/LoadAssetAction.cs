@@ -24,10 +24,14 @@ internal sealed class LoadAssetAction : FlowAction
         {
             var bundlesPath = Path.Combine(_plugin.PluginFolderPath, GlobalModDefines.AssetBundlesFolder);
             if (Directory.Exists(bundlesPath))
+            {
                 foreach (var file in Directory.GetFiles(bundlesPath))
                 {
                     var assetBundleName = Path.GetFileNameWithoutExtension(file);
-                    if (Path.GetExtension(file) != ".bundle") continue;
+                    if (Path.GetExtension(file) != ".bundle")
+                    {
+                        continue;
+                    }
 
                     var assetBundle = AssetBundle.LoadFromFile(file);
 
@@ -42,9 +46,12 @@ internal sealed class LoadAssetAction : FlowAction
                         assetBundle);
                     Logger.LogInfo($"Loaded AssetBundle {_plugin.SpaceWarpMetadata.ModID}/{assetBundleName}");
                 }
+            }
             else
+            {
                 Logger.LogInfo(
                     $"Did not load asset bundles for {_plugin.SpaceWarpMetadata.Name} as no asset bundles folder existed!");
+            }
 
             var imagesPath = Path.Combine(_plugin.PluginFolderPath, GlobalModDefines.ImageAssetsFolder);
             if (Directory.Exists(imagesPath))
@@ -61,7 +68,10 @@ internal sealed class LoadAssetAction : FlowAction
                     for (var i = 0; i < assetPathList.Length; i++)
                     {
                         assetPath += assetPathList[i].ToLower();
-                        if (i != assetPathList.Length - 1) assetPath += "/";
+                        if (i != assetPathList.Length - 1)
+                        {
+                            assetPath += "/";
+                        }
                     }
 
                     assetPath = $"images/{assetPath}";

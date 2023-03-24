@@ -26,7 +26,10 @@ public abstract class AppbarMenu : KerbalBehavior
     {
         get
         {
-            if (_spaceWarpConsoleSkin == null) _spaceWarpConsoleSkin = Skins.ConsoleSkin;
+            if (_spaceWarpConsoleSkin == null)
+            {
+                _spaceWarpConsoleSkin = Skins.ConsoleSkin;
+            }
 
             return _spaceWarpConsoleSkin;
         }
@@ -40,7 +43,10 @@ public abstract class AppbarMenu : KerbalBehavior
     public void OnGUI()
     {
         if (!_drawing
-            || GameManager.Instance.Game.GlobalGameState.GetState() != GameState.FlightView) return;
+            || GameManager.Instance.Game.GlobalGameState.GetState() != GameState.FlightView)
+        {
+            return;
+        }
 
         GUI.skin = Skin;
         _closeButtonStyle ??= new GUIStyle(GUI.skin.button)
