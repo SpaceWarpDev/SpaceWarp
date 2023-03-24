@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Version>$(SpaceWarpVersion)</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" />
+      <PackageReference Include="HarmonyX" Version="2.10.1" />
+    </ItemGroup>
+    
+</Project>
