@@ -1,18 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
-        <LangVersion>11</LangVersion>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    </PropertyGroup>
     <ItemGroup>
-        <Reference Include="Assembly-CSharp">
-            <HintPath>..\external_dlls\Assembly-CSharp.dll</HintPath>
-            <Publicize>true</Publicize>
-            <Private>false</Private>
-        </Reference>
+        <Reference Include="Assembly-CSharp" Private="false" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\SpaceWarp\SpaceWarp.csproj" Private="false" />
