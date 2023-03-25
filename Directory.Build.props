@@ -1,0 +1,29 @@
+<Project>
+    <PropertyGroup>
+        <SpaceWarpVersion>1.1.0</SpaceWarpVersion>
+        <TargetFramework>net472</TargetFramework>
+        <LangVersion>11</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+        <!-- Disabled warning for publicizer attribute until the NuGet exists for KSP2  -->
+        <NoWarn>CS0436</NoWarn>
+    </PropertyGroup>
+
+    <!--
+    Allows use of some newer C# language features that have compiler gates normally.
+    Do not modify the included types without checking that they don't require runtime support that doesn't exist. 
+    -->
+
+    <ItemGroup>
+        <PackageReference Include="PolySharp" Version="1.12.1" PrivateAssets="all"/>
+    </ItemGroup>
+    <PropertyGroup>
+        <PolySharpIncludeGeneratedTypes>
+            System.Index;
+            System.Range;
+            System.Diagnostics.CodeAnalysis.NotNullWhenAttribute;
+            System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute;
+        </PolySharpIncludeGeneratedTypes>
+    </PropertyGroup>
+</Project>

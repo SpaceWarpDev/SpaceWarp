@@ -122,7 +122,12 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
         foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
         {
-            SpaceWarpManager.ModsOutdated[info.ModID] = false;
+            SpaceWarpManager.ModsOutdated[info.Item2.ModID] = false;
+        }
+
+        foreach (var info in SpaceWarpManager.DisabledInfoPlugins)
+        {
+            SpaceWarpManager.ModsOutdated[info.Item2.ModID] = false;
         }
     }
 
@@ -139,9 +144,17 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
         foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
         {
-            if (info.VersionCheck != null)
+            if (info.Item2.VersionCheck != null)
             {
-                StartCoroutine(CheckVersion(info));
+                StartCoroutine(CheckVersion(info.Item2));
+            }
+        }
+
+        foreach (var info in SpaceWarpManager.DisabledInfoPlugins)
+        {
+            if (info.Item2.VersionCheck != null)
+            {
+                StartCoroutine(CheckVersion(info.Item2));
             }
         }
     }
