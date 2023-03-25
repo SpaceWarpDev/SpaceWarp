@@ -2,6 +2,7 @@ Key,Type,Description,English,Portuguese BR
 SpaceWarp/ModList/EnableAll,Text,,Enable All,EnableAll
 SpaceWarp/ModList/DisableAll,Text,,Disable All,DisableAll
 SpaceWarp/ModList/RevertChanges,Text,,Revert Changes,RevertChanges
+SpaceWarp/ModList/ChangesDetected,Text,,"{0} changes detected, please restart to apply them",ChangesDetected
 SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist
 SpaceWarp/ModList/SpaceWarpMods,Text,,SpaceWarp Mods,Mods de SpaceWarp
 SpaceWarp/ModList/UnmanagedMods,Text,,Unmanaged Mods,Mods externos

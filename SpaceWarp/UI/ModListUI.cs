@@ -15,6 +15,7 @@ public class ModListUI : KerbalMonoBehaviour
     private static readonly LocalizedString EnableAll = "SpaceWarp/ModList/EnableAll";
     private static readonly LocalizedString DisableAll = "SpaceWarp/ModList/DisableAll";
     private static readonly LocalizedString RevertChanges = "SpaceWarp/ModList/RevertChanges";
+    private static readonly LocalizedString ChangesDetected = "SpaceWarp/ModList/ChangesDetected";
     private static readonly LocalizedString ModListHeader = "SpaceWarp/ModList/Header";
     private static readonly LocalizedString SpaceWarpMods = "SpaceWarp/ModList/SpaceWarpMods";
     private static readonly LocalizedString UnmanagedMods = "SpaceWarp/ModList/UnmanagedMods";
@@ -313,7 +314,7 @@ public class ModListUI : KerbalMonoBehaviour
     
         if (numChanges > 0)
         {
-            GUILayout.Label($"{numChanges} changes detected, please restart to apply them");
+            GUILayout.Label(string.Format(ChangesDetected, numChanges));
         }
 
         
