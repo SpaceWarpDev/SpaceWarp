@@ -131,7 +131,7 @@ internal static class SpaceWarpManager
             {
                 disabledNonInfoPlugins.Add(plugin);
             }
-            pluginGuidEnabledStatus.Add((plugin.Metadata.GUID, true));
+            pluginGuidEnabledStatus.Add((plugin.Metadata.GUID, false));
         }
 
         DisabledInfoPlugins = disabledInfoPlugins;
@@ -161,6 +161,11 @@ internal static class SpaceWarpManager
         }
 
         foreach (var info in NonSpaceWarpInfos)
+        {
+            ModsUnsupported[info.Item2.ModID] = !info.Item2.SupportedKsp2Versions.IsSupported(kspVersion);
+        }
+
+        foreach (var info in DisabledInfoPlugins)
         {
             ModsUnsupported[info.Item2.ModID] = !info.Item2.SupportedKsp2Versions.IsSupported(kspVersion);
         }

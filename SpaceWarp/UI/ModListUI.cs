@@ -42,6 +42,7 @@ public class ModListUI : KerbalMonoBehaviour
     private static GUIStyle _closeButtonStyle;
     private static GUIStyle _outdatedModStyle;
     private static GUIStyle _unsupportedModStyle;
+    private static GUIStyle _disabledModStyle;
     private static GUIStyle _headerStyle;
 
     private bool _showSupportedMods = true;
@@ -87,8 +88,10 @@ public class ModListUI : KerbalMonoBehaviour
         }
 
         _loaded = true;
-        _initialToggles = SpaceWarpManager.PluginGuidEnabledStatus.ToList();
-        _toggles = _initialToggles;
+        _initialToggles = SpaceWarpManager.PluginGuidEnabledStatus.ToList().FindAll(
+            item => !NoTogglePlugins.Contains(item.Item1)
+        );
+        _toggles = new List<(string, bool)>(_initialToggles);
     }
 
     private void Update()
@@ -188,6 +191,42 @@ public class ModListUI : KerbalMonoBehaviour
             onNormal =
             {
                 textColor = Color.red
+            }
+        };
+        
+        _disabledModStyle ??= new GUIStyle(GUI.skin.button)
+        {
+            normal =
+            {
+                textColor = Color.gray
+            },
+            active =
+            {
+                textColor = Color.gray
+            },
+            hover =
+            {
+                textColor = Color.gray
+            },
+            focused =
+            {
+                textColor = Color.gray
+            },
+            onActive =
+            {
+                textColor = Color.gray
+            },
+            onFocused =
+            {
+                textColor = Color.gray
+            },
+            onHover =
+            {
+                textColor = Color.gray
+            },
+            onNormal =
+            {
+                textColor = Color.gray
             }
         };
 
@@ -370,15 +409,11 @@ public class ModListUI : KerbalMonoBehaviour
         {
             foreach (var (plugin, info) in SpaceWarpManager.DisabledInfoPlugins)
             {
-                var style = SpaceWarpManager.ModsUnsupported[info.ModID] ? _unsupportedModStyle
-                    : SpaceWarpManager.ModsOutdated[info.ModID] ? _outdatedModStyle
-                    : null;
-
                 DrawModListItem(plugin.Metadata.GUID, info.Name, () =>
                 {
                     _selectedBepIn = false;
                     _selectedMetaData = info;
-                }, style);
+                }, _disabledModStyle);
             }
 
             foreach (var plugin in SpaceWarpManager.DisabledNonInfoPlugins)
@@ -387,7 +422,7 @@ public class ModListUI : KerbalMonoBehaviour
                 {
                     _selectedBepIn = true;
                     _selectedBepInMetadata = plugin.Metadata;
-                });
+                }, _disabledModStyle);
             }
         }
 
@@ -446,13 +481,16 @@ public class ModListUI : KerbalMonoBehaviour
 
     private void DrawModListItem(string guid, string modName, Action onSelected, GUIStyle style = null)
     {
-        int toggleIndex = _toggles.FindIndex(t => t.Item1 == guid);
-        bool isToggled = _toggles[toggleIndex].Item2; // current state of the toggle
-        bool wasToggled = _wasToggledDict.ContainsKey(guid) && _wasToggledDict[guid]; // previous state of the toggle (defaults to false if not found)
+        bool isToggled = false;
+        bool wasToggled = false;
 
         GUILayout.BeginHorizontal();
         if (!NoTogglePlugins.Contains(guid))
         {
+            int toggleIndex = _toggles.FindIndex(t => t.Item1 == guid);
+            isToggled = _toggles[toggleIndex].Item2; // current state of the toggle
+            wasToggled = _wasToggledDict.ContainsKey(guid) && _wasToggledDict[guid]; // previous state of the toggle (defaults to false if not found)
+            
             _toggles[toggleIndex] = (guid, GUILayout.Toggle(isToggled, ""));
         }
         else
@@ -467,12 +505,7 @@ public class ModListUI : KerbalMonoBehaviour
         }
         GUILayout.EndHorizontal();
         
-        // Edge detection
-        if (!isToggled && wasToggled) // falling edge
-        {
-            UpdateDisabledFile();
-        }
-        else if (isToggled && !wasToggled) // rising edge
+        if ((!isToggled && wasToggled) || (isToggled && !wasToggled))
         {
             UpdateDisabledFile();
         }
