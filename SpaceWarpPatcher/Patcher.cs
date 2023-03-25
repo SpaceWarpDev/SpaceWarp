@@ -10,6 +10,8 @@ using HarmonyLib;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
 
 [assembly: InternalsVisibleTo("SpaceWarp")]
 

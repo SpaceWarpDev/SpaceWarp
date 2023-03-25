@@ -56,6 +56,12 @@ public class ModListUI : KerbalMonoBehaviour
     private List<(string, bool)> _initialToggles = new();
     private readonly Dictionary<string, bool> _wasToggledDict = new();
 
+    private static readonly IReadOnlyList<string> NoTogglePlugins = new List<string>
+    {
+        "com.github.x606.spacewarp",
+        "com.bepis.bepinex.configurationmanager"
+    };
+
     private void Awake()
     {
         const float minResolution = 1280f / 720f;
@@ -231,7 +237,7 @@ public class ModListUI : KerbalMonoBehaviour
         );
         
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button(_disableAll))
+        if (GUILayout.Button(DisableAll))
         {
             for (int i = 0; i < _toggles.Count; i++)
             {
@@ -239,7 +245,7 @@ public class ModListUI : KerbalMonoBehaviour
             }
         }
         
-        if (GUILayout.Button(_enableAll))
+        if (GUILayout.Button(EnableAll))
         {
             for (int i = 0; i < _toggles.Count; i++)
             {
@@ -249,7 +255,7 @@ public class ModListUI : KerbalMonoBehaviour
         GUILayout.EndHorizontal();
         
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button(_revertChanges))
+        if (GUILayout.Button(RevertChanges))
         {
             // Replace _toggles list with backup copy
             _toggles = new List<(string, bool)>(_initialToggles);
@@ -274,14 +280,14 @@ public class ModListUI : KerbalMonoBehaviour
         
         if (_showSupportedMods)
         {
-            if (GUILayout.Button($"{_spaceWarpMods} ▼", _headerStyle))
+            if (GUILayout.Button($"{SpaceWarpMods} ▼", _headerStyle))
             {
                 _showSupportedMods = !_showSupportedMods;
             }
         }
         else
         {
-            if (GUILayout.Button($"{_spaceWarpMods} ▲", _headerStyle))
+            if (GUILayout.Button($"{SpaceWarpMods} ▲", _headerStyle))
             {
                 _showSupportedMods = !_showSupportedMods;
             }
@@ -347,14 +353,14 @@ public class ModListUI : KerbalMonoBehaviour
         GUILayout.Label("");
         if (_showDisabledMods)
         {
-            if (GUILayout.Button($"{_disabledMods} ▼", _headerStyle))
+            if (GUILayout.Button($"{DisabledMods} ▼", _headerStyle))
             {
                 _showDisabledMods = !_showDisabledMods;
             }
         }
         else
         {
-            if (GUILayout.Button($"{_disabledMods} ▲", _headerStyle))
+            if (GUILayout.Button($"{DisabledMods} ▲", _headerStyle))
             {
                 _showDisabledMods = !_showDisabledMods;
             }
@@ -438,14 +444,21 @@ public class ModListUI : KerbalMonoBehaviour
         GUI.DragWindow();
     }
 
-    private void DrawModListItem(string GUID, string modName, Action onSelected, GUIStyle style = null)
+    private void DrawModListItem(string guid, string modName, Action onSelected, GUIStyle style = null)
     {
-        int toggleIndex = _toggles.FindIndex(t => t.Item1 == GUID);
+        int toggleIndex = _toggles.FindIndex(t => t.Item1 == guid);
         bool isToggled = _toggles[toggleIndex].Item2; // current state of the toggle
-        bool wasToggled = _wasToggledDict.ContainsKey(GUID) && _wasToggledDict[GUID]; // previous state of the toggle (defaults to false if not found)
+        bool wasToggled = _wasToggledDict.ContainsKey(guid) && _wasToggledDict[guid]; // previous state of the toggle (defaults to false if not found)
 
         GUILayout.BeginHorizontal();
-        _toggles[toggleIndex] = (GUID, GUILayout.Toggle(isToggled, ""));
+        if (!NoTogglePlugins.Contains(guid))
+        {
+            _toggles[toggleIndex] = (guid, GUILayout.Toggle(isToggled, ""));
+        }
+        else
+        {
+            GUILayout.Space(25);
+        }
 
         var buttonName = Trim(modName);
         if (style == null ? GUILayout.Button(buttonName) : GUILayout.Button(buttonName, style))
@@ -464,7 +477,7 @@ public class ModListUI : KerbalMonoBehaviour
             UpdateDisabledFile();
         }
 
-        _wasToggledDict[GUID] = isToggled; // update the previous state of the toggle
+        _wasToggledDict[guid] = isToggled; // update the previous state of the toggle
     }
 
     private void UpdateDisabledFile()
