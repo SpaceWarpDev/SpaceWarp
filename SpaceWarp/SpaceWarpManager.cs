@@ -108,7 +108,6 @@ internal static class SpaceWarpManager
             {
                 nonSWPlugins.Add(plugin);
             }
-
             pluginGuidEnabledStatus.Add((plugin.Info.Metadata.GUID, true));
         }
 #pragma warning restore CS0618
@@ -132,7 +131,6 @@ internal static class SpaceWarpManager
             {
                 disabledNonInfoPlugins.Add(plugin);
             }
-
             pluginGuidEnabledStatus.Add((plugin.Metadata.GUID, true));
         }
 
