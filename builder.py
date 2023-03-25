@@ -7,7 +7,7 @@ import zipfile
 
 TEMPLATE_DIR = os.path.abspath("SpaceWarpBuildTemplate")
 SPACEWARP_DIR = os.path.abspath("SpaceWarp")
-PATCHER_DIR = os.path.abspath("ChainLoaderPatcher")
+PATCHER_DIR = os.path.abspath("SpaceWarpPatcher")
 BUILD_DIR = os.path.abspath("build")
 THIRD_PARTY = os.path.abspath("ThirdParty")
 
@@ -53,6 +53,7 @@ def build(release=False):
 
     print("=> Copying output template")
     shutil.copytree(TEMPLATE_DIR, output_dir)
+    open(os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "disabled_plugins.cfg"), 'a').close()
 
     print(f"=> Executing: {' '.join(dotnet_args)}")
 
@@ -68,7 +69,7 @@ def build(release=False):
         print(f"        {line}")
 
     # patcher build
-    patcher_dotnet_args = ["dotnet", "build", os.path.join(PATCHER_DIR, "ChainLoaderPatcher.csproj"), "-c",
+    patcher_dotnet_args = ["dotnet", "build", os.path.join(PATCHER_DIR, "SpaceWarpPatcher.csproj"), "-c",
                            "Release" if release else "Debug"]
     patcher_build_output_dir = os.path.join(PATCHER_DIR, "bin", "Release" if release else "Debug")
     patcher_output_dir = os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "patchers", "SpaceWarp")
@@ -96,10 +97,10 @@ def build(release=False):
 
     if not release and os.path.exists(os.path.join(build_output_dir, "SpaceWarp.pdb")):
         shutil_copy("SpaceWarp.pdb")
-    if not release and os.path.exists(os.path.join(patcher_build_output_dir, "ChainLoaderPatcher.pdb")):
-        shutil_copy_patcher("ChainLoaderPatcher.pdb")
+    if not release and os.path.exists(os.path.join(patcher_build_output_dir, "SpaceWarpPatcher.pdb")):
+        shutil_copy_patcher("SpaceWarpPatcher.pdb")
     shutil_copy("SpaceWarp.dll")
-    shutil_copy_patcher("ChainLoaderPatcher.dll")
+    shutil_copy_patcher("SpaceWarpPatcher.dll")
 
 
 def create_zip_name(prefix):
