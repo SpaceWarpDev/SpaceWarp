@@ -66,7 +66,7 @@ internal class ColorsPatch
     private static Shader _ksp2Opaque;
     private static Shader _ksp2Transparent;
     private static Shader _unityStandard;
-    public static ManualLogSource Logger;
+    internal static ManualLogSource Logger;
 
     ///TODO: Implement false behaviour
     public static Dictionary<string, string[]> DeclaredParts { get; } = new();
@@ -108,7 +108,7 @@ internal class ColorsPatch
     ///     Collection of partNames. Names that end in XS, S, M, L or XL will be counted as the same
     ///     part,
     /// </param>
-    public static void DeclareParts(string modGUID, params string[] partNameList)
+    internal static void DeclareParts(string modGUID, params string[] partNameList)
     {
         DeclareParts(modGUID, partNameList.ToList());
     }
@@ -122,7 +122,7 @@ internal class ColorsPatch
     ///     Collection of partNames. Names that end in XS, S, M, L or XL will be counted as the same
     ///     part.
     /// </param>
-    public static void DeclareParts(string modGUID, IEnumerable<string> partNameList)
+    internal static void DeclareParts(string modGUID, IEnumerable<string> partNameList)
     {
         if (DeclaredParts.ContainsKey(modGUID))
         {
@@ -138,6 +138,17 @@ internal class ColorsPatch
         }
 
         DeclaredParts.Add(modGUID, nameList.ToArray());
+    }
+
+    internal static Texture[] GetTextures(string partName)
+    {
+        if (_partHash.ContainsKey(partName))
+            return _partHash[partName];
+        else
+        {
+            LogError($"Requested textures from {partName} but part doesn't exist on declared parts!");
+            return null;
+        }
     }
 
     private static void LoadDeclaredParts()
@@ -177,11 +188,11 @@ internal class ColorsPatch
 
     private static void LoadTextures(string modGUID)
     {
-        LogMessage($">Loading parts from {modGUID}<");
+        LogMessage($">Loading parts from {modGUID}");
 
         foreach (var partName in DeclaredParts[modGUID])
         {
-            LogMessage($">Loading {partName}");
+            LogMessage($"\t>Loading {partName}");
             if (!TryAddUnique(partName))
             {
                 LogWarning(
@@ -199,7 +210,7 @@ internal class ColorsPatch
             {
                 _partHash[trimmedPartName][DIFFUSE] = dTex;
                 count++;
-                LogMessage($"\t({count}/6) Loaded {TextureNames[DIFFUSE]} texture");
+                LogMessage($"\t\t>({count}/6) Loaded {TextureNames[DIFFUSE]} texture");
             }
             else
             {
@@ -207,14 +218,25 @@ internal class ColorsPatch
                 return;
             }
 
-            for (var i = 1; i < _propertyIds.Length; i++)
+            for (int i = 1; i < _propertyIds.Length; i++)
+            {
                 if (AssetManager.TryGetAsset($"{pathWithoutSuffix}_{TextureSuffixes[i]}", out Texture2D Tex))
                 {
                     count++;
 
+                    if(i== ColorsPatch.BUMP) //Converting texture to Bump texture
+                    {
+                        Texture2D normalTexture = new Texture2D(Tex.width, Tex.height, TextureFormat.RGBA32, false, true);
+                        Graphics.CopyTexture(Tex, normalTexture);
+                        Tex = normalTexture;
+                    }
                     _partHash[trimmedPartName][i] = Tex;
-                    LogMessage($"\t({count}/6) Loaded {TextureNames[i]} texture");
+                    LogMessage($"\t\t>({count}/6) Loaded {TextureNames[i]} texture");
                 }
+            }
+
+            if (count == 6)
+                LogMessage($"\t\tWoW Much Textures!");
         }
     }
 
@@ -255,14 +277,14 @@ internal class ColorsPatch
 
     [HarmonyPatch(typeof(GameManager),
         nameof(GameManager.OnLoadingFinished))]
-    public static void Prefix()
+    internal static void Prefix()
     {
         LoadDeclaredParts(); ///TODO: Move this to a more apropriate call, like the one loading parts or something like that.
     }
 
     [HarmonyPatch(typeof(Module_Color),
         nameof(Module_Color.OnInitialize))]
-    public static void Postfix(Module_Color __instance)
+    internal static void Postfix(Module_Color __instance)
     {
         if (DeclaredParts.Count == 0)
         {
