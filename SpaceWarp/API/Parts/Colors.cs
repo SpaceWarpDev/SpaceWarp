@@ -13,8 +13,6 @@ public static class Colors
     /// </summary>
     public static Dictionary<string, string[]> DeclaredParts => ColorsPatch.DeclaredParts;
 
-    private static ManualLogSource Logger => ColorsPatch.Logger;
-
     /// <summary>
     ///     Adds <paramref name="partNameList" /> to internal parts list under <paramref name="modGuid" />
     ///     allowing them to have the patch applied.
@@ -42,4 +40,10 @@ public static class Colors
     {
         ColorsPatch.DeclareParts(modGuid, partNameList);
     }
+    /// <summary>
+    /// Retrieves all the texture list from your part. Textures not set will be null.
+    /// </summary>
+    /// <param name="partName">Name of the part as described in the .json.</param>
+    /// <returns></returns>
+    public static UnityEngine.Texture[] GetTextures(string partName) => ColorsPatch.GetTextures(partName);
 }
