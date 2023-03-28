@@ -89,7 +89,7 @@ public static class Loading
             }
         }
 
-        var assets = importFunction(file, assetPath);
+        var assets = importFunction(assetPath, file);
         foreach (var asset in assets)
         {
             AssetManager.RegisterSingleAsset(plugin.SpaceWarpMetadata.ModID, asset.name, asset.asset);
