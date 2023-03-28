@@ -78,7 +78,9 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
-
+        
+        SpaceWarpManager.InitializeSpaceWarpsLoadingActions();
+        
         SpaceWarpManager.Initialize(this);
     }
 
