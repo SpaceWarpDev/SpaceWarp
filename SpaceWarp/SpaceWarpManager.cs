@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
+using I2.Loc;
 using SpaceWarpPatcher;
 using Newtonsoft.Json;
 using SpaceWarp.API.Assets;
+using SpaceWarp.API.Loading;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI.Appbar;
@@ -169,5 +172,70 @@ internal static class SpaceWarpManager
         {
             ModsUnsupported[info.Item2.ModID] = !info.Item2.SupportedKsp2Versions.IsSupported(kspVersion);
         }
+    }
+
+    private static List<(string name, UnityObject asset)> AssetBundleLoadingAction(string internalPath, string filename)
+    {
+        var assetBundle = AssetBundle.LoadFromFile(filename);
+        if (assetBundle == null)
+        {
+            throw new Exception(
+                $"Failed to load AssetBundle {internalPath}");
+        }
+
+        internalPath = internalPath.Replace(".bundle", "");
+        var names = assetBundle.GetAllAssetNames();
+        List<(string name, UnityObject asset)> assets = new();
+        foreach (var name in names)
+        {
+            var assetName = name;
+
+            if (assetName.ToLower().StartsWith("assets/"))
+            {
+                assetName = assetName["assets/".Length..];
+            }
+
+            if (assetName.ToLower().StartsWith(internalPath + "/"))
+            {
+                assetName = assetName[(internalPath.Length + 1)..];
+            }
+
+            var path = internalPath + "/" + assetName;
+            path = path.ToLower();
+            var asset = assetBundle.LoadAsset(name);
+            assets.Add((path, asset));
+        }
+
+        return assets;
+    }
+
+    private static List<(string name, UnityObject asset)> ImageLoadingAction(string internalPath, string filename)
+    {
+        var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false)
+        {
+            filterMode = FilterMode.Point 
+        };
+        var fileData = File.ReadAllBytes(filename);
+        tex.LoadImage(fileData); // Will automatically resize
+        List<(string name, UnityObject asset)> assets = new();
+        assets.Add(($"images/{internalPath}",tex));
+        return assets;
+    }
+
+    private static void LoadLanguageSourceAsset(LanguageSourceAsset asset)
+    {
+        if (!asset || LocalizationManager.Sources.Contains(asset.mSource))
+        {
+            return;
+        }
+
+        asset.mSource.owner = asset;
+        LocalizationManager.AddSource(asset.mSource);
+    }
+    internal static void InitializeSpaceWarpsLoadingActions()
+    {
+        Loading.AddAssetLoadingAction("bundles","loading asset bundles",AssetBundleLoadingAction,"bundle");
+        Loading.AddAssetLoadingAction("images","loading images",ImageLoadingAction);
+        Loading.AddAddressablesLoadingAction<LanguageSourceAsset>("loading addressable localizations","language_source",LoadLanguageSourceAsset);
     }
 }
