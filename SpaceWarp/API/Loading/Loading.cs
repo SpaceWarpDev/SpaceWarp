@@ -24,16 +24,11 @@ public static class Loading
     public static void AddAssetLoadingAction(string subfolder, string name,
         Func<string, string, List<(string name, UnityObject asset)>> importFunction, params string[] extensions)
     {
-        if (extensions.Length == 0)
-        {
-            LoadingActionGenerators.Add(p => new ModLoadingAction(name, CreateAssetLoadingActionWithoutExtension(subfolder, importFunction),p));
-        }
-        else
-        {
-            LoadingActionGenerators.Add(p => new ModLoadingAction(name, CreateAssetLoadingActionWithExtensions(subfolder, importFunction, extensions),p));
-        }
+        AddModLoadingAction(name,
+            extensions.Length == 0
+                ? CreateAssetLoadingActionWithoutExtension(subfolder, importFunction)
+                : CreateAssetLoadingActionWithExtensions(subfolder, importFunction, extensions));
     }
-
     public static void AddModLoadingAction(string name, Action<BaseSpaceWarpPlugin> action)
     {
         LoadingActionGenerators.Add(p => new ModLoadingAction(name,action,p));
