@@ -29,16 +29,32 @@ public static class Loading
                 ? CreateAssetLoadingActionWithoutExtension(subfolder, importFunction)
                 : CreateAssetLoadingActionWithExtensions(subfolder, importFunction, extensions));
     }
+    /// <summary>
+    /// Registers a per mod loading action
+    /// </summary>
+    /// <param name="name">The name of the action</param>
+    /// <param name="action">The action</param>
     public static void AddModLoadingAction(string name, Action<BaseSpaceWarpPlugin> action)
     {
         LoadingActionGenerators.Add(p => new ModLoadingAction(name,action,p));
     }
 
+    /// <summary>
+    /// Registers a general loading action
+    /// </summary>
+    /// <param name="action">The action</param>
     public static void AddGeneralLoadingAction(FlowAction action)
     {
         GeneralLoadingActions.Add(action);
     }
 
+    /// <summary>
+    /// Registers an action to be done on addressables after addressables have been loaded
+    /// </summary>
+    /// <param name="name">The name of the action</param>
+    /// <param name="label">The addressables label to hook into</param>
+    /// <param name="action">The action to be done on each addressables asset</param>
+    /// <typeparam name="T">The type of asset that this action is done upon</typeparam>
     public static void AddAddressablesLoadingAction<T>(string name, string label, Action<T> action) where T : UnityObject
     {
         AddGeneralLoadingAction(new AddressableAction<T>(name, label, action));
