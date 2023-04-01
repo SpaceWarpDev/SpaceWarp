@@ -31,7 +31,7 @@ internal class ColorsPatch
     private const int EMISSION = 4;
     private const int PAINT_MAP = 5;
 
-    private const string KSP2_OPAQUE_PATH = "KSP2/Scenery/Standard (Opaque)",
+    private const string KSP2_OPAQUE_PATH = "KSP2/Parts/Standard Damaged",
         KSP2_TRANSPARENT_PATH = "KSP2/Scenery/Standard (Transparent)",
         UNITY_STANDARD = "Standard";
 
@@ -243,6 +243,9 @@ internal class ColorsPatch
     private static void SetTexturesToMaterial(string partName, ref Material material)
     {
         var trimmedPartName = TrimPartName(partName);
+        material.SetFloat("_MetallicGlossMap", 1f);
+        material.SetFloat("_Metallic", 1f);
+        material.SetFloat("_PaintGlossMapScale",.8f);
         for (var i = 0; i < _propertyIds.Length; i++)
         {
             var texture = _partHash[trimmedPartName][i];
