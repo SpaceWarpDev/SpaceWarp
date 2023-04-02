@@ -12,8 +12,8 @@ public class ConfigurationPatch
     static void Postfix(ref BaseUnityPlugin[] __result)
     {
         //Disable because I know what I am doing.
-#pragma warning disable CS0618
+        #pragma warning disable CS0618
         __result = Chainloader.Plugins.ToArray();
-#pragma warning restore CS0618
+        #pragma warning restore CS0618
     }
 }

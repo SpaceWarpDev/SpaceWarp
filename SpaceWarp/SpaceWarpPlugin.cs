@@ -2,7 +2,7 @@
 global using System.Linq;
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
@@ -13,66 +13,73 @@ using Newtonsoft.Json;
 using SpaceWarp.API.Game.Messages;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.API.UI;
+using SpaceWarp.API.Versions;
 using SpaceWarp.UI;
+using SpaceWarp.UI.Debug;
 using UnityEngine;
 using UnityEngine.Networking;
 
 namespace SpaceWarp;
 
-[BepInDependency(ConfigurationManager.ConfigurationManager.GUID,ConfigurationManager.ConfigurationManager.Version)]
+[BepInDependency(ConfigurationManager.ConfigurationManager.GUID, ConfigurationManager.ConfigurationManager.Version)]
 [BepInPlugin(ModGuid, ModName, ModVer)]
 public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 {
     public const string ModGuid = "com.github.x606.spacewarp";
     public const string ModName = "Space Warp";
     public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
+    internal ConfigEntry<Color> ConfigAllColor;
+    internal ConfigEntry<bool> ConfigCheckVersions;
+    internal ConfigEntry<Color> ConfigDebugColor;
+    internal ConfigEntry<int> ConfigDebugMessageLimit;
 
-    internal ConfigEntry<Color> configErrorColor;
-    internal ConfigEntry<Color> configWarningColor;
-    internal ConfigEntry<Color> configMessageColor;
-    internal ConfigEntry<Color> configInfoColor;
-    internal ConfigEntry<Color> configDebugColor;
-    internal ConfigEntry<Color> configAllColor;
-    internal ConfigEntry<bool> configShowConsoleButton;
-    internal ConfigEntry<bool> configShowTimeStamps;
-    internal ConfigEntry<string> configTimeStampFormat;
-    internal ConfigEntry<int> configDebugMessageLimit;
-    internal ConfigEntry<bool> configFirstLaunch;
-    internal ConfigEntry<bool> configCheckVersions;
-
+    internal ConfigEntry<Color> ConfigErrorColor;
+    private ConfigEntry<bool> _configFirstLaunch;
+    internal ConfigEntry<Color> ConfigInfoColor;
+    internal ConfigEntry<Color> ConfigMessageColor;
+    internal ConfigEntry<bool> ConfigShowConsoleButton;
+    internal ConfigEntry<bool> ConfigShowTimeStamps;
+    internal ConfigEntry<string> ConfigTimeStampFormat;
+    internal ConfigEntry<Color> ConfigWarningColor;
+    private string _kspVersion;
 
     internal new ManualLogSource Logger => base.Logger;
 
     public void Awake()
     {
-        configErrorColor = Config.Bind("Debug Console", "Color Error", Color.red,
+        _kspVersion = typeof(VersionID).GetField("VERSION_TEXT", BindingFlags.Static | BindingFlags.Public)
+            ?.GetValue(null) as string;
+        ConfigErrorColor = Config.Bind("Debug Console", "Color Error", Color.red,
             "The color for log messages that have the level: Error/Fatal (bolded)");
-        configWarningColor = Config.Bind("Debug Console", "Color Warning", Color.yellow,
+        ConfigWarningColor = Config.Bind("Debug Console", "Color Warning", Color.yellow,
             "The color for log messages that have the level: Warning");
-        configMessageColor = Config.Bind("Debug Console", "Color Message", Color.white,
+        ConfigMessageColor = Config.Bind("Debug Console", "Color Message", Color.white,
             "The color for log messages that have the level: Message");
-        configInfoColor = Config.Bind("Debug Console", "Color Info", Color.cyan,
+        ConfigInfoColor = Config.Bind("Debug Console", "Color Info", Color.cyan,
             "The color for log messages that have the level: Info");
-        configDebugColor = Config.Bind("Debug Console", "Color Debug", Color.green,
+        ConfigDebugColor = Config.Bind("Debug Console", "Color Debug", Color.green,
             "The color for log messages that have the level: Debug");
-        configAllColor = Config.Bind("Debug Console", "Color All", Color.magenta,
+        ConfigAllColor = Config.Bind("Debug Console", "Color All", Color.magenta,
             "The color for log messages that have the level: All");
-        configShowConsoleButton = Config.Bind("Debug Console", "Show Console Button", false,
-                "Show console button in app.bar, requires restart");
-        configShowTimeStamps = Config.Bind("Debug Console", "Show Timestamps", true, 
+        ConfigShowConsoleButton = Config.Bind("Debug Console", "Show Console Button", false,
+            "Show console button in app.bar, requires restart");
+        ConfigShowTimeStamps = Config.Bind("Debug Console", "Show Timestamps", true,
             "Show time stamps in debug console");
-        configTimeStampFormat = Config.Bind("Debug Console", "Timestamp Format", "HH:mm:ss.fff",
+        ConfigTimeStampFormat = Config.Bind("Debug Console", "Timestamp Format", "HH:mm:ss.fff",
             "The format for the timestamps in the debug console.");
-        configDebugMessageLimit = Config.Bind("Debug Console", "Message Limit", 1000,
+        ConfigDebugMessageLimit = Config.Bind("Debug Console", "Message Limit", 1000,
             "The maximum number of messages to keep in the debug console.");
-        configFirstLaunch = Config.Bind("Version Checking", "First Launch", true,
+        _configFirstLaunch = Config.Bind("Version Checking", "First Launch", true,
             "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user.");
-        configCheckVersions = Config.Bind("Version Checking", "Check Versions", false,
+        ConfigCheckVersions = Config.Bind("Version Checking", "Check Versions", false,
             "Whether or not Space Warp should check mod versions using their swinfo.json files");
-        
+
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
+        
+        SpaceWarpManager.InitializeSpaceWarpsLoadingActions();
         
         SpaceWarpManager.Initialize(this);
     }
@@ -81,22 +88,22 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public override void OnInitialized()
     {
         base.OnInitialized();
-        
-        Game.Messages.Subscribe(typeof(GameStateEnteredMessage), StateChanges.OnGameStateEntered,false,true);
-        Game.Messages.Subscribe(typeof(GameStateLeftMessage), StateChanges.OnGameStateLeft,false,true);
-        Game.Messages.Subscribe(typeof(GameStateChangedMessage), StateChanges.OnGameStateChanged,false,true);
-        
+
+        Game.Messages.Subscribe(typeof(GameStateEnteredMessage), StateChanges.OnGameStateEntered, false, true);
+        Game.Messages.Subscribe(typeof(GameStateLeftMessage), StateChanges.OnGameStateLeft, false, true);
+        Game.Messages.Subscribe(typeof(GameStateChangedMessage), StateChanges.OnGameStateChanged, false, true);
+
         InitializeUI();
-        if (configFirstLaunch.Value)
+        if (_configFirstLaunch.Value)
         {
-            configFirstLaunch.Value = false;
+            _configFirstLaunch.Value = false;
             // Generate a prompt for whether or not space warp should check mod versions
-            GameObject o = new GameObject();
-            VersionCheckPrompt prompt = o.AddComponent<VersionCheckPrompt>();
+            var o = new GameObject();
+            var prompt = o.AddComponent<VersionCheckPrompt>();
             prompt.spaceWarpPlugin = this;
         }
 
-        if (configCheckVersions.Value)
+        if (ConfigCheckVersions.Value)
         {
             CheckVersions();
         }
@@ -104,7 +111,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         {
             ClearVersions();
         }
-        
+
         SpaceWarpManager.CheckKspVersions();
     }
 
@@ -117,9 +124,15 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
         foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
         {
-            SpaceWarpManager.ModsOutdated[info.ModID] = false;
+            SpaceWarpManager.ModsOutdated[info.Item2.ModID] = false;
+        }
+
+        foreach (var info in SpaceWarpManager.DisabledInfoPlugins)
+        {
+            SpaceWarpManager.ModsOutdated[info.Item2.ModID] = false;
         }
     }
+
     public void CheckVersions()
     {
         ClearVersions();
@@ -133,41 +146,27 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
         foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
         {
-            if (info.VersionCheck != null)
+            if (info.Item2.VersionCheck != null)
             {
-                StartCoroutine(CheckVersion(info));
+                StartCoroutine(CheckVersion(info.Item2));
+            }
+        }
+
+        foreach (var info in SpaceWarpManager.DisabledInfoPlugins)
+        {
+            if (info.Item2.VersionCheck != null)
+            {
+                StartCoroutine(CheckVersion(info.Item2));
             }
         }
     }
 
-    static bool OlderThan(string currentVersion, string onlineVersion)
+    private static bool OlderThan(string currentVersion, string onlineVersion)
     {
-        try
-        {
-            var currentList = currentVersion.Split('.');
-            var onlineList = onlineVersion.Split('.');
-            var minLength = Math.Min(currentList.Length, onlineList.Length);
-            for (var i = 0; i < minLength; i++)
-            {
-                if (int.Parse(currentList[i]) < int.Parse(onlineList[i]))
-                {
-                    return true;
-                }
-
-                if (int.Parse(currentList[i]) > int.Parse(onlineList[i]))
-                {
-                    return false;
-                }
-            }
-
-            return onlineList.Length > currentList.Length;
-        } catch (Exception e)
-        {
-            Debug.Log(e);
-            return false;
-        }
+        return VersionUtility.CompareSemanticVersionStrings(currentVersion, onlineVersion) < 0;
     }
-    IEnumerator CheckVersion(ModInfo pluginInfo)
+
+    private IEnumerator CheckVersion(ModInfo pluginInfo)
     {
         var www = UnityWebRequest.Get(pluginInfo.VersionCheck);
         yield return www.SendWebRequest();
@@ -178,16 +177,29 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
         else
         {
-            
             var results = www.downloadHandler.text;
-            var checkInfo = JsonConvert.DeserializeObject<ModInfo>(results);
-            SpaceWarpManager.ModsOutdated[pluginInfo.ModID] = OlderThan(pluginInfo.Version, checkInfo.Version);
+            try
+            {
+                var checkInfo = JsonConvert.DeserializeObject<ModInfo>(results);
+                if (!checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion))
+                {
+                    yield break;
+                }
+
+                SpaceWarpManager.ModsOutdated[pluginInfo.ModID] = OlderThan(pluginInfo.Version, checkInfo.Version);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError($"Unable to check version for {pluginInfo.ModID} due to error {e}");
+            }
         }
     }
-    
+
     private void InitializeUI()
     {
-        SpaceWarpManager.ConfigurationManager = (ConfigurationManager.ConfigurationManager)Chainloader.PluginInfos[global::ConfigurationManager.ConfigurationManager.GUID].Instance;
+        SpaceWarpManager.ConfigurationManager =
+            (ConfigurationManager.ConfigurationManager)Chainloader
+                .PluginInfos[ConfigurationManager.ConfigurationManager.GUID].Instance;
         GameObject modUIObject = new("Space Warp Mod UI");
         modUIObject.Persist();
 
@@ -201,7 +213,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         consoleUIObject.transform.SetParent(Chainloader.ManagerObject.transform);
         consoleUIObject.AddComponent<SpaceWarpConsole>();
         consoleUIObject.SetActive(true);
-        
-        API.UI.MainMenu.RegisterMenuButton("mods", SpaceWarpManager.ModListUI.ToggleVisible);
+
+        MainMenu.RegisterLocalizedMenuButton("SpaceWarp/Mods", SpaceWarpManager.ModListUI.ToggleVisible);
     }
 }

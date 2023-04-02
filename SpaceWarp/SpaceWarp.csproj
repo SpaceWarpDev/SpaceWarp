@@ -1,44 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <Version>1.0.1</Version>
-        <TargetFramework>net472</TargetFramework>
-        <LangVersion>11</LangVersion>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-        <!-- Disabled warning for publicizer attribute until the NuGet exists for KSP2  -->
-        <NoWarn>CS0436</NoWarn>
+        <Version>$(SpaceWarpVersion)</Version>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="Assembly-CSharp">
-            <HintPath>..\external_dlls\Assembly-CSharp.dll</HintPath>
-            <Publicize>true</Publicize>
-            <Private>false</Private>
-        </Reference>
-        <Reference Include="Unity.TextMeshPro">
-            <HintPath>..\external_dlls\Unity.TextMeshPro.dll</HintPath>
-            <Private>false</Private>
-        </Reference>
-        <Reference Include="UnityEngine.UI">
-            <HintPath>..\external_dlls\UnityEngine.UI.dll</HintPath>
-            <Private>false</Private>
-        </Reference>
-        <Reference Include="Unity.Addressables">
-            <HintPath>..\external_dlls\Unity.Addressables.dll</HintPath>
-            <Private>false</Private>
-        </Reference>
-        <Reference Include="Unity.ResourceManager">
-            <HintPath>..\external_dlls\Unity.ResourceManager.dll</HintPath>
-            <Private>false</Private>
-        </Reference>
-        <Reference Include="KSPLogging">
-            <HintPath>..\external_dlls\KSPLogging.dll</HintPath>
-            <Private>false</Private>
-        </Reference>
-        <Reference Include="BepInEx.ConfigurationManager">
+        <Reference Include="Assembly-CSharp" Private="false" Publicize="true" />
+        <Reference Include="Unity.TextMeshPro" Private="false" />
+        <Reference Include="UnityEngine.UI" Private="false" />
+        <Reference Include="Unity.Addressables" Private="false" />
+        <Reference Include="Unity.ResourceManager" Private="false" />
+        <Reference Include="KSPLogging" Private="false" />
+        <Reference Include="BepInEx.ConfigurationManager" Private="false" Publicize="true">
             <HintPath>..\ThirdParty\ConfigurationManager\ConfigurationManager.dll</HintPath>
-            <Publicize>true</Publicize>
         </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -50,20 +23,7 @@
         <PackageReference Include="UnityEngine.Modules" Version="2020.3.33" />
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all" />
     </ItemGroup>
-
-    <!--
-    Allows use of some newer C# language features that have compiler gates normally.
-    Do not modify the included types without checking that they don't require runtime support that doesn't exist. 
-    -->
     <ItemGroup>
-        <PackageReference Include="PolySharp" Version="1.12.1" PrivateAssets="all" />
+        <ProjectReference Include="..\SpaceWarpPatcher\SpaceWarpPatcher.csproj" />
     </ItemGroup>
-    <PropertyGroup>
-        <PolySharpIncludeGeneratedTypes>
-            System.Index;
-            System.Range;
-            System.Diagnostics.CodeAnalysis.NotNullWhenAttribute;
-            System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute;
-        </PolySharpIncludeGeneratedTypes>
-    </PropertyGroup>
 </Project>

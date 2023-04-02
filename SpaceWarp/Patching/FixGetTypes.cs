@@ -12,19 +12,22 @@ internal static class FixGetTypes
     [HarmonyPatch(typeof(Assembly), nameof(Assembly.GetExportedTypes))]
     private static Exception GetTypesFix(Exception __exception, Assembly __instance, ref Type[] __result)
     {
-        if (__exception is ReflectionTypeLoadException reflectionTypeLoadException)
+        if (__exception is not ReflectionTypeLoadException reflectionTypeLoadException)
         {
-            SpaceWarpManager.Logger.LogWarning($"Types failed to load from assembly {__instance.FullName} due to the reasons below, continuing anyway.");
-            SpaceWarpManager.Logger.LogWarning($"Exception: {__exception}");
-            
-            foreach (var exception in reflectionTypeLoadException.LoaderExceptions)
-            {
-                SpaceWarpManager.Logger.LogWarning(exception.ToString());
-            }
-            __result = reflectionTypeLoadException.Types.Where(type => type != null).ToArray();
-            return null;
+            return __exception;
         }
-        
-        return __exception;
+
+        SpaceWarpManager.Logger.LogWarning(
+            $"Types failed to load from assembly {__instance.FullName} due to the reasons below, continuing anyway.");
+        SpaceWarpManager.Logger.LogWarning($"Exception: {__exception}");
+
+        foreach (var exception in reflectionTypeLoadException.LoaderExceptions)
+        {
+            SpaceWarpManager.Logger.LogWarning(exception.ToString());
+        }
+
+        __result = reflectionTypeLoadException.Types.Where(type => type != null).ToArray();
+        return null;
+
     }
 }

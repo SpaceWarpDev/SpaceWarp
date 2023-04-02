@@ -6,12 +6,12 @@ namespace SpaceWarp;
 internal static class PathHelpers
 {
     /// <summary>
-    /// Creates a relative path from one file or folder to another.
+    ///     Creates a relative path from one file or folder to another.
     /// </summary>
     /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
     /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>
     /// <returns>The relative path from the start directory to the end path.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="fromPath"/> or <paramref name="toPath"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="fromPath" /> or <paramref name="toPath" /> is <c>null</c>.</exception>
     /// <exception cref="UriFormatException"></exception>
     /// <exception cref="InvalidOperationException"></exception>
     internal static string GetRelativePath(string fromPath, string toPath)
@@ -26,16 +26,16 @@ internal static class PathHelpers
             throw new ArgumentNullException(nameof(toPath));
         }
 
-        Uri fromUri = new Uri(AppendDirectorySeparatorChar(fromPath));
-        Uri toUri = new Uri(AppendDirectorySeparatorChar(toPath));
+        var fromUri = new Uri(AppendDirectorySeparatorChar(fromPath));
+        var toUri = new Uri(AppendDirectorySeparatorChar(toPath));
 
         if (fromUri.Scheme != toUri.Scheme)
         {
             return toPath;
         }
 
-        Uri relativeUri = fromUri.MakeRelativeUri(toUri);
-        string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+        var relativeUri = fromUri.MakeRelativeUri(toUri);
+        var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
 
         if (string.Equals(toUri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase))
         {

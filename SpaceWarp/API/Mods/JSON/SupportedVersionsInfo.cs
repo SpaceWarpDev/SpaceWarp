@@ -1,66 +1,25 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using SpaceWarp.API.Versions;
 
 namespace SpaceWarp.API.Mods.JSON;
 
 /// <summary>
-/// Representation of the supported version info of a mod from a JSON file.
+///     Representation of the supported version info of a mod from a JSON file.
 /// </summary>
 [JsonObject(MemberSerialization.OptIn)]
 public sealed class SupportedVersionsInfo
 {
-    [JsonProperty("min")]
-    public string Min { get; internal set; } = "0.0.0";
+    [JsonProperty("min")] public string Min { get; internal set; } = "0.0.0";
 
-    [JsonProperty("max")]
-    public string Max { get; internal set; } = "*";
+    [JsonProperty("max")] public string Max { get; internal set; } = "*";
 
     public bool IsSupported(string toCheck)
     {
-        try
+        if (VersionUtility.CompareSemanticVersionStrings(toCheck, Min) < 0)
         {
-            var minList = Min.Split('.');
-            var maxList = Max.Split('.');
-            var checkList = toCheck.Split('.');
-            var minMin = Math.Min(minList.Length, checkList.Length);
-            var minMax = Math.Max(maxList.Length, checkList.Length);
-            for (var i = 0; i < minMin; i++)
-            {
-                if (minList[i] == "*")
-                {
-                    break;
-                }
-                if (int.Parse(checkList[i]) < int.Parse(minList[i]))
-                {
-                    return false;
-                }
-                if (int.Parse(checkList[i]) > int.Parse(minList[i]))
-                {
-                    break;
-                }
-            }
-
-            for (var i = 0; i < minMax; i++)
-            {
-                if (maxList[i] == "*")
-                {
-                    break;
-                }
-                if (int.Parse(checkList[i]) > int.Parse(minList[i]))
-                {
-                    return false;
-                }
-                if (int.Parse(checkList[i]) < int.Parse(minList[i]))
-                {
-                    break;
-                }
-            }
-
-            return true;
+            return false;
         }
-        catch
-        {
-            return true;
-        }
+
+        return VersionUtility.CompareSemanticVersionStrings(toCheck, Max) <= 0;
     }
 }

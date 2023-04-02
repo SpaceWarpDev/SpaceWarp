@@ -1,6 +1,7 @@
 using HarmonyLib;
 using KSP.Game;
 using MonoMod.Cil;
+using SpaceWarp.API.Loading;
 using SpaceWarp.Patching.LoadingActions;
 
 namespace SpaceWarp.Patching;
@@ -14,7 +15,7 @@ internal static class BootstrapPatch
     {
         SpaceWarpManager.GetSpaceWarpPlugins();
     }
-    
+
     [HarmonyILManipulator]
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.StartBootstrap))]
     private static void PatchInitializationsIL(ILContext ilContext, ILLabel endLabel)
@@ -35,7 +36,7 @@ internal static class BootstrapPatch
                 GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
             }
         });
-        
+
         ilCursor.GotoLabel(endLabel, MoveType.Before);
         ilCursor.Index -= 1;
         ilCursor.EmitDelegate(static () =>
@@ -46,21 +47,26 @@ internal static class BootstrapPatch
             {
                 flow.AddAction(new LoadAddressablesAction(plugin));
                 flow.AddAction(new LoadLocalizationAction(plugin));
-                flow.AddAction(new LoadAssetAction(plugin));
+                foreach (var action in Loading.LoadingActionGenerators)
+                {
+                    flow.AddAction(action(plugin));
+                }
             }
-            
-            flow.AddAction(new LoadAddressablesLocalizationsAction());
-            
+
+            // flow.AddAction(new LoadAddressablesLocalizationsAction());
+            foreach (var action in Loading.GeneralLoadingActions)
+            {
+                flow.AddAction(action);
+            }
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
                 flow.AddAction(new InitializeModAction(plugin));
             }
-            
+
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
                 flow.AddAction(new PostInitializeModAction(plugin));
             }
-            
         });
     }
 }

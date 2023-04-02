@@ -1,38 +1,57 @@
 ﻿using HarmonyLib;
+using I2.Loc;
 using KSP.Api.CoreTypes;
+using KSP.Game.StartupFlow;
 using SpaceWarp.API.UI;
 using TMPro;
-using UnityEngine;
 
 namespace SpaceWarp.Patching;
 
-[HarmonyPatch(typeof(KSP.Game.StartupFlow.LandingHUD))]
+[HarmonyPatch(typeof(LandingHUD))]
 [HarmonyPatch("Start")]
 internal class MainMenuPatcher
 {
-    public static void Postfix(KSP.Game.StartupFlow.LandingHUD __instance)
+    public static void Postfix(LandingHUD __instance)
     {
-        Transform menuItemsGroupTransform = __instance.transform.FindChildEx("MenuItemsGroup");
-        Transform singleplayerButtonTransform = menuItemsGroupTransform.FindChildEx("Singleplayer");
+        var menuItemsGroupTransform = __instance.transform.FindChildEx("MenuItemsGroup");
+        var singleplayerButtonTransform = menuItemsGroupTransform.FindChildEx("Singleplayer");
 
         foreach (var menuButtonToBeAdded in MainMenu.MenuButtonsToBeAdded)
         {
-            GameObject newButton = Object.Instantiate(singleplayerButtonTransform.gameObject, menuItemsGroupTransform, false);
+            var newButton =
+                UnityObject.Instantiate(singleplayerButtonTransform.gameObject, menuItemsGroupTransform, false);
             newButton.name = menuButtonToBeAdded.name;
 
             // Move the button to be above the Exit button.
             newButton.transform.SetSiblingIndex(newButton.transform.GetSiblingIndex() - 1);
 
             // Rebind the button's action to call the action
-            UIAction_Void_Button uiAction = newButton.GetComponent<UIAction_Void_Button>();
+            var uiAction = newButton.GetComponent<UIAction_Void_Button>();
             DelegateAction action = new();
             action.BindDelegate(() => menuButtonToBeAdded.onClicked.Invoke());
             uiAction.BindAction(action);
 
             // Set the label to "Mods".
-            TextMeshProUGUI tmp = newButton.GetComponentInChildren<TextMeshProUGUI>();
+            var tmp = newButton.GetComponentInChildren<TextMeshProUGUI>();
 
             tmp.SetText(menuButtonToBeAdded.name);
+        }
+
+        foreach (var localizedMenuButtonToBeAddded in MainMenu.LocalizedMenuButtonsToBeAdded)
+        {var newButton =
+                UnityObject.Instantiate(singleplayerButtonTransform.gameObject, menuItemsGroupTransform, false);
+            newButton.name = localizedMenuButtonToBeAddded.term;
+
+            // Move the button to be above the Exit button.
+            newButton.transform.SetSiblingIndex(newButton.transform.GetSiblingIndex() - 1);
+
+            // Rebind the button's action to call the action
+            var uiAction = newButton.GetComponent<UIAction_Void_Button>();
+            DelegateAction action = new();
+            action.BindDelegate(() => localizedMenuButtonToBeAddded.onClicked.Invoke());
+            uiAction.BindAction(action);
+            var localize = newButton.GetComponentInChildren<Localize>();
+            localize.SetTerm(localizedMenuButtonToBeAddded.term);
         }
     }
 }
