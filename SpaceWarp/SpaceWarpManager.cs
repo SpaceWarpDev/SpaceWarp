@@ -222,20 +222,9 @@ internal static class SpaceWarpManager
         return assets;
     }
 
-    private static void LoadLanguageSourceAsset(LanguageSourceAsset asset)
-    {
-        if (!asset || LocalizationManager.Sources.Contains(asset.mSource))
-        {
-            return;
-        }
-
-        asset.mSource.owner = asset;
-        LocalizationManager.AddSource(asset.mSource);
-    }
     internal static void InitializeSpaceWarpsLoadingActions()
     {
         Loading.AddAssetLoadingAction("bundles","loading asset bundles",AssetBundleLoadingAction,"bundle");
         Loading.AddAssetLoadingAction("images","loading images",ImageLoadingAction);
-        Loading.AddAddressablesLoadingAction<LanguageSourceAsset>("loading addressable localizations","language_source",LoadLanguageSourceAsset);
     }
 }
