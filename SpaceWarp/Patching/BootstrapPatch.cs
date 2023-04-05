@@ -53,7 +53,7 @@ internal static class BootstrapPatch
                 }
             }
 
-            // flow.AddAction(new LoadAddressablesLocalizationsAction());
+            flow.AddAction(new LoadAddressablesLocalizationsAction());
             foreach (var action in Loading.GeneralLoadingActions)
             {
                 flow.AddAction(action);
