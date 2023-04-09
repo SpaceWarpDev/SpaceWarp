@@ -27,11 +27,11 @@ public static class Patcher
         // is this necessary? I (Windows10CE) didn't think so until i had to do it!
         var targetType = asm.MainModule.GetType("UnityEngine.Application");
         var targetMethod = targetType.Methods.Single(x => x.Name == ".cctor");
-        
+
         using var thisAsm = AssemblyDefinition.ReadAssembly(typeof(Patcher).Assembly.Location);
         var delayer = thisAsm.MainModule.GetType("SpaceWarpPatcher.Delayer");
         var patchMethod = delayer.Methods.Single(m => m.Name == "PatchChainloaderStart");
-        
+
         ILContext il = new(targetMethod);
         ILCursor c = new(il);
         c.GotoNext(MoveType.Before,
@@ -48,6 +48,7 @@ internal static class Delayer
     {
         ChainloaderPatch.Logger = Logger.CreateLogSource("SW BIE Extensions");
         string disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
+        ChainloaderPatch.DisabledPluginsFilepath = disabledPluginsFilepath;
         if (!File.Exists(disabledPluginsFilepath))
         {
             File.Create(disabledPluginsFilepath).Dispose();
@@ -66,7 +67,7 @@ internal static class ChainloaderPatch
     internal static string DisabledPluginsFilepath;
     internal static ManualLogSource Logger;
     internal static List<PluginInfo> DisabledPlugins;
-    
+
     [HarmonyILManipulator]
     [HarmonyPatch(typeof(Chainloader), nameof(Chainloader.Start))]
     private static void DisablePluginsIL(ILContext il)
