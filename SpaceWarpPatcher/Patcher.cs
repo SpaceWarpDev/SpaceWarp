@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -46,7 +47,13 @@ internal static class Delayer
     public static void PatchChainloaderStart()
     {
         ChainloaderPatch.Logger = Logger.CreateLogSource("SW BIE Extensions");
-        ChainloaderPatch.DisabledPluginGuids = File.ReadAllLines(ChainloaderPatch.DisabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg"));
+        string disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
+        if (!File.Exists(disabledPluginsFilepath))
+        {
+            File.Create(disabledPluginsFilepath).Dispose();
+            ChainloaderPatch.Logger.LogWarning("Disabled plugins file did not exist, created empty file at: " + disabledPluginsFilepath);
+        }
+        ChainloaderPatch.DisabledPluginGuids = File.ReadAllLines(disabledPluginsFilepath);
         ChainloaderPatch.DisabledPlugins = new();
         Harmony.CreateAndPatchAll(typeof(ChainloaderPatch));
     }
