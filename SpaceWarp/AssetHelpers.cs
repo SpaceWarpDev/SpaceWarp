@@ -54,7 +54,7 @@ internal static class AssetHelpers
 
         if (languageSourceData != null)
         {
-            languageSourceData.OnMissingTranslation = LanguageSourceData.MissingTranslationAction.ShowTerm;
+            languageSourceData.OnMissingTranslation = LanguageSourceData.MissingTranslationAction.Fallback;
             SpaceWarpManager.Logger.LogInfo($"Loaded localizations from {folder}");
             LocalizationManager.AddSource(languageSourceData);
         }
