@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <SpaceWarpVersion>1.1.1</SpaceWarpVersion>
+        <SpaceWarpVersion>1.1.2</SpaceWarpVersion>
         <TargetFramework>net472</TargetFramework>
         <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -12,7 +12,7 @@
 
     <!--
     Allows use of some newer C# language features that have compiler gates normally.
-    Do not modify the included types without checking that they don't require runtime support that doesn't exist. 
+    Do not modify the included types without checking that they don't require runtime support that doesn't exist.
     -->
 
     <ItemGroup>
