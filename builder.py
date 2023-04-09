@@ -53,7 +53,6 @@ def build(release=False):
 
     print("=> Copying output template")
     shutil.copytree(TEMPLATE_DIR, output_dir)
-    open(os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "disabled_plugins.cfg"), 'a').close()
 
     print(f"=> Executing: {' '.join(dotnet_args)}")
 
