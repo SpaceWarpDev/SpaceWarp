@@ -3,9 +3,9 @@
 # Space Warp
 [![Curseforge](http://cf.way2muchnoise.eu/full_831005_downloads.svg?badge_style=plastic)](https://www.curseforge.com/kerbal-space-program-2/mods/space-warp)
 ![Downloads](https://img.shields.io/github/downloads/X606/SpaceWarp/latest/total.svg?label=%E2%A4%93%20Downloads&style=plastic)  
-![SpaceDock Downloads](https://img.shields.io/badge/dynamic/json?color=blueviolet&label=SpaceDock%20Downloads&query=downloads&url=https%3A%2F%2Fspacedock.info%2Fapi%2Fmod%2F3257)
+![SpaceDock Downloads](https://img.shields.io/badge/dynamic/json?color=blueviolet&label=SpaceDock%20Downloads&query=downloads&url=https%3A%2F%2Fspacedock.info%2Fapi%2Fmod%2F3277)
 
-[Documentation](https://spacewarpdocs.readthedocs.io/en/latest/index.html)
+[Documentation](https://wiki.spacewarp.org)
 
 Space Warp is a mod loader for Kerbal Space Program 2.
 
