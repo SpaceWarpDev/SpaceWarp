@@ -50,7 +50,7 @@ KSP2_Root_Folder/
 │   │   │   │   │   ├── *.bundle
 │   │   │   │   ├── images/
 │   │   │   │   │   ├── *
-│   │   │   ├── localization/
+│   │   │   ├── localizations/
 │   │   │   │   ├── *.csv
 │   │   │   ├── addressables/
 │   │   │   │   ├── catalog.json
