@@ -5,7 +5,7 @@
 ![Downloads](https://img.shields.io/github/downloads/X606/SpaceWarp/latest/total.svg?label=%E2%A4%93%20Downloads&style=plastic)  
 ![SpaceDock Downloads](https://img.shields.io/badge/dynamic/json?color=blueviolet&label=SpaceDock%20Downloads&query=downloads&url=https%3A%2F%2Fspacedock.info%2Fapi%2Fmod%2F3277)
 
-[Documentation](https://wiki.spacewarp.org)
+[Documentation](https://docs.spacewarp.org)
 
 Space Warp is a mod loader for Kerbal Space Program 2.
 
