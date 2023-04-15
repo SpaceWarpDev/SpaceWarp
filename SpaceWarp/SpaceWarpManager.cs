@@ -13,7 +13,7 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.Backend.UI.Appbar;
-using SpaceWarp.UI;
+using SpaceWarp.UI.ModList;
 using UnityEngine;
 
 namespace SpaceWarp;
@@ -40,7 +40,7 @@ internal static class SpaceWarpManager
 
     private static GUISkin _skin;
 
-    public static ModListUI ModListUI { get; internal set; }
+    public static ModListController ModListController { get; internal set; }
 
     public static GUISkin Skin
     {
@@ -143,7 +143,7 @@ internal static class SpaceWarpManager
 
     public static void Initialize(SpaceWarpPlugin spaceWarpPlugin)
     {
-        Logger = spaceWarpPlugin.Logger;
+        Logger = SpaceWarpPlugin.Logger;
 
         SpaceWarpFolder = Path.GetDirectoryName(spaceWarpPlugin.Info.Location);
 
