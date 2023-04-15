@@ -9,7 +9,9 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using KSP.Messages;
+using Ksp2Uitk.API;
 using Newtonsoft.Json;
+using SpaceWarp.API.Assets;
 using SpaceWarp.API.Game.Messages;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
@@ -17,8 +19,10 @@ using SpaceWarp.API.UI;
 using SpaceWarp.API.Versions;
 using SpaceWarp.UI;
 using SpaceWarp.UI.Debug;
+using SpaceWarp.UI.ModList;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UIElements;
 
 namespace SpaceWarp;
 
@@ -44,7 +48,12 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<Color> ConfigWarningColor;
     private string _kspVersion;
 
-    internal new ManualLogSource Logger => base.Logger;
+    internal new static ManualLogSource Logger;
+
+    public SpaceWarpPlugin()
+    {
+        Logger = base.Logger;
+    }
 
     public void Awake()
     {
@@ -78,9 +87,9 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
-        
+
         SpaceWarpManager.InitializeSpaceWarpsLoadingActions();
-        
+
         SpaceWarpManager.Initialize(this);
     }
 
@@ -93,7 +102,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         Game.Messages.Subscribe(typeof(GameStateLeftMessage), StateChanges.OnGameStateLeft, false, true);
         Game.Messages.Subscribe(typeof(GameStateChangedMessage), StateChanges.OnGameStateChanged, false, true);
 
-        InitializeUI();
         if (_configFirstLaunch.Value)
         {
             _configFirstLaunch.Value = false;
@@ -113,6 +121,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
 
         SpaceWarpManager.CheckKspVersions();
+
+        InitializeUI();
     }
 
     public void ClearVersions()
@@ -200,13 +210,13 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         SpaceWarpManager.ConfigurationManager =
             (ConfigurationManager.ConfigurationManager)Chainloader
                 .PluginInfos[ConfigurationManager.ConfigurationManager.GUID].Instance;
-        GameObject modUIObject = new("Space Warp Mod UI");
-        modUIObject.Persist();
 
-        modUIObject.transform.SetParent(transform);
-        SpaceWarpManager.ModListUI = modUIObject.AddComponent<ModListUI>();
-
-        modUIObject.SetActive(true);
+        var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlist.uxml");
+        var modList = Window.CreateFromUxml(modListUxml, "Space Warp Mod List", transform);
+        var modListObject = modList.gameObject;
+        modListObject.Persist();
+        SpaceWarpManager.ModListController = modListObject.AddComponent<ModListController>();
+        modList.rootVisualElement.style.display = DisplayStyle.None;
 
         GameObject consoleUIObject = new("Space Warp Console");
         consoleUIObject.Persist();
@@ -214,6 +224,9 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         consoleUIObject.AddComponent<SpaceWarpConsole>();
         consoleUIObject.SetActive(true);
 
-        MainMenu.RegisterLocalizedMenuButton("SpaceWarp/Mods", SpaceWarpManager.ModListUI.ToggleVisible);
+        MainMenu.RegisterLocalizedMenuButton(
+            "SpaceWarp/Mods",
+            () => SpaceWarpManager.ModListController.GetComponent<UIDocument>().rootVisualElement.style.display = DisplayStyle.Flex
+        );
     }
 }
