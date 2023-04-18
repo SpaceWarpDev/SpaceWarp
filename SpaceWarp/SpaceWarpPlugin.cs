@@ -9,7 +9,7 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using KSP.Messages;
-using Ksp2Uitk.API;
+using UitkForKsp2.API;
 using Newtonsoft.Json;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Game.Messages;
@@ -212,7 +212,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
                 .PluginInfos[ConfigurationManager.ConfigurationManager.GUID].Instance;
 
         var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlist.uxml");
-        var modList = Window.CreateFromUxml(modListUxml, "Space Warp Mod List", transform);
+        var modList = Window.CreateFromUxml(modListUxml, "Space Warp Mod List", transform, true);
         var modListObject = modList.gameObject;
         modListObject.Persist();
         SpaceWarpManager.ModListController = modListObject.AddComponent<ModListController>();

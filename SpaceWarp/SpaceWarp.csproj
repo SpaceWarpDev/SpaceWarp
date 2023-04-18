@@ -19,7 +19,7 @@
         <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" Publicize="true" />
         <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all" />
         <PackageReference Include="HarmonyX" Version="2.10.1" />
-        <PackageReference Include="Ksp2Uitk" Version="0.2.5" />
+        <PackageReference Include="UitkForKsp2" Version="0.4.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
         <PackageReference Include="UnityEngine.Modules" Version="2020.3.33" />
