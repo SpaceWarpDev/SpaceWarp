@@ -3,6 +3,7 @@ global using System.Linq;
 using System;
 using System.Collections;
 using System.Reflection;
+using System.Xml;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
@@ -78,9 +79,9 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
-        
+
         SpaceWarpManager.InitializeSpaceWarpsLoadingActions();
-        
+
         SpaceWarpManager.Initialize(this);
     }
 
@@ -161,11 +162,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
     }
 
-    private static bool OlderThan(string currentVersion, string onlineVersion)
-    {
-        return VersionUtility.CompareSemanticVersionStrings(currentVersion, onlineVersion) < 0;
-    }
-
     private IEnumerator CheckVersion(ModInfo pluginInfo)
     {
         var www = UnityWebRequest.Get(pluginInfo.VersionCheck);
@@ -180,19 +176,68 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             var results = www.downloadHandler.text;
             try
             {
-                var checkInfo = JsonConvert.DeserializeObject<ModInfo>(results);
-                if (!checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion))
+                switch (pluginInfo.VersionCheckType)
                 {
-                    yield break;
+                    case VersionCheckType.SwInfo:
+                        CheckJsonVersion(pluginInfo, results);
+                        break;
+                    case VersionCheckType.Csproj:
+                        CheckCsprojVersion(pluginInfo, results);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(pluginInfo), "Invalid version_check_type");
                 }
-
-                SpaceWarpManager.ModsOutdated[pluginInfo.ModID] = OlderThan(pluginInfo.Version, checkInfo.Version);
             }
             catch (Exception e)
             {
                 Logger.LogError($"Unable to check version for {pluginInfo.ModID} due to error {e}");
             }
         }
+    }
+
+    private void CheckJsonVersion(ModInfo pluginInfo, string json)
+    {
+        var checkInfo = JsonConvert.DeserializeObject<ModInfo>(json);
+        if (!checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion))
+        {
+            if (pluginInfo.Name == "swinfo_name") Logger.LogWarning("unsupported");
+            return;
+        }
+
+        SpaceWarpManager.ModsOutdated[pluginInfo.ModID] =
+            VersionUtility.IsOlderThan(pluginInfo.Version, checkInfo.Version);
+        if (pluginInfo.Name == "swinfo_name") Logger.LogWarning(SpaceWarpManager.ModsOutdated[pluginInfo.ModID] ? "outdated" : "fresh");
+    }
+
+    private void CheckCsprojVersion(ModInfo pluginInfo, string csproj)
+    {
+        var document = new XmlDocument();
+        document.LoadXml(csproj);
+
+        var ksp2VersionMin = document.GetElementsByTagName("Ksp2VersionMin")[0]?.InnerText
+            ?? SupportedVersionsInfo.DefaultMin;
+        var ksp2VersionMax = document.GetElementsByTagName("Ksp2VersionMax")[0]?.InnerText
+            ?? SupportedVersionsInfo.DefaultMax;
+
+        if (!VersionUtility.IsSupported(_kspVersion, ksp2VersionMin, ksp2VersionMax))
+        {
+            if (pluginInfo.Name == "swinfo_name") Logger.LogWarning("unsupported");
+            return;
+        }
+
+        var checkVersionTags = document.GetElementsByTagName("Version");
+        var checkVersion = checkVersionTags[0]?.InnerText;
+        if (checkVersion == null || checkVersionTags.Count != 1)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(csproj),
+                "There must be exactly 1 Version tag in the checked .csproj"
+            );
+        }
+
+        SpaceWarpManager.ModsOutdated[pluginInfo.ModID] =
+            VersionUtility.IsOlderThan(pluginInfo.Version, checkVersion);
+        if (pluginInfo.Name == "swinfo_name") Logger.LogWarning(SpaceWarpManager.ModsOutdated[pluginInfo.ModID] ? "outdated" : "fresh");
     }
 
     private void InitializeUI()
