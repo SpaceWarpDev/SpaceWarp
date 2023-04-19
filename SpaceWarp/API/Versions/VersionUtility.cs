@@ -5,41 +5,30 @@ namespace SpaceWarp.API.Versions;
 public static class VersionUtility
 {
     /// <summary>
-    ///     Checks if one semantic version is above another
+    ///     Checks if one semantic version is newer than another
     /// </summary>
-    /// <param name="version">The version to check against</param>
-    /// <param name="toCheck">The version that is being checked</param>
-    /// <returns>toCheck >= version</returns>
-    public static bool IsVersionAbove(string version, string toCheck)
+    /// <param name="version1">The first version</param>
+    /// <param name="version2">The second version</param>
+    /// <returns>version1 is newer than version2</returns>
+    public static bool IsNewerThan(string version1, string version2)
     {
-        if (version == "")
-        {
-            return true;
-        }
-
-        var semanticVersion = toCheck.Split('.');
-        var requiredVersion = version.Split('.');
-
-        return !requiredVersion.Where((t, i) => t != "*" && int.Parse(semanticVersion[i]) < int.Parse(t)).Any();
+        return CompareSemanticVersionStrings(version1, version2) > 0;
     }
 
     /// <summary>
-    ///     Checks if one semantic version is below another
+    ///     Checks if one semantic version is older than another
     /// </summary>
-    /// <param name="version">The version to check against</param>
-    /// <param name="toCheck">The version that is being checked</param>
-    /// <returns>toCheck is less than or equal to version</returns>
-    public static bool IsVersionBelow(string version, string toCheck)
+    /// <param name="version1">The first version</param>
+    /// <param name="version2">The second version</param>
+    /// <returns>version1 is older than version2</returns>
+    public static bool IsOlderThan(string version1, string version2)
     {
-        if (version == "")
-        {
-            return true;
-        }
+        return CompareSemanticVersionStrings(version1, version2) < 0;
+    }
 
-        var semanticVersion = toCheck.Split('.');
-        var requiredVersion = version.Split('.');
-
-        return !requiredVersion.Where((t, i) => t != "*" && int.Parse(semanticVersion[i]) > int.Parse(t)).Any();
+    public static bool IsSupported(string version, string min, string max)
+    {
+        return !IsOlderThan(version, min) && !IsNewerThan(version, max);
     }
 
     /// <summary>
