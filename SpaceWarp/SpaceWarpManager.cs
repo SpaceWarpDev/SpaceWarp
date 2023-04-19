@@ -159,19 +159,33 @@ internal static class SpaceWarpManager
             ?.GetValue(null) as string;
         foreach (var plugin in SpaceWarpPlugins)
         {
-            ModsUnsupported[plugin.SpaceWarpMetadata.ModID] =
-                !plugin.SpaceWarpMetadata.SupportedKsp2Versions.IsSupported(kspVersion);
+            CheckModKspVersion(plugin.SpaceWarpMetadata, kspVersion);
         }
 
         foreach (var info in NonSpaceWarpInfos)
         {
-            ModsUnsupported[info.Item2.ModID] = !info.Item2.SupportedKsp2Versions.IsSupported(kspVersion);
+            CheckModKspVersion(info.Item2, kspVersion);
         }
 
         foreach (var info in DisabledInfoPlugins)
         {
-            ModsUnsupported[info.Item2.ModID] = !info.Item2.SupportedKsp2Versions.IsSupported(kspVersion);
+            CheckModKspVersion(info.Item2, kspVersion);
         }
+    }
+
+    private static void CheckModKspVersion(ModInfo modInfo, string kspVersion)
+    {
+        var unsupported = true;
+        try
+        {
+            unsupported = !modInfo.SupportedKsp2Versions.IsSupported(kspVersion);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Unable to check KSP version for {modInfo.ModID} due to error {e}");
+        }
+
+        ModsUnsupported[modInfo.ModID] = unsupported;
     }
 
     private static List<(string name, UnityObject asset)> AssetBundleLoadingAction(string internalPath, string filename)
@@ -213,7 +227,7 @@ internal static class SpaceWarpManager
     {
         var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false)
         {
-            filterMode = FilterMode.Point 
+            filterMode = FilterMode.Point
         };
         var fileData = File.ReadAllBytes(filename);
         tex.LoadImage(fileData); // Will automatically resize
