@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
         <SpaceWarpVersion>1.1.3</SpaceWarpVersion>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
