@@ -6,10 +6,9 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-        <!-- Disabled warning for publicizer attribute until the NuGet exists for KSP2  -->
-        <NoWarn>CS0436</NoWarn>
-        <!-- Disabled warning for missing documentation comments for public types and members -->
-        <NoWarn>CS1591</NoWarn>
+        <!-- Disabled warning for publicizer attribute until the NuGet exists for KSP2,
+             and for missing documentation comments for public types and members -->
+        <NoWarn>$(NoWarn),CS0436,CS1591</NoWarn>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 

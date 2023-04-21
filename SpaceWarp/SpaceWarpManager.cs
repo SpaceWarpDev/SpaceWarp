@@ -5,7 +5,6 @@ using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
-using I2.Loc;
 using SpaceWarpPatcher;
 using Newtonsoft.Json;
 using SpaceWarp.API.Assets;
@@ -231,14 +230,13 @@ internal static class SpaceWarpManager
         };
         var fileData = File.ReadAllBytes(filename);
         tex.LoadImage(fileData); // Will automatically resize
-        List<(string name, UnityObject asset)> assets = new();
-        assets.Add(($"images/{internalPath}",tex));
+        List<(string name, UnityObject asset)> assets = new() { ($"images/{internalPath}", tex) };
         return assets;
     }
 
     internal static void InitializeSpaceWarpsLoadingActions()
     {
-        Loading.AddAssetLoadingAction("bundles","loading asset bundles",AssetBundleLoadingAction,"bundle");
-        Loading.AddAssetLoadingAction("images","loading images",ImageLoadingAction);
+        Loading.AddAssetLoadingAction("bundles", "loading asset bundles", AssetBundleLoadingAction, "bundle");
+        Loading.AddAssetLoadingAction("images", "loading images", ImageLoadingAction);
     }
 }
