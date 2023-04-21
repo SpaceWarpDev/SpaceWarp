@@ -96,7 +96,7 @@ internal class ColorsPatch
 
         Logger = BepInEx.Logging.Logger.CreateLogSource(displayName);
 
-        return true; ///TODO: add config to enable/disable this patch, if disabled return false.
+        return true; // TODO: add config to enable/disable this patch, if disabled return false.
     }
 
     /// <summary>
@@ -282,7 +282,7 @@ internal class ColorsPatch
         nameof(GameManager.OnLoadingFinished))]
     internal static void Prefix()
     {
-        LoadDeclaredParts(); ///TODO: Move this to a more apropriate call, like the one loading parts or something like that.
+        LoadDeclaredParts(); // TODO: Move this to a more apropriate call, like the one loading parts or something like that.
     }
 
     [HarmonyPatch(typeof(Module_Color),

@@ -1,4 +1,5 @@
-﻿using KSP.Game.Flow;
+﻿using System;
+using KSP.Game.Flow;
 using SpaceWarp.Patching;
 
 namespace SpaceWarp.API.Loading;
