@@ -24,6 +24,38 @@
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\SpaceWarpPatcher\SpaceWarpPatcher.csproj" />
+        <ProjectReference Include="..\SpaceWarpPatcher\SpaceWarpPatcher.csproj">
+            <PrivateAssets>all</PrivateAssets>
+            <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+            <IncludeAssets>SpaceWarpPatcher.dll</IncludeAssets>
+        </ProjectReference>
     </ItemGroup>
+    <!-- Nuget packaging configuration -->
+    <ItemGroup>
+        <None Include="$(SolutionDir)\images\icon.png" Pack="true" PackagePath="\"/>
+        <None Include="$(SolutionDir)\LICENSE" Pack="true" PackagePath="\"/>
+        <None Include="$(SolutionDir)\.github\README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>Space Warp contributors</Authors>
+        <Description>A C# modding API for KSP2 built on top of BepInEx</Description>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageId>SpaceWarp</PackageId>
+        <PackageLicenseUrl>https://raw.githubusercontent.com/SpaceWarpDev/SpaceWarp/main/LICENSE</PackageLicenseUrl>
+        <PackageOutputPath>$(SolutionDir)\build</PackageOutputPath>
+        <PackageProjectUrl>https://spacewarp.org</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>SpaceWarp;KSP2;modding</PackageTags>
+        <RepositoryUrl>https://github.com/SpaceWarpDev/SpaceWarp</RepositoryUrl>
+        <Title>Space Warp</Title>
+    </PropertyGroup>
+    <Target Name="IncludeAllFilesInTargetDir" AfterTargets="Build">
+        <ItemGroup>
+            <None Include="$(TargetDir)\**">
+                <Pack>true</Pack>
+                <PackagePath>lib\$(TargetFramework)</PackagePath>
+            </None>
+        </ItemGroup>
+    </Target>
 </Project>
