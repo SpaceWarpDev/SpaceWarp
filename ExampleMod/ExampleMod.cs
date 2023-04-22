@@ -42,7 +42,7 @@ public class ExampleMod : BaseSpaceWarpPlugin
             // Path format [mod_id]/images/filename
             // for bundles its [mod_id]/[bundle_name]/[path to file in bundle with out assets/bundle]/filename.extension
             // There is also a try get asset function, that returns a bool on whether or not it could grab the asset
-            AssetManager.GetAsset<Texture2D>($"{SpaceWarpMetadata.ModID}/images/icon.png"),
+            AssetManager.GetAsset<Texture2D>($"{Guid}/images/icon.png"),
             ToggleButton
         );
     }
@@ -73,7 +73,7 @@ public class ExampleMod : BaseSpaceWarpPlugin
             windowRect = GUILayout.Window(
                 GUIUtility.GetControlID(FocusType.Passive),
                 windowRect,
-                FillWindow, // The method we call. 
+                FillWindow, // The method we call.
                 "Window Header",
                 GUILayout.Height(350),
                 GUILayout.Width(350)
@@ -90,7 +90,7 @@ public class ExampleMod : BaseSpaceWarpPlugin
         GUILayout.Label("Example Mod - Built with Space-Warp");
         GUI.DragWindow(new Rect(0, 0, 10000, 500));
     }
-    
+
     private float lastUpdateTime = 0.0f;
     private float updateInterval = 1.0f;
 
@@ -123,9 +123,9 @@ public class ExampleMod : BaseSpaceWarpPlugin
         }
         else if (Game.GlobalGameState.GetState() == KSP.Game.GameState.FlightView)
         {
-            // Getting the active vessel, staging it over and over and printing out all the parts. 
+            // Getting the active vessel, staging it over and over and printing out all the parts.
             VesselComponent _activeVessel = Game.ViewController.GetActiveSimVessel();
-            
+
             if (_activeVessel != null)
             {
                 _activeVessel.ActivateNextStage();
