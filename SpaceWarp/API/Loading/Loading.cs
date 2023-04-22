@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using KSP.Game.Flow;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
+using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.Patching.LoadingActions;
 
 namespace SpaceWarp.API.Loading;
@@ -59,7 +60,7 @@ public static class Loading
     {
         AddGeneralLoadingAction(new AddressableAction<T>(name, label, action));
     }
-    
+
 
     private static Action<BaseSpaceWarpPlugin> CreateAssetLoadingActionWithExtensions(string subfolder, Func<string, string, List<(string name, UnityObject asset)>> importFunction, string[] extensions)
     {
@@ -103,7 +104,7 @@ public static class Loading
         var assets = importFunction(assetPath, file);
         foreach (var asset in assets)
         {
-            AssetManager.RegisterSingleAsset(plugin.SpaceWarpMetadata.ModID, asset.name, asset.asset);
+            AssetManager.RegisterSingleAsset(plugin.Guid, asset.name, asset.asset);
         }
     }
 

@@ -158,21 +158,21 @@ internal static class SpaceWarpManager
             ?.GetValue(null) as string;
         foreach (var plugin in SpaceWarpPlugins)
         {
-            CheckModKspVersion(plugin.SpaceWarpMetadata, kspVersion);
+            CheckModKspVersion(plugin.Guid, plugin.SpaceWarpMetadata, kspVersion);
         }
 
         foreach (var info in NonSpaceWarpInfos)
         {
-            CheckModKspVersion(info.Item2, kspVersion);
+            CheckModKspVersion(BaseSpaceWarpPlugin.GetGuidBySpec(info.Item1.Info, info.Item2), info.Item2, kspVersion);
         }
 
         foreach (var info in DisabledInfoPlugins)
         {
-            CheckModKspVersion(info.Item2, kspVersion);
+            CheckModKspVersion(BaseSpaceWarpPlugin.GetGuidBySpec(info.Item1, info.Item2), info.Item2, kspVersion);
         }
     }
 
-    private static void CheckModKspVersion(ModInfo modInfo, string kspVersion)
+    private static void CheckModKspVersion(string guid, ModInfo modInfo, string kspVersion)
     {
         var unsupported = true;
         try
@@ -181,10 +181,10 @@ internal static class SpaceWarpManager
         }
         catch (Exception e)
         {
-            Logger.LogError($"Unable to check KSP version for {modInfo.ModID} due to error {e}");
+            Logger.LogError($"Unable to check KSP version for {guid} due to error {e}");
         }
 
-        ModsUnsupported[modInfo.ModID] = unsupported;
+        ModsUnsupported[guid] = unsupported;
     }
 
     private static List<(string name, UnityObject asset)> AssetBundleLoadingAction(string internalPath, string filename)

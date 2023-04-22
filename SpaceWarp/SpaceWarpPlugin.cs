@@ -120,17 +120,17 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     {
         foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
         {
-            SpaceWarpManager.ModsOutdated[plugin.SpaceWarpMetadata.ModID] = false;
+            SpaceWarpManager.ModsOutdated[plugin.Guid] = false;
         }
 
         foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
         {
-            SpaceWarpManager.ModsOutdated[info.Item2.ModID] = false;
+            SpaceWarpManager.ModsOutdated[GetGuidBySpec(info.Item1.Info, info.Item2)] = false;
         }
 
         foreach (var info in SpaceWarpManager.DisabledInfoPlugins)
         {
-            SpaceWarpManager.ModsOutdated[info.Item2.ModID] = false;
+            SpaceWarpManager.ModsOutdated[GetGuidBySpec(info.Item1, info.Item2)] = false;
         }
     }
 
@@ -141,7 +141,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         {
             if (plugin.SpaceWarpMetadata.VersionCheck != null)
             {
-                StartCoroutine(CheckVersion(plugin.SpaceWarpMetadata));
+                StartCoroutine(CheckVersion(plugin.Info, plugin.SpaceWarpMetadata));
             }
         }
 
@@ -149,7 +149,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         {
             if (info.Item2.VersionCheck != null)
             {
-                StartCoroutine(CheckVersion(info.Item2));
+                StartCoroutine(CheckVersion(info.Item1.Info, info.Item2));
             }
         }
 
@@ -157,45 +157,47 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         {
             if (info.Item2.VersionCheck != null)
             {
-                StartCoroutine(CheckVersion(info.Item2));
+                StartCoroutine(CheckVersion(info.Item1, info.Item2));
             }
         }
     }
 
-    private IEnumerator CheckVersion(ModInfo pluginInfo)
+    private IEnumerator CheckVersion(PluginInfo pluginInfo, ModInfo modInfo)
     {
-        var www = UnityWebRequest.Get(pluginInfo.VersionCheck);
+        var www = UnityWebRequest.Get(modInfo.VersionCheck);
         yield return www.SendWebRequest();
+
+        var guid = GetGuidBySpec(pluginInfo, modInfo);
 
         if (www.result != UnityWebRequest.Result.Success)
         {
-            Logger.LogInfo($"Unable to check version for {pluginInfo.ModID} due to error {www.error}");
+            Logger.LogInfo($"Unable to check version for {guid} due to error {www.error}");
         }
         else
         {
             var results = www.downloadHandler.text;
             try
             {
-                switch (pluginInfo.VersionCheckType)
+                switch (modInfo.VersionCheckType)
                 {
                     case VersionCheckType.SwInfo:
-                        CheckJsonVersion(pluginInfo, results);
+                        CheckJsonVersion(guid, modInfo.Version, results);
                         break;
                     case VersionCheckType.Csproj:
-                        CheckCsprojVersion(pluginInfo, results);
+                        CheckCsprojVersion(guid, modInfo.Version, results);
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(pluginInfo), "Invalid version_check_type");
+                        throw new ArgumentOutOfRangeException(nameof(modInfo), "Invalid version_check_type");
                 }
             }
             catch (Exception e)
             {
-                Logger.LogError($"Unable to check version for {pluginInfo.ModID} due to error {e}");
+                Logger.LogError($"Unable to check version for {guid} due to error {e}");
             }
         }
     }
 
-    private void CheckJsonVersion(ModInfo pluginInfo, string json)
+    private void CheckJsonVersion(string guid, string version, string json)
     {
         var checkInfo = JsonConvert.DeserializeObject<ModInfo>(json);
         if (!checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion))
@@ -203,11 +205,10 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             return;
         }
 
-        SpaceWarpManager.ModsOutdated[pluginInfo.ModID] =
-            VersionUtility.IsOlderThan(pluginInfo.Version, checkInfo.Version);
+        SpaceWarpManager.ModsOutdated[guid] = VersionUtility.IsOlderThan(version, checkInfo.Version);
     }
 
-    private void CheckCsprojVersion(ModInfo pluginInfo, string csproj)
+    private void CheckCsprojVersion(string guid, string version, string csproj)
     {
         var document = new XmlDocument();
         document.LoadXml(csproj);
@@ -232,8 +233,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             );
         }
 
-        SpaceWarpManager.ModsOutdated[pluginInfo.ModID] =
-            VersionUtility.IsOlderThan(pluginInfo.Version, checkVersion);
+        SpaceWarpManager.ModsOutdated[guid] = VersionUtility.IsOlderThan(version, checkVersion);
     }
 
     private void InitializeUI()
