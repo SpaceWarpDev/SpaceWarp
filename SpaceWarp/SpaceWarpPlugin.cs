@@ -200,13 +200,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         var checkInfo = JsonConvert.DeserializeObject<ModInfo>(json);
         if (!checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion))
         {
-            if (pluginInfo.Name == "swinfo_name") Logger.LogWarning("unsupported");
             return;
         }
 
         SpaceWarpManager.ModsOutdated[pluginInfo.ModID] =
             VersionUtility.IsOlderThan(pluginInfo.Version, checkInfo.Version);
-        if (pluginInfo.Name == "swinfo_name") Logger.LogWarning(SpaceWarpManager.ModsOutdated[pluginInfo.ModID] ? "outdated" : "fresh");
     }
 
     private void CheckCsprojVersion(ModInfo pluginInfo, string csproj)
@@ -221,7 +219,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
         if (!VersionUtility.IsSupported(_kspVersion, ksp2VersionMin, ksp2VersionMax))
         {
-            if (pluginInfo.Name == "swinfo_name") Logger.LogWarning("unsupported");
             return;
         }
 
@@ -237,7 +234,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
         SpaceWarpManager.ModsOutdated[pluginInfo.ModID] =
             VersionUtility.IsOlderThan(pluginInfo.Version, checkVersion);
-        if (pluginInfo.Name == "swinfo_name") Logger.LogWarning(SpaceWarpManager.ModsOutdated[pluginInfo.ModID] ? "outdated" : "fresh");
     }
 
     private void InitializeUI()
