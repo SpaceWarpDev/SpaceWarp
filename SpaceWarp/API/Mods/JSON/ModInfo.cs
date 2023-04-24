@@ -10,7 +10,28 @@ namespace SpaceWarp.API.Mods.JSON;
 [JsonObject(MemberSerialization.OptIn)]
 public sealed class ModInfo
 {
-    [JsonProperty("mod_id")] public string ModID { get; internal set; }
+    [JsonProperty("spec")] public SpecVersion Spec { get; internal set; } = new();
+
+    [JsonProperty("mod_id")] private string _modID;
+
+    public string ModID
+    {
+        get
+        {
+            if (Spec >= SpecVersion.V1_2)
+            {
+                throw new DeprecatedSwinfoPropertyException(nameof(ModID), SpecVersion.V1_2);
+            }
+
+            SpaceWarpManager.Logger.LogWarning(
+                "The swinfo.json \"mod_id\" property is deprecated and will be removed in a future version. " +
+                "Instead of ModID, use PluginClass.Info.Metadata.GUID in your code."
+            );
+
+            return _modID;
+        }
+        internal set => _modID = value;
+    }
 
     [JsonProperty("name")] public string Name { get; internal set; }
 
