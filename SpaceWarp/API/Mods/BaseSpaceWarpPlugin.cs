@@ -59,7 +59,7 @@ public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin
 
     internal static string GetGuidBySpec(PluginInfo pluginInfo, ModInfo modInfo)
     {
-        return modInfo.Spec >= SpecVersion.SpecBepInExGuid
+        return modInfo.Spec >= SpecVersion.V1_2
             ? pluginInfo.Metadata.GUID
             : modInfo.ModID;
     }

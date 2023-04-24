@@ -18,9 +18,9 @@ public sealed class ModInfo
     {
         get
         {
-            if (Spec >= SpecVersion.SpecBepInExGuid)
+            if (Spec >= SpecVersion.V1_2)
             {
-                throw new DeprecatedSpecPropertyException(nameof(ModID), SpecVersion.SpecBepInExGuid);
+                throw new DeprecatedSwinfoPropertyException(nameof(ModID), SpecVersion.V1_2);
             }
 
             SpaceWarpManager.Logger.LogWarning(

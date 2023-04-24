@@ -5,7 +5,7 @@ using SpaceWarp.API.Mods.JSON.Converters;
 namespace SpaceWarp.API.Mods.JSON;
 
 /// <summary>
-/// Represents the version of the swinfo.json file specification
+/// Represents the version of the API specification from the swinfo.json file.
 /// </summary>
 [JsonConverter(typeof(SpecVersionConverter))]
 public sealed record SpecVersion
@@ -16,18 +16,22 @@ public sealed record SpecVersion
     public int Major { get; } = DefaultMajor;
     public int Minor { get; } = DefaultMinor;
 
+    // ReSharper disable InconsistentNaming
+
     /// <summary>
     /// Specification version 1.0 (SpaceWarp &lt; 1.2), used if "spec" is not specified in the swinfo.json file.
     /// </summary>
-    public static SpecVersion SpecDefault => new();
+    public static SpecVersion Default { get; } = new();
 
     /// <summary>
     /// Specification version 1.2 (SpaceWarp 1.2.x), replaces SpaceWarp's proprietary ModID with BepInEx plugin GUID.
     /// </summary>
-    public static SpecVersion SpecBepInExGuid => new(1, 2);
+    public static SpecVersion V1_2 { get; } = new(1, 2);
+
+    // ReSharper restore InconsistentNaming
 
     /// <summary>
-    ///
+    /// Creates a new SpecVersion object with the version "major.minor".
     /// </summary>
     /// <param name="major">Major version number</param>
     /// <param name="minor">Minor version number</param>
@@ -38,10 +42,10 @@ public sealed record SpecVersion
     }
 
     /// <summary>
-    ///
+    /// Creates a new SpecVersion object from a string.
     /// </summary>
     /// <param name="version">Specification version in the format "major.minor"</param>
-    /// <exception cref="InvalidSpecVersionException"></exception>
+    /// <exception cref="InvalidSpecVersionException">Thrown if the string format is invalid</exception>
     public SpecVersion(string version = null)
     {
         if (version == null)
@@ -77,6 +81,9 @@ public sealed record SpecVersion
     }
 }
 
+/// <summary>
+/// Thrown if the specification version string is invalid.
+/// </summary>
 public sealed class InvalidSpecVersionException : Exception
 {
     public InvalidSpecVersionException(string version) : base(
@@ -85,10 +92,13 @@ public sealed class InvalidSpecVersionException : Exception
     }
 }
 
-public sealed class DeprecatedSpecPropertyException : Exception
+/// <summary>
+/// Thrown if a property is deprecated in the current specification version.
+/// </summary>
+public sealed class DeprecatedSwinfoPropertyException : Exception
 {
-    public DeprecatedSpecPropertyException(string property, SpecVersion deprecationVersion) : base(
-        $"The property \"{property}\" is deprecated in the spec version {deprecationVersion} and will be removed completely in the future."
+    public DeprecatedSwinfoPropertyException(string property, SpecVersion deprecationVersion) : base(
+        $"The swinfo.json property \"{property}\" is deprecated in the spec version {deprecationVersion} and will be removed completely in the future."
     )
     {
     }
