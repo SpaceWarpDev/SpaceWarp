@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using BepInEx;
+using I2.Loc;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarpPatcher;
@@ -20,7 +21,7 @@ public class ModListController : MonoBehaviour
     private Button _disableAllButton;
     private Button _revertChangesButton;
     private Label _changesLabel;
-    private const string ChangesLabelText = "Changes detected: {0}. Please restart the game.";
+    private readonly LocalizedString _changesLabelText = "SpaceWarp/ModList/ChangesDetected";
 
     private Foldout _spaceWarpModFoldout;
     private VisualElement _spaceWarpModList;
@@ -386,7 +387,7 @@ public class ModListController : MonoBehaviour
         if (numChanges > 0)
         {
             _changesLabel.style.display = DisplayStyle.Flex;
-            _changesLabel.text = string.Format(ChangesLabelText, numChanges);
+            _changesLabel.text = string.Format(_changesLabelText, numChanges);
         }
         else
         {
