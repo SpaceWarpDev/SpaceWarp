@@ -242,7 +242,7 @@ public class ModListController : MonoBehaviour
 
         var data = new ModListItemController(element);
         bindFunc(data);
-        element.RegisterCallback<ClickEvent>(OnModSelected);
+        element.AddManipulator(new Clickable(OnModSelected));
 
         if (!NoToggleGuids.Contains(data.Guid))
         {
@@ -258,9 +258,9 @@ public class ModListController : MonoBehaviour
         container.Add(element);
     }
 
-    private void OnModSelected(ClickEvent evt)
+    private void OnModSelected(EventBase evt)
     {
-        if (evt.currentTarget is not VisualElement { userData: ModListItemController data })
+        if (evt.currentTarget is not TemplateContainer { userData: ModListItemController data })
         {
             return;
         }
@@ -368,7 +368,7 @@ public class ModListController : MonoBehaviour
     {
         foreach (var element in _modItemElements)
         {
-            if (!(element.userData is ModListItemController data) || NoToggleGuids.Contains(data.Guid))
+            if (element.userData is not ModListItemController data || NoToggleGuids.Contains(data.Guid))
             {
                 continue;
             }
