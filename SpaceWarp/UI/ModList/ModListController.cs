@@ -5,6 +5,7 @@ using System.IO;
 using BepInEx;
 using I2.Loc;
 using SpaceWarp.API.Assets;
+using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarpPatcher;
 using UnityEngine;
@@ -145,12 +146,13 @@ public class ModListController : MonoBehaviour
                 data.Guid = plugin.Info.Metadata.GUID;
                 data.SetInfo(plugin.SpaceWarpMetadata);
 
-                if (SpaceWarpManager.ModsOutdated[plugin.SpaceWarpMetadata.ModID])
+                var guid = BaseSpaceWarpPlugin.GetGuidBySpec(plugin.Info, plugin.SpaceWarpMetadata);
+                if (SpaceWarpManager.ModsOutdated[guid])
                 {
                     data.SetIsOutdated();
                 }
 
-                if (SpaceWarpManager.ModsUnsupported[plugin.SpaceWarpMetadata.ModID])
+                if (SpaceWarpManager.ModsUnsupported[guid])
                 {
                     data.SetIsUnsupported();
                 }
@@ -164,12 +166,13 @@ public class ModListController : MonoBehaviour
                 data.Guid = plugin.Info.Metadata.GUID;
                 data.SetInfo(modInfo);
 
-                if (SpaceWarpManager.ModsOutdated[modInfo.ModID])
+                var guid = BaseSpaceWarpPlugin.GetGuidBySpec(plugin.Info, modInfo);
+                if (SpaceWarpManager.ModsOutdated[guid])
                 {
                     data.SetIsOutdated();
                 }
 
-                if (SpaceWarpManager.ModsUnsupported[modInfo.ModID])
+                if (SpaceWarpManager.ModsUnsupported[guid])
                 {
                     data.SetIsUnsupported();
                 }
@@ -315,20 +318,20 @@ public class ModListController : MonoBehaviour
                 return;
 
             case ModInfo modInfo:
-                SetSelectedModInfo(modInfo);
+                SetSelectedModInfo(data.Guid, modInfo);
                 return;
 
             case PluginInfo plugin:
-                SetSelectedPluginInfo(plugin);
+                SetSelectedPluginInfo(data.Guid, plugin);
                 return;
         }
     }
 
-    private void SetSelectedModInfo(ModInfo info)
+    private void SetSelectedModInfo(string guid, ModInfo info)
     {
         SetSelected(
             info.Name,
-            info.ModID,
+            guid,
             info.Author,
             info.Version,
             info.Source,
@@ -340,9 +343,9 @@ public class ModListController : MonoBehaviour
         );
     }
 
-    private void SetSelectedPluginInfo(PluginInfo info)
+    private void SetSelectedPluginInfo(string guid, PluginInfo info)
     {
-        SetSelected(info.Metadata.Name, info.Metadata.GUID, version: info.Metadata.Version.ToString());
+        SetSelected(info.Metadata.Name, guid, version: info.Metadata.Version.ToString());
     }
 
     private void SetSelected(
