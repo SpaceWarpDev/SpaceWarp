@@ -13,15 +13,21 @@ Note: Use at your own risk, as this is an early version that is expected to unde
 
 ## Installation
 
-Ensure you have BepInEx correctly installed, it is required for SpaceWarp!
+**It is highly recommended to use CKAN [Download Here](https://github.com/KSP-CKAN/CKAN) to install Space Warp**
+
+If you for some reason want to manually install it, here are the instructions:
+
+Note: *Don't worry about the BepInEx installation, it already comes in the zip folder!*
 
 Download the latest release from this page under the [Releases](https://github.com/SpaceWarpDev/SpaceWarp/releases) section above.
 
-Drag the contents of the .zip folder into your KSP2 directory underneath BepInEx as a plugin, commonly located at `C:\Steam\steamapps\common\Kerbal Space Program 2\BepInEx\plugins` or use the [Installer](https://github.com/SpaceWarpDev/Space-Warp-Installer).
+Drag the contents of the .zip folder into your KSP2 directory, commonly located at `C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program 2`.
 
-In case of installing on Linux under Wine/Proton, you need to override winhttp DLL in winecfg, as described [in BepInEx documentation](https://docs.bepinex.dev/articles/advanced/proton_wine.html).
+In the case of installing on Linux under Wine/Proton, you need to override winhttp DLL in winecfg, as described [in BepInEx documentation](https://docs.bepinex.dev/articles/advanced/proton_wine.html).
 
-To install the downloaded mods, simply drag them into the same location: `C:\Steam\steamapps\common\Kerbal Space Program 2\BepInEx\plugins`. Note that with the latest SpaceWarp update, mods are not loaded within the SpaceWarp folder itself.
+To install the downloaded mods, simply drag them into the plugins folder location: `C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program 2\BepInEx\plugins`. Remember that mods don't go into the SpaceWarp plugin folder, they go along side with it in the `BepInEx\plugins` folder.
+
+That should be it, you can now launch the game and enjoy!
 
 ## Compiling
 
