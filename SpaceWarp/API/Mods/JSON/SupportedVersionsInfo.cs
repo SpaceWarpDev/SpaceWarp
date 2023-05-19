@@ -20,4 +20,9 @@ public sealed class SupportedVersionsInfo
     {
         return VersionUtility.IsSupported(toCheck, Min, Max);
     }
+
+    public override string ToString()
+    {
+        return $"{Min} - {Max}";
+    }
 }
