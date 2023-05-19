@@ -254,6 +254,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
         var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlist.uxml");
         var modList = Window.CreateFromUxml(modListUxml, "Space Warp Mod List", transform, true);
+        modList.EnableLocalization();
         var modListObject = modList.gameObject;
         modListObject.Persist();
         SpaceWarpManager.ModListController = modListObject.AddComponent<ModListController>();
@@ -267,7 +268,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
         MainMenu.RegisterLocalizedMenuButton(
             "SpaceWarp/Mods",
-            () => SpaceWarpManager.ModListController.GetComponent<UIDocument>().rootVisualElement.style.display = DisplayStyle.Flex
+            () => SpaceWarpManager.ModListController.GetComponent<UIDocument>().rootVisualElement.style.display =
+                DisplayStyle.Flex
         );
     }
 }

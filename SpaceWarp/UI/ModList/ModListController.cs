@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using BepInEx;
 using I2.Loc;
@@ -31,6 +32,9 @@ public class ModListController : MonoBehaviour
     private Foldout _disabledModFoldout;
     private VisualElement _disabledInfoModList;
     private VisualElement _disabledModList;
+
+    private Button _openModsFolderButton;
+    private Button _openConfigManagerButton;
 
     // Details UI element references
     private Label _detailsNameLabel;
@@ -68,6 +72,7 @@ public class ModListController : MonoBehaviour
         InitializeElements();
         FillModLists();
         SetupToggles();
+        SetupButtons();
         _isLoaded = true;
     }
 
@@ -97,6 +102,9 @@ public class ModListController : MonoBehaviour
         _disabledModFoldout = root.Q<Foldout>("disabled-mod-foldout");
         _disabledInfoModList = root.Q<VisualElement>("disabled-info-mod-list");
         _disabledModList = root.Q<VisualElement>("disabled-mod-list");
+
+        _openModsFolderButton = root.Q<Button>("open-mods-folder-button");
+        _openConfigManagerButton = root.Q<Button>("open-config-manager-button");
 
         // Store references to the selected mod details UI element references
         _detailsNameLabel = root.Q<Label>("details-name");
@@ -213,7 +221,10 @@ public class ModListController : MonoBehaviour
         {
             element.Q<Toggle>().RemoveFromHierarchy();
         }
+    }
 
+    private void SetupButtons()
+    {
         _enableAllButton.RegisterCallback<ClickEvent>(_ =>
         {
             _toggles = _toggles.Keys.ToDictionary(key => key, _ => true);
@@ -221,6 +232,7 @@ public class ModListController : MonoBehaviour
             UpdateChangesLabel();
             UpdateDisabledFile();
         });
+
         _disableAllButton.RegisterCallback<ClickEvent>(_ =>
         {
             _toggles = _toggles.Keys.ToDictionary(key => key, _ => false);
@@ -228,12 +240,29 @@ public class ModListController : MonoBehaviour
             UpdateChangesLabel();
             UpdateDisabledFile();
         });
+
         _revertChangesButton.RegisterCallback<ClickEvent>(_ =>
         {
             _toggles = new Dictionary<string, bool>(_initialToggles);
             UpdateToggles();
             UpdateChangesLabel();
             UpdateDisabledFile();
+        });
+
+        _openModsFolderButton.RegisterCallback<ClickEvent>(_ =>
+        {
+            var explorer = new Process();
+            explorer.StartInfo = new ProcessStartInfo("explorer.exe")
+            {
+                Arguments = $"\"{Paths.PluginPath}\""
+            };
+            explorer.Start();
+        });
+
+        var configManager = SpaceWarpManager.ConfigurationManager;
+        _openConfigManagerButton.RegisterCallback<ClickEvent>(_ =>
+        {
+            configManager.DisplayingWindow = !configManager.DisplayingWindow;
         });
     }
 

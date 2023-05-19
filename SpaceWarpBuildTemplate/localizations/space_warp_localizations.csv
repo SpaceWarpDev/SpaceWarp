@@ -10,12 +10,13 @@ SpaceWarp/ModList/DisabledMods,Text,,Disabled Mods,DisabledMods
 SpaceWarp/ModList/Version,Text,,Version,Versão
 SpaceWarp/ModList/Author,Text,,Author,Autor
 SpaceWarp/ModList/outdated,Text,,outdated,Desatualizado
+SpaceWarp/ModList/unsupported,Text,,unsupported,Não suportado
 SpaceWarp/ModList/Source,Text,,Source,Fonte
 SpaceWarp/ModList/Description,Text,,Description,Descrição
 SpaceWarp/ModList/KSP2Version,Text,,KSP2 Version,Versão do jogo
 SpaceWarp/ModList/Dependencies,Text,,Dependencies,Dependências
-SpaceWarp/ModList/OpenConfigManager,Text,,Open Configuration Manager,Abrir gestor de configurações
-SpaceWarp/ModList/unsupported,Text,,unsupported,Não suportado
+SpaceWarp/ModList/OpenConfigurationManager,Text,,Open Configuration Manager,Abrir gestor de configurações
+SpaceWarp/ModList/OpenModsFolder,Text,,Open Mods Folder,SpaceWarp/ModList/OpenModsFolder
 SpaceWarp/Mods,Text,,Mods,Mods
 SpaceWarp,Text,,Space Warp,Space Warp
 SpaceWarp/VersionChecking,Text,,Allow Space Warp to check versions for mods over the network?,Deixar SpaceWarp verificar a versão dos mods na internet?
