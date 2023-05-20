@@ -21,6 +21,7 @@ using SpaceWarp.API.Versions;
 using SpaceWarp.UI;
 using SpaceWarp.UI.Debug;
 using SpaceWarp.UI.ModList;
+using UitkForKsp2;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -28,6 +29,7 @@ using UnityEngine.UIElements;
 namespace SpaceWarp;
 
 [BepInDependency(ConfigurationManager.ConfigurationManager.GUID, ConfigurationManager.ConfigurationManager.Version)]
+[BepInDependency(UitkForKsp2Plugin.ModGuid, UitkForKsp2Plugin.ModVer)]
 [BepInPlugin(ModGuid, ModName, ModVer)]
 public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 {
