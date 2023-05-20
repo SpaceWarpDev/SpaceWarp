@@ -15,8 +15,10 @@ public class ModListItemController
     }
 
     public string Guid { get; set; }
-
     public object Info { get; private set; }
+    public bool IsOutdated { get; private set; }
+    public bool IsUnsupported { get; private set; }
+    public bool IsDisabled { get; private set; }
 
     public void SetInfo(ModInfo info)
     {
@@ -32,16 +34,19 @@ public class ModListItemController
 
     public void SetIsOutdated()
     {
+        IsOutdated = true;
         _nameLabel.AddToClassList("outdated");
     }
 
     public void SetIsUnsupported()
     {
+        IsUnsupported = true;
         _nameLabel.AddToClassList("unsupported");
     }
 
     public void SetIsDisabled()
     {
+        IsDisabled = true;
         _nameLabel.AddToClassList("disabled");
     }
 

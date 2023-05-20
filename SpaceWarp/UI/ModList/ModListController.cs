@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using BepInEx;
 using I2.Loc;
 using SpaceWarp.API.Assets;
-using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.API.UI;
 using SpaceWarpPatcher;
+using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -19,6 +21,8 @@ public class ModListController : MonoBehaviour
     private VisualTreeAsset _dependencyTemplate;
 
     // Mod list UI element references
+    private VisualElement _container;
+
     private Button _enableAllButton;
     private Button _disableAllButton;
     private Button _revertChangesButton;
@@ -38,19 +42,26 @@ public class ModListController : MonoBehaviour
     private Button _openConfigManagerButton;
 
     // Details UI element references
+    private VisualElement _detailsContainer;
     private Label _detailsNameLabel;
     private Label _detailsIdLabel;
     private Label _detailsAuthorLabel;
     private Label _detailsVersionLabel;
-    private Label _detailsSourceLabel;
+    private Button _detailsSourceLink;
+    private StyleFloat _detailsSourceLinkInitialBorderWidth;
     private Label _detailsDescriptionLabel;
     private Label _detailsKspVersionLabel;
-    private VisualElement _detailsContainer;
+    private VisualElement _detailsOutdatedWarning;
+    private VisualElement _detailsUnsupportedWarning;
+    private VisualElement _detailsDisabledWarning;
     private Foldout _detailsDependenciesFoldout;
     private VisualElement _detailsDependenciesList;
 
     // State
-    private readonly List<VisualElement> _modItemElements = new();
+    private bool _isLoaded;
+    private bool _isWindowVisible;
+
+    private readonly Dictionary<string, VisualElement> _modItemElements = new();
 
     private Dictionary<string, bool> _toggles;
     private Dictionary<string, bool> _initialToggles;
@@ -61,7 +72,13 @@ public class ModListController : MonoBehaviour
         ConfigurationManager.ConfigurationManager.GUID
     };
 
-    private bool _isLoaded;
+    private void Awake()
+    {
+        _listEntryTemplate = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlistitem.uxml");
+        _dependencyTemplate = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlistdependency.uxml");
+
+        MainMenu.RegisterLocalizedMenuButton("SpaceWarp/Mods", ToggleWindow);
+    }
 
     private void OnEnable()
     {
@@ -70,6 +87,7 @@ public class ModListController : MonoBehaviour
             return;
         }
 
+        SetupDocument();
         InitializeElements();
         FillModLists();
         SetupToggles();
@@ -77,48 +95,93 @@ public class ModListController : MonoBehaviour
         _isLoaded = true;
     }
 
+    private void Update()
+    {
+        if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.M))
+        {
+            ToggleWindow();
+        }
+
+        if (_isWindowVisible && Input.GetKey(KeyCode.Escape))
+        {
+            HideWindow();
+        }
+    }
+
+    private void SetupDocument()
+    {
+        var document = GetComponent<UIDocument>();
+        if (document.TryGetComponent<DocumentLocalization>(out var localization))
+        {
+            localization.Localize();
+        }
+        else
+        {
+            document.EnableLocalization();
+        }
+
+        _container = document.rootVisualElement;
+
+        StartCoroutine(SetupWindow());
+    }
+
+    private IEnumerator SetupWindow()
+    {
+        yield return new WaitForFixedUpdate();
+
+        var root = _container.hierarchy[0];
+        root.transform.position = new Vector3(
+            (Screen.width - root.boundingBox.width) / 2,
+            (Screen.height - root.boundingBox.height) / 2
+        );
+
+        yield return new WaitForFixedUpdate();
+
+        _container.style.display = DisplayStyle.None;
+    }
+
     private void InitializeElements()
     {
-        _listEntryTemplate = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlistitem.uxml");
-        _dependencyTemplate = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlistdetailsitem.uxml");
-
-        var root = GetComponent<UIDocument>().rootVisualElement;
-
         // Register a callback for the back button
-        root.Q<Button>("back-button").RegisterCallback<ClickEvent>(_ => root.style.display = DisplayStyle.None);
+        _container.Q<Button>("back-button").RegisterCallback<ClickEvent>(_ => HideWindow());
 
         // Store references to the Mod list UI elements
-        _enableAllButton = root.Q<Button>("enable-all-button");
-        _disableAllButton = root.Q<Button>("disable-all-button");
-        _revertChangesButton = root.Q<Button>("revert-changes-button");
-        _changesLabel = root.Q<Label>("changes-label");
+        _enableAllButton = _container.Q<Button>("enable-all-button");
+        _disableAllButton = _container.Q<Button>("disable-all-button");
+        _revertChangesButton = _container.Q<Button>("revert-changes-button");
+        _changesLabel = _container.Q<Label>("changes-label");
 
-        _spaceWarpModFoldout = root.Q<Foldout>("spacewarp-mod-foldout");
-        _spaceWarpModList = root.Q<VisualElement>("spacewarp-mod-list");
+        _spaceWarpModFoldout = _container.Q<Foldout>("spacewarp-mod-foldout");
+        _spaceWarpModList = _container.Q<VisualElement>("spacewarp-mod-list");
 
-        _otherModFoldout = root.Q<Foldout>("other-mod-foldout");
-        _otherInfoModList = root.Q<VisualElement>("other-info-mod-list");
-        _otherModList = root.Q<VisualElement>("other-mod-list");
+        _otherModFoldout = _container.Q<Foldout>("other-mod-foldout");
+        _otherInfoModList = _container.Q<VisualElement>("other-info-mod-list");
+        _otherModList = _container.Q<VisualElement>("other-mod-list");
 
-        _disabledModFoldout = root.Q<Foldout>("disabled-mod-foldout");
-        _disabledInfoModList = root.Q<VisualElement>("disabled-info-mod-list");
-        _disabledModList = root.Q<VisualElement>("disabled-mod-list");
+        _disabledModFoldout = _container.Q<Foldout>("disabled-mod-foldout");
+        _disabledInfoModList = _container.Q<VisualElement>("disabled-info-mod-list");
+        _disabledModList = _container.Q<VisualElement>("disabled-mod-list");
 
-        _openModsFolderButton = root.Q<Button>("open-mods-folder-button");
-        _openConfigManagerButton = root.Q<Button>("open-config-manager-button");
+        _openModsFolderButton = _container.Q<Button>("open-mods-folder-button");
+        _openConfigManagerButton = _container.Q<Button>("open-config-manager-button");
 
         // Store references to the selected mod details UI element references
-        _detailsNameLabel = root.Q<Label>("details-name");
-        _detailsIdLabel = root.Q<Label>("details-id");
-        _detailsAuthorLabel = root.Q<Label>("details-author");
-        _detailsVersionLabel = root.Q<Label>("details-version");
-        _detailsSourceLabel = root.Q<Label>("details-source");
-        _detailsDescriptionLabel = root.Q<Label>("details-description");
-        _detailsKspVersionLabel = root.Q<Label>("details-ksp-version");
-        _detailsContainer = root.Q<VisualElement>("details-container");
+        _detailsContainer = _container.Q<VisualElement>("details-container");
+        _detailsNameLabel = _container.Q<Label>("details-name");
+        _detailsIdLabel = _container.Q<Label>("details-id");
+        _detailsAuthorLabel = _container.Q<Label>("details-author");
+        _detailsVersionLabel = _container.Q<Label>("details-version");
+        _detailsSourceLink = _container.Q<Button>("details-source");
+        _detailsSourceLinkInitialBorderWidth = _detailsSourceLink.style.borderBottomWidth;
+        _detailsDescriptionLabel = _container.Q<Label>("details-description");
+        _detailsKspVersionLabel = _container.Q<Label>("details-ksp-version");
 
-        _detailsDependenciesFoldout = root.Q<Foldout>("details-dependencies-foldout");
-        _detailsDependenciesList = root.Q<VisualElement>("details-dependencies-list");
+        _detailsOutdatedWarning = _container.Q<VisualElement>("details-outdated-warning");
+        _detailsUnsupportedWarning = _container.Q<VisualElement>("details-unsupported-warning");
+        _detailsDisabledWarning = _container.Q<VisualElement>("details-disabled-warning");
+
+        _detailsDependenciesFoldout = _container.Q<Foldout>("details-dependencies-foldout");
+        _detailsDependenciesList = _container.Q<VisualElement>("details-dependencies-list");
 
         // Show only categories that have any mods in them
         if (SpaceWarpManager.SpaceWarpPlugins.Count + SpaceWarpManager.NonSpaceWarpInfos.Count > 0)
@@ -146,13 +209,7 @@ public class ModListController : MonoBehaviour
                 data.Guid = plugin.Info.Metadata.GUID;
                 data.SetInfo(plugin.SpaceWarpMetadata);
 
-                var guid = BaseSpaceWarpPlugin.GetGuidBySpec(plugin.Info, plugin.SpaceWarpMetadata);
-                if (SpaceWarpManager.ModsOutdated[guid])
-                {
-                    data.SetIsOutdated();
-                }
-
-                if (SpaceWarpManager.ModsUnsupported[guid])
+                if (SpaceWarpManager.ModsUnsupported[data.Guid])
                 {
                     data.SetIsUnsupported();
                 }
@@ -166,13 +223,7 @@ public class ModListController : MonoBehaviour
                 data.Guid = plugin.Info.Metadata.GUID;
                 data.SetInfo(modInfo);
 
-                var guid = BaseSpaceWarpPlugin.GetGuidBySpec(plugin.Info, modInfo);
-                if (SpaceWarpManager.ModsOutdated[guid])
-                {
-                    data.SetIsOutdated();
-                }
-
-                if (SpaceWarpManager.ModsUnsupported[guid])
+                if (SpaceWarpManager.ModsUnsupported[data.Guid])
                 {
                     data.SetIsUnsupported();
                 }
@@ -194,7 +245,12 @@ public class ModListController : MonoBehaviour
             {
                 data.Guid = pluginInfo.Metadata.GUID;
                 data.SetInfo(modInfo);
-                data.SetIsOutdated();
+                data.SetIsDisabled();
+
+                if (SpaceWarpManager.ModsUnsupported[data.Guid])
+                {
+                    data.SetIsUnsupported();
+                }
             });
         }
 
@@ -217,12 +273,10 @@ public class ModListController : MonoBehaviour
         _toggles = new Dictionary<string, bool>(_initialToggles);
         UpdateToggles();
 
-        var noToggleElements = _modItemElements.Where(element =>
-            NoToggleGuids.Contains(((ModListItemController)element.userData).Guid)
-        );
-        foreach (var element in noToggleElements)
+        var noToggleElements = _modItemElements.Where(pair => NoToggleGuids.Contains(pair.Key));
+        foreach (var pair in noToggleElements)
         {
-            element.Q<Toggle>().RemoveFromHierarchy();
+            pair.Value.Q<Toggle>().RemoveFromHierarchy();
         }
     }
 
@@ -250,6 +304,15 @@ public class ModListController : MonoBehaviour
             UpdateToggles();
             UpdateChangesLabel();
             UpdateDisabledFile();
+        });
+
+        _detailsSourceLink.RegisterCallback<ClickEvent>(_ =>
+        {
+            var url = _detailsSourceLink.text?.Trim();
+            if (!string.IsNullOrEmpty(url) && url.StartsWith("http"))
+            {
+                Application.OpenURL(url);
+            }
         });
 
         _openModsFolderButton.RegisterCallback<ClickEvent>(_ =>
@@ -287,7 +350,7 @@ public class ModListController : MonoBehaviour
             });
         }
 
-        _modItemElements.Add(element);
+        _modItemElements[data.Guid] = element;
         container.Add(element);
     }
 
@@ -298,7 +361,7 @@ public class ModListController : MonoBehaviour
             return;
         }
 
-        foreach (var modItem in _modItemElements)
+        foreach (var modItem in _modItemElements.Values)
         {
             if (modItem == evt.currentTarget)
             {
@@ -318,20 +381,20 @@ public class ModListController : MonoBehaviour
                 return;
 
             case ModInfo modInfo:
-                SetSelectedModInfo(data.Guid, modInfo);
+                SetSelectedModInfo(data, modInfo);
                 return;
 
             case PluginInfo plugin:
-                SetSelectedPluginInfo(data.Guid, plugin);
+                SetSelectedPluginInfo(data, plugin);
                 return;
         }
     }
 
-    private void SetSelectedModInfo(string guid, ModInfo info)
+    private void SetSelectedModInfo(ModListItemController data, ModInfo info)
     {
         SetSelected(
             info.Name,
-            guid,
+            data.Guid,
             info.Author,
             info.Version,
             info.Source,
@@ -339,13 +402,23 @@ public class ModListController : MonoBehaviour
             info.SupportedKsp2Versions.ToString(),
             info.Dependencies
                 ?.Select(dependencyInfo => (dependencyInfo.ID, dependencyInfo.Version.ToString()))
-                .ToList()
+                .ToList(),
+            data.IsOutdated,
+            data.IsUnsupported,
+            data.IsDisabled
         );
     }
 
-    private void SetSelectedPluginInfo(string guid, PluginInfo info)
+    private void SetSelectedPluginInfo(ModListItemController data, PluginInfo info)
     {
-        SetSelected(info.Metadata.Name, guid, version: info.Metadata.Version.ToString());
+        SetSelected(
+            info.Metadata.Name,
+            data.Guid,
+            version: info.Metadata.Version.ToString(),
+            isOutdated: data.IsOutdated,
+            isUnsupported: data.IsUnsupported,
+            isDisabled: data.IsDisabled
+        );
     }
 
     private void SetSelected(
@@ -357,6 +430,9 @@ public class ModListController : MonoBehaviour
         string description = "",
         string kspVersion = "",
         List<(string, string)> dependencies = null,
+        bool isOutdated = false,
+        bool isUnsupported = false,
+        bool isDisabled = false,
         bool hasSelected = true
     )
     {
@@ -366,11 +442,15 @@ public class ModListController : MonoBehaviour
         _detailsIdLabel.text = id;
         _detailsAuthorLabel.text = author;
         _detailsVersionLabel.text = version;
-        _detailsSourceLabel.text = source;
+        _detailsSourceLink.text = source;
+        _detailsSourceLink.style.borderBottomWidth = string.IsNullOrEmpty(source) || !source.StartsWith("http")
+            ? 0
+            : _detailsSourceLinkInitialBorderWidth;
         _detailsDescriptionLabel.text = description;
         _detailsKspVersionLabel.text = kspVersion;
 
         SetDependencies(dependencies);
+        SetModWarnings(isOutdated, isUnsupported, isDisabled);
     }
 
     private void SetDependencies(List<(string, string)> dependencies)
@@ -392,6 +472,13 @@ public class ModListController : MonoBehaviour
         }
     }
 
+    private void SetModWarnings(bool isOutdated, bool isUnsupported, bool isDisabled)
+    {
+        _detailsOutdatedWarning.style.display = isOutdated ? DisplayStyle.Flex : DisplayStyle.None;
+        _detailsUnsupportedWarning.style.display = isUnsupported ? DisplayStyle.Flex : DisplayStyle.None;
+        _detailsDisabledWarning.style.display = isDisabled ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
     private void ClearSelected()
     {
         SetSelected(hasSelected: false);
@@ -399,7 +486,7 @@ public class ModListController : MonoBehaviour
 
     private void UpdateToggles()
     {
-        foreach (var element in _modItemElements)
+        foreach (var element in _modItemElements.Values)
         {
             if (element.userData is not ModListItemController data || NoToggleGuids.Contains(data.Guid))
             {
@@ -433,5 +520,25 @@ public class ModListController : MonoBehaviour
             ChainloaderPatch.DisabledPluginsFilepath,
             _toggles.Where(item => !item.Value).Select(item => item.Key)
         );
+    }
+
+    internal void UpdateOutdated(string guid, bool isOutdated)
+    {
+        if (isOutdated)
+        {
+            (_modItemElements[guid]?.userData as ModListItemController)?.SetIsOutdated();
+        }
+    }
+
+    internal void ToggleWindow()
+    {
+        _container.style.display = _isWindowVisible ? DisplayStyle.None : DisplayStyle.Flex;
+        _isWindowVisible = !_isWindowVisible;
+    }
+
+    internal void HideWindow()
+    {
+        _container.style.display = DisplayStyle.None;
+        _isWindowVisible = false;
     }
 }
