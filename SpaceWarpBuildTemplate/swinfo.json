@@ -6,7 +6,15 @@
   "source": "https://github.com/SpaceWarpDev/SpaceWarp",
   "version_check": "https://raw.githubusercontent.com/SpaceWarpDev/SpaceWarp/main/SpaceWarpBuildTemplate/swinfo.json",
   "version": "1.2.0",
-  "dependencies": [],
+  "dependencies": [
+    {
+      "id":  "UitkForKsp2",
+      "version": {
+        "min": "0.5.1",
+        "max": "*"
+      }
+    }
+  ],
   "ksp2_version": {
     "min": "0",
     "max": "*"

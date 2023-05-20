@@ -13,7 +13,7 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.Backend.UI.Appbar;
-using SpaceWarp.UI;
+using SpaceWarp.UI.ModList;
 using UnityEngine;
 
 namespace SpaceWarp;
@@ -40,7 +40,7 @@ internal static class SpaceWarpManager
 
     private static GUISkin _skin;
 
-    public static ModListUI ModListUI { get; internal set; }
+    public static ModListController ModListController { get; internal set; }
 
     public static GUISkin Skin
     {
@@ -143,7 +143,7 @@ internal static class SpaceWarpManager
 
     public static void Initialize(SpaceWarpPlugin spaceWarpPlugin)
     {
-        Logger = spaceWarpPlugin.Logger;
+        Logger = SpaceWarpPlugin.Logger;
 
         SpaceWarpFolder = Path.GetDirectoryName(spaceWarpPlugin.Info.Location);
 
@@ -158,17 +158,17 @@ internal static class SpaceWarpManager
             ?.GetValue(null) as string;
         foreach (var plugin in SpaceWarpPlugins)
         {
-            CheckModKspVersion(plugin.Guid, plugin.SpaceWarpMetadata, kspVersion);
+            CheckModKspVersion(plugin.Info.Metadata.GUID, plugin.SpaceWarpMetadata, kspVersion);
         }
 
         foreach (var info in NonSpaceWarpInfos)
         {
-            CheckModKspVersion(BaseSpaceWarpPlugin.GetGuidBySpec(info.Item1.Info, info.Item2), info.Item2, kspVersion);
+            CheckModKspVersion(info.Item1.Info.Metadata.GUID, info.Item2, kspVersion);
         }
 
         foreach (var info in DisabledInfoPlugins)
         {
-            CheckModKspVersion(BaseSpaceWarpPlugin.GetGuidBySpec(info.Item1, info.Item2), info.Item2, kspVersion);
+            CheckModKspVersion(info.Item1.Metadata.GUID, info.Item2, kspVersion);
         }
     }
 
