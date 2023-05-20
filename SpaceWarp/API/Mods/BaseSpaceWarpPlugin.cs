@@ -30,7 +30,7 @@ public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin
     internal ManualLogSource ModLogger => Logger;
     public string PluginFolderPath { get; internal set; }
 
-    public string Guid => GetGuidBySpec(Info, SpaceWarpMetadata);
+    public string IdBySpec => GetGuidBySpec(Info, SpaceWarpMetadata);
 
     /// <summary>
     ///     1st stage initialization

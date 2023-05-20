@@ -104,7 +104,7 @@ public static class Loading
         var assets = importFunction(assetPath, file);
         foreach (var asset in assets)
         {
-            AssetManager.RegisterSingleAsset(plugin.Guid, asset.name, asset.asset);
+            AssetManager.RegisterSingleAsset(plugin.IdBySpec, asset.name, asset.asset);
         }
     }
 

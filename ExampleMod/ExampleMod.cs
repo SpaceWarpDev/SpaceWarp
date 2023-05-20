@@ -42,7 +42,7 @@ public class ExampleMod : BaseSpaceWarpPlugin
             // Path format [mod_id]/images/filename
             // for bundles its [mod_id]/[bundle_name]/[path to file in bundle with out assets/bundle]/filename.extension
             // There is also a try get asset function, that returns a bool on whether or not it could grab the asset
-            AssetManager.GetAsset<Texture2D>($"{Guid}/images/icon.png"),
+            AssetManager.GetAsset<Texture2D>($"{IdBySpec}/images/icon.png"),
             ToggleButton
         );
     }
