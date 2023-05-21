@@ -9,17 +9,20 @@ namespace SpaceWarp.API.Mods.JSON;
 [JsonObject(MemberSerialization.OptIn)]
 public sealed class SupportedVersionsInfo
 {
-    [JsonProperty("min")] public string Min { get; internal set; } = "0.0.0";
+    internal const string DefaultMin = "0.0.0";
+    internal const string DefaultMax = "*";
 
-    [JsonProperty("max")] public string Max { get; internal set; } = "*";
+    [JsonProperty("min")] public string Min { get; internal set; } = DefaultMin;
+
+    [JsonProperty("max")] public string Max { get; internal set; } = DefaultMax;
 
     public bool IsSupported(string toCheck)
     {
-        if (VersionUtility.CompareSemanticVersionStrings(toCheck, Min) < 0)
-        {
-            return false;
-        }
+        return VersionUtility.IsSupported(toCheck, Min, Max);
+    }
 
-        return VersionUtility.CompareSemanticVersionStrings(toCheck, Max) <= 0;
+    public override string ToString()
+    {
+        return $"{Min} - {Max}";
     }
 }

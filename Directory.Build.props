@@ -1,13 +1,15 @@
 <Project>
     <PropertyGroup>
-        <SpaceWarpVersion>1.1.3</SpaceWarpVersion>
-        <TargetFramework>net472</TargetFramework>
+        <SpaceWarpVersion>1.2.0</SpaceWarpVersion>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-        <!-- Disabled warning for publicizer attribute until the NuGet exists for KSP2  -->
-        <NoWarn>CS0436</NoWarn>
+        <!-- Disabled warning for publicizer attribute until the NuGet exists for KSP2,
+             and for missing documentation comments for public types and members -->
+        <NoWarn>$(NoWarn),CS0436,CS1591</NoWarn>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <!--

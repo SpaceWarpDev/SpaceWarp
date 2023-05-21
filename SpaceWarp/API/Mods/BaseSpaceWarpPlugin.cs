@@ -30,6 +30,8 @@ public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin
     internal ManualLogSource ModLogger => Logger;
     public string PluginFolderPath { get; internal set; }
 
+    public string IdBySpec => GetGuidBySpec(Info, SpaceWarpMetadata);
+
     /// <summary>
     ///     1st stage initialization
     ///     This is called before any of the game is actually loaded, it is called as early as possible in the games bootstrap
@@ -53,5 +55,12 @@ public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin
     /// </summary>
     public virtual void OnPostInitialized()
     {
+    }
+
+    internal static string GetGuidBySpec(PluginInfo pluginInfo, ModInfo modInfo)
+    {
+        return modInfo.Spec >= SpecVersion.V1_2
+            ? pluginInfo.Metadata.GUID
+            : modInfo.ModID;
     }
 }

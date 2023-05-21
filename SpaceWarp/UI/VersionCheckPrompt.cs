@@ -11,12 +11,12 @@ internal class VersionCheckPrompt : MonoBehaviour
     private float _windowHeight;
     private Rect _windowRect;
     private float _windowWidth;
-    
+
     private static readonly LocalizedString SpaceWarp = "SpaceWarp";
     private static readonly LocalizedString VersionChecking = "SpaceWarp/VersionChecking";
     private static readonly LocalizedString Yes = "SpaceWarp/Yes";
     private static readonly LocalizedString No = "SpaceWarp/No";
-    
+
     private void Awake()
     {
         const float minResolution = 1280f / 720f;
@@ -60,7 +60,7 @@ internal class VersionCheckPrompt : MonoBehaviour
         GUILayout.BeginVertical();
         GUILayout.Label(VersionChecking);
         GUILayout.BeginHorizontal();
-        
+
         if (GUILayout.Button(Yes))
         {
             spaceWarpPlugin.CheckVersions();

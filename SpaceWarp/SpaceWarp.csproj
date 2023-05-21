@@ -6,7 +6,6 @@
     <ItemGroup>
         <Reference Include="Assembly-CSharp" Private="false" Publicize="true" />
         <Reference Include="Unity.TextMeshPro" Private="false" />
-        <Reference Include="UnityEngine.UI" Private="false" />
         <Reference Include="Unity.Addressables" Private="false" />
         <Reference Include="Unity.ResourceManager" Private="false" />
         <Reference Include="KSPLogging" Private="false" />
@@ -15,15 +14,48 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all" />
         <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" Publicize="true" />
-        <PackageReference Include="HarmonyX" Version="2.10.1" />
         <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all" />
+        <PackageReference Include="HarmonyX" Version="2.10.1" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+        <PackageReference Include="UitkForKsp2" Version="1.0.0" />
         <PackageReference Include="UnityEngine.Modules" Version="2020.3.33" />
-        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0" PrivateAssets="all" />
+        <PackageReference Include="UnityEngine.UITK" Version="2020.3.33" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\SpaceWarpPatcher\SpaceWarpPatcher.csproj" />
+        <ProjectReference Include="..\SpaceWarpPatcher\SpaceWarpPatcher.csproj">
+            <PrivateAssets>all</PrivateAssets>
+            <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+            <IncludeAssets>SpaceWarpPatcher.dll</IncludeAssets>
+        </ProjectReference>
     </ItemGroup>
+    <!-- Nuget packaging configuration -->
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>Space Warp contributors</Authors>
+        <Description>A C# modding API for KSP2 built on top of BepInEx</Description>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageId>SpaceWarp</PackageId>
+        <PackageLicenseUrl>https://raw.githubusercontent.com/SpaceWarpDev/SpaceWarp/main/LICENSE</PackageLicenseUrl>
+        <PackageOutputPath>..\build</PackageOutputPath>
+        <PackageProjectUrl>https://spacewarp.org</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>SpaceWarp;KSP2;modding</PackageTags>
+        <RepositoryUrl>https://github.com/SpaceWarpDev/SpaceWarp</RepositoryUrl>
+        <Title>Space Warp</Title>
+        <NoWarn>$(NoWarn),NU5118,NU5125</NoWarn>
+    </PropertyGroup>
+    <Target Name="IncludeAllFilesInTargetDir" AfterTargets="Build">
+        <ItemGroup>
+            <None Include="..\images\icon.png" Pack="true" PackagePath="\" />
+            <None Include="..\LICENSE" Pack="true" PackagePath="\" />
+            <None Include="..\.github\README.md" Pack="true" PackagePath="\" />
+            <None Include="$(TargetDir)\**">
+                <Pack>true</Pack>
+                <PackagePath>lib\$(TargetFramework)</PackagePath>
+            </None>
+        </ItemGroup>
+    </Target>
 </Project>

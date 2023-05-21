@@ -5,7 +5,6 @@ using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
-using I2.Loc;
 using SpaceWarpPatcher;
 using Newtonsoft.Json;
 using SpaceWarp.API.Assets;
@@ -14,7 +13,7 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.Backend.UI.Appbar;
-using SpaceWarp.UI;
+using SpaceWarp.UI.ModList;
 using UnityEngine;
 
 namespace SpaceWarp;
@@ -41,7 +40,7 @@ internal static class SpaceWarpManager
 
     private static GUISkin _skin;
 
-    public static ModListUI ModListUI { get; internal set; }
+    public static ModListController ModListController { get; internal set; }
 
     public static GUISkin Skin
     {
@@ -144,7 +143,7 @@ internal static class SpaceWarpManager
 
     public static void Initialize(SpaceWarpPlugin spaceWarpPlugin)
     {
-        Logger = spaceWarpPlugin.Logger;
+        Logger = SpaceWarpPlugin.Logger;
 
         SpaceWarpFolder = Path.GetDirectoryName(spaceWarpPlugin.Info.Location);
 
@@ -159,19 +158,33 @@ internal static class SpaceWarpManager
             ?.GetValue(null) as string;
         foreach (var plugin in SpaceWarpPlugins)
         {
-            ModsUnsupported[plugin.SpaceWarpMetadata.ModID] =
-                !plugin.SpaceWarpMetadata.SupportedKsp2Versions.IsSupported(kspVersion);
+            CheckModKspVersion(plugin.Info.Metadata.GUID, plugin.SpaceWarpMetadata, kspVersion);
         }
 
         foreach (var info in NonSpaceWarpInfos)
         {
-            ModsUnsupported[info.Item2.ModID] = !info.Item2.SupportedKsp2Versions.IsSupported(kspVersion);
+            CheckModKspVersion(info.Item1.Info.Metadata.GUID, info.Item2, kspVersion);
         }
 
         foreach (var info in DisabledInfoPlugins)
         {
-            ModsUnsupported[info.Item2.ModID] = !info.Item2.SupportedKsp2Versions.IsSupported(kspVersion);
+            CheckModKspVersion(info.Item1.Metadata.GUID, info.Item2, kspVersion);
         }
+    }
+
+    private static void CheckModKspVersion(string guid, ModInfo modInfo, string kspVersion)
+    {
+        var unsupported = true;
+        try
+        {
+            unsupported = !modInfo.SupportedKsp2Versions.IsSupported(kspVersion);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Unable to check KSP version for {guid} due to error {e}");
+        }
+
+        ModsUnsupported[guid] = unsupported;
     }
 
     private static List<(string name, UnityObject asset)> AssetBundleLoadingAction(string internalPath, string filename)
@@ -213,18 +226,17 @@ internal static class SpaceWarpManager
     {
         var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false)
         {
-            filterMode = FilterMode.Point 
+            filterMode = FilterMode.Point
         };
         var fileData = File.ReadAllBytes(filename);
         tex.LoadImage(fileData); // Will automatically resize
-        List<(string name, UnityObject asset)> assets = new();
-        assets.Add(($"images/{internalPath}",tex));
+        List<(string name, UnityObject asset)> assets = new() { ($"images/{internalPath}", tex) };
         return assets;
     }
 
     internal static void InitializeSpaceWarpsLoadingActions()
     {
-        Loading.AddAssetLoadingAction("bundles","loading asset bundles",AssetBundleLoadingAction,"bundle");
-        Loading.AddAssetLoadingAction("images","loading images",ImageLoadingAction);
+        Loading.AddAssetLoadingAction("bundles", "loading asset bundles", AssetBundleLoadingAction, "bundle");
+        Loading.AddAssetLoadingAction("images", "loading images", ImageLoadingAction);
     }
 }
