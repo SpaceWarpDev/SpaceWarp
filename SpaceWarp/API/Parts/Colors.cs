@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BepInEx.Logging;
 using SpaceWarp.Patching;
 
@@ -21,7 +22,9 @@ public static class Colors
     /// <param name="partNameList">
     ///     Collection of partNames. Names that end in XS, S, M, L or XL will be counted as the same
     ///     part,
+    ///     Example: partNameS, partNameM, partNameL, partNameXL are all treated as partName
     /// </param>
+    [Obsolete("This should only be used for testing purposes (for easier reloading of textures). Use the shader \"Parts Replace\" instead")]
     public static void DeclareParts(string modGuid, params string[] partNameList)
     {
         ColorsPatch.DeclareParts(modGuid, partNameList);
@@ -35,7 +38,9 @@ public static class Colors
     /// <param name="partNameList">
     ///     Collection of partNames. Names that end in XS, S, M, L or XL will be counted as the same
     ///     part.
+    ///     Example: partNameS, partNameM, partNameL, partNameXL are all treated as partName
     /// </param>
+    [Obsolete("This should only be used for testing purposes (for easier reloading of textures). Use the shader \"Parts Replace\" instead")]
     public static void DeclareParts(string modGuid, IEnumerable<string> partNameList)
     {
         ColorsPatch.DeclareParts(modGuid, partNameList);
