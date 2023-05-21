@@ -31,7 +31,7 @@ internal class ColorsPatch
     private const int EMISSION = 4;
     private const int PAINT_MAP = 5;
 
-    private const string KSP2_OPAQUE_PATH = "KSP2/Parts/Standard Damaged",
+    private const string KSP2_OPAQUE_PATH = "KSP2/Scenery/Standard (Opaque)",
         KSP2_TRANSPARENT_PATH = "KSP2/Scenery/Standard (Transparent)",
         UNITY_STANDARD = "Standard";
 
@@ -224,7 +224,7 @@ internal class ColorsPatch
                 {
                     count++;
 
-                    if(i== ColorsPatch.BUMP) //Converting texture to Bump texture
+                    if (i == ColorsPatch.BUMP) //Converting texture to Bump texture
                     {
                         Texture2D normalTexture = new Texture2D(Tex.width, Tex.height, TextureFormat.RGBA32, false, true);
                         Graphics.CopyTexture(Tex, normalTexture);
@@ -245,7 +245,7 @@ internal class ColorsPatch
         var trimmedPartName = TrimPartName(partName);
         material.SetFloat("_MetallicGlossMap", 1f);
         material.SetFloat("_Metallic", 1f);
-        material.SetFloat("_PaintGlossMapScale",.8f);
+        material.SetFloat("_PaintGlossMapScale", 1f);
         for (var i = 0; i < _propertyIds.Length; i++)
         {
             var texture = _partHash[trimmedPartName][i];
@@ -297,29 +297,41 @@ internal class ColorsPatch
         var partName = __instance.OABPart is not null ? __instance.OABPart.PartName : __instance.part.Name;
         var trimmedPartName = TrimPartName(partName);
 
-        if (!_allParts.Contains(trimmedPartName))
-            //SpaceWarpManager.Logger.LogError($"{partName} is not declared and onlyDeclareParts is enabled. Skipping."); //This will generate a LOT of logs
+        if (_allParts.Contains(trimmedPartName))
         {
-            return;
-        }
-
-        foreach (var renderer in __instance.GetComponentsInChildren<MeshRenderer>(true))
-        {
-            if (renderer.material.shader.name != _unityStandard.name)
-            {
-                continue;
-            }
-
             var mat = new Material(_ksp2Opaque);
-            SetTexturesToMaterial(trimmedPartName, ref mat);
+            mat.name = __instance.GetComponentInChildren<MeshRenderer>().material.name;
 
-            renderer.material = mat;
-
-            if (renderer.material.shader.name != _ksp2Opaque.name)
+            foreach (var renderer in __instance.GetComponentsInChildren<MeshRenderer>(true))
             {
-                renderer.SetMaterial(mat); //Sometimes the material Set doesn't work, this seems to be more reliable.
+                if (renderer.material.shader.name != _unityStandard.name)
+                {
+                    continue;
+                }
+
+                SetTexturesToMaterial(trimmedPartName, ref mat);
+
+                renderer.material = mat;
+
+                if (renderer.material.shader.name != _ksp2Opaque.name)
+                {
+                    renderer.SetMaterial(mat); //Sometimes the material Set doesn't work, this seems to be more reliable.
+                }
             }
         }
+        else 
+        {
+            foreach (var renderer in __instance.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                if (renderer.material.shader.name == "Parts Replace")
+                {
+                    var mat = new Material(_ksp2Opaque);
+                    mat.name = renderer.material.name;
+                    mat.CopyPropertiesFromMaterial(renderer.material);
+                    renderer.material = mat;
+                }
+            }
+        }//New way to render textures
 
         __instance.SomeColorUpdated();
     }
