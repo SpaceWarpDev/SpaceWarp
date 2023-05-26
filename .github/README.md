@@ -21,11 +21,11 @@ Note: *Don't worry about the BepInEx installation, it already comes in the zip f
 
 Download the latest release of [UITK for KSP 2](https://github.com/jan-bures/UitkForKsp2/releases).
 
-Drag the contents of the .zip file into your KSP2 directory, commonly located at `C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program 2`.
+Drag the contents of UitkForKsp2's .zip file into your KSP2 directory, commonly located at `C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program 2`.
 
 Download the latest Space Warp release from this page under the [Releases](https://github.com/SpaceWarpDev/SpaceWarp/releases) section above.
 
-Once again, drag the contents of the .zip file into your KSP2 directory, commonly located at `C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program 2`.
+Drag the contents of Space Warp's .zip file into your KSP2 directory, commonly located at `C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program 2`.
 
 In the case of installing on Linux under Wine/Proton, you need to override winhttp DLL in winecfg, as described [in BepInEx documentation](https://docs.bepinex.dev/articles/advanced/proton_wine.html).
 
