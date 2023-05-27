@@ -13,6 +13,7 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.Backend.UI.Appbar;
+using SpaceWarp.UI.Debug;
 using SpaceWarp.UI.ModList;
 using UnityEngine;
 
@@ -41,6 +42,8 @@ internal static class SpaceWarpManager
     private static GUISkin _skin;
 
     public static ModListController ModListController { get; internal set; }
+    
+    public static SpaceWarpConsole SpaceWarpConsole { get; internal set; }
 
     public static GUISkin Skin
     {
