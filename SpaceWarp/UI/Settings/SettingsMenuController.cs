@@ -8,6 +8,7 @@ using KSP.UI;
 using KSP.UI.Binding;
 using KSP.UI.Binding.Core;
 using SpaceWarp.API.UI.Settings;
+using SpaceWarp.Patching;
 using UnityEngine;
 using UnityEngine.UI;
 namespace SpaceWarp.UI.Settings;
@@ -32,6 +33,10 @@ public class SettingsMenuController : KerbalMonoBehaviour
 
     private const string RadioButtonPrefabPath =
         $"{ContentPath}/GraphicsSettingsMenu/Video/GameScreenMode";
+
+    private const string SliderPrefabPath = $"{ContentPath}/GameplaySettingsMenu/Simulation/MaxPatchesToDisplay";
+
+    private const string InputFieldPrefabPath = "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Main Canvas/MainMenu(Clone)/CampaignMenu/CreateCampaignMenu/Menu/CampaignOptions/CampaignName/CampaignNameInputField";
     
 
     private ModsSubMenu _modsSubMenu;
@@ -39,6 +44,11 @@ public class SettingsMenuController : KerbalMonoBehaviour
     private GameObject _dividerPrefab;
     private GameObject _sectionPrefab;
     private void Start()
+    {
+        MainMenuPatcher.MainMenuLoaded += Setup;
+    }
+
+    private void Setup()
     {
         var categories = GameObject.Find(CategoriesPath);
         var graphics = GameObject.Find(GraphicsPath);
@@ -90,11 +100,38 @@ public class SettingsMenuController : KerbalMonoBehaviour
             if (beta != null) Destroy(beta);
             
         }
-        
         radioPrefab.SetActive(false);
         radioSettingPrefab.SetActive(false);
         ModsPropertyDrawers.RadioPrefab = radioPrefab;
         ModsPropertyDrawers.RadioSettingPrefab = radioSettingPrefab;
+
+        var inputFieldContainer = Instantiate(ddPrefab);
+        inputFieldContainer.Persist();
+        var setting = inputFieldContainer.GetChild("Setting");
+        foreach (Transform child in setting.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+
+        var inputFieldPrefab = Instantiate(GameObject.Find(InputFieldPrefabPath), setting.transform);
+        Destroy(inputFieldPrefab.GetChild("Icons"));
+        var extended = inputFieldPrefab.GetComponentInChildren<InputFieldExtended>();
+        var textArea = extended.gameObject;
+        Destroy(textArea.GetComponent<InputFieldIconController>());
+        Destroy(textArea.GetComponent<UIValue_WriteString_Field>());
+        Destroy(textArea.GetComponent<UIAction_Void_InputFieldExtended>());
+        inputFieldContainer.SetActive(false);
+        ModsPropertyDrawers.InputFieldPrefab = inputFieldContainer;
+
+        var sliderPrefab = Instantiate(GameObject.Find(SliderPrefabPath));
+        var sliderSetting = sliderPrefab.GetChild("Setting");
+        var slider = sliderSetting.GetChild("KSP2SliderLinear");
+        var amount = sliderSetting.GetChild("Amount display");
+        Destroy(slider.GetComponent<UIValue_WriteNumber_Slider>());
+        Destroy(amount.GetComponentInChildren<UIValue_ReadString_Text>());
+        sliderPrefab.SetActive(false);
+        ModsPropertyDrawers.SliderPrefab = sliderPrefab;
         
         
         modsButton.GetComponentInChildren<Localize>().Term = "";

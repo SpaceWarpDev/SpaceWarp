@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using BepInEx.Configuration;
 using I2.Loc;
 using KSP;
+using KSP.Api.CoreTypes;
 using KSP.UI;
 using KSP.UI.Binding;
 using SpaceWarp.Backend.UI.Settings;
@@ -24,34 +26,27 @@ public static class ModsPropertyDrawers
     {
         if (entry.SettingType.IsEnum && !AllPropertyDrawers.ContainsKey(entry.SettingType))
             AllPropertyDrawers.Add(entry.SettingType, GenerateEnumDrawerFor(entry.SettingType));
+        if (!AllPropertyDrawers.ContainsKey(entry.SettingType))
+        {
+            try
+            {
+                AllPropertyDrawers.Add(entry.SettingType,GenerateGenericDrawerFor(entry.SettingType));
+            }
+            catch
+            {
+                //Ignored
+            }
+        }
         return AllPropertyDrawers.TryGetValue(entry.SettingType, out var func) ? func(entry) : null;
     }
+
+
 
     internal static GameObject DropdownPrefab;
     internal static GameObject RadioPrefab;
     internal static GameObject RadioSettingPrefab;
+    internal static GameObject InputFieldPrefab;
 
-    // We internally just generate a localization key for the description
-    private static int nextLocKey = 0;
-
-    private static string GetNextLocalizationKey()
-    {
-        return $"Menu/Settings/Descriptions/ModOption{nextLocKey++}";
-    }
-
-    private static string GenerateLocalizationKeyFor(string description)
-    {
-        int numLanguages = LocalizationManager.Sources.First().mLanguages.Count;
-        var termData = new TermData
-        {
-            TermType = eTermType.Text,
-            Term = GetNextLocalizationKey(),
-            Description = "",
-            Languages = Enumerable.Repeat(description, numLanguages).ToArray()
-        };
-        LocalizationManager.Sources.First().mTerms.Add(termData);
-        return termData.Term;
-    }
 
     private static Func<ConfigEntryBase, GameObject> GenerateEnumDrawerFor(Type t)
     {
@@ -96,6 +91,7 @@ public static class ModsPropertyDrawers
                 sec.description = entry.Description.Description;
                 sec.isInputSettingElement = false;
                 ddCopy.SetActive(true);
+                ddCopy.name = entry.Definition.Key;
                 return ddCopy;
             }
             else
@@ -145,6 +141,7 @@ public static class ModsPropertyDrawers
                         }
                     });
                     allToggles.Add(toggle);
+                    toggle.name = optionNames[i];
                     settingCopy.SetActive(true);
                 }
 
@@ -152,11 +149,66 @@ public static class ModsPropertyDrawers
                 sec.description = entry.Description.Description;
                 sec.isInputSettingElement = false;
                 radioCopy.SetActive(true);
+                radioCopy.name = entry.Definition.Key;
                 return radioCopy;
             }
         };
     }
 
+    
+    // Should satisfy most needs
+    private static Func<ConfigEntryBase, GameObject> GenerateGenericDrawerFor(Type entrySettingType)
+    {
+        var valueListMethod = typeof(ModsPropertyDrawers).GetMethod(nameof(CreateFromAcceptableValueList),
+            BindingFlags.Static | BindingFlags.NonPublic)
+            ?.MakeGenericMethod(entrySettingType);
+        var valueRangeMethod = typeof(ModsPropertyDrawers).GetMethod(nameof(CreateFromAcceptableValueRange),
+                BindingFlags.Static | BindingFlags.NonPublic)
+            ?.MakeGenericMethod(entrySettingType);
+        return entry =>
+        {
+            var t = entry.Description.AcceptableValues?.GetType();
+            if (t?.GetGenericTypeDefinition() == typeof(AcceptableValueList<>) &&
+                t.GenericTypeArguments[0] == entrySettingType)
+            {
+                if (valueListMethod != null)
+                    return (GameObject)valueListMethod.Invoke(null, new object[] { entry, entry.Description.AcceptableValues });
+            }
+
+            if (t?.GetGenericTypeDefinition() == typeof(AcceptableValueRange<>) &&
+                t.GenericTypeArguments[0] == entrySettingType)
+            {
+                if (valueRangeMethod != null)
+                {
+                    return (GameObject)valueRangeMethod.Invoke(null, new object[] { entry, entry.Description.AcceptableValues });
+                }
+            }
+            
+            var inputFieldCopy = UnityObject.Instantiate(InputFieldPrefab);
+            var lab = inputFieldCopy.GetChild("Label");
+            lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
+            lab.GetComponent<TextMeshProUGUI>().text = entry.Definition.Key;
+            var textField = inputFieldCopy.GetComponentInChildren<InputFieldExtended>();
+            var textFieldObject = textField.gameObject;
+            textFieldObject.name = entry.Definition.Key + ": Text Field";
+            textField.characterLimit = 256;
+            textField.readOnly = false;
+            textField.interactable = true;
+            textField.text = entry.BoxedValue.ToString();
+            textField.onValueChanged.AddListener(str => { entry.BoxedValue = TypeDescriptor.GetConverter(entrySettingType).ConvertFromString(str); });
+            var rectTransform = textFieldObject.transform.parent.gameObject.GetComponent<RectTransform>();
+            rectTransform.anchorMin = new Vector2(0, 2.7f);
+            rectTransform.anchorMax = new Vector2(0.19f, 2.25f);
+            var sec = inputFieldCopy.AddComponent<CustomSettingsElementDescriptionController>();
+            sec.description = entry.Description.Description;
+            sec.isInputSettingElement = false;
+            inputFieldCopy.SetActive(true);
+            inputFieldCopy.name = entry.Definition.Key;
+            return inputFieldCopy;
+        };
+    }
+    
+    
     private static GameObject CreateBoolConfig(ConfigEntryBase baseEntry)
     {
         var entry = (ConfigEntry<bool>)baseEntry;
@@ -195,6 +247,7 @@ public static class ModsPropertyDrawers
                 {
                     return;
                 }
+
                 entry.BoxedValue = i1 == 0;
                 for (var j = 0; j < allToggles.Count; j++)
                 {
@@ -211,11 +264,147 @@ public static class ModsPropertyDrawers
         sec.description = entry.Description.Description;
         sec.isInputSettingElement = false;
         radioCopy.SetActive(true);
+        radioCopy.name = entry.Definition.Key;
         return radioCopy;
+    }
+
+    private static GameObject CreateFromAcceptableValueList<T>(ConfigEntry<T> entry,
+        AcceptableValueList<T> acceptableValues) where T : IEquatable<T>
+    {
+        var ddCopy = UnityObject.Instantiate(DropdownPrefab);
+        var lab = ddCopy.GetChild("Label");
+        lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
+        lab.GetComponent<TextMeshProUGUI>().text = entry.Definition.Key;
+        var dropdown = ddCopy.GetChild("Setting").GetChild("KSP2DropDown");
+        var extended = dropdown.GetComponent<DropdownExtended>();
+        // Start by clearing the options data
+        extended.options.Clear();
+        foreach (var option in acceptableValues.AcceptableValues)
+        {
+            extended.options.Add(new TMP_Dropdown.OptionData(option as string ?? (option is Color color
+                ? (color.a < 1 ? ColorUtility.ToHtmlStringRGBA(color) : ColorUtility.ToHtmlStringRGB(color))
+                : option.ToString())));
+        }
+
+        extended.value = acceptableValues.AcceptableValues.IndexOf(entry.Value);
+        extended.onValueChanged.AddListener(idx => { entry.Value = acceptableValues.AcceptableValues[idx]; });
+        var sec = ddCopy.AddComponent<CustomSettingsElementDescriptionController>();
+        sec.description = entry.Description.Description;
+        sec.isInputSettingElement = false;
+        ddCopy.SetActive(true);
+        ddCopy.name = entry.Definition.Key;
+        return ddCopy;
+    }
+
+    internal static GameObject SliderPrefab;
+    
+    // We should just assume that stuff can be converted to a float for this
+    private static GameObject CreateFromAcceptableValueRange<T>(ConfigEntry<T> entry,
+        AcceptableValueRange<T> acceptableValues) where T : IComparable
+    {
+        // Now we have to have a "slider" prefab
+        var slCopy = UnityObject.Instantiate(SliderPrefab);
+        var lab = slCopy.GetChild("Label");
+        lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
+        lab.GetComponent<TextMeshProUGUI>().text = entry.Definition.Key;
+        var setting = slCopy.GetChild("Setting");
+        var slider = setting.GetChild("KSP2SliderLinear").GetComponent<SliderExtended>();
+        var amount = setting.GetChild("Amount display");
+        var text = amount.GetComponentInChildren<TextMeshProUGUI>();
+        text.text = entry.Value.ToString();
+        var convFloat = TypeDescriptor.GetConverter(typeof(float)) ?? throw new ArgumentNullException("TypeDescriptor.GetConverter(typeof(float))");
+        var convT = TypeDescriptor.GetConverter(typeof(T)) ?? throw new ArgumentNullException("TypeDescriptor.GetConverter(typeof(T))");
+        Func<T,float> toFloat = x => (float)convFloat.ConvertFrom(x);
+        Func<float, T> toT = x => (T)convT.ConvertFrom(x);
+        slider.onValueChanged.AddListener(value =>
+        {
+            // var trueValue = (acceptableValues.MaxValue-acceptableValues.MinValue) * (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFrom(value)
+            var trueValue = (toFloat(acceptableValues.MaxValue) - toFloat(acceptableValues.MinValue)) * value +
+                            toFloat(acceptableValues.MinValue);
+
+            entry.Value = toT(trueValue) ?? entry.Value;
+            if (entry.Value != null) text.text = entry.Value.ToString();
+            slider.SetWithoutCallback(toFloat(entry.Value));
+        });
+
+        var sec = slCopy.AddComponent<CustomSettingsElementDescriptionController>();
+        sec.description = entry.Description.Description;
+        sec.isInputSettingElement = false;
+        slCopy.SetActive(true);
+        slCopy.name = entry.Definition.Key;
+        return slCopy;
+    }
+
+    private static GameObject CreateStringConfig(ConfigEntryBase entryBase)
+    {
+        var entry = (ConfigEntry<string>)entryBase;
+        if (entry.Description.AcceptableValues is AcceptableValueList<string> str)
+        {
+            return CreateFromAcceptableValueList(entry, str);
+        }
+
+        var inputFieldCopy = UnityObject.Instantiate(InputFieldPrefab);
+        var lab = inputFieldCopy.GetChild("Label");
+        lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
+        lab.GetComponent<TextMeshProUGUI>().text = entry.Definition.Key;
+        var textField = inputFieldCopy.GetComponentInChildren<InputFieldExtended>();
+        var textFieldObject = textField.gameObject;
+        textFieldObject.name = entry.Definition.Key + ": Text Field";
+        textField.characterLimit = 256;
+        textField.readOnly = false;
+        textField.interactable = true;
+        textField.text = entry.Value;
+        textField.onValueChanged.AddListener(str => { entry.Value = str; });
+        var rectTransform = textFieldObject.transform.parent.gameObject.GetComponent<RectTransform>();
+        rectTransform.anchorMin = new Vector2(0, 2.7f);
+        rectTransform.anchorMax = new Vector2(0.19f, 2.25f);
+        var sec = inputFieldCopy.AddComponent<CustomSettingsElementDescriptionController>();
+        sec.description = entry.Description.Description;
+        sec.isInputSettingElement = false;
+        inputFieldCopy.SetActive(true);
+        inputFieldCopy.name = entry.Definition.Key;
+        return inputFieldCopy;
+    }
+
+    private static GameObject CreateColorConfig(ConfigEntryBase entryBase)
+    {
+        var entry = (ConfigEntry<Color>)entryBase;
+        if (entry.Description.AcceptableValues is AcceptableValueList<Color> col)
+        {
+            return CreateFromAcceptableValueList(entry, col);
+        }
+        var inputFieldCopy = UnityObject.Instantiate(InputFieldPrefab);
+        var lab = inputFieldCopy.GetChild("Label");
+        lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
+        lab.GetComponent<TextMeshProUGUI>().text = entry.Definition.Key;
+        var textField = inputFieldCopy.GetComponentInChildren<InputFieldExtended>();
+        var textFieldObject = textField.gameObject;
+        textFieldObject.name = entry.Definition.Key + ": Color Field";
+        textField.characterLimit = 256;
+        textField.readOnly = false;
+        textField.interactable = true;
+        textField.text = entry.Value.a < 1 ? ColorUtility.ToHtmlStringRGBA(entry.Value) : ColorUtility.ToHtmlStringRGB(entry.Value);
+        textField.onValueChanged.AddListener(str => {
+            if (ColorUtility.TryParseHtmlString(str, out var color))
+            {
+                entry.Value = color;
+            }
+        });
+        var rectTransform = textFieldObject.transform.parent.gameObject.GetComponent<RectTransform>();
+        rectTransform.anchorMin = new Vector2(0, 2.7f);
+        rectTransform.anchorMax = new Vector2(0.19f, 2.25f);
+        var sec = inputFieldCopy.AddComponent<CustomSettingsElementDescriptionController>();
+        sec.description = entry.Description.Description;
+        sec.isInputSettingElement = false;
+        inputFieldCopy.SetActive(true);
+        inputFieldCopy.name = entry.Definition.Key;
+        return inputFieldCopy;
     }
 
     internal static void SetupDefaults()
     {
         AllPropertyDrawers[typeof(bool)] = CreateBoolConfig;
+        AllPropertyDrawers[typeof(string)] = CreateStringConfig;
+        AllPropertyDrawers[typeof(Color)] = CreateColorConfig;
     }
 }
