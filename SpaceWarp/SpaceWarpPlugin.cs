@@ -129,6 +129,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
     }
 
+    public override void OnPostInitialized()
+    {
+        InitializeSettingsUI();
+    }
+
     public void ClearVersions()
     {
         foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
@@ -265,7 +270,10 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         consoleUIObject.transform.SetParent(Chainloader.ManagerObject.transform);
         consoleUIObject.AddComponent<SpaceWarpConsole>();
         consoleUIObject.SetActive(true);
+    }
 
+    private void InitializeSettingsUI()
+    {
         GameObject settingsController = new("Settings Controller");
         settingsController.Persist();
         settingsController.transform.SetParent(Chainloader.ManagerObject.transform);
