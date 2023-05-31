@@ -50,6 +50,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<bool> ConfigShowTimeStamps;
     internal ConfigEntry<string> ConfigTimeStampFormat;
     internal ConfigEntry<Color> ConfigWarningColor;
+    internal ConfigEntry<Color> ConfigAutoScrollEnabledColor;
     private string _kspVersion;
 
     internal new static ManualLogSource Logger;
@@ -262,14 +263,15 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
         var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlist.uxml");
         var modList = Window.CreateFromUxml(modListUxml, "Space Warp Mod List", transform, true);
+        
+        var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/swconsole/swconsole.uxml");
+        var swConsole = Window.CreateFromUxml(swConsoleUxml, "Space Warp Console", transform, true);
+        
         SpaceWarpManager.ModListController = modList.gameObject.AddComponent<ModListController>();
         modList.gameObject.Persist();
 
-        GameObject consoleUIObject = new("Space Warp Console");
-        consoleUIObject.Persist();
-        consoleUIObject.transform.SetParent(Chainloader.ManagerObject.transform);
-        consoleUIObject.AddComponent<SpaceWarpConsole>();
-        consoleUIObject.SetActive(true);
+        SpaceWarpManager.SpaceWarpConsole = swConsole.gameObject.AddComponent<SpaceWarpConsole>();
+        swConsole.gameObject.Persist();
     }
 
     private void InitializeSettingsUI()

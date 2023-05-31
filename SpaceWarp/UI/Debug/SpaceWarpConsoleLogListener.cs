@@ -8,6 +8,8 @@ public sealed class SpaceWarpConsoleLogListener : ILogListener
 {	
     internal static readonly List<string> DebugMessages = new();	
     private readonly SpaceWarpPlugin _spaceWarpPluginInstance;	
+    
+    public static event Action<string> OnNewMessage;
 
     public SpaceWarpConsoleLogListener(SpaceWarpPlugin spaceWarpPluginInstance)	
     {	
@@ -17,7 +19,11 @@ public sealed class SpaceWarpConsoleLogListener : ILogListener
     public void LogEvent(object sender, LogEventArgs eventArgs)	
     {	
         DebugMessages.Add(BuildMessage(TimestampMessage(), eventArgs.Level, eventArgs.Data, eventArgs.Source));	
-        LogMessageJanitor();	
+        
+        // Notify all listeners that a new message has been added
+        OnNewMessage?.Invoke(DebugMessages[^1]);
+
+        LogMessageJanitor();
     }	
 
     public void Dispose()	
