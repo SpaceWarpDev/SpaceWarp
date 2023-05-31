@@ -224,7 +224,8 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
             logEntry.style.display = DisplayStyle.Flex;
             if (!string.IsNullOrEmpty(searchFilter))
             {
-                if (!logEntry.LogSource.SourceName.Contains(searchFilter) && !logEntry.LogMessage.Contains(searchFilter))
+                string lowercaseSearch = searchFilter.ToLower();
+                if (!logEntry.LogSource.SourceName.ToLower().Contains(lowercaseSearch) && !logEntry.LogMessage.ToLower().Contains(lowercaseSearch))
                 {
                     logEntry.style.display = DisplayStyle.None;
                 }
