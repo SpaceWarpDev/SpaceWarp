@@ -123,22 +123,25 @@ public class ModListController : MonoBehaviour
 
         _container = document.rootVisualElement;
 
-        StartCoroutine(SetupWindow());
+        SetupWindow();
     }
 
-    private IEnumerator SetupWindow()
+    private void SetupWindow()
     {
-        yield return new WaitForFixedUpdate();
+        _container.style.visibility = Visibility.Hidden;
+        _container.RegisterCallback<GeometryChangedEvent>(CenterWindow);
+    }
 
+    private void CenterWindow(GeometryChangedEvent evt)
+    {
         var root = _container.hierarchy[0];
         root.transform.position = new Vector3(
             (Screen.width - root.boundingBox.width) / 2,
             (Screen.height - root.boundingBox.height) / 2
         );
-
-        yield return new WaitForFixedUpdate();
-
         _container.style.display = DisplayStyle.None;
+        _container.style.visibility = Visibility.Visible;
+        _container.UnregisterCallback<GeometryChangedEvent>(CenterWindow);
     }
 
     private void InitializeElements()
