@@ -9,6 +9,7 @@ using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using KSP;
 using KSP.Messages;
 using UitkForKsp2.API;
 using Newtonsoft.Json;
@@ -20,6 +21,7 @@ using SpaceWarp.API.Versions;
 using SpaceWarp.UI;
 using SpaceWarp.UI.Debug;
 using SpaceWarp.UI.ModList;
+using SpaceWarp.UI.Settings;
 using UitkForKsp2;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -263,5 +265,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         consoleUIObject.transform.SetParent(Chainloader.ManagerObject.transform);
         consoleUIObject.AddComponent<SpaceWarpConsole>();
         consoleUIObject.SetActive(true);
+
+        GameObject settingsController = new("Settings Controller");
+        settingsController.Persist();
+        settingsController.transform.SetParent(Chainloader.ManagerObject.transform);
+        settingsController.AddComponent<SettingsMenuController>();
+        settingsController.SetActive(true);
     }
 }
