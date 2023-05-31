@@ -5,6 +5,9 @@ using KSP.Api.CoreTypes;
 using KSP.Game;
 using KSP.Rendering;
 using KSP.UI;
+using KSP.UI.Binding;
+using KSP.UI.Binding.Core;
+using SpaceWarp.API.UI.Settings;
 using UnityEngine;
 using UnityEngine.UI;
 namespace SpaceWarp.UI.Settings;
@@ -23,6 +26,14 @@ public class SettingsMenuController : KerbalMonoBehaviour
         $"{SettingsMenuPath}/Submenus Scroll/Viewport/Content";
 
     private const string ContentGraphicsPath = $"{ContentPath}/GraphicsSettingsMenu";
+
+    private const string DropdownPrefabPath =
+        $"{ContentPath}/GeneralSettingsMenu/Language";
+
+    private const string RadioButtonPrefabPath =
+        $"{ContentPath}/GraphicsSettingsMenu/Video/GameScreenMode";
+    
+
     private ModsSubMenu _modsSubMenu;
     private GameObject _headerPrefab;
     private GameObject _dividerPrefab;
@@ -50,6 +61,42 @@ public class SettingsMenuController : KerbalMonoBehaviour
         }
         _sectionPrefab.Persist();
         _sectionPrefab.SetActive(false);
+        var ddPrefab = Instantiate(GameObject.Find(DropdownPrefabPath));
+        Destroy(ddPrefab.GetComponent<UIValue_ReadBool_SetActive>());
+        ddPrefab.Persist();
+        var dropdown = ddPrefab.GetChild("Setting").GetChild("KSP2DropDown");
+        // This will be redone once I add a specific 
+        Destroy(dropdown.GetComponent<UIValue_ReadDropdownOption_Text>());
+        Destroy(dropdown.GetComponent<SettingsElementDescriptionController>());
+        
+        ddPrefab.SetActive(false);
+        ModsPropertyDrawers.DropdownPrefab = ddPrefab;
+
+        var radioPrefab = Instantiate(GameObject.Find(RadioButtonPrefabPath));
+        radioPrefab.Persist();
+        var radioSetting = radioPrefab.GetChild("Setting");
+        Destroy(radioSetting.GetComponent<UIValue_WriteEnum_ToggleFlipFlop>());
+        var radioSettingPrefab = Instantiate(radioSetting.GetChild("Fullscreen"));
+        radioSettingPrefab.Persist();
+        foreach (Transform child in radioSetting.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        {
+            var alpha = radioSettingPrefab.GetComponent<UIValue_WriteBool_Toggle>();
+            if (alpha != null) Destroy(alpha);
+            var beta = radioSettingPrefab.GetComponent<UIAction_Void_Toggle>();
+            if (beta != null) Destroy(beta);
+            
+        }
+        
+        radioPrefab.SetActive(false);
+        radioSettingPrefab.SetActive(false);
+        ModsPropertyDrawers.RadioPrefab = radioPrefab;
+        ModsPropertyDrawers.RadioSettingPrefab = radioSettingPrefab;
+        
+        
         modsButton.GetComponentInChildren<Localize>().Term = "";
         var text = modsButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
         text.text = "Mods";
@@ -71,12 +118,14 @@ public class SettingsMenuController : KerbalMonoBehaviour
         toggle.actionKey = "ToggleModsSettings";
         toggle.action = new DelegateAction(ToggleModsSettings);
         _modsSubMenu.gameObject.SetActive(false);
+        ModsPropertyDrawers.SetupDefaults();
     }
 
     private void ToggleModsSettings()
     {
         Game.SettingsMenuManager.ToggleMenu(_modsSubMenu);
-        Game.SettingsMenuManager.UpdateResetButton("Mods");
+        Game.SettingsMenuManager._currentResetButtonLocKey = "Mods";
+        Game.SettingsMenuManager._resetButtonText.SetValue("Reset Mods");
     }
 
     private GameObject GenerateTitle(string title)

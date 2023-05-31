@@ -2,6 +2,7 @@
 global using System.Linq;
 using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Reflection;
 using System.Xml;
 using BepInEx;
@@ -36,6 +37,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 {
     internal static SpaceWarpPlugin Instance;
 
+
     public const string ModGuid = "com.github.x606.spacewarp";
     public const string ModName = "Space Warp";
     public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
@@ -44,6 +46,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<Color> ConfigDebugColor;
     internal ConfigEntry<int> ConfigDebugMessageLimit;
 
+    
     internal ConfigEntry<Color> ConfigErrorColor;
     private ConfigEntry<bool> _configFirstLaunch;
     internal ConfigEntry<Color> ConfigInfoColor;
