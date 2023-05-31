@@ -95,18 +95,15 @@ public class SettingsMenuController : KerbalMonoBehaviour
         copy.SetActive(true);
         return copy;
     }
-
     private GameObject GenerateSection(string section)
     {
         var copy = Instantiate(_sectionPrefab);
-        var title = copy.transform.Find("Title");
-
-        var loc = copy.GetComponent<Localize>();
-        if (loc != null)
+        var text = copy.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        var localize = copy.GetComponentInChildren<Localize>();
+        if (localize != null)
         {
-            loc.Term = section;
+            localize.Term = section;
         }
-        var text = title.GetComponent<TMPro.TextMeshProUGUI>();
         text.text = section;
         copy.SetActive(true);
         return copy;
