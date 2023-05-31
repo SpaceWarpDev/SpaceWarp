@@ -19,7 +19,7 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
 using SpaceWarp.UI;
-using SpaceWarp.UI.Debug;
+using SpaceWarp.UI.Console;
 using SpaceWarp.UI.ModList;
 using SpaceWarp.UI.Settings;
 using UitkForKsp2;

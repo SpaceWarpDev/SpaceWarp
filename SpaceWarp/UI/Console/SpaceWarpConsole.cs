@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using BepInEx.Bootstrap;	
+﻿using System.Collections;
 using BepInEx.Logging;
-using KSP.Animation;
-using KSP.DebugTools;
 using KSP.Game;
-using MoonSharp.VsCodeDebugger.SDK;
-using SpaceWarp.API.Assets;
 using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static SpaceWarp.UI.Debug.SpaceWarpConsoleLogListener;
+using static SpaceWarp.UI.Console.SpaceWarpConsoleLogListener;
 
-namespace SpaceWarp.UI.Debug;	
+namespace SpaceWarp.UI.Console;	
 
 public sealed class SpaceWarpConsole : KerbalMonoBehaviour	
 {	

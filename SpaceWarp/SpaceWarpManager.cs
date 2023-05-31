@@ -13,7 +13,7 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.Backend.UI.Appbar;
-using SpaceWarp.UI.Debug;
+using SpaceWarp.UI.Console;
 using SpaceWarp.UI.ModList;
 using UnityEngine;
 
