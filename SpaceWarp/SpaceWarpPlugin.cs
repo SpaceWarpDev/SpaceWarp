@@ -32,6 +32,8 @@ namespace SpaceWarp;
 [BepInPlugin(ModGuid, ModName, ModVer)]
 public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 {
+    internal static SpaceWarpPlugin Instance;
+
     public const string ModGuid = "com.github.x606.spacewarp";
     public const string ModName = "Space Warp";
     public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
@@ -56,6 +58,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public SpaceWarpPlugin()
     {
         Logger = base.Logger;
+        Instance = this;
     }
 
     public void Awake()
@@ -257,7 +260,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlist.uxml");
         var modList = Window.CreateFromUxml(modListUxml, "Space Warp Mod List", transform, true);
         
-        var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/swconsole/swconsole.uxml");
+        var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/uitkswconsole/spacewarp.console/ConsoleWindow.uxml");
         var swConsole = Window.CreateFromUxml(swConsoleUxml, "Space Warp Console", transform, true);
         
         SpaceWarpManager.ModListController = modList.gameObject.AddComponent<ModListController>();
