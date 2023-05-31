@@ -7,9 +7,10 @@ namespace SpaceWarp.UI.Debug;
 public sealed class SpaceWarpConsoleLogListener : ILogListener	
 {	
     internal static readonly List<string> DebugMessages = new();	
-    private readonly SpaceWarpPlugin _spaceWarpPluginInstance;	
-    
+    private readonly SpaceWarpPlugin _spaceWarpPluginInstance;
+
     public static event Action<string> OnNewMessage;
+    public static event Action<LogInfo> OnNewLog;
 
     public SpaceWarpConsoleLogListener(SpaceWarpPlugin spaceWarpPluginInstance)	
     {	
@@ -18,13 +19,23 @@ public sealed class SpaceWarpConsoleLogListener : ILogListener
 
     public void LogEvent(object sender, LogEventArgs eventArgs)	
     {	
-        DebugMessages.Add(BuildMessage(TimestampMessage(), eventArgs.Level, eventArgs.Data, eventArgs.Source));	
-        
+        DebugMessages.Add(BuildMessage(TimestampMessage(), eventArgs.Level, eventArgs.Data, eventArgs.Source));
+
         // Notify all listeners that a new message has been added
         OnNewMessage?.Invoke(DebugMessages[^1]);
+        OnNewLog?.Invoke(new LogInfo { dateTime = DateTime.Now, args = eventArgs});
 
         LogMessageJanitor();
     }	
+
+    public struct LogInfo
+    {
+        public DateTime dateTime;
+        public LogLevel Level => args.Level;
+        public ILogSource Source => args.Source;
+        public object Data => args.Data;
+        public LogEventArgs args;
+    }
 
     public void Dispose()	
     {	
