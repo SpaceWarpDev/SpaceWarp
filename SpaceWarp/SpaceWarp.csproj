@@ -4,7 +4,6 @@
         <Version>$(SpaceWarpVersion)</Version>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="Assembly-CSharp" Private="false" Publicize="true" />
         <Reference Include="Unity.TextMeshPro" Private="false" />
         <Reference Include="Unity.Addressables" Private="false" />
         <Reference Include="Unity.ResourceManager" Private="false" />
@@ -18,6 +17,7 @@
         <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" Publicize="true" />
         <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all" />
         <PackageReference Include="HarmonyX" Version="2.10.1" />
+        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.2" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
         <PackageReference Include="UitkForKsp2" Version="1.0.0" />
