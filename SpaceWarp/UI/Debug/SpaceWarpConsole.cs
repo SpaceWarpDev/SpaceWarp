@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using BepInEx.Bootstrap;	
 using BepInEx.Logging;
 using KSP.Animation;
+using KSP.DebugTools;
 using KSP.Game;
+using MoonSharp.VsCodeDebugger.SDK;
 using SpaceWarp.API.Assets;
 using UitkForKsp2.API;
 using UnityEngine;
@@ -18,10 +20,6 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
     // State
     private bool _isLoaded;
     private bool _isWindowVisible;
-    
-    private SpaceWarpPlugin _spaceWarpPluginInstance;
-    
-    private VisualTreeAsset _consoleTemplate;
 
     // UITK Stuff
     private VisualElement _container;
@@ -59,8 +57,16 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
     {
         LogEntry entry = new(logInfo);
         entry.TextColor = GetColorFromLogLevel(logInfo.Level);
-        entry.RegisterCallback<ClickEvent>((evt) => entry.MessageGrouper.style.display = entry.MessageGrouper.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex);
         _consoleContent.Add(entry);
+
+        //Check if this entry should be currently hidden
+        CheckFilter(entry);
+
+        //First in first out
+        if (_consoleContent.contentContainer.childCount > SpaceWarpPlugin.Instance.ConfigDebugMessageLimit.Value)
+            _consoleContent.contentContainer.RemoveAt(0); 
+        if(_toggleAutoScroll.value)
+            AutoScrollToBottom();
     }
 
 
@@ -70,9 +76,6 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         
         // Debugging
         _logger = SpaceWarpPlugin.Logger;
-        
-        // IDK what this does tbh but it fixed some issues
-        _spaceWarpPluginInstance = (Chainloader.PluginInfos[SpaceWarpPlugin.ModGuid].Instance as SpaceWarpPlugin)!;
 
         // Run the main UITK setup functions
         SetupDocument();
@@ -160,7 +163,8 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         _toggleDebug.RegisterValueChangedCallback(filterHandler);
         _toggleMessage.RegisterValueChangedCallback(filterHandler);
         _toggleInfo.RegisterValueChangedCallback(filterHandler);
-        _toggleAutoScroll.RegisterValueChangedCallback(filterHandler);
+
+        _toggleAutoScroll.RegisterValueChangedCallback(AutoScrollChanged);
     }
 
     private void UnbindFunctions()
@@ -172,7 +176,20 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         _toggleDebug.UnregisterValueChangedCallback(filterHandler);
         _toggleMessage.UnregisterValueChangedCallback(filterHandler);
         _toggleInfo.UnregisterValueChangedCallback(filterHandler);
-        _toggleAutoScroll.UnregisterValueChangedCallback(filterHandler);
+
+        _toggleAutoScroll.UnregisterValueChangedCallback(AutoScrollChanged);
+    }
+
+    private void AutoScrollChanged(ChangeEvent<bool> changeEvent)
+    {
+        if (changeEvent.newValue)
+        {
+            StartCoroutine(AutoScrollToBottomCoroutine());
+        }
+        else
+        {
+            StopCoroutine(AutoScrollToBottomCoroutine());
+        }
     }
 
     private void SetDefaults()
@@ -184,32 +201,38 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
         _toggleError.value = true;
         _toggleAutoScroll.value = true;
     }
-    
+
     private void FilterMessages()
     {
-        // Start off with the original messages.
-        foreach(var message in _consoleContent.Children())
+        for (int i = 0; i < _consoleContent.childCount; i++)
         {
-            if (message is LogEntry logEntry)
-            {
-                bool LogLevelPermitted = IsLogLevelEnabled(logEntry.logLevel);
+            //Only LogEntries should be in this content
+            LogEntry entry = _consoleContent[i] as LogEntry;
 
-                if (LogLevelPermitted)
+            if (entry is not null)
+            {
+                CheckFilter(entry);
+            }
+        }
+    }
+    internal void CheckFilter(LogEntry logEntry)
+    {
+        bool LogLevelPermitted = IsLogLevelEnabled(logEntry.logLevel);
+
+        if (LogLevelPermitted)
+        {
+            logEntry.style.display = DisplayStyle.Flex;
+            if (!string.IsNullOrEmpty(searchFilter))
+            {
+                if (!logEntry.LogSource.SourceName.Contains(searchFilter) && !logEntry.LogMessage.Contains(searchFilter))
                 {
-                    message.style.display = DisplayStyle.Flex;
-                    if (!string.IsNullOrEmpty(searchFilter))
-                    {
-                        if (!logEntry.LogSource.SourceName.Contains(searchFilter) && !logEntry.LogMessage.Contains(searchFilter))
-                        {
-                            message.style.display = DisplayStyle.None;
-                        }
-                    }
-                }
-                else
-                {
-                    message.style.display = DisplayStyle.None;
+                    logEntry.style.display = DisplayStyle.None;
                 }
             }
+        }
+        else
+        {
+            logEntry.style.display = DisplayStyle.None;
         }
     }
 
@@ -239,24 +262,18 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
             case LogLevel.Fatal:
                 return Color.red;
             case LogLevel.Error:
-                return _spaceWarpPluginInstance.ConfigErrorColor.Value;
+                return SpaceWarpPlugin.Instance.ConfigErrorColor.Value;
             case LogLevel.Warning:
-                return _spaceWarpPluginInstance.ConfigWarningColor.Value;
+                return SpaceWarpPlugin.Instance.ConfigWarningColor.Value;
             case LogLevel.Message:
-                return _spaceWarpPluginInstance.ConfigMessageColor.Value;
+                return SpaceWarpPlugin.Instance.ConfigMessageColor.Value;
             case LogLevel.Info:
-                return _spaceWarpPluginInstance.ConfigInfoColor.Value;
+                return SpaceWarpPlugin.Instance.ConfigInfoColor.Value;
             case LogLevel.Debug:
-                return _spaceWarpPluginInstance.ConfigDebugColor.Value;
+                return SpaceWarpPlugin.Instance.ConfigDebugColor.Value;
             default:
-                return _spaceWarpPluginInstance.ConfigMessageColor.Value;
+                return SpaceWarpPlugin.Instance.ConfigMessageColor.Value;
         }
-    }
-
-    private void ToggleAutoScroll()
-    {
-        _toggleAutoScroll.value = !_toggleAutoScroll.value;
-        _logger.LogInfo("AutoScroll is now " + (_toggleAutoScroll.value ? "enabled" : "disabled") + ".");
     }
 
     private void AutoScrollToBottom()
@@ -267,8 +284,8 @@ public sealed class SpaceWarpConsole : KerbalMonoBehaviour
     private IEnumerator AutoScrollToBottomCoroutine()
     {
         yield return null;
-
         _consoleContent.ScrollTo(_consoleContent.contentContainer[_consoleContent.contentContainer.childCount - 1]);
+        //put a while loop here to make this automatic!
     }
     
     private void ToggleWindow()
