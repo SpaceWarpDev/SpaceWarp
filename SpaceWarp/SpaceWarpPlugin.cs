@@ -2,6 +2,7 @@
 global using System.Linq;
 using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Reflection;
 using System.Xml;
 using BepInEx;
@@ -9,6 +10,7 @@ using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using KSP;
 using KSP.Messages;
 using UitkForKsp2.API;
 using Newtonsoft.Json;
@@ -20,6 +22,7 @@ using SpaceWarp.API.Versions;
 using SpaceWarp.UI;
 using SpaceWarp.UI.Console;
 using SpaceWarp.UI.ModList;
+using SpaceWarp.UI.Settings;
 using UitkForKsp2;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -34,6 +37,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 {
     internal static SpaceWarpPlugin Instance;
 
+
     public const string ModGuid = "com.github.x606.spacewarp";
     public const string ModName = "Space Warp";
     public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
@@ -42,6 +46,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<Color> ConfigDebugColor;
     internal ConfigEntry<int> ConfigDebugMessageLimit;
 
+    
     internal ConfigEntry<Color> ConfigErrorColor;
     private ConfigEntry<bool> _configFirstLaunch;
     internal ConfigEntry<Color> ConfigInfoColor;
@@ -137,6 +142,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         {
             ClearVersions();
         }
+    }
+
+    public override void OnPostInitialized()
+    {
+        InitializeSettingsUI();
     }
 
     public void ClearVersions()
@@ -276,5 +286,14 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
         SpaceWarpManager.SpaceWarpConsole = swConsole.gameObject.AddComponent<SpaceWarpConsole>();
         swConsole.gameObject.Persist();
+    }
+
+    private void InitializeSettingsUI()
+    {
+        GameObject settingsController = new("Settings Controller");
+        settingsController.Persist();
+        settingsController.transform.SetParent(Chainloader.ManagerObject.transform);
+        settingsController.AddComponent<SettingsMenuController>();
+        settingsController.SetActive(true);
     }
 }
