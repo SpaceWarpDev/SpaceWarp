@@ -69,6 +69,7 @@ public class ModListController : MonoBehaviour
     private static readonly IReadOnlyList<string> NoToggleGuids = new List<string>
     {
         SpaceWarpPlugin.ModGuid,
+        UitkForKsp2Plugin.ModGuid,
         ConfigurationManager.ConfigurationManager.GUID
     };
 
