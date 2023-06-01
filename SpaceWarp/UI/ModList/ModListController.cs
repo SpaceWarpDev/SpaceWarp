@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,6 +8,7 @@ using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI;
 using SpaceWarpPatcher;
+using UitkForKsp2;
 using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -121,23 +121,8 @@ public class ModListController : MonoBehaviour
         }
 
         _container = document.rootVisualElement;
-
-        StartCoroutine(SetupWindow());
-    }
-
-    private IEnumerator SetupWindow()
-    {
-        yield return new WaitForFixedUpdate();
-
-        var root = _container.hierarchy[0];
-        root.transform.position = new Vector3(
-            (Screen.width - root.boundingBox.width) / 2,
-            (Screen.height - root.boundingBox.height) / 2
-        );
-
-        yield return new WaitForFixedUpdate();
-
-        _container.style.display = DisplayStyle.None;
+        _container[0].CenterByDefault();
+        HideWindow();
     }
 
     private void InitializeElements()
@@ -530,13 +515,13 @@ public class ModListController : MonoBehaviour
         }
     }
 
-    internal void ToggleWindow()
+    private void ToggleWindow()
     {
         _container.style.display = _isWindowVisible ? DisplayStyle.None : DisplayStyle.Flex;
         _isWindowVisible = !_isWindowVisible;
     }
 
-    internal void HideWindow()
+    private void HideWindow()
     {
         _container.style.display = DisplayStyle.None;
         _isWindowVisible = false;
