@@ -7,6 +7,8 @@
     <ItemGroup>
       <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" />
       <PackageReference Include="HarmonyX" Version="2.10.1" />
+      <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.5.0" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
     </ItemGroup>
     
 </Project>

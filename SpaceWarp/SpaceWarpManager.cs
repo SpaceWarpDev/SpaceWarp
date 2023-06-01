@@ -13,7 +13,7 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.Backend.UI.Appbar;
-using SpaceWarp.UI.Debug;
+using SpaceWarp.UI.Console;
 using SpaceWarp.UI.ModList;
 using UnityEngine;
 
@@ -45,6 +45,8 @@ internal static class SpaceWarpManager
     
     public static SpaceWarpConsole SpaceWarpConsole { get; internal set; }
 
+    
+    [Obsolete("Spacewarps support for IMGUI will not be getting updates, please use UITK instead")]
     public static GUISkin Skin
     {
         get

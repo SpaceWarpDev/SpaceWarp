@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using HarmonyLib;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
 
@@ -46,14 +50,16 @@ internal static class Delayer
 {
     public static void PatchChainloaderStart()
     {
-        ChainloaderPatch.Logger = Logger.CreateLogSource("SW BIE Extensions");
+        ChainloaderPatch.LogSource = Logger.CreateLogSource("SW BIE Extensions");
         string disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
         ChainloaderPatch.DisabledPluginsFilepath = disabledPluginsFilepath;
         if (!File.Exists(disabledPluginsFilepath))
         {
             File.Create(disabledPluginsFilepath).Dispose();
-            ChainloaderPatch.Logger.LogWarning("Disabled plugins file did not exist, created empty file at: " + disabledPluginsFilepath);
+            ChainloaderPatch.LogSource.LogWarning("Disabled plugins file did not exist, created empty file at: " +
+                                                  disabledPluginsFilepath);
         }
+
         ChainloaderPatch.DisabledPluginGuids = File.ReadAllLines(disabledPluginsFilepath);
         ChainloaderPatch.DisabledPlugins = new();
         Harmony.CreateAndPatchAll(typeof(ChainloaderPatch));
@@ -65,8 +71,139 @@ internal static class ChainloaderPatch
 {
     internal static string[] DisabledPluginGuids;
     internal static string DisabledPluginsFilepath;
-    internal static ManualLogSource Logger;
+    internal static ManualLogSource LogSource;
     internal static List<PluginInfo> DisabledPlugins;
+
+    private static string[] AllSourceFiles(DirectoryInfo directoryInfo) =>
+        directoryInfo.EnumerateFiles("*.cs", SearchOption.AllDirectories)
+            .Select(fileInfo => fileInfo.FullName)
+            .ToArray();
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Chainloader), nameof(Chainloader.Start))]
+    private static void CompileRoslynMods()
+    {
+        var trueLogger = Logger.CreateLogSource("Roslyn Compiler");
+        try
+        {
+            List<string> toLoad = new()
+            {
+                "System.Collections.Immutable",
+                "System.Memory",
+                "System.Reflection.Metadata",
+                "System.Threading.Tasks.Extensions",
+                "Microsoft.CodeAnalysis",
+                "Microsoft.CodeAnalysis.CSharp",
+                "System.Runtime.CompilerServices.Unsafe",
+                "System.Numerics.Vectors"
+            };
+            var loc = new DirectoryInfo(Assembly.GetExecutingAssembly().Location).Parent.FullName;
+            foreach (var file in toLoad)
+            {
+                trueLogger.LogError($"Loading: {file}");
+                Assembly.LoadFile(Path.Combine(loc, "lib", file + ".dll"));
+            }
+            // Assembly.LoadFile(Path.Combine(loc, "lib", "Microsoft.CodeAnalysis.dll"));
+            // Assembly.LoadFile(Path.Combine(loc, "lib", "Microsoft.CodeAnalysis.CSharp.dll"));
+            // Assembly.LoadFile(Path.Combine(loc, "lib", "System.Collections.Immutable.dll"));
+            trueLogger.LogInfo("Loaded assemblies");
+            // So now we can compile roslyn based mods by first importing every precompiled DLL
+            var pluginsFilePath = new DirectoryInfo(Path.Combine(Paths.BepInExRootPath, "plugins"));
+            // So now we do a loop and generate a reference table to every plugin name that does not start with "roslyn-"
+            // And we keep track of every folder that contains a src folder
+
+            var references = AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && x.Location.Length > 0)
+                .Select(x => MetadataReference.CreateFromFile(x.Location)).ToList();
+            references.AddRange(from file in pluginsFilePath.EnumerateFiles("*.dll", SearchOption.AllDirectories)
+                where !file.Name.StartsWith("roslyn-")
+                select MetadataReference.CreateFromFile(file.FullName));
+
+
+            foreach (var directory in pluginsFilePath.EnumerateDirectories("src", SearchOption.AllDirectories))
+            {
+                var parent = directory.Parent;
+                if (parent == null || !File.Exists(Path.Combine(parent.FullName, "swinfo.json"))) continue;
+                var logger = Logger.CreateLogSource(parent.Name + " compilation");
+                var allSource = AllSourceFiles(directory);
+                DateTime latestWriteTime = DateTime.FromBinary(0);
+                foreach (var sourceFile in allSource)
+                {
+                    if (File.GetLastWriteTime(sourceFile) > latestWriteTime)
+                    {
+                        latestWriteTime = File.GetLastWriteTime(sourceFile);
+                    }
+                }
+
+                var resultFileName = "roslyn-" + DateTime.Now.ToBinary();
+                var combined = Path.Combine(parent.FullName, resultFileName);
+                var pdb = combined + ".pdb";
+                var dll = combined + ".dll";
+                var xml = combined + ".dll";
+                var shouldContinue = false;
+                foreach (var file in parent.GetFiles("roslyn-*.dll"))
+                {
+                    if (file.LastWriteTime < latestWriteTime)
+                    {
+                        File.Delete(file.FullName);
+                        try
+                        {
+                            File.Delete(file.FullName.Replace(".dll", ".pdb"));
+                            File.Delete(file.FullName.Replace(".dll", ".xml"));
+                        }
+                        catch
+                        {
+                            //Ignored
+                        }
+                    }
+                    else
+                    {
+                        shouldContinue = true;
+                    }
+                }
+
+                if (shouldContinue) continue;
+
+                var trees = allSource.Select(x => (filename: x, text: File.ReadAllText(x))).Select(code =>
+                    CSharpSyntaxTree.ParseText(code.text, CSharpParseOptions.Default, code.filename)).ToList();
+                var compilation = CSharpCompilation.Create(resultFileName + ".dll", trees, references,
+                    new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+                var result = compilation.Emit(dll, pdb, xml);
+                foreach (var diagnostic in result.Diagnostics)
+                {
+                    if (diagnostic.WarningLevel == 0)
+                    {
+                        logger.LogError(diagnostic.ToString());
+                    }
+                    else
+                    {
+                        logger.LogInfo(diagnostic.ToString());
+                    }
+                }
+
+                if (!result.Success)
+                {
+                    try
+                    {
+                        File.Delete(pdb);
+                        File.Delete(dll);
+                        File.Delete(xml);
+                    }
+                    catch
+                    {
+                        //Ignored
+                    }
+
+                    continue;
+                }
+
+                references.Add(MetadataReference.CreateFromFile(dll));
+            }
+        }
+        catch (Exception e)
+        {
+            trueLogger.LogError(e);
+        }
+    }
 
     [HarmonyILManipulator]
     [HarmonyPatch(typeof(Chainloader), nameof(Chainloader.Start))]
@@ -84,15 +221,16 @@ internal static class ChainloaderPatch
         c.Emit(OpCodes.Ldloc, 23); // current PluginInfo
         c.Emit(OpCodes.Ldloc, 5); // set of denied plugins so far
         // false means skip to this plugin, true means continue loading it
-        c.EmitDelegate(static bool(PluginInfo plugin, HashSet<string> deniedSet) =>
+        c.EmitDelegate(static bool (PluginInfo plugin, HashSet<string> deniedSet) =>
         {
             if (Array.IndexOf(DisabledPluginGuids, plugin.Metadata.GUID) != -1)
             {
                 deniedSet.Add(plugin.Metadata.GUID);
                 DisabledPlugins.Add(plugin);
-                Logger.LogInfo($"{plugin.Metadata.GUID} was disabled, skipping loading...");
+                LogSource.LogInfo($"{plugin.Metadata.GUID} was disabled, skipping loading...");
                 return false;
             }
+
             return true;
         });
         c.Emit(OpCodes.Brfalse, continueLabel);
