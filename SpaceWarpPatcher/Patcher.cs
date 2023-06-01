@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
@@ -103,6 +104,12 @@ internal static class ChainloaderPatch
                 trueLogger.LogError($"Loading: {file}");
                 Assembly.LoadFile(Path.Combine(loc, "lib", file + ".dll"));
             }
+
+            var cacheLocation = Path.Combine(Paths.BepInExRootPath, "AssemblyCache");
+            if (!Directory.Exists(cacheLocation))
+            {
+                Directory.CreateDirectory(cacheLocation);
+            }
             // Assembly.LoadFile(Path.Combine(loc, "lib", "Microsoft.CodeAnalysis.dll"));
             // Assembly.LoadFile(Path.Combine(loc, "lib", "Microsoft.CodeAnalysis.CSharp.dll"));
             // Assembly.LoadFile(Path.Combine(loc, "lib", "System.Collections.Immutable.dll"));
@@ -114,69 +121,64 @@ internal static class ChainloaderPatch
 
             var references = AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && x.Location.Length > 0)
                 .Select(x => MetadataReference.CreateFromFile(x.Location)).ToList();
-            references.AddRange(from file in pluginsFilePath.EnumerateFiles("*.dll", SearchOption.AllDirectories)
-                where !file.Name.StartsWith("roslyn-")
-                select MetadataReference.CreateFromFile(file.FullName));
 
+            foreach (var file in pluginsFilePath.EnumerateFiles("*.dll", SearchOption.AllDirectories))
+            {
+                if (file.Name.StartsWith("roslyn-"))
+                {
+                    File.Delete(file.FullName);
+                }
+                else
+                {
+                    references.Add(MetadataReference.CreateFromFile(file.FullName));
+                }
+            }
 
             foreach (var directory in pluginsFilePath.EnumerateDirectories("src", SearchOption.AllDirectories))
             {
                 var parent = directory.Parent;
                 if (parent == null || !File.Exists(Path.Combine(parent.FullName, "swinfo.json"))) continue;
+                var id = parent.Name;
+                
+                
                 var logger = Logger.CreateLogSource(parent.Name + " compilation");
                 var allSource = AllSourceFiles(directory);
                 DateTime latestWriteTime = DateTime.FromBinary(0);
-                foreach (var sourceFile in allSource)
-                {
-                    if (File.GetLastWriteTime(sourceFile) > latestWriteTime)
-                    {
-                        latestWriteTime = File.GetLastWriteTime(sourceFile);
-                    }
-                }
+                
 
-                var resultFileName = "roslyn-" + DateTime.Now.ToBinary();
+                var resultFileName = "roslyn-" + id;
+                var cached = Path.Combine(cacheLocation,resultFileName);
+                var cachedDLL = cached + ".dll";
+                
                 var combined = Path.Combine(parent.FullName, resultFileName);
-                var pdb = combined + ".pdb";
                 var dll = combined + ".dll";
-                var xml = combined + ".dll";
-                var shouldContinue = false;
-                foreach (var file in parent.GetFiles("roslyn-*.dll"))
+
+                if (File.Exists(cachedDLL))
                 {
-                    if (file.LastWriteTime < latestWriteTime)
+                    if (File.GetLastWriteTime(cachedDLL) < latestWriteTime)
                     {
-                        File.Delete(file.FullName);
-                        try
-                        {
-                            File.Delete(file.FullName.Replace(".dll", ".pdb"));
-                            File.Delete(file.FullName.Replace(".dll", ".xml"));
-                        }
-                        catch
-                        {
-                            //Ignored
-                        }
+                        File.Delete(cachedDLL);
                     }
                     else
                     {
-                        shouldContinue = true;
+                        File.Copy(cachedDLL, dll);
+                        continue;
                     }
                 }
-
-                if (shouldContinue) continue;
-
                 var trees = allSource.Select(x => (filename: x, text: File.ReadAllText(x))).Select(code =>
-                    CSharpSyntaxTree.ParseText(code.text, CSharpParseOptions.Default, code.filename)).ToList();
+                    CSharpSyntaxTree.ParseText(code.text, CSharpParseOptions.Default, code.filename,Encoding.UTF8)).ToList();
                 var compilation = CSharpCompilation.Create(resultFileName + ".dll", trees, references,
                     new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-                var result = compilation.Emit(dll, pdb, xml);
+                var result = compilation.Emit(cachedDLL);
                 foreach (var diagnostic in result.Diagnostics)
                 {
                     if (diagnostic.WarningLevel == 0)
                     {
-                        logger.LogError(diagnostic.ToString());
+                        logger.LogError(diagnostic.Location + ": " + diagnostic);
                     }
                     else
                     {
-                        logger.LogInfo(diagnostic.ToString());
+                        logger.LogInfo(diagnostic.Location + ": " + diagnostic);
                     }
                 }
 
@@ -184,24 +186,23 @@ internal static class ChainloaderPatch
                 {
                     try
                     {
-                        File.Delete(pdb);
-                        File.Delete(dll);
-                        File.Delete(xml);
+                        File.Delete(cachedDLL);
                     }
                     catch
                     {
                         //Ignored
                     }
-
+                    
                     continue;
                 }
-
+                File.Copy(cachedDLL, dll);
                 references.Add(MetadataReference.CreateFromFile(dll));
             }
         }
         catch (Exception e)
         {
             trueLogger.LogError(e);
+            trueLogger.LogInfo(e.StackTrace);
         }
     }
 
