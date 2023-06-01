@@ -56,6 +56,9 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<string> ConfigTimeStampFormat;
     internal ConfigEntry<Color> ConfigWarningColor;
     internal ConfigEntry<Color> ConfigAutoScrollEnabledColor;
+
+    internal ConfigEntry<int> AcceptableValueRangeTest;
+    internal ConfigEntry<string> AcceptableValueListTest;
     private string _kspVersion;
 
     internal new static ManualLogSource Logger;
@@ -95,6 +98,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         ConfigCheckVersions = Config.Bind("Version Checking", "Check Versions", false,
             "Whether or not Space Warp should check mod versions using their swinfo.json files");
 
+        AcceptableValueRangeTest = Config.Bind("Testing", "Range",1,
+            new ConfigDescription("A test",new AcceptableValueRange<int>(0, 5)));
+        AcceptableValueListTest = Config.Bind("Testing", "List", "Pi",
+            new ConfigDescription("A test", new AcceptableValueList<string>("E", "Pi", "Tau", "Zero")));
+        
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);

@@ -45,6 +45,8 @@ internal static class SpaceWarpManager
     
     public static SpaceWarpConsole SpaceWarpConsole { get; internal set; }
 
+    
+    [Obsolete("Spacewarps support for IMGUI will not be getting updates, please use UITK instead")]
     public static GUISkin Skin
     {
         get
