@@ -5,8 +5,6 @@ VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarp", "SpaceWarp\SpaceWarp.csproj", "{42FA2F7B-A595-44E8-8CD5-A9C30B80A667}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleMod", "ExampleMod\ExampleMod.csproj", "{56255DE9-749D-447D-B1D8-1B634535A087}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarpPatcher", "SpaceWarpPatcher\SpaceWarpPatcher.csproj", "{2EF642D0-F66D-461C-A5B0-953E39307B76}"
 EndProject
 Global
@@ -19,10 +17,6 @@ Global
 		{42FA2F7B-A595-44E8-8CD5-A9C30B80A667}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42FA2F7B-A595-44E8-8CD5-A9C30B80A667}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42FA2F7B-A595-44E8-8CD5-A9C30B80A667}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56255DE9-749D-447D-B1D8-1B634535A087}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56255DE9-749D-447D-B1D8-1B634535A087}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56255DE9-749D-447D-B1D8-1B634535A087}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56255DE9-749D-447D-B1D8-1B634535A087}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2EF642D0-F66D-461C-A5B0-953E39307B76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2EF642D0-F66D-461C-A5B0-953E39307B76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2EF642D0-F66D-461C-A5B0-953E39307B76}.Release|Any CPU.ActiveCfg = Release|Any CPU
