@@ -14,6 +14,7 @@ using HarmonyLib;
 using KSP;
 using KSP.Messages;
 using KSP.ScriptInterop.impl.moonsharp;
+using KSP.Sim.impl.lua;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Interop.RegistrationPolicies;
@@ -63,7 +64,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<Color> ConfigWarningColor;
     internal ConfigEntry<Color> ConfigAutoScrollEnabledColor;
 
-    internal Script GlobalLuaState;
+    internal ScriptEnvironment GlobalLuaState;
     
     private string _kspVersion;
 
@@ -114,12 +115,15 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         SpaceWarpManager.Initialize(this);
     }
 
-    public override void OnPreInitialized()
+
+    private void SetupLuaState()
     {
         // I have been warned and I do not care
         UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-        // IH
-        GlobalLuaState = new Script();
+
+        GlobalLuaState = (ScriptEnvironment)Game.ScriptEnvironment;
+        GlobalLuaState.script.Globals["SWLog"] = Logger;
+
         // Now we loop over every assembly and import static lua classes for methods
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
@@ -130,7 +134,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
                 foreach (var attr in type.GetCustomAttributes())
                 {
                     if (attr is not SpaceWarpLuaAPIAttribute luaAPIAttribute) continue;
-                    GlobalLuaState.Globals[luaAPIAttribute.LuaName] = UserData.CreateStatic(type);
+                    // As this seems to be used here
+                    GlobalLuaState.script.Globals[luaAPIAttribute.LuaName] = UserData.CreateStatic(type);
                     break;
                 }
             }
@@ -141,6 +146,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public override void OnInitialized()
     {
         base.OnInitialized();
+        SetupLuaState();
 
         Game.Messages.Subscribe(typeof(GameStateEnteredMessage), StateChanges.OnGameStateEntered, false, true);
         Game.Messages.Subscribe(typeof(GameStateLeftMessage), StateChanges.OnGameStateLeft, false, true);
@@ -173,12 +179,19 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     {
         InitializeSettingsUI();
         // Now here we initialize lua mods just to be sure
+        RunLuaScripts();
+    }
+
+    private void RunLuaScripts()
+    {
         var pluginDirectory = new DirectoryInfo(Paths.PluginPath);
         foreach (var luaFile in pluginDirectory.GetFiles("*.lua", SearchOption.AllDirectories))
         {
             try
             {
-                GlobalLuaState.DoString(File.ReadAllText(luaFile.FullName));
+                // var compiled = GlobalLuaState.Compile(File.ReadAllText(luaFile.FullName), luaFile.FullName);
+                // GlobalLuaState.RunScriptAsset(compiled);
+                GlobalLuaState.script.DoString(File.ReadAllText(luaFile.FullName));
             }
             catch (Exception e)
             {
