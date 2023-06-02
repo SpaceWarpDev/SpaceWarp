@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SpaceWarp.API.Lua;
 using UnityEngine;
 using Logger = BepInEx.Logging.Logger;
 
 namespace SpaceWarp.API.Assets;
 
+[SpaceWarpLuaAPI("Assets")]
 public static class AssetManager
 {
     private static readonly Dictionary<string, UnityObject> AllAssets = new();
@@ -130,6 +132,56 @@ public static class AssetManager
         }
 
         asset = tValue;
+
+        return true;
+    }
+    
+    /// <summary>
+    ///     Gets an asset from the specified asset path
+    /// </summary>
+    /// <param name="path">an asset path, format: {mod_id}/{asset_bundle}/{asset_path}</param>
+    /// <returns></returns>
+    public static UnityObject GetAsset(string path)
+    {
+        path = path.ToLower();
+        var subPaths = path.Split('/', '\\');
+        if (subPaths.Length < 3)
+        {
+            throw new ArgumentException(
+                "Invalid path, asset paths must follow to following structure: {mod_id}/{asset_bundle}/{asset_path}");
+        }
+
+        if (!AllAssets.TryGetValue(path, out var value))
+        {
+            throw new IndexOutOfRangeException($"Unable to find asset at path \"{path}\"");
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Tries to get an asset from the specified asset path
+    /// </summary>
+    /// <param name="path">an asset path, format: {mod_id}/{asset_bundle}/{asset_name}</param>
+    /// <param name="asset">the asset output</param>
+    /// <returns>Whether or not the asset exists and is loaded</returns>
+    public static bool TryGetAsset(string path, out UnityObject asset)
+    {
+        path = path.ToLower();
+        asset = null;
+        var subPaths = path.Split('/', '\\');
+
+        if (subPaths.Length < 3)
+        {
+            return false;
+        }
+
+        if (!AllAssets.TryGetValue(path, out var value))
+        {
+            return false;
+        }
+
+        asset = value;
 
         return true;
     }
