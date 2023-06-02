@@ -192,8 +192,8 @@ public class ModListController : MonoBehaviour
         {
             MakeListItem(_spaceWarpModList, data =>
             {
-                data.Guid = plugin.Info.Metadata.GUID;
-                data.SetInfo(plugin.SpaceWarpMetadata);
+                data.Guid = plugin.Guid;
+                data.SetInfo(plugin.SWInfo);
 
                 if (SpaceWarpManager.ModsUnsupported[data.Guid])
                 {

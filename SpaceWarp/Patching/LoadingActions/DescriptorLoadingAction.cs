@@ -1,17 +1,19 @@
 ﻿using System;
-using System.IO;
 using KSP.Game.Flow;
 using SpaceWarp.API.Mods;
 
 namespace SpaceWarp.Patching.LoadingActions;
 
-internal sealed class LoadLocalizationAction : FlowAction
+public class DescriptorLoadingAction : FlowAction
 {
+    private readonly Action<SpaceWarpPluginDescriptor> _action;
     private readonly SpaceWarpPluginDescriptor _plugin;
-
-    public LoadLocalizationAction(SpaceWarpPluginDescriptor plugin) : base(
-        $"Loading localizations for plugin {plugin.SWInfo.Name}")
+    
+    
+    public DescriptorLoadingAction(string actionName, Action<SpaceWarpPluginDescriptor> action, SpaceWarpPluginDescriptor plugin) : base(
+        $"{plugin.SWInfo.Name}:{actionName}")
     {
+        _action = action;
         _plugin = plugin;
     }
 
@@ -19,8 +21,7 @@ internal sealed class LoadLocalizationAction : FlowAction
     {
         try
         {
-            var localizationsPath = Path.Combine(_plugin.Folder.FullName, "localizations");
-            AssetHelpers.LoadLocalizationFromFolder(localizationsPath);
+            _action(_plugin);
             resolve();
         }
         catch (Exception e)

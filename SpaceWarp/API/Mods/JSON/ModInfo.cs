@@ -18,16 +18,10 @@ public sealed class ModInfo
     {
         get
         {
-            if (Spec >= SpecVersion.V1_2)
+            if (Spec == SpecVersion.V1_2)
             {
                 throw new DeprecatedSwinfoPropertyException(nameof(ModID), SpecVersion.V1_2);
             }
-
-            SpaceWarpManager.Logger.LogWarning(
-                "The swinfo.json \"mod_id\" property is deprecated and will be removed in a future version. " +
-                "Instead of ModID, use PluginClass.Info.Metadata.GUID in your code."
-            );
-
             return _modID;
         }
         internal set => _modID = value;

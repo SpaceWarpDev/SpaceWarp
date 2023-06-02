@@ -65,11 +65,11 @@ public static class PluginList
     public static ModInfo TryGetSwinfo(string guid)
     {
         var swModInfo = SpaceWarpManager.SpaceWarpPlugins
-            .FirstOrDefault(item => item.Info.Metadata.GUID == guid);
+            .FirstOrDefault(item => item.Guid == guid);
 
         if (swModInfo != null)
         {
-            return swModInfo.SpaceWarpMetadata;
+            return swModInfo.SWInfo;
         }
 
         var nonSwModInfo = SpaceWarpManager.NonSpaceWarpInfos
@@ -88,6 +88,17 @@ public static class PluginList
             .FirstOrDefault();
 
         return disabledModInfo;
+    }
+    /// <summary>
+    /// Retrieves the <see cref="SpaceWarpPluginDescriptor"/> of the specified plugin. Returns null if the specified plugin guid doesn't
+    /// have an associated <see cref="SpaceWarpPluginDescriptor"/>.
+    /// </summary>
+    /// <param name="guid">GUID of the plugin</param>
+    /// <returns><see cref="SpaceWarpPluginDescriptor"/> of the plugin or null if not found</returns>
+    public static SpaceWarpPluginDescriptor TryGetDescriptor(string guid)
+    {
+        return SpaceWarpManager.SpaceWarpPlugins
+            .FirstOrDefault(item => item.Guid == guid);
     }
 
     /// <summary>

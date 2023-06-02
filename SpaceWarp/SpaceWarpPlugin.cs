@@ -178,33 +178,15 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public override void OnPostInitialized()
     {
         InitializeSettingsUI();
-        // Now here we initialize lua mods just to be sure
-        RunLuaScripts();
     }
 
-    private void RunLuaScripts()
-    {
-        var pluginDirectory = new DirectoryInfo(Paths.PluginPath);
-        foreach (var luaFile in pluginDirectory.GetFiles("*.lua", SearchOption.AllDirectories))
-        {
-            try
-            {
-                // var compiled = GlobalLuaState.Compile(File.ReadAllText(luaFile.FullName), luaFile.FullName);
-                // GlobalLuaState.RunScriptAsset(compiled);
-                GlobalLuaState.script.DoString(File.ReadAllText(luaFile.FullName));
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e);
-            }
-        }
-    }
+
 
     public void ClearVersions()
     {
         foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
         {
-            SpaceWarpManager.ModsOutdated[plugin.Info.Metadata.GUID] = false;
+            SpaceWarpManager.ModsOutdated[plugin.Guid] = false;
         }
 
         foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
@@ -223,9 +205,9 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         ClearVersions();
         foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
         {
-            if (plugin.SpaceWarpMetadata.VersionCheck != null)
+            if (plugin.SWInfo.VersionCheck != null)
             {
-                StartCoroutine(CheckVersion(plugin.Info.Metadata.GUID, plugin.SpaceWarpMetadata));
+                StartCoroutine(CheckVersion(plugin.Guid, plugin.SWInfo));
             }
         }
 
