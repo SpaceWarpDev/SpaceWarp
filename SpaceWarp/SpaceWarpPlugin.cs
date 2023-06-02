@@ -3,6 +3,7 @@ global using System.Linq;
 using System;
 using System.Collections;
 using System.ComponentModel;
+using System.IO;
 using System.Reflection;
 using System.Xml;
 using BepInEx;
@@ -12,10 +13,15 @@ using BepInEx.Logging;
 using HarmonyLib;
 using KSP;
 using KSP.Messages;
+using KSP.ScriptInterop.impl.moonsharp;
+using MoonSharp.Interpreter;
+using MoonSharp.Interpreter.Interop;
+using MoonSharp.Interpreter.Interop.RegistrationPolicies;
 using UitkForKsp2.API;
 using Newtonsoft.Json;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Game.Messages;
+using SpaceWarp.API.Lua;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
@@ -57,8 +63,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<Color> ConfigWarningColor;
     internal ConfigEntry<Color> ConfigAutoScrollEnabledColor;
 
-    internal ConfigEntry<int> AcceptableValueRangeTest;
-    internal ConfigEntry<string> AcceptableValueListTest;
+    internal Script GlobalLuaState;
+    
     private string _kspVersion;
 
     internal new static ManualLogSource Logger;
@@ -97,11 +103,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user.");
         ConfigCheckVersions = Config.Bind("Version Checking", "Check Versions", false,
             "Whether or not Space Warp should check mod versions using their swinfo.json files");
-
-        AcceptableValueRangeTest = Config.Bind("Testing", "Range",1,
-            new ConfigDescription("A test",new AcceptableValueRange<int>(0, 5)));
-        AcceptableValueListTest = Config.Bind("Testing", "List", "Pi",
-            new ConfigDescription("A test", new AcceptableValueList<string>("E", "Pi", "Tau", "Zero")));
+        
         
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
@@ -110,6 +112,29 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         SpaceWarpManager.InitializeSpaceWarpsLoadingActions();
 
         SpaceWarpManager.Initialize(this);
+    }
+
+    public override void OnPreInitialized()
+    {
+        // I have been warned and I do not care
+        UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
+        // IH
+        GlobalLuaState = new Script();
+        // Now we loop over every assembly and import static lua classes for methods
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            UserData.RegisterAssembly(assembly);
+            foreach (var type in assembly.GetTypes())
+            {
+                // Now we can easily create API Objects from a [SpaceWarpLuaAPI] attribute
+                foreach (var attr in type.GetCustomAttributes())
+                {
+                    if (attr is not SpaceWarpLuaAPIAttribute luaAPIAttribute) continue;
+                    GlobalLuaState.Globals[luaAPIAttribute.LuaName] = UserData.CreateStatic(type);
+                    break;
+                }
+            }
+        }
     }
 
 
@@ -147,6 +172,19 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public override void OnPostInitialized()
     {
         InitializeSettingsUI();
+        // Now here we initialize lua mods just to be sure
+        var pluginDirectory = new DirectoryInfo(Paths.PluginPath);
+        foreach (var luaFile in pluginDirectory.GetFiles("*.lua", SearchOption.AllDirectories))
+        {
+            try
+            {
+                GlobalLuaState.DoString(File.ReadAllText(luaFile.FullName));
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e);
+            }
+        }
     }
 
     public void ClearVersions()
