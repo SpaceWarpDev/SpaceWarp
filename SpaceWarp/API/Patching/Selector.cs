@@ -17,6 +17,14 @@ public class Selector
     public Selector WithModule<T>() => WithModule(typeof(T));
 
     public Selector WithModule(Type moduleType) => Where(part => part.modules.Any(x => x.GetType() == moduleType));
+    
+    public Selector WithoutModule(string moduleName) =>
+        Where(part =>
+            part.modules.All(x => x.GetType().Name != moduleName && x.GetType().FullName != moduleName && x.GetType().Name != $"Module_{moduleName}"));
+
+    public Selector WithoutModule<T>() => WithModule(typeof(T));
+
+    public Selector WithoutModule(Type moduleType) => Where(part => part.modules.All(x => x.GetType() != moduleType));
 
     public Selector WithName(string name) => Where(part => part.data.partName == name);
 

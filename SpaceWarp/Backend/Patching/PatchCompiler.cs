@@ -17,20 +17,20 @@ namespace SpaceWarp.Backend.Patching;
 internal static class PatchCompiler
 {
     private static bool _generatedUsings = false;
-    private static List<string> _namespacesToUse = new();
-    private static PatchRewriter _rewriter = new();
-    private static List<MetadataReference> _references = new();
+    private static readonly List<string> NamespacesToUse = new();
+    private static readonly PatchRewriter Rewriter = new();
+    private static readonly List<MetadataReference> References = new();
 
     private static void GenerateUsingsAndReferences()
     {
         // Inject the SpaceWarp.API.Patching reference
-        _namespacesToUse.Add("SpaceWarp.API.Patching");
+        NamespacesToUse.Add("SpaceWarp.API.Patching");
         // Inject the KSP.Sim.Definitions reference
-        _namespacesToUse.Add("KSP.Sim.Definitions");
+        NamespacesToUse.Add("KSP.Sim.Definitions");
         // Inject the System reference
-        _namespacesToUse.Add("System");
+        NamespacesToUse.Add("System");
         // Inject the Generic collections reference
-        _namespacesToUse.Add("System.Collections.Generic");
+        NamespacesToUse.Add("System.Collections.Generic");
         
         
         // Iterate over all types
@@ -43,8 +43,8 @@ internal static class PatchCompiler
                 {
                     if (type.Namespace != null && type.Namespace.Length > 0)
                     {
-                        if (!_namespacesToUse.Contains(type.Namespace))
-                            _namespacesToUse.Add(type.Namespace);
+                        if (!NamespacesToUse.Contains(type.Namespace))
+                            NamespacesToUse.Add(type.Namespace);
                     }
                 }
 
@@ -52,8 +52,8 @@ internal static class PatchCompiler
                 {
                     if (type.Namespace != null && type.Namespace.Length > 0)
                     {
-                        if (!_namespacesToUse.Contains(type.Namespace))
-                            _namespacesToUse.Add(type.Namespace);
+                        if (!NamespacesToUse.Contains(type.Namespace))
+                            NamespacesToUse.Add(type.Namespace);
                     }
                 }
                 
@@ -62,7 +62,7 @@ internal static class PatchCompiler
 
             if (!assembly.IsDynamic && assembly.Location != "")
             {
-                _references.Add(MetadataReference.CreateFromFile(assembly.Location));
+                References.Add(MetadataReference.CreateFromFile(assembly.Location));
             }
         }
 
@@ -76,7 +76,7 @@ internal static class PatchCompiler
         StringBuilder sb = new StringBuilder();
         bool containsNamespace = false;
         List<string> alreadyPresentUsings = new();
-        foreach (var uns in _namespacesToUse)
+        foreach (var uns in NamespacesToUse)
         {
             sb.Append($"using {uns};\n");
         }
@@ -122,7 +122,7 @@ internal static class PatchCompiler
         return $"{guid}.{ns}".Replace(" ","").Replace("-","").Replace("..",".");
     }
     
-    internal static void CompilePatchesFor(string guid, DirectoryInfo patchDirectory)
+    internal static Assembly CompilePatchesFor(string guid, DirectoryInfo patchDirectory)
     {
         var cacheLocation = Path.Combine(Paths.BepInExRootPath, "AssemblyCache");
         var compileLogger = Logger.CreateLogSource($"Patch Compiler: {guid}");
@@ -146,8 +146,7 @@ internal static class PatchCompiler
             }
             else
             {
-                Assembly.LoadFile(Path.Combine(cacheLocation, dllName));
-                return;
+                return Assembly.LoadFile(Path.Combine(cacheLocation, dllName));
             }
         }
         List<(string patchFileName, string code)> patchesToCompile = new();
@@ -183,7 +182,7 @@ internal static class PatchCompiler
 
             try
             {
-                var newRoot = (CSharpSyntaxNode)_rewriter.Visit(tree.GetRoot());
+                var newRoot = (CSharpSyntaxNode)Rewriter.Visit(tree.GetRoot());
                 tree = CSharpSyntaxTree.Create(newRoot, CSharpParseOptions.Default);
             }
             catch (Exception e)
@@ -193,7 +192,7 @@ internal static class PatchCompiler
             }
             allTrees.Add(tree);
         }
-        var compilation = CSharpCompilation.Create(dllName, allTrees, _references,
+        var compilation = CSharpCompilation.Create(dllName, allTrees, References,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
         var result = compilation.Emit(Path.Combine(cacheLocation, dllName));
         foreach (var diagnostic in result.Diagnostics)
@@ -207,19 +206,18 @@ internal static class PatchCompiler
                 compileLogger.LogInfo(diagnostic.Location + ": " + diagnostic);
             }
         }
-
-        if (!result.Success)
+        
+        // How to note that this is for "this" mod, by returning it per mod
+        if (result.Success) return Assembly.LoadFile(Path.Combine(cacheLocation, dllName));
+        try
         {
-            try
-            {
-                File.Delete(Path.Combine(cacheLocation, dllName));
-            }
-            catch
-            {
-                //Ignored
-            }
+            File.Delete(Path.Combine(cacheLocation, dllName));
         }
-        // How to note that this is for "this" mod
-        Assembly.LoadFile(Path.Combine(cacheLocation, dllName));
+        catch
+        {
+            //Ignored
+        }
+
+        return null;
     }
 }

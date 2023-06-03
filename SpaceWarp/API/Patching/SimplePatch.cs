@@ -21,6 +21,12 @@ public abstract class SimplePatch : PatchBase
                     case WithModuleAttribute withModuleAttribute:
                         selector.WithModule(withModuleAttribute.ModuleType);
                         break;
+                    case WithoutModuleAttribute { ModuleName: not null } withoutModuleAttribute:
+                        selector.WithoutModule(withoutModuleAttribute.ModuleName);
+                        break;
+                    case WithoutModuleAttribute withoutModuleAttribute:
+                        selector.WithoutModule(withoutModuleAttribute.ModuleType);
+                        break;
                     case WithNameAttribute withNameAttribute:
                         selector.WithName(withNameAttribute.Name);
                         break;
