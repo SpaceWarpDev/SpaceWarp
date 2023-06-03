@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Bootstrap;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarpPatcher;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -17,6 +18,10 @@ namespace SpaceWarp.API.Mods;
 /// </summary>
 public static class PluginList
 {
+    /// <summary>
+    /// Set if the plugin list is different in any way since last run (version differences, new mods, mods removed, mods disabled, description differences, any different in any swinfo file and the disabled mod list)
+    /// </summary>
+    public static bool ModListChangedSinceLastRun => ChainloaderPatch.ModListChangedSinceLastRun;
     /// <summary>
     /// Contains information about all currently loaded plugins. The key is the BepInEx GUID of the plugin.
     /// </summary>

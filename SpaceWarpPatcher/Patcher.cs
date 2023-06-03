@@ -74,6 +74,7 @@ internal static class ChainloaderPatch
     internal static string DisabledPluginsFilepath;
     internal static ManualLogSource LogSource;
     internal static List<PluginInfo> DisabledPlugins;
+    internal static bool ModListChangedSinceLastRun;
 
     private static string[] AllSourceFiles(DirectoryInfo directoryInfo) =>
         directoryInfo.EnumerateFiles("*.cs", SearchOption.AllDirectories)
@@ -106,6 +107,52 @@ internal static class ChainloaderPatch
             }
 
             var cacheLocation = Path.Combine(Paths.BepInExRootPath, "AssemblyCache");
+            var modListHash = Path.Combine(Paths.BepInExRootPath, "ModListHash.txt");
+            string disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
+            var allPluginsSwinfo = string.Join("",
+                (new DirectoryInfo(Path.Combine(Paths.BepInExRootPath, "plugins")))
+                .EnumerateFiles("swinfo.json", SearchOption.AllDirectories).Select(x => File.ReadAllText(x.FullName)));
+            allPluginsSwinfo += File.ReadAllText(disabledPluginsFilepath);
+            string hash = "";
+            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            {
+                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(allPluginsSwinfo);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+                StringBuilder sb = new System.Text.StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("X2"));
+                }
+                hash = sb.ToString();
+            }
+            // Then lets add the disabled plugins list (if it exists)
+            
+            if (!File.Exists(modListHash))
+            {
+                File.WriteAllText(modListHash, hash);
+                ModListChangedSinceLastRun = true;
+            }
+            else
+            {
+                var storedHash = File.ReadAllText(modListHash);
+                if (storedHash != hash)
+                {
+                    File.WriteAllText(modListHash, hash);
+                    ModListChangedSinceLastRun = true;
+                }
+                else
+                {
+                    ModListChangedSinceLastRun = false;
+                }
+            }
+
+            if (ModListChangedSinceLastRun)
+            {
+                if (Directory.Exists(cacheLocation))
+                {
+                    Directory.Delete(cacheLocation, true);
+                }
+            }
             if (!Directory.Exists(cacheLocation))
             {
                 Directory.CreateDirectory(cacheLocation);

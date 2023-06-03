@@ -13,6 +13,7 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.API.Versions;
+using SpaceWarp.Backend.Patching;
 using SpaceWarp.Backend.UI.Appbar;
 using SpaceWarp.UI.Console;
 using SpaceWarp.UI.ModList;
