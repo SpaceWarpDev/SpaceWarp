@@ -376,13 +376,5 @@ internal static class SpaceWarpManager
     {
         Loading.AddAssetLoadingAction("bundles", "loading asset bundles", AssetBundleLoadingAction, "bundle");
         Loading.AddAssetLoadingAction("images", "loading images", ImageLoadingAction);
-        Loading.AddDescriptorLoadingAction("compiling patches", descriptor =>
-        {
-            if (Directory.Exists(Path.Combine(descriptor.Folder.FullName, "patches")))
-            {
-                PatchCompiler.CompilePatchesFor(descriptor.Guid,
-                    new DirectoryInfo(Path.Combine(descriptor.Folder.FullName, "patches")));
-            }
-        });
     }
 }
