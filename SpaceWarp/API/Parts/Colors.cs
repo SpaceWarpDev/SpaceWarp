@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using BepInEx.Logging;
+using SpaceWarp.API.Lua;
 using SpaceWarp.Patching;
 
 namespace SpaceWarp.API.Parts;
 
+[SpaceWarpLuaAPI("Colors")]
 public static class Colors
 {
     /// <summary>

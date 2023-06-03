@@ -3,6 +3,7 @@ global using System.Linq;
 using System;
 using System.Collections;
 using System.ComponentModel;
+using System.IO;
 using System.Reflection;
 using System.Xml;
 using BepInEx;
@@ -12,10 +13,16 @@ using BepInEx.Logging;
 using HarmonyLib;
 using KSP;
 using KSP.Messages;
+using KSP.ScriptInterop.impl.moonsharp;
+using KSP.Sim.impl.lua;
+using MoonSharp.Interpreter;
+using MoonSharp.Interpreter.Interop;
+using MoonSharp.Interpreter.Interop.RegistrationPolicies;
 using UitkForKsp2.API;
 using Newtonsoft.Json;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Game.Messages;
+using SpaceWarp.API.Lua;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
@@ -57,8 +64,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<Color> ConfigWarningColor;
     internal ConfigEntry<Color> ConfigAutoScrollEnabledColor;
 
-    internal ConfigEntry<int> AcceptableValueRangeTest;
-    internal ConfigEntry<string> AcceptableValueListTest;
+    internal ScriptEnvironment GlobalLuaState;
+    
     private string _kspVersion;
 
     internal new static ManualLogSource Logger;
@@ -97,11 +104,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user.");
         ConfigCheckVersions = Config.Bind("Version Checking", "Check Versions", false,
             "Whether or not Space Warp should check mod versions using their swinfo.json files");
-
-        AcceptableValueRangeTest = Config.Bind("Testing", "Range",1,
-            new ConfigDescription("A test",new AcceptableValueRange<int>(0, 5)));
-        AcceptableValueListTest = Config.Bind("Testing", "List", "Pi",
-            new ConfigDescription("A test", new AcceptableValueList<string>("E", "Pi", "Tau", "Zero")));
+        
         
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
@@ -113,9 +116,37 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     }
 
 
+    private void SetupLuaState()
+    {
+        // I have been warned and I do not care
+        UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
+
+        GlobalLuaState = (ScriptEnvironment)Game.ScriptEnvironment;
+        GlobalLuaState.script.Globals["SWLog"] = Logger;
+
+        // Now we loop over every assembly and import static lua classes for methods
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            UserData.RegisterAssembly(assembly);
+            foreach (var type in assembly.GetTypes())
+            {
+                // Now we can easily create API Objects from a [SpaceWarpLuaAPI] attribute
+                foreach (var attr in type.GetCustomAttributes())
+                {
+                    if (attr is not SpaceWarpLuaAPIAttribute luaAPIAttribute) continue;
+                    // As this seems to be used here
+                    GlobalLuaState.script.Globals[luaAPIAttribute.LuaName] = UserData.CreateStatic(type);
+                    break;
+                }
+            }
+        }
+    }
+
+
     public override void OnInitialized()
     {
         base.OnInitialized();
+        SetupLuaState();
 
         Game.Messages.Subscribe(typeof(GameStateEnteredMessage), StateChanges.OnGameStateEntered, false, true);
         Game.Messages.Subscribe(typeof(GameStateLeftMessage), StateChanges.OnGameStateLeft, false, true);
@@ -149,11 +180,13 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         InitializeSettingsUI();
     }
 
+
+
     public void ClearVersions()
     {
         foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
         {
-            SpaceWarpManager.ModsOutdated[plugin.Info.Metadata.GUID] = false;
+            SpaceWarpManager.ModsOutdated[plugin.Guid] = false;
         }
 
         foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
@@ -172,9 +205,9 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         ClearVersions();
         foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
         {
-            if (plugin.SpaceWarpMetadata.VersionCheck != null)
+            if (plugin.SWInfo.VersionCheck != null)
             {
-                StartCoroutine(CheckVersion(plugin.Info.Metadata.GUID, plugin.SpaceWarpMetadata));
+                StartCoroutine(CheckVersion(plugin.Guid, plugin.SWInfo));
             }
         }
 

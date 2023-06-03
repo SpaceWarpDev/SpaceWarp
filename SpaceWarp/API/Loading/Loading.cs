@@ -12,6 +12,13 @@ namespace SpaceWarp.API.Loading;
 
 public static class Loading
 {
+    internal static List<Func<SpaceWarpPluginDescriptor, DescriptorLoadingAction>> DescriptorLoadingActionGenerators =
+        new();
+
+    internal static List<Func<SpaceWarpPluginDescriptor, DescriptorLoadingAction>>
+        FallbackDescriptorLoadingActionGenerators =
+            new();
+
     internal static List<Func<BaseSpaceWarpPlugin, ModLoadingAction>> LoadingActionGenerators = new();
     internal static List<FlowAction> GeneralLoadingActions = new();
 
@@ -29,15 +36,31 @@ public static class Loading
             extensions.Length == 0
                 ? CreateAssetLoadingActionWithoutExtension(subfolder, importFunction)
                 : CreateAssetLoadingActionWithExtensions(subfolder, importFunction, extensions));
+        FallbackDescriptorLoadingActionGenerators.Add(d => new DescriptorLoadingAction(name,
+            extensions.Length == 0
+                ? CreateAssetLoadingActionWithoutExtensionDescriptor(subfolder, importFunction)
+                : CreateAssetLoadingActionWithExtensionsDescriptor(subfolder, importFunction, extensions), d));
     }
+
     /// <summary>
     /// Registers a per mod loading action
     /// </summary>
     /// <param name="name">The name of the action</param>
     /// <param name="action">The action</param>
+    [Obsolete("Use AddDescriptorLoadingAction instead")]
     public static void AddModLoadingAction(string name, Action<BaseSpaceWarpPlugin> action)
     {
-        LoadingActionGenerators.Add(p => new ModLoadingAction(name,action,p));
+        LoadingActionGenerators.Add(p => new ModLoadingAction(name, action, p));
+    }
+
+    /// <summary>
+    /// Registers a per mod loading action (but more general)
+    /// </summary>
+    /// <param name="name">The name of the action</param>
+    /// <param name="action">The action</param>
+    public static void AddDescriptorLoadingAction(string name, Action<SpaceWarpPluginDescriptor> action)
+    {
+        DescriptorLoadingActionGenerators.Add(p => new DescriptorLoadingAction(name, action, p));
     }
 
     /// <summary>
@@ -56,13 +79,15 @@ public static class Loading
     /// <param name="label">The addressables label to hook into</param>
     /// <param name="action">The action to be done on each addressables asset</param>
     /// <typeparam name="T">The type of asset that this action is done upon</typeparam>
-    public static void AddAddressablesLoadingAction<T>(string name, string label, Action<T> action) where T : UnityObject
+    public static void AddAddressablesLoadingAction<T>(string name, string label, Action<T> action)
+        where T : UnityObject
     {
         AddGeneralLoadingAction(new AddressableAction<T>(name, label, action));
     }
 
 
-    private static Action<BaseSpaceWarpPlugin> CreateAssetLoadingActionWithExtensions(string subfolder, Func<string, string, List<(string name, UnityObject asset)>> importFunction, string[] extensions)
+    private static Action<BaseSpaceWarpPlugin> CreateAssetLoadingActionWithExtensions(string subfolder,
+        Func<string, string, List<(string name, UnityObject asset)>> importFunction, string[] extensions)
     {
         return plugin =>
         {
@@ -87,7 +112,37 @@ public static class Loading
         };
     }
 
-    private static void LoadSingleAsset(Func<string, string, List<(string name, UnityObject asset)>> importFunction, string path, string file, BaseSpaceWarpPlugin plugin)
+    private static Action<SpaceWarpPluginDescriptor> CreateAssetLoadingActionWithExtensionsDescriptor(string subfolder,
+        Func<string, string, List<(string name, UnityObject asset)>> importFunction, string[] extensions)
+    {
+        return plugin =>
+        {
+            var path = Path.Combine(plugin.Folder.FullName, "assets", subfolder);
+            if (!Directory.Exists(path)) return;
+            var directoryInfo = new DirectoryInfo(path);
+            foreach (var extension in extensions)
+            {
+                foreach (var file in directoryInfo.EnumerateFiles($"*.{extension}", SearchOption.AllDirectories)
+                             .Select(fileInfo => fileInfo.FullName))
+                {
+                    try
+                    {
+                        LoadSingleAsset(importFunction, path, file, plugin);
+                    }
+                    catch (Exception e)
+                    {
+                        if (plugin.Plugin != null)
+                            plugin.Plugin.ModLogger.LogError(e.ToString());
+                        else
+                            SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
+                    }
+                }
+            }
+        };
+    }
+
+    private static void LoadSingleAsset(Func<string, string, List<(string name, UnityObject asset)>> importFunction,
+        string path, string file, BaseSpaceWarpPlugin plugin)
     {
         var assetPathList = PathHelpers.GetRelativePath(path, file)
             .Split(Path.DirectorySeparatorChar);
@@ -108,7 +163,30 @@ public static class Loading
         }
     }
 
-    private static Action<BaseSpaceWarpPlugin> CreateAssetLoadingActionWithoutExtension(string subfolder, Func<string, string, List<(string name, UnityObject asset)>> importFunction)
+    private static void LoadSingleAsset(Func<string, string, List<(string name, UnityObject asset)>> importFunction,
+        string path, string file, SpaceWarpPluginDescriptor plugin)
+    {
+        var assetPathList = PathHelpers.GetRelativePath(path, file)
+            .Split(Path.DirectorySeparatorChar);
+        var assetPath = "";
+        for (var i = 0; i < assetPathList.Length; i++)
+        {
+            assetPath += assetPathList[i].ToLower();
+            if (i != assetPathList.Length - 1)
+            {
+                assetPath += "/";
+            }
+        }
+
+        var assets = importFunction(assetPath, file);
+        foreach (var asset in assets)
+        {
+            AssetManager.RegisterSingleAsset(plugin.Guid, asset.name, asset.asset);
+        }
+    }
+
+    private static Action<BaseSpaceWarpPlugin> CreateAssetLoadingActionWithoutExtension(string subfolder,
+        Func<string, string, List<(string name, UnityObject asset)>> importFunction)
     {
         return plugin =>
         {
@@ -117,13 +195,40 @@ public static class Loading
             var directoryInfo = new DirectoryInfo(path);
             foreach (var file in directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories)
                          .Select(fileInfo => fileInfo.FullName))
-            {try
+            {
+                try
                 {
                     LoadSingleAsset(importFunction, path, file, plugin);
                 }
                 catch (Exception e)
                 {
                     plugin.ModLogger.LogError(e.ToString());
+                }
+            }
+        };
+    }
+
+    private static Action<SpaceWarpPluginDescriptor> CreateAssetLoadingActionWithoutExtensionDescriptor(
+        string subfolder, Func<string, string, List<(string name, UnityObject asset)>> importFunction)
+    {
+        return plugin =>
+        {
+            var path = Path.Combine(plugin.Folder.FullName, "assets", subfolder);
+            if (!Directory.Exists(path)) return;
+            var directoryInfo = new DirectoryInfo(path);
+            foreach (var file in directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories)
+                         .Select(fileInfo => fileInfo.FullName))
+            {
+                try
+                {
+                    LoadSingleAsset(importFunction, path, file, plugin);
+                }
+                catch (Exception e)
+                {
+                    if (plugin.Plugin != null)
+                        plugin.Plugin.ModLogger.LogError(e.ToString());
+                    else
+                        SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
                 }
             }
         };

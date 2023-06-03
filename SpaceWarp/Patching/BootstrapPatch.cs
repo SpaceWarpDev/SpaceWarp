@@ -33,7 +33,8 @@ internal static class BootstrapPatch
         {
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
-                GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
+                if (plugin.Plugin != null)
+                    GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin.Plugin));
             }
         });
 
@@ -47,7 +48,22 @@ internal static class BootstrapPatch
             {
                 flow.AddAction(new LoadAddressablesAction(plugin));
                 flow.AddAction(new LoadLocalizationAction(plugin));
-                foreach (var action in Loading.LoadingActionGenerators)
+                if (plugin.Plugin != null)
+                {
+                    foreach (var action in Loading.LoadingActionGenerators)
+                    {
+                        flow.AddAction(action(plugin.Plugin));
+                    }
+                }
+                else
+                {
+                    foreach (var action in Loading.FallbackDescriptorLoadingActionGenerators)
+                    {
+                        flow.AddAction(action(plugin));
+                    }
+                }
+
+                foreach (var action in Loading.DescriptorLoadingActionGenerators)
                 {
                     flow.AddAction(action(plugin));
                 }
@@ -58,14 +74,23 @@ internal static class BootstrapPatch
             {
                 flow.AddAction(action);
             }
+            
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
-                flow.AddAction(new InitializeModAction(plugin));
+                if (plugin.Plugin != null)
+                    flow.AddAction(new InitializeModAction(plugin.Plugin));
             }
+            
+            foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            {
+                flow.AddAction(new LoadLuaAction(plugin));
+            }
+            
 
             foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
             {
-                flow.AddAction(new PostInitializeModAction(plugin));
+                if (plugin.Plugin != null)
+                    flow.AddAction(new PostInitializeModAction(plugin.Plugin));
             }
         });
     }
