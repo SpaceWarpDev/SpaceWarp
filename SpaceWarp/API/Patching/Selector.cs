@@ -12,7 +12,7 @@ public class Selector
     // TODO: Make this more efficient for multiple module requirements
     public Selector WithModule(string moduleName) =>
         Where(part =>
-            part.modules.Any(x => x.GetType().Name == moduleName || x.GetType().FullName == moduleName));
+            part.modules.Any(x => x.GetType().Name == moduleName || x.GetType().FullName == moduleName || x.GetType().Name == $"Module_{moduleName}"));
 
     public Selector WithModule<T>() => WithModule(typeof(T));
 

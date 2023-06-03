@@ -41,12 +41,23 @@ internal static class PatchCompiler
             {
                 if (type.IsSubclassOf(typeof(PartBehaviourModule)))
                 {
-                    if (type.Namespace.Length > 0)
+                    if (type.Namespace != null && type.Namespace.Length > 0)
                     {
                         if (!_namespacesToUse.Contains(type.Namespace))
                             _namespacesToUse.Add(type.Namespace);
                     }
                 }
+
+                if (type.IsSubclassOf(typeof(ModuleData)))
+                {
+                    if (type.Namespace != null && type.Namespace.Length > 0)
+                    {
+                        if (!_namespacesToUse.Contains(type.Namespace))
+                            _namespacesToUse.Add(type.Namespace);
+                    }
+                }
+                
+                // How to allow access to configuration?
             }
 
             if (!assembly.IsDynamic && assembly.Location != "")
@@ -208,6 +219,7 @@ internal static class PatchCompiler
                 //Ignored
             }
         }
+        // How to note that this is for "this" mod
         Assembly.LoadFile(Path.Combine(cacheLocation, dllName));
     }
 }

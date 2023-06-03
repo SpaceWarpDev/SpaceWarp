@@ -2,5 +2,9 @@
 
 public abstract class PatchBase
 {
-    public abstract Selector Select();
+
+    private Selector _selector;
+    internal Selector CachedSelector => _selector ??= Selector;
+
+    public abstract Selector Selector { get; }
 }
