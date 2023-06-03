@@ -13,6 +13,7 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.API.Versions;
+using SpaceWarp.Backend.Patching;
 using SpaceWarp.Backend.UI.Appbar;
 using SpaceWarp.UI.Console;
 using SpaceWarp.UI.ModList;
@@ -375,5 +376,13 @@ internal static class SpaceWarpManager
     {
         Loading.AddAssetLoadingAction("bundles", "loading asset bundles", AssetBundleLoadingAction, "bundle");
         Loading.AddAssetLoadingAction("images", "loading images", ImageLoadingAction);
+        Loading.AddDescriptorLoadingAction("compiling patches", descriptor =>
+        {
+            if (Directory.Exists(Path.Combine(descriptor.Folder.FullName, "patches")))
+            {
+                PatchCompiler.CompilePatchesFor(descriptor.Guid,
+                    new DirectoryInfo(Path.Combine(descriptor.Folder.FullName, "patches")));
+            }
+        });
     }
 }

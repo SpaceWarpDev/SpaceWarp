@@ -11,7 +11,7 @@ public class DescriptorLoadingAction : FlowAction
     
     
     public DescriptorLoadingAction(string actionName, Action<SpaceWarpPluginDescriptor> action, SpaceWarpPluginDescriptor plugin) : base(
-        $"{plugin.SWInfo.Name}:{actionName}")
+        $"{plugin.SWInfo.Name}: {actionName}")
     {
         _action = action;
         _plugin = plugin;
