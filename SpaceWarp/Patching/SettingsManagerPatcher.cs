@@ -6,7 +6,7 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch]
 internal static class SettingsManagerPatcher
 {
-    internal static List<SettingsMenu> AllExtrasSettingsMenus;
+    internal static List<SettingsSubMenu> AllExtrasSettingsMenus = new();
     
     [HarmonyPostfix]
     [HarmonyPatch(typeof(SettingsMenuManager))]

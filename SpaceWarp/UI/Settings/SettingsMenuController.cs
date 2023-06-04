@@ -157,6 +157,7 @@ public class SettingsMenuController : KerbalMonoBehaviour
         toggle.action = new DelegateAction(ToggleModsSettings);
         _modsSubMenu.gameObject.SetActive(false);
         ModsPropertyDrawers.SetupDefaults();
+        SettingsManagerPatcher.AllExtrasSettingsMenus.Add(_modsSubMenu);
     }
 
     private void ToggleModsSettings()
