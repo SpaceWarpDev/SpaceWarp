@@ -8,6 +8,7 @@ using KSP.UI;
 using KSP.UI.Binding;
 using KSP.UI.Binding.Core;
 using SpaceWarp.API.UI.Settings;
+using SpaceWarp.InternalUtilities;
 using SpaceWarp.Patching;
 using UnityEngine;
 using UnityEngine.UI;

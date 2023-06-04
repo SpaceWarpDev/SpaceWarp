@@ -26,6 +26,7 @@ using SpaceWarp.API.Lua;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
+using SpaceWarp.InternalUtilities;
 using SpaceWarp.UI;
 using SpaceWarp.UI.Console;
 using SpaceWarp.UI.ModList;
@@ -82,6 +83,19 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     {
         _kspVersion = typeof(VersionID).GetField("VERSION_TEXT", BindingFlags.Static | BindingFlags.Public)
             ?.GetValue(null) as string;
+        SetupSpaceWarpConfiguration();
+        
+        BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
+
+        Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
+
+        SpaceWarpManager.InitializeSpaceWarpsLoadingActions();
+
+        SpaceWarpManager.Initialize(this);
+    }
+
+    private void SetupSpaceWarpConfiguration()
+    {
         ConfigErrorColor = Config.Bind("Debug Console", "Color Error", Color.red,
             "The color for log messages that have the level: Error/Fatal (bolded)");
         ConfigWarningColor = Config.Bind("Debug Console", "Color Warning", Color.yellow,
@@ -106,15 +120,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user.");
         ConfigCheckVersions = Config.Bind("Version Checking", "Check Versions", false,
             "Whether or not Space Warp should check mod versions using their swinfo.json files");
-        
-        
-        BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
-
-        Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
-
-        SpaceWarpManager.InitializeSpaceWarpsLoadingActions();
-
-        SpaceWarpManager.Initialize(this);
     }
 
 

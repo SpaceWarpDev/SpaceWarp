@@ -4,7 +4,7 @@ using KSP.Game;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace SpaceWarp;
+namespace SpaceWarp.InternalUtilities;
 
 internal static class AssetHelpers
 {

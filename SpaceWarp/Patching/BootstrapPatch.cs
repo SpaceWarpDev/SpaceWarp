@@ -13,7 +13,7 @@ internal static class BootstrapPatch
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.Awake))]
     private static void GetSpaceWarpMods()
     {
-        SpaceWarpManager.GetSpaceWarpPlugins();
+        SpaceWarpManager.GetAllPlugins();
     }
 
     [HarmonyILManipulator]

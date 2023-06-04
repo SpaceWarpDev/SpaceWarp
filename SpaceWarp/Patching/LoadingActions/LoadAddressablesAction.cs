@@ -3,6 +3,7 @@ using System.IO;
 using BepInEx.Logging;
 using KSP.Game.Flow;
 using SpaceWarp.API.Mods;
+using SpaceWarp.InternalUtilities;
 
 namespace SpaceWarp.Patching.LoadingActions;
 
