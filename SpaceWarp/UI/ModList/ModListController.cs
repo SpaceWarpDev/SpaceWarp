@@ -170,10 +170,10 @@ public class ModListController : MonoBehaviour
         _detailsDependenciesList = _container.Q<VisualElement>("details-dependencies-list");
 
         // Show only categories that have any mods in them
-        // if (SpaceWarpManager.AllPlugins.Count + SpaceWarpManager.NonSpaceWarpInfos.Count > 0)
-        // {
-        //     _spaceWarpModFoldout.style.display = DisplayStyle.Flex;
-        // }
+        if (SpaceWarpManager.AllPlugins.Count > 0)
+        {
+            _spaceWarpModFoldout.style.display = DisplayStyle.Flex;
+        }
         //
         // if (SpaceWarpManager.NonSpaceWarpPlugins.Count > 0)
         // {
