@@ -170,17 +170,17 @@ public class ModListController : MonoBehaviour
         _detailsDependenciesList = _container.Q<VisualElement>("details-dependencies-list");
 
         // Show only categories that have any mods in them
-        if (SpaceWarpManager.SpaceWarpPlugins.Count + SpaceWarpManager.NonSpaceWarpInfos.Count > 0)
-        {
-            _spaceWarpModFoldout.style.display = DisplayStyle.Flex;
-        }
+        // if (SpaceWarpManager.AllPlugins.Count + SpaceWarpManager.NonSpaceWarpInfos.Count > 0)
+        // {
+        //     _spaceWarpModFoldout.style.display = DisplayStyle.Flex;
+        // }
+        //
+        // if (SpaceWarpManager.NonSpaceWarpPlugins.Count > 0)
+        // {
+        //     _otherModFoldout.style.display = DisplayStyle.Flex;
+        // }
 
-        if (SpaceWarpManager.NonSpaceWarpPlugins.Count > 0)
-        {
-            _otherModFoldout.style.display = DisplayStyle.Flex;
-        }
-
-        if (SpaceWarpManager.DisabledInfoPlugins.Count + SpaceWarpManager.DisabledNonInfoPlugins.Count > 0)
+        if (SpaceWarpManager.DisabledPlugins.Count + SpaceWarpManager.DisabledPlugins.Count > 0)
         {
             _disabledModFoldout.style.display = DisplayStyle.Flex;
         }
@@ -188,7 +188,7 @@ public class ModListController : MonoBehaviour
 
     private void FillModLists()
     {
-        foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+        foreach (var plugin in SpaceWarpManager.AllPlugins)
         {
             MakeListItem(_spaceWarpModList, data =>
             {
@@ -202,50 +202,50 @@ public class ModListController : MonoBehaviour
             });
         }
 
-        foreach (var (plugin, modInfo) in SpaceWarpManager.NonSpaceWarpInfos)
-        {
-            MakeListItem(_otherInfoModList, data =>
-            {
-                data.Guid = plugin.Info.Metadata.GUID;
-                data.SetInfo(modInfo);
+        // foreach (var (plugin, modInfo) in SpaceWarpManager.NonSpaceWarpInfos)
+        // {
+        //     MakeListItem(_otherInfoModList, data =>
+        //     {
+        //         data.Guid = plugin.Info.Metadata.GUID;
+        //         data.SetInfo(modInfo);
+        //
+        //         if (SpaceWarpManager.ModsUnsupported[data.Guid])
+        //         {
+        //             data.SetIsUnsupported();
+        //         }
+        //     });
+        // }
 
-                if (SpaceWarpManager.ModsUnsupported[data.Guid])
-                {
-                    data.SetIsUnsupported();
-                }
-            });
-        }
+        // foreach (var bepinPlugin in SpaceWarpManager.NonSpaceWarpPlugins)
+        // {
+        //     MakeListItem(_otherModList, data =>
+        //     {
+        //         data.Guid = bepinPlugin.Info.Metadata.GUID;
+        //         data.SetInfo(bepinPlugin.Info);
+        //     });
+        // }
+        //
+        // foreach (var (pluginInfo, modInfo) in SpaceWarpManager.DisabledInfoPlugins)
+        // {
+        //     MakeListItem(_disabledInfoModList, data =>
+        //     {
+        //         data.Guid = pluginInfo.Metadata.GUID;
+        //         data.SetInfo(modInfo);
+        //         data.SetIsDisabled();
+        //
+        //         if (SpaceWarpManager.ModsUnsupported[data.Guid])
+        //         {
+        //             data.SetIsUnsupported();
+        //         }
+        //     });
+        // }
 
-        foreach (var bepinPlugin in SpaceWarpManager.NonSpaceWarpPlugins)
-        {
-            MakeListItem(_otherModList, data =>
-            {
-                data.Guid = bepinPlugin.Info.Metadata.GUID;
-                data.SetInfo(bepinPlugin.Info);
-            });
-        }
-
-        foreach (var (pluginInfo, modInfo) in SpaceWarpManager.DisabledInfoPlugins)
-        {
-            MakeListItem(_disabledInfoModList, data =>
-            {
-                data.Guid = pluginInfo.Metadata.GUID;
-                data.SetInfo(modInfo);
-                data.SetIsDisabled();
-
-                if (SpaceWarpManager.ModsUnsupported[data.Guid])
-                {
-                    data.SetIsUnsupported();
-                }
-            });
-        }
-
-        foreach (var pluginInfo in SpaceWarpManager.DisabledNonInfoPlugins)
+        foreach (var pluginInfo in SpaceWarpManager.DisabledPlugins)
         {
             MakeListItem(_disabledModList, data =>
             {
-                data.Guid = pluginInfo.Metadata.GUID;
-                data.SetInfo(pluginInfo);
+                data.Guid = pluginInfo.Guid;
+                data.SetInfo(pluginInfo.SWInfo);
                 data.SetIsDisabled();
             });
         }

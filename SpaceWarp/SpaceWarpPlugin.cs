@@ -191,26 +191,16 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     public void ClearVersions()
     {
-        foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+        foreach (var plugin in SpaceWarpManager.AllPlugins)
         {
             SpaceWarpManager.ModsOutdated[plugin.Guid] = false;
-        }
-
-        foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
-        {
-            SpaceWarpManager.ModsOutdated[info.Item1.Info.Metadata.GUID] = false;
-        }
-
-        foreach (var info in SpaceWarpManager.DisabledInfoPlugins)
-        {
-            SpaceWarpManager.ModsOutdated[info.Item1.Metadata.GUID] = false;
         }
     }
 
     public void CheckVersions()
     {
         ClearVersions();
-        foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+        foreach (var plugin in SpaceWarpManager.AllPlugins)
         {
             if (plugin.SWInfo.VersionCheck != null)
             {
@@ -218,19 +208,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             }
         }
 
-        foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
+        foreach (var info in SpaceWarpManager.DisabledPlugins)
         {
-            if (info.Item2.VersionCheck != null)
+            if (info.SWInfo.VersionCheck != null)
             {
-                StartCoroutine(CheckVersion(info.Item1.Info.Metadata.GUID, info.Item2));
-            }
-        }
-
-        foreach (var info in SpaceWarpManager.DisabledInfoPlugins)
-        {
-            if (info.Item2.VersionCheck != null)
-            {
-                StartCoroutine(CheckVersion(info.Item1.Metadata.GUID, info.Item2));
+                StartCoroutine(CheckVersion(info.Guid, info.SWInfo));
             }
         }
     }

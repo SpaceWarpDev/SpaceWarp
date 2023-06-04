@@ -31,12 +31,13 @@ internal static class SpaceWarpManager
 
     internal static string SpaceWarpFolder;
     // The plugin can be null
-    internal static IReadOnlyList<SpaceWarpPluginDescriptor> SpaceWarpPlugins;
-    internal static IReadOnlyList<BaseUnityPlugin> NonSpaceWarpPlugins;
-    internal static IReadOnlyList<(BaseUnityPlugin, ModInfo)> NonSpaceWarpInfos;
+    internal static IReadOnlyList<SpaceWarpPluginDescriptor> AllPlugins;
+    // internal static IReadOnlyList<BaseUnityPlugin> NonSpaceWarpPlugins;
+    // internal static IReadOnlyList<(BaseUnityPlugin, ModInfo)> NonSpaceWarpInfos;
 
-    internal static IReadOnlyList<(PluginInfo, ModInfo)> DisabledInfoPlugins;
-    internal static IReadOnlyList<PluginInfo> DisabledNonInfoPlugins;
+    // internal static IReadOnlyList<(PluginInfo, ModInfo)> DisabledInfoPlugins;
+    // internal static IReadOnlyList<PluginInfo> DisabledNonInfoPlugins;
+    internal static IReadOnlyList<SpaceWarpPluginDescriptor> DisabledPlugins;
     internal static IReadOnlyList<(string, bool)> PluginGuidEnabledStatus;
 
     internal static readonly Dictionary<string, bool> ModsOutdated = new();
@@ -66,30 +67,22 @@ internal static class SpaceWarpManager
     internal static void GetAllPlugins()
     {
         var pluginGuidEnabledStatus = new List<(string, bool)>();
-        // obsolete warning for Chainloader.Plugins, is fine since we need ordered list
-        // to break this we would likely need to upgrade to BIE 6, which isn't happening
 #pragma warning disable CS0618
         var spaceWarpPlugins = Chainloader.Plugins.OfType<BaseSpaceWarpPlugin>().ToList();
-        // SpaceWarpPlugins = spaceWarpPlugins;
-        var spaceWarpInfos = new List<SpaceWarpPluginDescriptor>();
+        var modDescriptors = new List<SpaceWarpPluginDescriptor>();
         var ignoredGUIDs = new List<string>();
 
-        GetCodeBasedSpaceWarpPlugins(spaceWarpPlugins, ignoredGUIDs, spaceWarpInfos, pluginGuidEnabledStatus);
+        GetCodeBasedSpaceWarpPlugins(spaceWarpPlugins, ignoredGUIDs, modDescriptors, pluginGuidEnabledStatus);
 
-        GetCodeBasedNonSpaceWarpPlugins(spaceWarpPlugins, pluginGuidEnabledStatus);
+        GetCodeBasedNonSpaceWarpPlugins(spaceWarpPlugins, modDescriptors, pluginGuidEnabledStatus);
 
-        var disabledInfoPlugins = new List<(PluginInfo, ModInfo)>();
-        var disabledNonInfoPlugins = new List<PluginInfo>();
+        var disabledPlugins = new List<SpaceWarpPluginDescriptor>();
 
-        GetDisabledPlugins(disabledInfoPlugins, disabledNonInfoPlugins, pluginGuidEnabledStatus);
+        GetDisabledPlugins(disabledPlugins, pluginGuidEnabledStatus);
 
-        // Now here is where we can find "codeless" mods
-        // We just loop through every swinfo we find and do stuff w/ it
-
-        GetCodelessSpaceWarpPlugins(ignoredGUIDs, spaceWarpInfos,pluginGuidEnabledStatus);
-        SpaceWarpPlugins = spaceWarpInfos;
-        DisabledInfoPlugins = disabledInfoPlugins;
-        DisabledNonInfoPlugins = disabledNonInfoPlugins;
+        GetCodelessSpaceWarpPlugins(ignoredGUIDs, modDescriptors, pluginGuidEnabledStatus);
+        AllPlugins = modDescriptors;
+        DisabledPlugins = disabledPlugins;
         PluginGuidEnabledStatus = pluginGuidEnabledStatus;
     }
 
@@ -179,15 +172,15 @@ internal static class SpaceWarpManager
             if (Chainloader.PluginInfos.ContainsKey(guid)) continue;
 
             // Now we can just add it to our plugin list
-            codelessInfos.Add(new(null, guid, swinfoData, swinfo.Directory));
+            codelessInfos.Add(new(null, guid,swinfoData.Name,swinfoData, swinfo.Directory));
         }
     }
 
-    private static void GetDisabledPlugins(List<(PluginInfo, ModInfo)> disabledInfoPlugins, List<PluginInfo> disabledNonInfoPlugins,
+    private static void GetDisabledPlugins(List<SpaceWarpPluginDescriptor> disabledPlugins,
         List<(string, bool)> pluginGuidEnabledStatus)
     {
-        var disabledPlugins = ChainloaderPatch.DisabledPlugins;
-        foreach (var plugin in disabledPlugins)
+        var allDisabledPlugins = ChainloaderPatch.DisabledPlugins;
+        foreach (var plugin in allDisabledPlugins)
         {
             var folderPath = Path.GetDirectoryName(plugin.Location);
             var swInfoPath = Path.Combine(folderPath!, "swinfo.json");
@@ -196,28 +189,30 @@ internal static class SpaceWarpManager
                 try
                 {
                     var swInfo = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(swInfoPath));
-                    disabledInfoPlugins.Add((plugin, swInfo));
+                    disabledPlugins.Add(new SpaceWarpPluginDescriptor(null,plugin.Metadata.GUID,plugin.Metadata.Name,swInfo,new DirectoryInfo(folderPath)));
                 }
                 catch
                 {
-                    disabledNonInfoPlugins.Add(plugin);
+                    var swInfo = BepinexToSWInfo(plugin);
+                    disabledPlugins.Add(new SpaceWarpPluginDescriptor(null,plugin.Metadata.GUID,plugin.Metadata.Name,swInfo,new DirectoryInfo(folderPath)));
                 }
             }
             else
             {
-                disabledNonInfoPlugins.Add(plugin);
+                var swInfo = BepinexToSWInfo(plugin);
+                disabledPlugins.Add(new SpaceWarpPluginDescriptor(null,plugin.Metadata.GUID,plugin.Metadata.Name,swInfo,new DirectoryInfo(folderPath)));
             }
 
             pluginGuidEnabledStatus.Add((plugin.Metadata.GUID, false));
         }
     }
 
-    private static void GetCodeBasedNonSpaceWarpPlugins(List<BaseSpaceWarpPlugin> spaceWarpPlugins, List<(string, bool)> pluginGuidEnabledStatus)
+    private static void GetCodeBasedNonSpaceWarpPlugins(List<BaseSpaceWarpPlugin> spaceWarpPlugins, List<SpaceWarpPluginDescriptor> allPlugins, List<(string, bool)> pluginGuidEnabledStatus)
     {
-        var allPlugins = Chainloader.Plugins.ToList();
-        List<BaseUnityPlugin> nonSWPlugins = new();
-        List<(BaseUnityPlugin, ModInfo)> nonSWInfos = new();
-        foreach (var plugin in allPlugins)
+        var allBEPlugins = Chainloader.Plugins.ToList();
+        // List<BaseUnityPlugin> nonSWPlugins = new();
+        // List<(BaseUnityPlugin, ModInfo)> nonSWInfos = new();
+        foreach (var plugin in allBEPlugins)
         {
             if (spaceWarpPlugins.Contains(plugin as BaseSpaceWarpPlugin))
             {
@@ -229,19 +224,52 @@ internal static class SpaceWarpManager
             if (File.Exists(modInfoPath))
             {
                 var info = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(modInfoPath));
-                nonSWInfos.Add((plugin, info));
+                // nonSWInfos.Add((plugin, info));
+                allPlugins.Add(new SpaceWarpPluginDescriptor(null,plugin.Info.Metadata.GUID,plugin.Info.Metadata.Name, info, new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!)));
             }
             else
             {
-                nonSWPlugins.Add(plugin);
+                var newInfo = BepinexToSWInfo(plugin.Info);
+                allPlugins.Add(new SpaceWarpPluginDescriptor(null,plugin.Info.Metadata.GUID,plugin.Info.Metadata.Name,newInfo,new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!)));
             }
 
             pluginGuidEnabledStatus.Add((plugin.Info.Metadata.GUID, true));
         }
 
-        NonSpaceWarpPlugins = nonSWPlugins;
-        NonSpaceWarpInfos = nonSWInfos;
+        // NonSpaceWarpPlugins = nonSWPlugins;
+        // NonSpaceWarpInfos = nonSWInfos;
 #pragma warning restore CS0618
+    }
+
+    private static ModInfo BepinexToSWInfo(PluginInfo plugin)
+    {
+        var newInfo = new ModInfo
+        {
+            Spec = SpecVersion.V1_3,
+            ModID = plugin.Metadata.GUID,
+            Name = plugin.Metadata.Name,
+            Author = "<unknown>",
+            Description = "<unknown>",
+            Source = "<unknwon>",
+            Version = plugin.Metadata.Version.ToString(),
+            Dependencies = plugin.Dependencies.Select(x => new DependencyInfo
+            {
+                ID = x.DependencyGUID,
+                Version = new SupportedVersionsInfo
+                {
+                    Min = x.MinimumVersion.ToString(),
+                    Max = "*"
+                }
+            }).ToList(),
+            SupportedKsp2Versions = new SupportedVersionsInfo
+            {
+                Min = "*",
+                Max = "*"
+            },
+            VersionCheck = null,
+            VersionCheckType = VersionCheckType.SwInfo
+        };
+        return newInfo;
     }
 
     private static void GetCodeBasedSpaceWarpPlugins(List<BaseSpaceWarpPlugin> spaceWarpPlugins, List<string> ignoredGUIDs, List<SpaceWarpPluginDescriptor> spaceWarpInfos,
@@ -307,7 +335,11 @@ internal static class SpaceWarpManager
 
             plugin.SpaceWarpMetadata = metadata;
             var directoryInfo = new FileInfo(modInfoPath).Directory;
-            spaceWarpInfos.Add(new(plugin, plugin.Info.Metadata.GUID, metadata, directoryInfo));
+            spaceWarpInfos.Add(new SpaceWarpPluginDescriptor(plugin,
+                plugin.Info.Metadata.GUID,
+                metadata.Name,
+                metadata,
+                directoryInfo));
             pluginGuidEnabledStatus.Add((plugin.Info.Metadata.GUID, true));
         }
     }
@@ -327,20 +359,15 @@ internal static class SpaceWarpManager
     {
         var kspVersion = typeof(VersionID).GetField("VERSION_TEXT", BindingFlags.Static | BindingFlags.Public)
             ?.GetValue(null) as string;
-        foreach (var plugin in SpaceWarpPlugins)
+        foreach (var plugin in AllPlugins)
         {
             // CheckModKspVersion(plugin.Info.Metadata.GUID, plugin.SpaceWarpMetadata, kspVersion);
             CheckModKspVersion(plugin.Guid, plugin.SWInfo, kspVersion);
         }
 
-        foreach (var info in NonSpaceWarpInfos)
+        foreach (var info in DisabledPlugins)
         {
-            CheckModKspVersion(info.Item1.Info.Metadata.GUID, info.Item2, kspVersion);
-        }
-
-        foreach (var info in DisabledInfoPlugins)
-        {
-            CheckModKspVersion(info.Item1.Metadata.GUID, info.Item2, kspVersion);
+            CheckModKspVersion(info.Guid, info.SWInfo, kspVersion);
         }
     }
 
