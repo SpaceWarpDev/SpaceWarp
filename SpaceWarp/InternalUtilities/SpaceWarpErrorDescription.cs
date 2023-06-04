@@ -18,7 +18,7 @@ internal class SpaceWarpErrorDescription
     public List<string> ErroredDependencies = new();
     public List<string> MissingDependencies = new();
     public List<string> UnsupportedDependencies = new();
-    
+    public List<string> UnspecifiedDependencies = new();
 
     public SpaceWarpErrorDescription(SpaceWarpPluginDescriptor plugin)
     {
@@ -57,6 +57,11 @@ internal class SpaceWarpErrorDescription
         foreach (var unsupportedDependency in UnsupportedDependencies)
         {
             controller.SetIsDependencyUnsupported(unsupportedDependency);
+        }
+
+        foreach (var unspecifiedDependency in UnspecifiedDependencies)
+        {
+            controller.SetIsDependencyUnspecified(unspecifiedDependency);
         }
     }
 }

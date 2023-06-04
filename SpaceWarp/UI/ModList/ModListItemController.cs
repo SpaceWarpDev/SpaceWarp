@@ -35,8 +35,10 @@ internal class ModListItemController
 
     internal List<string> DisabledDependencies { get; private set; } = new();
     internal List<string> UnsupportedDependencies { get; private set; } = new();
-    
-    
+
+    internal List<string> UnspecifiedDependencies { get; private set; } = new();
+
+
     internal void SetInfo(ModInfo info)
     {
         Info = info;
@@ -119,6 +121,12 @@ internal class ModListItemController
     internal void SetIsDependencyUnsupported(string unsupportedDependency)
     {
         UnsupportedDependencies.Add(unsupportedDependency);
+        SetIsErrored();
+    }
+
+    internal void SetIsDependencyUnspecified(string unspecifiedDependency)
+    {
+        UnspecifiedDependencies.Add(unspecifiedDependency);
         SetIsErrored();
     }
 

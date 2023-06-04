@@ -540,9 +540,37 @@ internal static class SpaceWarpManager
                     });
                     continue;
                 }
+
+                var unspecifiedDeps = new List<string>();
+                foreach (var dep in plugin.Info.Dependencies)
+                {
+                    if (metadata.Dependencies.Any(x => x.ID == dep.DependencyGUID)) continue;
+                    Logger.LogError($"Found Space Warp Plugin {plugin.Info.Metadata.Name} that has an unspecified swinfo dependency found in its BepInDependencies: {dep.DependencyGUID}");
+                    unspecifiedDeps.Add(dep.DependencyGUID);
+                    metadata.Dependencies.Add(new DependencyInfo
+                    {
+                        ID = dep.DependencyGUID,
+                        Version = new SupportedVersionsInfo
+                        {
+                            Min = dep.MinimumVersion.ToString(),
+                            Max = "*"
+                        }
+                    });
+                }
+
+                if (unspecifiedDeps.Count > 0)
+                {
+                    errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin,
+                        plugin.Info.Metadata.GUID,
+                        plugin.Info.Metadata.Name,
+                        BepinexToSWInfo(plugin.Info),
+                        new DirectoryInfo(folderPath)))
+                    {
+                        UnspecifiedDependencies = unspecifiedDeps
+                    });
+                    continue;
+                }
             }
-
-
             plugin.SpaceWarpMetadata = metadata;
             var directoryInfo = new FileInfo(modInfoPath).Directory;
             spaceWarpInfos.Add(new SpaceWarpPluginDescriptor(plugin,
