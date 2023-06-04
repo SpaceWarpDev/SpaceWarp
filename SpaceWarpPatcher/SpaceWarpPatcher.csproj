@@ -7,6 +7,7 @@
     <ItemGroup>
       <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" />
       <PackageReference Include="HarmonyX" Version="2.10.1" />
+      <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.2" />
     </ItemGroup>
     
 </Project>
