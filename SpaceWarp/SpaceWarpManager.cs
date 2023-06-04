@@ -86,7 +86,7 @@ internal static class SpaceWarpManager
         PluginGuidEnabledStatus = pluginGuidEnabledStatus;
     }
 
-    private static void GetCodelessSpaceWarpPlugins(List<string> ignoredGUIDs, List<SpaceWarpPluginDescriptor> spaceWarpInfos,List<(string, bool)> pluginGuidEnabledStatus)
+    private static void GetCodelessSpaceWarpPlugins(List<string> ignoredGUIDs, List<SpaceWarpPluginDescriptor> spaceWarpInfos,ICollection<(string, bool)> pluginGuidEnabledStatus)
     {
         var codelessInfos = new List<SpaceWarpPluginDescriptor>();
         FindAllCodelessSWInfos(codelessInfos);
@@ -94,39 +94,32 @@ internal static class SpaceWarpManager
         var codelessInfosInOrder =
             new List<SpaceWarpPluginDescriptor>();
         // Check for the dependencies on codelessInfos
-        ResolveCodelessPluginDependencyOrder(ignoredGUIDs, codelessInfosInOrder, codelessInfos,pluginGuidEnabledStatus);
+        ResolveCodelessPluginDependencyOrder(ignoredGUIDs, spaceWarpInfos, codelessInfosInOrder, codelessInfos,pluginGuidEnabledStatus);
         spaceWarpInfos.AddRange(codelessInfosInOrder);
     }
-
-    private static void ResolveCodelessPluginDependencyOrder(List<string> ignoredGUIDs, List<SpaceWarpPluginDescriptor> codelessInfosInOrder,
-        List<SpaceWarpPluginDescriptor> codelessInfos, List<(string, bool)> pluginGuidEnabledStatus)
+    private static bool CodelessDependencyResolved(SpaceWarpPluginDescriptor descriptor, ICollection<string> ignoredGUIDs, ICollection<SpaceWarpPluginDescriptor> spaceWarpInfos, IReadOnlyCollection<SpaceWarpPluginDescriptor> codelessInfosInOrder)
     {
-        bool CodelessDependencyResolved(SpaceWarpPluginDescriptor descriptor)
+        foreach (var dependency in descriptor.SWInfo.Dependencies)
         {
-            foreach (var dependency in descriptor.SWInfo.Dependencies)
-            {
-                if (Chainloader.PluginInfos.ContainsKey(dependency.ID) && !ignoredGUIDs.Contains(dependency.ID))
-                {
-                    var chainloaderVersion = Chainloader.PluginInfos[dependency.ID].Metadata.Version.ToString();
-                    if (!VersionUtility.IsSupported(chainloaderVersion, dependency.Version.Min, dependency.Version.Max))
-                        return false;
-                }
-
-                var codelessInfo = codelessInfosInOrder.FirstOrDefault(x => x.Guid == dependency.ID);
-                if (codelessInfo == null || !VersionUtility.IsSupported(codelessInfo.SWInfo.Version, dependency.Version.Min,
-                        dependency.Version.Max)) return false;
-            }
-
-            return true;
+            Logger.LogInfo($"({descriptor.Name}) Attempting to check if dependency is resolved: {dependency.ID}");
+            var info = spaceWarpInfos.FirstOrDefault(x => x.Guid == dependency.ID) ??
+                       codelessInfosInOrder.FirstOrDefault(x => x.Guid == dependency.ID);
+            if (info == null || !VersionUtility.IsSupported(info.SWInfo.Version, dependency.Version.Min,
+                    dependency.Version.Max)) return false;
         }
 
-        bool changed = true;
+        return true;
+    }
+    private static void ResolveCodelessPluginDependencyOrder(List<string> ignoredGUIDs, List<SpaceWarpPluginDescriptor> spaceWarpInfos, List<SpaceWarpPluginDescriptor> codelessInfosInOrder,
+        List<SpaceWarpPluginDescriptor> codelessInfos, ICollection<(string, bool)> pluginGuidEnabledStatus)
+    {
+        var changed = true;
         while (changed)
         {
             changed = false;
             for (var i = codelessInfos.Count - 1; i >= 0; i--)
             {
-                if (!CodelessDependencyResolved(codelessInfos[i])) continue;
+                if (!CodelessDependencyResolved(codelessInfos[i],ignoredGUIDs,spaceWarpInfos,codelessInfosInOrder)) continue;
                 codelessInfosInOrder.Add(codelessInfos[i]);
                 pluginGuidEnabledStatus.Add((codelessInfos[i].Guid,true));
                 codelessInfos.RemoveAt(i);
@@ -134,14 +127,12 @@ internal static class SpaceWarpManager
             }
         }
 
-        if (codelessInfos.Count > 0)
+        if (codelessInfos.Count <= 0) return;
+        foreach (var info in codelessInfos)
         {
-            foreach (var info in codelessInfos)
-            {
-                // TODO: Specific dependency warnings in the mod list at some point!
-                Logger.LogError($"Missing dependency for codeless mod: {info.SWInfo.Name}, this mod will not be loaded");
+            // TODO: Specific dependency warnings in the mod list at some point!
+            Logger.LogError($"Missing dependency for codeless mod: {info.Name}, this mod will not be loaded");
                 
-            }
         }
     }
 
@@ -173,7 +164,7 @@ internal static class SpaceWarpManager
             if (Chainloader.PluginInfos.ContainsKey(guid)) continue;
 
             // Now we can just add it to our plugin list
-            codelessInfos.Add(new(null, guid,swinfoData.Name,swinfoData, swinfo.Directory));
+            codelessInfos.Add(new SpaceWarpPluginDescriptor(null, guid,swinfoData.Name,swinfoData, swinfo.Directory));
         }
     }
 
