@@ -173,16 +173,18 @@ internal class ModListController : MonoBehaviour
         if (SpaceWarpManager.AllPlugins.Count > 0)
         {
             _spaceWarpModFoldout.style.display = DisplayStyle.Flex;
+            _spaceWarpModFoldout.text = "Enabled Mods";
         }
-        //
-        // if (SpaceWarpManager.NonSpaceWarpPlugins.Count > 0)
-        // {
-        //     _otherModFoldout.style.display = DisplayStyle.Flex;
-        // }
+        if (SpaceWarpManager.ErroredPlugins.Count > 0)
+        {
+            _otherModFoldout.style.display = DisplayStyle.Flex;
+            _otherModFoldout.text = "Errored Mods";
+        }
 
-        if (SpaceWarpManager.DisabledPlugins.Count + SpaceWarpManager.DisabledPlugins.Count > 0)
+        if (SpaceWarpManager.DisabledPlugins.Count > 0)
         {
             _disabledModFoldout.style.display = DisplayStyle.Flex;
+            _disabledModFoldout.text = "Disabled Mods";
         }
     }
 
@@ -202,44 +204,6 @@ internal class ModListController : MonoBehaviour
             });
         }
 
-        // foreach (var (plugin, modInfo) in SpaceWarpManager.NonSpaceWarpInfos)
-        // {
-        //     MakeListItem(_otherInfoModList, data =>
-        //     {
-        //         data.Guid = plugin.Info.Metadata.GUID;
-        //         data.SetInfo(modInfo);
-        //
-        //         if (SpaceWarpManager.ModsUnsupported[data.Guid])
-        //         {
-        //             data.SetIsUnsupported();
-        //         }
-        //     });
-        // }
-
-        // foreach (var bepinPlugin in SpaceWarpManager.NonSpaceWarpPlugins)
-        // {
-        //     MakeListItem(_otherModList, data =>
-        //     {
-        //         data.Guid = bepinPlugin.Info.Metadata.GUID;
-        //         data.SetInfo(bepinPlugin.Info);
-        //     });
-        // }
-        //
-        // foreach (var (pluginInfo, modInfo) in SpaceWarpManager.DisabledInfoPlugins)
-        // {
-        //     MakeListItem(_disabledInfoModList, data =>
-        //     {
-        //         data.Guid = pluginInfo.Metadata.GUID;
-        //         data.SetInfo(modInfo);
-        //         data.SetIsDisabled();
-        //
-        //         if (SpaceWarpManager.ModsUnsupported[data.Guid])
-        //         {
-        //             data.SetIsUnsupported();
-        //         }
-        //     });
-        // }
-
         foreach (var pluginInfo in SpaceWarpManager.DisabledPlugins)
         {
             MakeListItem(_disabledModList, data =>
@@ -247,6 +211,14 @@ internal class ModListController : MonoBehaviour
                 data.Guid = pluginInfo.Guid;
                 data.SetInfo(pluginInfo.SWInfo);
                 data.SetIsDisabled();
+            });
+        }
+
+        foreach (var erroredPlugin in SpaceWarpManager.ErroredPlugins)
+        {
+            MakeListItem(_otherModList, data => { 
+                data.Guid = erroredPlugin.Plugin.Guid;
+                erroredPlugin.Apply(data);
             });
         }
     }
@@ -378,6 +350,8 @@ internal class ModListController : MonoBehaviour
 
     private void SetSelectedModInfo(ModListItemController data, ModInfo info)
     {
+        
+        //TODO: Add the ability to show errors at some point (Munix)
         SetSelected(
             info.Name,
             data.Guid,
