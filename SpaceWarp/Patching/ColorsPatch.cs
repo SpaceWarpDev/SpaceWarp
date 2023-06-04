@@ -289,15 +289,9 @@ internal class ColorsPatch
         nameof(Module_Color.OnInitialize))]
     internal static void Postfix(Module_Color __instance)
     {
-        if (DeclaredParts.Count == 0)
-        {
-            return;
-        }
-
         var partName = __instance.OABPart is not null ? __instance.OABPart.PartName : __instance.part.Name;
         var trimmedPartName = TrimPartName(partName);
-
-        if (_allParts.Contains(trimmedPartName))
+        if (DeclaredParts.Count > 0 && _allParts.Contains(trimmedPartName))
         {
             var mat = new Material(_ksp2Opaque);
             mat.name = __instance.GetComponentInChildren<MeshRenderer>().material.name;
