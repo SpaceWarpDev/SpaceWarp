@@ -7,93 +7,85 @@ using static SpaceWarp.UI.Console.SpaceWarpConsoleLogListener;
 namespace SpaceWarp.UI.Console
 {
 
-    public class LogEntry : BindableElement
+    internal class LogEntry : BindableElement
     {
-        public static readonly string ussClassName = "spacewarp-logEntry";
-        public static readonly string ussLogEntryElementClassName = ussClassName + "-element";
-        public static readonly string ussHeaderGrouperClassName = ussClassName + "__headerContent";
-        public static readonly string ussTimeDateClassName = ussClassName + "__timeDate";
-        public static readonly string ussLogLevelClassName = ussClassName + "__logLevel";
-        public static readonly string ussLogSourceClassName = ussClassName + "__logSource";
-        public static readonly string ussLogMessageHeaderClassName = ussClassName + "__logMessage";
+        private const string USSClassName = "spacewarp-logEntry";
+        private const string USSLogEntryElementClassName = USSClassName + "-element";
+        private const string USSHeaderGrouperClassName = USSClassName + "__headerContent";
+        private const string USSTimeDateClassName = USSClassName + "__timeDate";
+        private const string USSLogLevelClassName = USSClassName + "__logLevel";
+        private const string USSLogSourceClassName = USSClassName + "__logSource";
+        private const string USSLogMessageHeaderClassName = USSClassName + "__logMessage";
 
-        public static readonly string ussMessageGrouperClassName = ussClassName + "__messageContent";
-        public static readonly string ussMessageClassName = ussClassName + "__messageLabel";
+        private const string USSMessageGrouperClassName = USSClassName + "__messageContent";
+        private const string USSMessageClassName = USSClassName + "__messageLabel";
 
-        public static int MaxHeaderLenght = 117;
+        // internal static int MaxHeaderLength = 117;
 
-        public VisualElement HeaderGrouper;
-        public Label TimeDateLabel;
-        public DateTime TimeDate
+        private readonly Label _timeDateLabel;
+
+        internal DateTime TimeDate
         {
             get => _timeDate;
             set
             {
                 _timeDate = value;
                 if (SpaceWarpPlugin.Instance.ConfigShowTimeStamps.Value)
-                    TimeDateLabel.text = value.ToString(SpaceWarpPlugin.Instance.ConfigTimeStampFormat.Value);
+                    _timeDateLabel.text = value.ToString(SpaceWarpPlugin.Instance.ConfigTimeStampFormat.Value);
                 else
-                    TimeDateLabel.style.display = DisplayStyle.None;
+                    _timeDateLabel.style.display = DisplayStyle.None;
             }
         }
         private DateTime _timeDate;
 
-        public Label LogLevelLabel;
-        public LogLevel logLevel
+        private readonly Label _logLevelLabel;
+
+        internal LogLevel LogLevel
         {
             get => _logLevel;
-            set
+            private set
             {
-                if (value != _logLevel)
-                {
-                    _logLevel = value;
-                    LogLevelLabel.text = $"[{_logLevel.ToString()}\t:";
-                }
+                if (value == _logLevel) return;
+                _logLevel = value;
+                _logLevelLabel.text = $"[{_logLevel.ToString()}\t:";
             }
         }
         private LogLevel _logLevel = LogLevel.All;
 
-        public Label LogSourceLabel;
+        private readonly Label _logSourceLabel;
         public ILogSource LogSource
         {
             get => _logSource;
-            set
+            private set
             {
-                if (value != _logSource)
-                {
-                    _logSource = value;
-                    LogSourceLabel.text = $"{_logSource.SourceName}]";
-                }
+                if (value == _logSource) return;
+                _logSource = value;
+                _logSourceLabel.text = $"{_logSource.SourceName}]";
             }
         }
         private ILogSource _logSource;
 
-        public Label LogMessageHeaderLabel;
-        public string LogMessageHeader
-        {
-            get
-            {
-                    return LogMessage;
-            }
-        }
+        private readonly Label _logMessageHeaderLabel;
+
+        private string LogMessageHeader => LogMessage;
         private object _logData;
 
-        public VisualElement MessageGrouper;
-        public Label LogMessageLabel;
+        private readonly Label _logMessageLabel;
 
         public string LogMessage => LogData.ToString();
 
-        public object LogData
+        private object LogData
         {
             get => _logData;
             set
             {
                 _logData = value;
-                LogMessageLabel.text = $" {LogMessage}";
-                LogMessageHeaderLabel.text = LogMessageHeader;
+                _logMessageLabel.text = $" {LogMessage}";
+                _logMessageHeaderLabel.text = LogMessageHeader;
             }
         }
-        public bool Expanded
+
+        private bool Expanded
         {
             get => _expanded;
             set
@@ -101,13 +93,13 @@ namespace SpaceWarp.UI.Console
                 _expanded = value;
                 if (value)
                 {
-                    LogMessageLabel.style.display = DisplayStyle.Flex;
+                    _logMessageLabel.style.display = DisplayStyle.Flex;
                 }
                 else
                 {
-                    LogMessageLabel.style.display = DisplayStyle.None;
+                    _logMessageLabel.style.display = DisplayStyle.None;
                 }
-                LogMessageHeaderLabel.text = LogMessageHeader;
+                _logMessageHeaderLabel.text = LogMessageHeader;
             }
         }
         private bool _expanded;
@@ -125,93 +117,93 @@ namespace SpaceWarp.UI.Console
         private void UpdateLabels()
         {
             //TimeDateLabel.style.color = TextColor;
-            LogLevelLabel.style.color = TextColor;
-            LogSourceLabel.style.color = TextColor;
-            LogMessageHeaderLabel.style.color = TextColor;
-            LogMessageLabel.style.color = TextColor;
+            _logLevelLabel.style.color = TextColor;
+            _logSourceLabel.style.color = TextColor;
+            _logMessageHeaderLabel.style.color = TextColor;
+            _logMessageLabel.style.color = TextColor;
         }
 
         private Color _textColor = Color.white;
 
         public LogEntry(LogInfo logInfo, bool startCollapsed = true)
         {
-            AddToClassList(ussClassName);
+            AddToClassList(USSClassName);
 
-            HeaderGrouper = new VisualElement()
+            var headerGrouper = new VisualElement()
             {
                 name = "console-LogEntry-headerGroup"
             };
-            HeaderGrouper.AddToClassList(ussHeaderGrouperClassName);
-            HeaderGrouper.AddToClassList(ussLogEntryElementClassName);
+            headerGrouper.AddToClassList(USSHeaderGrouperClassName);
+            headerGrouper.AddToClassList(USSLogEntryElementClassName);
 
-            hierarchy.Add(HeaderGrouper);
+            hierarchy.Add(headerGrouper);
 
-            TimeDateLabel = new Label()
+            _timeDateLabel = new Label()
             {
                 name = "console-LogEntry-timeDate"
             };
 
-            TimeDateLabel.AddToClassList(ussTimeDateClassName);
-            TimeDateLabel.AddToClassList(ussLogEntryElementClassName);
-            LogLevelLabel = new Label()
+            _timeDateLabel.AddToClassList(USSTimeDateClassName);
+            _timeDateLabel.AddToClassList(USSLogEntryElementClassName);
+            _logLevelLabel = new Label()
             {
                 name = "console-LogEntry-logLevel"
             };
 
-            LogLevelLabel.AddToClassList(ussLogLevelClassName);
-            LogLevelLabel.AddToClassList(ussLogEntryElementClassName);
+            _logLevelLabel.AddToClassList(USSLogLevelClassName);
+            _logLevelLabel.AddToClassList(USSLogEntryElementClassName);
 
-            LogSourceLabel = new Label()
+            _logSourceLabel = new Label()
             {
                 name = "console-LogEntry-logSource"
             };
 
-            LogSourceLabel.AddToClassList(ussLogSourceClassName);
-            LogSourceLabel.AddToClassList(ussLogEntryElementClassName);
+            _logSourceLabel.AddToClassList(USSLogSourceClassName);
+            _logSourceLabel.AddToClassList(USSLogEntryElementClassName);
 
-            LogMessageHeaderLabel = new Label()
+            _logMessageHeaderLabel = new Label()
             {
                 name = "console-LogEntry-logMessageHeader"
             };
 
-            LogMessageHeaderLabel.AddToClassList(ussLogMessageHeaderClassName);
-            LogMessageHeaderLabel.AddToClassList(ussLogEntryElementClassName);
+            _logMessageHeaderLabel.AddToClassList(USSLogMessageHeaderClassName);
+            _logMessageHeaderLabel.AddToClassList(USSLogEntryElementClassName);
 
-            MessageGrouper = new VisualElement()
+            var messageGrouper = new VisualElement()
             {
                 name = "console-LogEntry-messageGroup"
             };
-            MessageGrouper.AddToClassList(ussMessageGrouperClassName);
-            MessageGrouper.AddToClassList(ussLogEntryElementClassName);
-            hierarchy.Add(MessageGrouper);
+            messageGrouper.AddToClassList(USSMessageGrouperClassName);
+            messageGrouper.AddToClassList(USSLogEntryElementClassName);
+            hierarchy.Add(messageGrouper);
 
-            LogMessageLabel = new Label()
+            _logMessageLabel = new Label()
             {
                 name = "console-LogEntry-logMessage"
             };
 
-            LogMessageLabel.AddToClassList(ussMessageClassName);
-            LogMessageLabel.AddToClassList(ussLogEntryElementClassName);
+            _logMessageLabel.AddToClassList(USSMessageClassName);
+            _logMessageLabel.AddToClassList(USSLogEntryElementClassName);
 
-            HeaderGrouper.hierarchy.Add(TimeDateLabel);
-            HeaderGrouper.hierarchy.Add(LogLevelLabel);
-            HeaderGrouper.hierarchy.Add(LogSourceLabel);
-            HeaderGrouper.hierarchy.Add(LogMessageHeaderLabel);
+            headerGrouper.hierarchy.Add(_timeDateLabel);
+            headerGrouper.hierarchy.Add(_logLevelLabel);
+            headerGrouper.hierarchy.Add(_logSourceLabel);
+            headerGrouper.hierarchy.Add(_logMessageHeaderLabel);
 
-            MessageGrouper.hierarchy.Add(LogMessageLabel);
+            messageGrouper.hierarchy.Add(_logMessageLabel);
 
-            this.TimeDate = logInfo.dateTime;
-            this.LogSource = logInfo.Source;
-            this.logLevel = logInfo.Level;
-            this.LogData = logInfo.Data;
-            this.Expanded = !startCollapsed;
+            TimeDate = logInfo.DateTime;
+            LogSource = logInfo.Source;
+            LogLevel = logInfo.Level;
+            LogData = logInfo.Data;
+            Expanded = !startCollapsed;
         }
 
         public override void HandleEvent(EventBase evt)
         {
-            if(evt is ClickEvent clickEvent)
+            if(evt is ClickEvent)
             {
-                this.Expanded = !this.Expanded;
+                Expanded = !Expanded;
             }
         }
     }

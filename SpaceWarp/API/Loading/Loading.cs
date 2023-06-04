@@ -6,6 +6,7 @@ using KSP.Game.Flow;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.InternalUtilities;
 using SpaceWarp.Patching.LoadingActions;
 
 namespace SpaceWarp.API.Loading;

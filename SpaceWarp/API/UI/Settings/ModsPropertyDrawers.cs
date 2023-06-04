@@ -9,6 +9,7 @@ using KSP.Api.CoreTypes;
 using KSP.UI;
 using KSP.UI.Binding;
 using SpaceWarp.Backend.UI.Settings;
+using SpaceWarp.InternalUtilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -312,10 +313,54 @@ public static class ModsPropertyDrawers
         var amount = setting.GetChild("Amount display");
         var text = amount.GetComponentInChildren<TextMeshProUGUI>();
         text.text = entry.Value.ToString();
-        var convFloat = TypeDescriptor.GetConverter(typeof(float)) ?? throw new ArgumentNullException("TypeDescriptor.GetConverter(typeof(float))");
-        var convT = TypeDescriptor.GetConverter(typeof(T)) ?? throw new ArgumentNullException("TypeDescriptor.GetConverter(typeof(T))");
-        Func<T,float> toFloat = x => (float)convFloat.ConvertFrom(x);
-        Func<float, T> toT = x => (T)convT.ConvertFrom(x);
+        Func<T, float> toFloat = x => Convert.ToSingle(x);
+        Func<float, T> toT;
+        // if (!typeof(T).IsIntegral())
+        // {
+        //     var convT = TypeDescriptor.GetConverter(typeof(T)) ??
+        //                 throw new ArgumentNullException("TypeDescriptor.GetConverter(typeof(T))");
+        //     toT = x => (T)convT.ConvertFrom(x);
+        // }
+        switch (Type.GetTypeCode(typeof(T)))
+        {
+            case TypeCode.Byte:
+                toT = x => (T)(object)Convert.ToByte(x);
+                break;
+            case TypeCode.SByte:
+                toT = x => (T)(object)Convert.ToSByte(x);
+                break;
+            case TypeCode.UInt16:
+                toT = x => (T)(object)Convert.ToUInt16(x);
+                break;
+            case TypeCode.UInt32:
+                toT = x => (T)(object)Convert.ToUInt32(x);
+                break;
+            case TypeCode.UInt64:
+                toT = x => (T)(object)Convert.ToUInt64(x);
+                break;
+            case TypeCode.Int16:
+                toT = x => (T)(object)Convert.ToInt16(x);
+                break;
+            case TypeCode.Int32:
+                toT = x => (T)(object)Convert.ToInt32(x);
+                break;
+            case TypeCode.Int64:
+                toT = x => (T)(object)Convert.ToInt64(x);
+                break;
+            case TypeCode.Decimal:
+                toT = x => (T)(object)Convert.ToDecimal(x);
+                break;
+            case TypeCode.Double:
+                toT = x => (T)(object)Convert.ToDouble(x);
+                break;
+            case TypeCode.Single:
+                toT = x => (T)(object)x;
+                break;
+            default:
+                toT = x => throw new NotImplementedException(typeof(T).ToString());
+                break;
+        }
+
         slider.onValueChanged.AddListener(value =>
         {
             // var trueValue = (acceptableValues.MaxValue-acceptableValues.MinValue) * (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFrom(value)

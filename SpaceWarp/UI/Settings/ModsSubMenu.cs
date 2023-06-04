@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SpaceWarp.UI.Settings;
 
-public class ModsSubMenu : SettingsSubMenu
+internal class ModsSubMenu : SettingsSubMenu
 {
     internal Func<string, GameObject> GenerateTitle;
     internal Func<GameObject> GenerateDivider;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BepInEx.Bootstrap;
 using KSP.UI.Binding;
 using SpaceWarp.Backend.UI.Appbar;
+using SpaceWarp.InternalUtilities;
 using UnityEngine;
 
 namespace SpaceWarp.API.UI.Appbar;

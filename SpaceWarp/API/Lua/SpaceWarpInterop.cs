@@ -6,6 +6,7 @@ using MoonSharp.Interpreter;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.Backend.UI.Appbar;
+using SpaceWarp.InternalUtilities;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Logger = BepInEx.Logging.Logger;

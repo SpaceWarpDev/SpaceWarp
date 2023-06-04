@@ -26,6 +26,7 @@ using SpaceWarp.API.Lua;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
+using SpaceWarp.InternalUtilities;
 using SpaceWarp.UI;
 using SpaceWarp.UI.Console;
 using SpaceWarp.UI.ModList;
@@ -82,6 +83,19 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     {
         _kspVersion = typeof(VersionID).GetField("VERSION_TEXT", BindingFlags.Static | BindingFlags.Public)
             ?.GetValue(null) as string;
+        SetupSpaceWarpConfiguration();
+        
+        BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
+
+        Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
+
+        SpaceWarpManager.InitializeSpaceWarpsLoadingActions();
+
+        SpaceWarpManager.Initialize(this);
+    }
+
+    private void SetupSpaceWarpConfiguration()
+    {
         ConfigErrorColor = Config.Bind("Debug Console", "Color Error", Color.red,
             "The color for log messages that have the level: Error/Fatal (bolded)");
         ConfigWarningColor = Config.Bind("Debug Console", "Color Warning", Color.yellow,
@@ -106,15 +120,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user.");
         ConfigCheckVersions = Config.Bind("Version Checking", "Check Versions", false,
             "Whether or not Space Warp should check mod versions using their swinfo.json files");
-        
-        
-        BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
-
-        Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
-
-        SpaceWarpManager.InitializeSpaceWarpsLoadingActions();
-
-        SpaceWarpManager.Initialize(this);
     }
 
 
@@ -186,26 +191,16 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     public void ClearVersions()
     {
-        foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+        foreach (var plugin in SpaceWarpManager.AllPlugins)
         {
             SpaceWarpManager.ModsOutdated[plugin.Guid] = false;
-        }
-
-        foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
-        {
-            SpaceWarpManager.ModsOutdated[info.Item1.Info.Metadata.GUID] = false;
-        }
-
-        foreach (var info in SpaceWarpManager.DisabledInfoPlugins)
-        {
-            SpaceWarpManager.ModsOutdated[info.Item1.Metadata.GUID] = false;
         }
     }
 
     public void CheckVersions()
     {
         ClearVersions();
-        foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+        foreach (var plugin in SpaceWarpManager.AllPlugins)
         {
             if (plugin.SWInfo.VersionCheck != null)
             {
@@ -213,19 +208,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             }
         }
 
-        foreach (var info in SpaceWarpManager.NonSpaceWarpInfos)
+        foreach (var info in SpaceWarpManager.DisabledPlugins)
         {
-            if (info.Item2.VersionCheck != null)
+            if (info.SWInfo.VersionCheck != null)
             {
-                StartCoroutine(CheckVersion(info.Item1.Info.Metadata.GUID, info.Item2));
-            }
-        }
-
-        foreach (var info in SpaceWarpManager.DisabledInfoPlugins)
-        {
-            if (info.Item2.VersionCheck != null)
-            {
-                StartCoroutine(CheckVersion(info.Item1.Metadata.GUID, info.Item2));
+                StartCoroutine(CheckVersion(info.Guid, info.SWInfo));
             }
         }
     }
@@ -310,10 +297,10 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             (ConfigurationManager.ConfigurationManager)Chainloader
                 .PluginInfos[ConfigurationManager.ConfigurationManager.GUID].Instance;
 
-        var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlist.uxml");
+        var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"{ModGuid}/modlist/modlist.uxml");
         var modList = Window.CreateFromUxml(modListUxml, "Space Warp Mod List", transform, true);
         
-        var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/uitkswconsole/spacewarp.console/ConsoleWindow.uxml");
+        var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>($"{ModGuid}/uitkswconsole/spacewarp.console/ConsoleWindow.uxml");
         var swConsole = Window.CreateFromUxml(swConsoleUxml, "Space Warp Console", transform, true);
         
         SpaceWarpManager.ModListController = modList.gameObject.AddComponent<ModListController>();

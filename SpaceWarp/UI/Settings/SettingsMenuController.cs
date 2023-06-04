@@ -8,12 +8,13 @@ using KSP.UI;
 using KSP.UI.Binding;
 using KSP.UI.Binding.Core;
 using SpaceWarp.API.UI.Settings;
+using SpaceWarp.InternalUtilities;
 using SpaceWarp.Patching;
 using UnityEngine;
 using UnityEngine.UI;
 namespace SpaceWarp.UI.Settings;
 
-public class SettingsMenuController : KerbalMonoBehaviour
+internal class SettingsMenuController : KerbalMonoBehaviour
 {
     // TODO: We need to expose this for more than just the mods menu
     // The magic words for our invocation
@@ -156,6 +157,7 @@ public class SettingsMenuController : KerbalMonoBehaviour
         toggle.action = new DelegateAction(ToggleModsSettings);
         _modsSubMenu.gameObject.SetActive(false);
         ModsPropertyDrawers.SetupDefaults();
+        SettingsManagerPatcher.AllExtrasSettingsMenus.Add(_modsSubMenu);
     }
 
     private void ToggleModsSettings()
