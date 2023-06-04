@@ -4,47 +4,47 @@ using UnityEngine.UIElements;
 
 namespace SpaceWarp.UI.ModList;
 
-public class ModListItemController
+internal class ModListItemController
 {
     private readonly Label _nameLabel;
 
-    public ModListItemController(VisualElement visualElement)
+    internal ModListItemController(VisualElement visualElement)
     {
         visualElement.userData = this;
         _nameLabel = visualElement.Q<Label>(className: "mod-item-label");
     }
 
-    public string Guid { get; set; }
-    public object Info { get; private set; }
-    public bool IsOutdated { get; private set; }
-    public bool IsUnsupported { get; private set; }
-    public bool IsDisabled { get; private set; }
+    internal string Guid { get; set; }
+    internal object Info { get; private set; }
+    internal bool IsOutdated { get; private set; }
+    internal bool IsUnsupported { get; private set; }
+    internal bool IsDisabled { get; private set; }
 
-    public void SetInfo(ModInfo info)
+    internal void SetInfo(ModInfo info)
     {
         Info = info;
         _nameLabel.text = Trim(info.Name);
     }
 
-    public void SetInfo(PluginInfo info)
+    internal void SetInfo(PluginInfo info)
     {
         Info = info;
         _nameLabel.text = Trim(info.Metadata.Name);
     }
 
-    public void SetIsOutdated()
+    internal void SetIsOutdated()
     {
         IsOutdated = true;
         _nameLabel.AddToClassList("outdated");
     }
 
-    public void SetIsUnsupported()
+    internal void SetIsUnsupported()
     {
         IsUnsupported = true;
         _nameLabel.AddToClassList("unsupported");
     }
 
-    public void SetIsDisabled()
+    internal void SetIsDisabled()
     {
         IsDisabled = true;
         _nameLabel.AddToClassList("disabled");

@@ -15,7 +15,7 @@ using UnityEngine.UIElements;
 
 namespace SpaceWarp.UI.ModList;
 
-public class ModListController : MonoBehaviour
+internal class ModListController : MonoBehaviour
 {
     private VisualTreeAsset _listEntryTemplate;
     private VisualTreeAsset _dependencyTemplate;
@@ -75,8 +75,8 @@ public class ModListController : MonoBehaviour
 
     private void Awake()
     {
-        _listEntryTemplate = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlistitem.uxml");
-        _dependencyTemplate = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlistdependency.uxml");
+        _listEntryTemplate = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/modlist/modlistitem.uxml");
+        _dependencyTemplate = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/modlist/modlistdependency.uxml");
 
         MainMenu.RegisterLocalizedMenuButton("SpaceWarp/Mods", ToggleWindow);
     }

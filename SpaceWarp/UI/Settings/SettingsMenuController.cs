@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace SpaceWarp.UI.Settings;
 
-public class SettingsMenuController : KerbalMonoBehaviour
+internal class SettingsMenuController : KerbalMonoBehaviour
 {
     // TODO: We need to expose this for more than just the mods menu
     // The magic words for our invocation

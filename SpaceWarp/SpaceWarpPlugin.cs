@@ -297,10 +297,10 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             (ConfigurationManager.ConfigurationManager)Chainloader
                 .PluginInfos[ConfigurationManager.ConfigurationManager.GUID].Instance;
 
-        var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/modlist/modlist.uxml");
+        var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"{ModGuid}/modlist/modlist.uxml");
         var modList = Window.CreateFromUxml(modListUxml, "Space Warp Mod List", transform, true);
         
-        var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>($"spacewarp/uitkswconsole/spacewarp.console/ConsoleWindow.uxml");
+        var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>($"{ModGuid}/uitkswconsole/spacewarp.console/ConsoleWindow.uxml");
         var swConsole = Window.CreateFromUxml(swConsoleUxml, "Space Warp Console", transform, true);
         
         SpaceWarpManager.ModListController = modList.gameObject.AddComponent<ModListController>();

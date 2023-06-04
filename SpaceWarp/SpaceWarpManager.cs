@@ -57,7 +57,7 @@ internal static class SpaceWarpManager
         {
             if (!_skin)
             {
-                AssetManager.TryGetAsset("spacewarp/swconsoleui/spacewarpconsole.guiskin", out _skin);
+                AssetManager.TryGetAsset($"{SpaceWarpPlugin.ModGuid}/swconsoleui/spacewarpconsole.guiskin", out _skin);
             }
 
             return _skin;
@@ -139,7 +139,8 @@ internal static class SpaceWarpManager
             foreach (var info in codelessInfos)
             {
                 // TODO: Specific dependency warnings in the mod list at some point!
-                Logger.LogError($"Missing dependency for codeless mod: ${info.SWInfo.Name}, this mod will not be loaded");
+                Logger.LogError($"Missing dependency for codeless mod: {info.SWInfo.Name}, this mod will not be loaded");
+                
             }
         }
     }
@@ -250,7 +251,7 @@ internal static class SpaceWarpManager
             Name = plugin.Metadata.Name,
             Author = "<unknown>",
             Description = "<unknown>",
-            Source = "<unknwon>",
+            Source = "<unknown>",
             Version = plugin.Metadata.Version.ToString(),
             Dependencies = plugin.Dependencies.Select(x => new DependencyInfo
             {
