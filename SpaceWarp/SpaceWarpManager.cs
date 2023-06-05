@@ -198,7 +198,7 @@ internal static class SpaceWarpManager
                     errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(null,
                         info.Metadata.GUID,
                         info.Metadata.Name,
-                        BepinexToSWInfo(info),
+                        BepInExToSWInfo(info),
                         new DirectoryInfo(Path.GetDirectoryName(info.Location)!)))
                     {
                         MissingDependencies = info.Dependencies.Select(x => x.DependencyGUID)
@@ -311,38 +311,33 @@ internal static class SpaceWarpManager
         var allDisabledPlugins = ChainloaderPatch.DisabledPlugins;
         foreach (var plugin in allDisabledPlugins)
         {
-            var folderPath = Path.GetDirectoryName(plugin.Location);
-            var swInfoPath = Path.Combine(folderPath!, "swinfo.json");
-            if (Path.GetFileName(folderPath) != "plugins" && File.Exists(swInfoPath))
+            GetSingleDisabledPlugin(disabledPlugins, plugin);
+        }
+    }
+
+    private static void GetSingleDisabledPlugin(ICollection<SpaceWarpPluginDescriptor> disabledPlugins, PluginInfo plugin)
+    {
+        var folderPath = Path.GetDirectoryName(plugin.Location);
+        var swInfoPath = Path.Combine(folderPath!, "swinfo.json");
+        if (Path.GetFileName(folderPath) != "plugins" && File.Exists(swInfoPath))
+        {
+            try
             {
-                try
-                {
-                    var swInfo = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(swInfoPath));
-                    disabledPlugins.Add(new SpaceWarpPluginDescriptor(null,
-                        plugin.Metadata.GUID,
-                        plugin.Metadata.Name,
-                        swInfo,
-                        new DirectoryInfo(folderPath)));
-                }
-                catch
-                {
-                    var swInfo = BepinexToSWInfo(plugin);
-                    disabledPlugins.Add(new SpaceWarpPluginDescriptor(null,
-                        plugin.Metadata.GUID,
-                        plugin.Metadata.Name,
-                        swInfo,
-                        new DirectoryInfo(folderPath)));
-                }
-            }
-            else
-            {
-                var swInfo = BepinexToSWInfo(plugin);
+                var swInfo = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(swInfoPath));
                 disabledPlugins.Add(new SpaceWarpPluginDescriptor(null,
                     plugin.Metadata.GUID,
                     plugin.Metadata.Name,
                     swInfo,
                     new DirectoryInfo(folderPath)));
             }
+            catch
+            {
+                disabledPlugins.Add(GetBepInExDescriptor(plugin));
+            }
+        }
+        else
+        {
+            disabledPlugins.Add(GetBepInExDescriptor(plugin));
         }
     }
 
@@ -351,61 +346,53 @@ internal static class SpaceWarpManager
         ICollection<SpaceWarpPluginDescriptor> allPlugins,
         ICollection<SpaceWarpErrorDescription> errorDescriptions)
     {
-        var allBEPlugins = Chainloader.Plugins.ToList();
-        // List<BaseUnityPlugin> nonSWPlugins = new();
-        // List<(BaseUnityPlugin, ModInfo)> nonSWInfos = new();
-        foreach (var plugin in allBEPlugins)
+        var allBiePlugins = Chainloader.Plugins.ToList();
+        foreach (var plugin in allBiePlugins)
         {
-            if (spaceWarpPlugins.Contains(plugin as BaseSpaceWarpPlugin))
-            {
-                continue;
-            }
-
-            var folderPath = Path.GetDirectoryName(plugin.Info.Location);
-            var modInfoPath = Path.Combine(folderPath!, "swinfo.json");
-            if (File.Exists(modInfoPath))
-            {
-                try
-                {
-                    var info = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(modInfoPath));
-                    // nonSWInfos.Add((plugin, info));
-                    allPlugins.Add(new SpaceWarpPluginDescriptor(null, plugin.Info.Metadata.GUID,
-                        plugin.Info.Metadata.Name, info,
-                        new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!)));
-                }
-                catch
-                {
-                    Logger.LogError(
-                        $"Error reading metadata for spacewarp plugin {plugin.Info.Metadata.Name}. This mod will not be initialized");
-                    ignoredGUIDs.Add(plugin.Info.Metadata.GUID);
-                    errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(null,
-                        plugin.Info.Metadata.GUID,
-                        plugin.Info.Metadata.Name,
-                        BepinexToSWInfo(plugin.Info),
-                        new DirectoryInfo(folderPath)))
-                    {
-                        MissingSwinfo = true
-                    });
-                    continue;
-                }
-            }
-            else
-            {
-                var newInfo = BepinexToSWInfo(plugin.Info);
-                allPlugins.Add(new SpaceWarpPluginDescriptor(null,
-                    plugin.Info.Metadata.GUID,
-                    plugin.Info.Metadata.Name,
-                    newInfo,
-                    new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!)));
-            }
+            GetSingleBepInExOnlyPlugin(spaceWarpPlugins, ignoredGUIDs, allPlugins, errorDescriptions, plugin);
         }
-
-        // NonSpaceWarpPlugins = nonSWPlugins;
-        // NonSpaceWarpInfos = nonSWInfos;
 #pragma warning restore CS0618
     }
 
-    private static ModInfo BepinexToSWInfo(PluginInfo plugin)
+    private static void GetSingleBepInExOnlyPlugin(List<BaseSpaceWarpPlugin> spaceWarpPlugins,
+        ICollection<string> ignoredGUIDs,
+        ICollection<SpaceWarpPluginDescriptor> allPlugins,
+        ICollection<SpaceWarpErrorDescription> errorDescriptions,
+        BaseUnityPlugin plugin)
+    {
+        if (spaceWarpPlugins.Contains(plugin as BaseSpaceWarpPlugin))
+        {
+            return;
+        }
+
+        var folderPath = Path.GetDirectoryName(plugin.Info.Location);
+        var modInfoPath = Path.Combine(folderPath!, "swinfo.json");
+        if (File.Exists(modInfoPath))
+        {
+            if (!TryReadModInfo(ignoredGUIDs, errorDescriptions, plugin, modInfoPath, folderPath,
+                    out var metadata)) return;
+            if (!AssertSpecificationCompliance(ignoredGUIDs, errorDescriptions, plugin, metadata, folderPath))
+                return;
+            allPlugins.Add(new SpaceWarpPluginDescriptor(null, plugin.Info.Metadata.GUID, plugin.Info.Metadata.Name,
+                metadata, new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!)));
+        }
+        else
+        {
+            allPlugins.Add(GetBepInExDescriptor(plugin.Info));
+        }
+    }
+
+    
+    private static SpaceWarpPluginDescriptor GetBepInExDescriptor(PluginInfo info)
+    {
+        return new SpaceWarpPluginDescriptor(null,
+            info.Metadata.GUID,
+            info.Metadata.Name,
+            BepInExToSWInfo(info),
+            new DirectoryInfo(Path.GetDirectoryName(info.Location)!));
+    }
+
+    private static ModInfo BepInExToSWInfo(PluginInfo plugin)
     {
         var newInfo = new ModInfo
         {
@@ -443,138 +430,202 @@ internal static class SpaceWarpManager
     {
         foreach (var plugin in spaceWarpPlugins.ToArray())
         {
-            var folderPath = Path.GetDirectoryName(plugin.Info.Location);
-            plugin.PluginFolderPath = folderPath;
-            if (Path.GetFileName(folderPath) == "plugins")
-            {
-                Logger.LogError(
-                    $"Found Space Warp mod {plugin.Info.Metadata.Name} in the BepInEx/plugins directory. This mod will not be initialized.");
-                errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin,
-                    plugin.Info.Metadata.GUID,
-                    plugin.Info.Metadata.Name,
-                    BepinexToSWInfo(plugin.Info),
-                    new DirectoryInfo(folderPath)))
-                {
-                    BadDirectory = true
-                });
-                ignoredGUIDs.Add(plugin.Info.Metadata.GUID);
-                continue;
-            }
-
-            var modInfoPath = Path.Combine(folderPath!, "swinfo.json");
-
-            if (!File.Exists(modInfoPath))
-            {
-                Logger.LogError(
-                    $"Found Space Warp plugin {plugin.Info.Metadata.Name} without a swinfo.json next to it. This mod will not be initialized.");
-                errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin,
-                    plugin.Info.Metadata.GUID,
-                    plugin.Info.Metadata.Name,
-                    BepinexToSWInfo(plugin.Info),
-                    new DirectoryInfo(folderPath)))
-                {
-                    MissingSwinfo = true
-                });
-                ignoredGUIDs.Add(plugin.Info.Metadata.GUID);
-                continue;
-            }
-
-            ModInfo metadata;
-            try
-            {
-                metadata = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(modInfoPath));
-            }
-            catch
-            {
-                Logger.LogError(
-                    $"Error reading metadata for spacewarp plugin {plugin.Info.Metadata.Name}. This mod will not be initialized");
-                ignoredGUIDs.Add(plugin.Info.Metadata.GUID);
-                errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin,
-                    plugin.Info.Metadata.GUID,
-                    plugin.Info.Metadata.Name,
-                    BepinexToSWInfo(plugin.Info),
-                    new DirectoryInfo(folderPath)))
-                {
-                    MissingSwinfo = true
-                });
-                continue;
-            }
-
-            if (metadata.Spec >= SpecVersion.V1_3)
-            {
-                // Enforce Mod ID here
-                var modID = metadata.ModID;
-                if (modID != plugin.Info.Metadata.GUID)
-                {
-                    Logger.LogError(
-                        $"Found Space Warp plugin {plugin.Info.Metadata.Name} that has an swinfo.json w/ spec version >= 1.3 that's ModID is not the same as the plugins GUID, This mod will not be initialized.");
-                    ignoredGUIDs.Add(plugin.Info.Metadata.GUID);
-                    errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin,
-                        plugin.Info.Metadata.GUID,
-                        plugin.Info.Metadata.Name,
-                        metadata,
-                        new DirectoryInfo(folderPath)))
-                    {
-                        BadID = true
-                    });
-                    continue;
-                }
-
-                // We should also enforce equality between versions w/ this spec
-                if (new Version(metadata.Version) != plugin.Info.Metadata.Version)
-                {
-                    Logger.LogError(
-                        $"Found Space Warp plugin {plugin.Info.Metadata.Name} that's swinfo version does not match the plugin version, this mod will not be initialized");
-                    ignoredGUIDs.Add(plugin.Info.Metadata.GUID);
-                    errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin,
-                        plugin.Info.Metadata.GUID,
-                        plugin.Info.Metadata.Name,
-                        metadata,
-                        new DirectoryInfo(folderPath)))
-                    {
-                        MismatchedVersion = true
-                    });
-                    continue;
-                }
-
-                var unspecifiedDeps = new List<string>();
-                foreach (var dep in plugin.Info.Dependencies)
-                {
-                    if (metadata.Dependencies.Any(x => x.ID == dep.DependencyGUID)) continue;
-                    Logger.LogError($"Found Space Warp Plugin {plugin.Info.Metadata.Name} that has an unspecified swinfo dependency found in its BepInDependencies: {dep.DependencyGUID}");
-                    unspecifiedDeps.Add(dep.DependencyGUID);
-                    metadata.Dependencies.Add(new DependencyInfo
-                    {
-                        ID = dep.DependencyGUID,
-                        Version = new SupportedVersionsInfo
-                        {
-                            Min = dep.MinimumVersion.ToString(),
-                            Max = "*"
-                        }
-                    });
-                }
-
-                if (unspecifiedDeps.Count > 0)
-                {
-                    errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin,
-                        plugin.Info.Metadata.GUID,
-                        plugin.Info.Metadata.Name,
-                        metadata,
-                        new DirectoryInfo(folderPath)))
-                    {
-                        UnspecifiedDependencies = unspecifiedDeps
-                    });
-                    continue;
-                }
-            }
-            plugin.SpaceWarpMetadata = metadata;
-            var directoryInfo = new FileInfo(modInfoPath).Directory;
-            spaceWarpInfos.Add(new SpaceWarpPluginDescriptor(plugin,
-                plugin.Info.Metadata.GUID,
-                metadata.Name,
-                metadata,
-                directoryInfo));
+            GetSingleSpaceWarpPlugin(ignoredGUIDs, spaceWarpInfos, errorDescriptions, plugin);
         }
+    }
+
+    private static void GetSingleSpaceWarpPlugin(ICollection<string> ignoredGUIDs, ICollection<SpaceWarpPluginDescriptor> spaceWarpInfos,
+        ICollection<SpaceWarpErrorDescription> errorDescriptions, BaseSpaceWarpPlugin plugin)
+    {
+        var folderPath = Path.GetDirectoryName(plugin.Info.Location);
+        plugin.PluginFolderPath = folderPath;
+        if (!AssertFolderPath(ignoredGUIDs, errorDescriptions, plugin, folderPath)) return;
+
+        var modInfoPath = Path.Combine(folderPath!, "swinfo.json");
+
+        if (!AssertModInfoExistence(ignoredGUIDs, errorDescriptions, plugin, modInfoPath, folderPath)) return;
+
+        if (!TryReadModInfo(ignoredGUIDs, errorDescriptions, plugin, modInfoPath, folderPath, out var metadata)) return;
+
+        if (!AssertSpecificationCompliance(ignoredGUIDs, errorDescriptions, plugin, metadata, folderPath)) return;
+
+        plugin.SpaceWarpMetadata = metadata;
+        var directoryInfo = new FileInfo(modInfoPath).Directory;
+        spaceWarpInfos.Add(new SpaceWarpPluginDescriptor(plugin,
+            plugin.Info.Metadata.GUID,
+            metadata.Name,
+            metadata,
+            directoryInfo));
+    }
+
+    private static bool AssertSpecificationCompliance(ICollection<string> ignoredGUIDs,
+        ICollection<SpaceWarpErrorDescription> errorDescriptions,
+        BaseUnityPlugin plugin,
+        ModInfo metadata,
+        string folderPath) =>
+        metadata.Spec < SpecVersion.V1_3 ||
+        AssertSpecVersion13Compliance(ignoredGUIDs,
+            errorDescriptions,
+            plugin,
+            metadata,
+            folderPath);
+
+    private static bool AssertSpecVersion13Compliance(ICollection<string> ignoredGUIDs,
+        ICollection<SpaceWarpErrorDescription> errorDescriptions,
+        BaseUnityPlugin plugin,
+        ModInfo metadata,
+        string folderPath) =>
+        AssertMatchingModID(ignoredGUIDs, errorDescriptions, plugin, metadata, folderPath) &&
+        AssertMatchingVersions(ignoredGUIDs, errorDescriptions, plugin, metadata, folderPath) &&
+        AssertAllDependenciesAreSpecified(errorDescriptions, plugin, metadata, folderPath);
+
+    private static bool AssertAllDependenciesAreSpecified(ICollection<SpaceWarpErrorDescription> errorDescriptions,
+        BaseUnityPlugin plugin,
+        ModInfo metadata,
+        string folderPath)
+    {
+        var unspecifiedDeps = new List<string>();
+        foreach (var dep in plugin.Info.Dependencies)
+        {
+            AssertDependencyIsSpecified(plugin, dep, metadata, unspecifiedDeps);
+        }
+
+        if (unspecifiedDeps.Count <= 0) return true;
+        errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin as BaseSpaceWarpPlugin, 
+            plugin.Info.Metadata.GUID,
+            plugin.Info.Metadata.Name,
+            metadata,
+            new DirectoryInfo(folderPath)))
+        {
+            UnspecifiedDependencies = unspecifiedDeps
+        });
+        return false;
+
+    }
+
+    private static void AssertDependencyIsSpecified(BaseUnityPlugin plugin,
+        BepInDependency dep,
+        ModInfo metadata,
+        ICollection<string> unspecifiedDeps)
+    {
+        if (metadata.Dependencies.Any(x => x.ID == dep.DependencyGUID)) return;
+        Logger.LogError(
+            $"Found Space Warp Plugin {plugin.Info.Metadata.Name} that has an unspecified swinfo dependency found in its BepInDependencies: {dep.DependencyGUID}");
+        unspecifiedDeps.Add(dep.DependencyGUID);
+        metadata.Dependencies.Add(new DependencyInfo
+        {
+            ID = dep.DependencyGUID,
+            Version = new SupportedVersionsInfo
+            {
+                Min = dep.MinimumVersion.ToString(),
+                Max = "*"
+            }
+        });
+    }
+
+    private static bool AssertMatchingVersions(ICollection<string> ignoredGUIDs, ICollection<SpaceWarpErrorDescription> errorDescriptions,
+        BaseUnityPlugin plugin, ModInfo metadata, string folderPath)
+    {
+        if (new Version(metadata.Version) == plugin.Info.Metadata.Version) return true;
+        Logger.LogError(
+            $"Found Space Warp plugin {plugin.Info.Metadata.Name} that's swinfo version does not match the plugin version, this mod will not be initialized");
+        ignoredGUIDs.Add(plugin.Info.Metadata.GUID);
+        errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin as BaseSpaceWarpPlugin, 
+            plugin.Info.Metadata.GUID,
+            plugin.Info.Metadata.Name,
+            metadata,
+            new DirectoryInfo(folderPath)))
+        {
+            MismatchedVersion = true
+        });
+        return false;
+
+    }
+
+    private static bool AssertMatchingModID(ICollection<string> ignoredGUIDs, ICollection<SpaceWarpErrorDescription> errorDescriptions,
+        BaseUnityPlugin plugin, ModInfo metadata, string folderPath)
+    {
+        var modID = metadata.ModID;
+        if (modID == plugin.Info.Metadata.GUID) return true;
+        Logger.LogError(
+            $"Found Space Warp plugin {plugin.Info.Metadata.Name} that has an swinfo.json w/ spec version >= 1.3 that's ModID is not the same as the plugins GUID, This mod will not be initialized.");
+        ignoredGUIDs.Add(plugin.Info.Metadata.GUID);
+        errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin as BaseSpaceWarpPlugin, 
+            plugin.Info.Metadata.GUID,
+            plugin.Info.Metadata.Name,
+            metadata,
+            new DirectoryInfo(folderPath)))
+        {
+            BadID = true
+        });
+        return false;
+
+    }
+
+    private static bool TryReadModInfo(ICollection<string> ignoredGUIDs, ICollection<SpaceWarpErrorDescription> errorDescriptions, BaseUnityPlugin plugin,
+        string modInfoPath, string folderPath, out ModInfo metadata)
+    {
+        try
+        {
+            metadata = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(modInfoPath));
+        }
+        catch
+        {
+            Logger.LogError(
+                $"Error reading metadata for spacewarp plugin {plugin.Info.Metadata.Name}. This mod will not be initialized");
+            ignoredGUIDs.Add(plugin.Info.Metadata.GUID);
+            errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(
+                plugin as BaseSpaceWarpPlugin, 
+                plugin.Info.Metadata.GUID,
+                plugin.Info.Metadata.Name,
+                BepInExToSWInfo(plugin.Info),
+                new DirectoryInfo(folderPath)))
+            {
+                MissingSwinfo = true
+            });
+            metadata = null;
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool AssertModInfoExistence(ICollection<string> ignoredGUIDs, ICollection<SpaceWarpErrorDescription> errorDescriptions,
+        BaseSpaceWarpPlugin plugin, string modInfoPath, string folderPath)
+    {
+        if (File.Exists(modInfoPath)) return true;
+        Logger.LogError(
+            $"Found Space Warp plugin {plugin.Info.Metadata.Name} without a swinfo.json next to it. This mod will not be initialized.");
+        errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin,
+            plugin.Info.Metadata.GUID,
+            plugin.Info.Metadata.Name,
+            BepInExToSWInfo(plugin.Info),
+            new DirectoryInfo(folderPath)))
+        {
+            MissingSwinfo = true
+        });
+        ignoredGUIDs.Add(plugin.Info.Metadata.GUID);
+        return false;
+
+    }
+
+    private static bool AssertFolderPath(ICollection<string> ignoredGUIDs, ICollection<SpaceWarpErrorDescription> errorDescriptions,
+        BaseSpaceWarpPlugin plugin, string folderPath)
+    {
+        if (Path.GetFileName(folderPath) != "plugins") return true;
+        Logger.LogError(
+            $"Found Space Warp mod {plugin.Info.Metadata.Name} in the BepInEx/plugins directory. This mod will not be initialized.");
+        errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(plugin,
+            plugin.Info.Metadata.GUID,
+            plugin.Info.Metadata.Name,
+            BepInExToSWInfo(plugin.Info),
+            new DirectoryInfo(folderPath)))
+        {
+            BadDirectory = true
+        });
+        ignoredGUIDs.Add(plugin.Info.Metadata.GUID);
+        return false;
+
     }
 
     public static void Initialize(SpaceWarpPlugin spaceWarpPlugin)
