@@ -52,8 +52,10 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
 
     private void CreateNewLogEntry(LogInfo logInfo)
     {
-        LogEntry entry = new(logInfo);
-        entry.TextColor = GetColorFromLogLevel(logInfo.Level);
+        LogEntry entry = new(logInfo)
+        {
+            TextColor = GetColorFromLogLevel(logInfo.Level)
+        };
         _consoleContent.Add(entry);
 
         //Check if this entry should be currently hidden
@@ -79,6 +81,7 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
         InitializeElements();
         BindFunctions();
         SetDefaults();
+        // HUH?? See me after class
         UnbindFunctions();
 
         _isLoaded = true;
@@ -166,6 +169,7 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
 
     private void UnbindFunctions()
     {
+        //WHAT IS THIS?
         _consoleSearch.RegisterValueChangedCallback(SearchHandler);
         
         _toggleError.UnregisterValueChangedCallback(FilterHandler);
@@ -219,14 +223,11 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
         if (logLevelPermitted)
         {
             logEntry.style.display = DisplayStyle.Flex;
-            if (!string.IsNullOrEmpty(SearchFilter))
-            {
-                string lowercaseSearch = SearchFilter.ToLower();
-                if (!logEntry.LogSource.SourceName.ToLower().Contains(lowercaseSearch) && !logEntry.LogMessage.ToLower().Contains(lowercaseSearch))
-                {
-                    logEntry.style.display = DisplayStyle.None;
-                }
-            }
+            if (string.IsNullOrEmpty(SearchFilter)) return;
+            var lowercaseSearch = SearchFilter.ToLower();
+            if (logEntry.LogSource.SourceName.ToLower().Contains(lowercaseSearch) ||
+                logEntry.LogMessage.ToLower().Contains(lowercaseSearch)) return;
+            logEntry.style.display = DisplayStyle.None;
         }
         else
         {
@@ -236,24 +237,18 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
 
     private bool IsLogLevelEnabled(LogLevel logLevel)
     {
-        switch (logLevel)
+        return logLevel switch
         {
-            case LogLevel.Error:
-                return _toggleError.value;
-            case LogLevel.Warning:
-                return _toggleWarning.value;
-            case LogLevel.Message:
-                return _toggleMessage.value;
-            case LogLevel.Info:
-                return _toggleInfo.value;
-            case LogLevel.Debug:
-                return _toggleDebug.value;
-            default:
-                return true;
-        }
+            LogLevel.Error => _toggleError.value,
+            LogLevel.Warning => _toggleWarning.value,
+            LogLevel.Message => _toggleMessage.value,
+            LogLevel.Info => _toggleInfo.value,
+            LogLevel.Debug => _toggleDebug.value,
+            _ => true
+        };
     }
 
-    private Color GetColorFromLogLevel(LogLevel logLevel)
+    private static Color GetColorFromLogLevel(LogLevel logLevel)
     {
         return logLevel switch
         {

@@ -314,52 +314,27 @@ public static class ModsPropertyDrawers
         var text = amount.GetComponentInChildren<TextMeshProUGUI>();
         text.text = entry.Value.ToString();
         Func<T, float> toFloat = x => Convert.ToSingle(x);
-        Func<float, T> toT;
         // if (!typeof(T).IsIntegral())
         // {
         //     var convT = TypeDescriptor.GetConverter(typeof(T)) ??
         //                 throw new ArgumentNullException("TypeDescriptor.GetConverter(typeof(T))");
         //     toT = x => (T)convT.ConvertFrom(x);
         // }
-        switch (Type.GetTypeCode(typeof(T)))
+        Func<float, T> toT = Type.GetTypeCode(typeof(T)) switch
         {
-            case TypeCode.Byte:
-                toT = x => (T)(object)Convert.ToByte(x);
-                break;
-            case TypeCode.SByte:
-                toT = x => (T)(object)Convert.ToSByte(x);
-                break;
-            case TypeCode.UInt16:
-                toT = x => (T)(object)Convert.ToUInt16(x);
-                break;
-            case TypeCode.UInt32:
-                toT = x => (T)(object)Convert.ToUInt32(x);
-                break;
-            case TypeCode.UInt64:
-                toT = x => (T)(object)Convert.ToUInt64(x);
-                break;
-            case TypeCode.Int16:
-                toT = x => (T)(object)Convert.ToInt16(x);
-                break;
-            case TypeCode.Int32:
-                toT = x => (T)(object)Convert.ToInt32(x);
-                break;
-            case TypeCode.Int64:
-                toT = x => (T)(object)Convert.ToInt64(x);
-                break;
-            case TypeCode.Decimal:
-                toT = x => (T)(object)Convert.ToDecimal(x);
-                break;
-            case TypeCode.Double:
-                toT = x => (T)(object)Convert.ToDouble(x);
-                break;
-            case TypeCode.Single:
-                toT = x => (T)(object)x;
-                break;
-            default:
-                toT = x => throw new NotImplementedException(typeof(T).ToString());
-                break;
-        }
+            TypeCode.Byte => x => (T)(object)Convert.ToByte(x),
+            TypeCode.SByte => x => (T)(object)Convert.ToSByte(x),
+            TypeCode.UInt16 => x => (T)(object)Convert.ToUInt16(x),
+            TypeCode.UInt32 => x => (T)(object)Convert.ToUInt32(x),
+            TypeCode.UInt64 => x => (T)(object)Convert.ToUInt64(x),
+            TypeCode.Int16 => x => (T)(object)Convert.ToInt16(x),
+            TypeCode.Int32 => x => (T)(object)Convert.ToInt32(x),
+            TypeCode.Int64 => x => (T)(object)Convert.ToInt64(x),
+            TypeCode.Decimal => x => (T)(object)Convert.ToDecimal(x),
+            TypeCode.Double => x => (T)(object)Convert.ToDouble(x),
+            TypeCode.Single => x => (T)(object)x,
+            _ => x => throw new NotImplementedException(typeof(T).ToString())
+        };
 
         slider.onValueChanged.AddListener(value =>
         {
