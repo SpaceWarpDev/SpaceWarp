@@ -122,7 +122,7 @@ internal static class SpaceWarpManager
     {
         foreach (var erroredPlugin in allErroredPlugins)
         {
-            if (erroredPlugin.MissingDependencies.Count <= 0) continue;
+            if (erroredPlugin.MissingDependencies.Count == 0) continue;
             for (var i = erroredPlugin.MissingDependencies.Count - 1; i >= 0; i--)
             {
                 var dep = erroredPlugin.MissingDependencies[i];
@@ -149,24 +149,7 @@ internal static class SpaceWarpManager
         for (var i = modDescriptors.Count - 1; i >= 0; i--)
         {
             var plugin = modDescriptors[i];
-            if (plugin.SWInfo.Spec < SpecVersion.V1_3) continue;
-            List<string> missingDependencies = new();
-            foreach (var dep in plugin.SWInfo.Dependencies)
-            {
-                var descriptor = modDescriptors.FirstOrDefault(x => x.Guid == dep.ID);
-                if (descriptor == null)
-                {
-                    missingDependencies.Add(dep.ID);
-                    continue;
-                }
-
-                if (!VersionUtility.IsSupported(descriptor.SWInfo.Version, dep.Version.Min, dep.Version.Max))
-                {
-                    missingDependencies.Add(descriptor.Guid);
-                }
-            }
-
-            if (missingDependencies.Count == 0) continue;
+            if (AssertSpec13Dependencies(modDescriptors, plugin, out var missingDependencies)) continue;
             allErroredPlugins.Add(new SpaceWarpErrorDescription(plugin)
             {
                 MissingDependencies = missingDependencies
@@ -175,7 +158,30 @@ internal static class SpaceWarpManager
         }
     }
 
-    private static void GetBepInExErroredPlugins(IReadOnlyCollection<string> ignoredGUIDS,
+    private static bool AssertSpec13Dependencies(IList<SpaceWarpPluginDescriptor> modDescriptors, SpaceWarpPluginDescriptor plugin,
+        out List<string> missingDependencies)
+    {
+        missingDependencies = new List<string>();
+        if (plugin.SWInfo.Spec < SpecVersion.V1_3) return true;
+        foreach (var dep in plugin.SWInfo.Dependencies)
+        {
+            var descriptor = modDescriptors.FirstOrDefault(x => x.Guid == dep.ID);
+            if (descriptor == null)
+            {
+                missingDependencies.Add(dep.ID);
+                continue;
+            }
+
+            if (!VersionUtility.IsSupported(descriptor.SWInfo.Version, dep.Version.Min, dep.Version.Max))
+            {
+                missingDependencies.Add(descriptor.Guid);
+            }
+        }
+
+        return missingDependencies.Count == 0;
+    }
+
+    private static void GetBepInExErroredPlugins(IReadOnlyCollection<string> ignoredGuids,
         ICollection<SpaceWarpErrorDescription> errorDescriptions, 
         IReadOnlyCollection<SpaceWarpPluginDescriptor> allLoadedPlugins,
         IReadOnlyCollection<SpaceWarpPluginDescriptor> allDisabledPlugins)
@@ -193,7 +199,7 @@ internal static class SpaceWarpManager
                 if (allLoadedPlugins.All(x => x.Guid != info.Metadata.GUID) &&
                     allDisabledPlugins.All(x => x.Guid != info.Metadata.GUID) &&
                     errorDescriptions.All(x => x.Plugin.Guid != info.Metadata.GUID) &&
-                    !ignoredGUIDS.Contains(info.Metadata.GUID))
+                    !ignoredGuids.Contains(info.Metadata.GUID))
                 {
                     errorDescriptions.Add(new SpaceWarpErrorDescription(new SpaceWarpPluginDescriptor(null,
                         info.Metadata.GUID,
@@ -228,7 +234,6 @@ internal static class SpaceWarpManager
         spaceWarpInfos.AddRange(codelessInfosInOrder);
     }
     private static bool CodelessDependencyResolved(SpaceWarpPluginDescriptor descriptor,
-        ICollection<string> ignoredGUIDs,
         ICollection<SpaceWarpPluginDescriptor> spaceWarpInfos,
         IReadOnlyCollection<SpaceWarpPluginDescriptor> codelessInfosInOrder)
     {
@@ -255,7 +260,7 @@ internal static class SpaceWarpManager
             changed = false;
             for (var i = codelessInfos.Count - 1; i >= 0; i--)
             {
-                if (!CodelessDependencyResolved(codelessInfos[i],ignoredGUIDs,spaceWarpInfos,codelessInfosInOrder)) continue;
+                if (!CodelessDependencyResolved(codelessInfos[i],spaceWarpInfos,codelessInfosInOrder)) continue;
                 codelessInfosInOrder.Add(codelessInfos[i]);
                 codelessInfos.RemoveAt(i);
                 changed = true;
