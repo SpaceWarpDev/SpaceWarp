@@ -4,8 +4,8 @@ SpaceWarp/ModList/DisableAll,Text,,Disable All,Desativar todos
 SpaceWarp/ModList/RevertChanges,Text,,Revert Changes,Reverter alterações
 SpaceWarp/ModList/ChangesDetected,Text,,"{0} changes detected, please restart to apply them","{0} alterações detetadas, porfavor reinicie o jogo"
 SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist
-SpaceWarp/ModList/SpaceWarpMods,Text,,Space Warp Mods,Mods de Space Warp
-SpaceWarp/ModList/UnmanagedMods,Text,,Other Mods,Mods externos
+SpaceWarp/ModList/EnabledMods,Text,,Enabled Mods,Mods ativados
+SpaceWarp/ModList/ErroredMods,Text,,Errored Mods,<Errored Mods>
 SpaceWarp/ModList/DisabledMods,Text,,Disabled Mods,Mods desativados
 SpaceWarp/ModList/Version,Text,,Version,Versão
 SpaceWarp/ModList/Author,Text,,Author,Autor
@@ -18,6 +18,14 @@ SpaceWarp/ModList/unsupported,Text,,unsupported,não suportado
 SpaceWarp/ModList/disabled,Text,,disabled,desativado
 SpaceWarp/ModList/OpenConfigurationManager,Text,,Open Configuration Manager,Abrir gestor de configurações
 SpaceWarp/ModList/OpenModsFolder,Text,,Open Mods Folder,Abrir pasta de mods
+SpaceWarp/ModList/mismatched,Text,,Mismatched,<Mismatched>
+SpaceWarp/ModList/baddirectory,Text,,Bad Directroy,<Bad Directory>
+SpaceWarp/ModList/missingswinfo,Text,,Missing SW Info,<Missing SW Info>
+SpaceWarp/ModList/MissingDependency,Text,,Dependency is missing,<Missing Dependency>
+SpaceWarp/ModList/ErroredDependency,Text,,Dependency had an error while loading,<Errored Dependency>
+SpaceWarp/ModList/DisabledDependency,Text,,Dependency is disabled,<Disabled Dependency>
+SpaceWarp/ModList/UnspecifiedDependency,Text,,Dependency was not specified in SW info,<Unspecified Dependency>
+SpaceWarp/ModList/UnsupportedDependency,Text,,Dependency is of an unsupported version,<Unsupported Dependency>
 SpaceWarp/Mods,Text,,Mods,Mods
 SpaceWarp,Text,,Space Warp,Space Warp
 SpaceWarp/VersionChecking,Text,,Allow Space Warp to check versions for mods over the network?,Deixar SpaceWarp verificar a versão dos mods na internet?

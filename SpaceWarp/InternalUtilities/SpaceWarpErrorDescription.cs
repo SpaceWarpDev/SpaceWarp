@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SpaceWarp.API.Mods;
+using SpaceWarp.Patching;
 using SpaceWarp.UI.ModList;
 using UnityEngine;
 using static UnityEngine.GameObject;
@@ -26,6 +27,14 @@ internal class SpaceWarpErrorDescription
         // Essentially if we have an errored plugin, we delete the plugin code
         if (plugin.Plugin != null)
         {
+            // If and only if this is space warp we don't destroy it
+            // Then we inform our loading patcher to do space warp specially
+            if (plugin.Plugin.Info.Metadata.GUID == SpaceWarpPlugin.ModGuid)
+            {
+                BootstrapPatch.ForceSpaceWarpLoadDueToError = true;
+                BootstrapPatch.ErroredSWPluginDescriptor = plugin;
+                return;
+            }
             Object.Destroy(plugin.Plugin);
         }
         plugin.Plugin = null;
@@ -33,7 +42,7 @@ internal class SpaceWarpErrorDescription
 
     public void Apply(ModListItemController controller)
     {
-        controller.SetInfo(Plugin.SWInfo);
+        controller.SetInfo(Plugin);
         controller.SetIsErrored();
         if (MissingSwinfo) controller.SetMissingSWInfo();
         if (BadDirectory) controller.SetBadDirectory();

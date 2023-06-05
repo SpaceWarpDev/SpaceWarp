@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BepInEx;
+using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using UnityEngine.UIElements;
 
@@ -16,7 +17,7 @@ internal class ModListItemController
     }
 
     internal string Guid { get; set; }
-    internal object Info { get; private set; }
+    internal SpaceWarpPluginDescriptor Info { get; private set; }
     internal bool IsOutdated { get; private set; }
     internal bool IsUnsupported { get; private set; }
     internal bool IsDisabled { get; private set; }
@@ -30,7 +31,7 @@ internal class ModListItemController
     internal bool BadDirectory { get; private set; }
     internal bool MissingSWInfo { get; private set; }
 
-    internal List<string> FailedDependencies { get; private set; } = new();
+    internal List<string> ErroredDependencies { get; private set; } = new();
     internal List<string> MissingDependencies { get; private set; } = new();
 
     internal List<string> DisabledDependencies { get; private set; } = new();
@@ -39,16 +40,10 @@ internal class ModListItemController
     internal List<string> UnspecifiedDependencies { get; private set; } = new();
 
 
-    internal void SetInfo(ModInfo info)
+    internal void SetInfo(SpaceWarpPluginDescriptor info)
     {
         Info = info;
         _nameLabel.text = Trim(info.Name);
-    }
-
-    internal void SetInfo(PluginInfo info)
-    {
-        Info = info;
-        _nameLabel.text = Trim(info.Metadata.Name);
     }
 
     internal void SetIsOutdated()
@@ -72,7 +67,7 @@ internal class ModListItemController
     internal void SetIsErrored()
     {
         IsErrored = true;
-        _nameLabel.AddToClassList("errored"); //TODO:
+        _nameLabel.AddToClassList("errored");
     }
 
     internal void SetBadID()
@@ -101,7 +96,7 @@ internal class ModListItemController
     
     internal void SetIsDependencyErrored(string erroredDependency)
     {
-        FailedDependencies.Add(erroredDependency);
+        ErroredDependencies.Add(erroredDependency);
         SetIsErrored();
     }
 
