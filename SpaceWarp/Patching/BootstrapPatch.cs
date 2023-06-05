@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using KSP.Game;
 using MonoMod.Cil;
 using SpaceWarp.API.Loading;
+using SpaceWarp.API.Mods;
 using SpaceWarp.Patching.LoadingActions;
 
 namespace SpaceWarp.Patching;
@@ -9,6 +11,9 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch]
 internal static class BootstrapPatch
 {
+    internal static bool ForceSpaceWarpLoadDueToError = false;
+    internal static SpaceWarpPluginDescriptor ErroredSWPluginDescriptor;
+    
     [HarmonyPrefix]
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.Awake))]
     private static void GetSpaceWarpMods()
@@ -31,6 +36,10 @@ internal static class BootstrapPatch
 
         ilCursor.EmitDelegate(static () =>
         {
+            if (ForceSpaceWarpLoadDueToError)
+            {
+                GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(SpaceWarpPlugin.Instance));
+            }
             foreach (var plugin in SpaceWarpManager.AllPlugins)
             {
                 if (plugin.Plugin != null)
@@ -43,8 +52,19 @@ internal static class BootstrapPatch
         ilCursor.EmitDelegate(static () =>
         {
             var flow = GameManager.Instance.LoadingFlow;
+            IReadOnlyList<SpaceWarpPluginDescriptor> allPlugins;
+            if (ForceSpaceWarpLoadDueToError)
+            {
+                var l = new List<SpaceWarpPluginDescriptor> { ErroredSWPluginDescriptor };
+                l.AddRange(SpaceWarpManager.AllPlugins);
+                allPlugins = l;
+            }
+            else
+            {
+                allPlugins = SpaceWarpManager.AllPlugins;
+            }
 
-            foreach (var plugin in SpaceWarpManager.AllPlugins)
+            foreach (var plugin in allPlugins)
             {
                 flow.AddAction(new LoadAddressablesAction(plugin));
                 flow.AddAction(new LoadLocalizationAction(plugin));
@@ -75,19 +95,19 @@ internal static class BootstrapPatch
                 flow.AddAction(action);
             }
             
-            foreach (var plugin in SpaceWarpManager.AllPlugins)
+            foreach (var plugin in allPlugins)
             {
                 if (plugin.Plugin != null)
                     flow.AddAction(new InitializeModAction(plugin.Plugin));
             }
             
-            foreach (var plugin in SpaceWarpManager.AllPlugins)
+            foreach (var plugin in allPlugins)
             {
                 flow.AddAction(new LoadLuaAction(plugin));
             }
             
 
-            foreach (var plugin in SpaceWarpManager.AllPlugins)
+            foreach (var plugin in allPlugins)
             {
                 if (plugin.Plugin != null)
                     flow.AddAction(new PostInitializeModAction(plugin.Plugin));

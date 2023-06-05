@@ -5,6 +5,7 @@ using System.IO;
 using BepInEx;
 using I2.Loc;
 using SpaceWarp.API.Assets;
+using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI;
 using SpaceWarpPatcher;
@@ -29,13 +30,11 @@ internal class ModListController : MonoBehaviour
     private Label _changesLabel;
     private readonly LocalizedString _changesLabelText = "SpaceWarp/ModList/ChangesDetected";
 
-    private Foldout _spaceWarpModFoldout;
-    private VisualElement _spaceWarpModList;
-    private Foldout _otherModFoldout;
-    private VisualElement _otherInfoModList;
-    private VisualElement _otherModList;
+    private Foldout _enabledModFoldout;
+    private VisualElement _enabledModList;
+    private Foldout _erroredModFoldout;
+    private VisualElement _erroredModList;
     private Foldout _disabledModFoldout;
-    private VisualElement _disabledInfoModList;
     private VisualElement _disabledModList;
 
     private Button _openModsFolderButton;
@@ -54,8 +53,18 @@ internal class ModListController : MonoBehaviour
     private VisualElement _detailsOutdatedWarning;
     private VisualElement _detailsUnsupportedWarning;
     private VisualElement _detailsDisabledWarning;
+    private VisualElement _mismatchedIDWarning;
+    private VisualElement _missingInfoWarning;
+    private VisualElement _mismatchedVersionWarning;
+    private VisualElement _badDirectoryWarning;
     private Foldout _detailsDependenciesFoldout;
     private VisualElement _detailsDependenciesList;
+
+    private static LocalizedString _missingDependency = "SpaceWarp/ModList/MissingDependency";
+    private static LocalizedString _erroredDependency = "SpaceWarp/ModList/ErroredDependency";
+    private static LocalizedString _disabledDependency = "SpaceWarp/ModList/DisabledDependency";
+    private static LocalizedString _unspecifiedDependency = "SpaceWarp/ModList/UnspecifiedDependency";
+    private static LocalizedString _unsupportedDependency = "SpaceWarp/ModList/UnsupportedDependency";
 
     // State
     private bool _isLoaded;
@@ -137,16 +146,15 @@ internal class ModListController : MonoBehaviour
         _revertChangesButton = _container.Q<Button>("revert-changes-button");
         _changesLabel = _container.Q<Label>("changes-label");
 
-        _spaceWarpModFoldout = _container.Q<Foldout>("spacewarp-mod-foldout");
-        _spaceWarpModList = _container.Q<VisualElement>("spacewarp-mod-list");
+        _enabledModFoldout = _container.Q<Foldout>("spacewarp-mod-foldout");
+        _enabledModList = _container.Q<VisualElement>("spacewarp-mod-list");
 
-        _otherModFoldout = _container.Q<Foldout>("other-mod-foldout");
-        _otherInfoModList = _container.Q<VisualElement>("other-info-mod-list");
-        _otherModList = _container.Q<VisualElement>("other-mod-list");
 
         _disabledModFoldout = _container.Q<Foldout>("disabled-mod-foldout");
-        _disabledInfoModList = _container.Q<VisualElement>("disabled-info-mod-list");
         _disabledModList = _container.Q<VisualElement>("disabled-mod-list");
+        
+        _erroredModFoldout = _container.Q<Foldout>("errored-mod-foldout");
+        _erroredModList = _container.Q<VisualElement>("errored-mod-list");
 
         _openModsFolderButton = _container.Q<Button>("open-mods-folder-button");
         _openConfigManagerButton = _container.Q<Button>("open-config-manager-button");
@@ -165,24 +173,28 @@ internal class ModListController : MonoBehaviour
         _detailsOutdatedWarning = _container.Q<VisualElement>("details-outdated-warning");
         _detailsUnsupportedWarning = _container.Q<VisualElement>("details-unsupported-warning");
         _detailsDisabledWarning = _container.Q<VisualElement>("details-disabled-warning");
-
+        _mismatchedIDWarning = _container.Q<VisualElement>("details-mismatched-id-error");
+        _missingInfoWarning = _container.Q<VisualElement>("details-missing-info-error");
+        _mismatchedVersionWarning = _container.Q<VisualElement>("details-mismatched-error");
+        _badDirectoryWarning = _container.Q<VisualElement>("details-bad-directory-error");
+        
         _detailsDependenciesFoldout = _container.Q<Foldout>("details-dependencies-foldout");
         _detailsDependenciesList = _container.Q<VisualElement>("details-dependencies-list");
 
         // Show only categories that have any mods in them
         if (SpaceWarpManager.AllPlugins.Count > 0)
         {
-            _spaceWarpModFoldout.style.display = DisplayStyle.Flex;
+            _enabledModFoldout.style.display = DisplayStyle.Flex;
         }
-        //
-        // if (SpaceWarpManager.NonSpaceWarpPlugins.Count > 0)
-        // {
-        //     _otherModFoldout.style.display = DisplayStyle.Flex;
-        // }
 
-        if (SpaceWarpManager.DisabledPlugins.Count + SpaceWarpManager.DisabledPlugins.Count > 0)
+        if (SpaceWarpManager.DisabledPlugins.Count > 0)
         {
             _disabledModFoldout.style.display = DisplayStyle.Flex;
+        }
+        
+        if (SpaceWarpManager.ErroredPlugins.Count > 0)
+        {
+            _erroredModFoldout.style.display = DisplayStyle.Flex;
         }
     }
 
@@ -190,10 +202,10 @@ internal class ModListController : MonoBehaviour
     {
         foreach (var plugin in SpaceWarpManager.AllPlugins)
         {
-            MakeListItem(_spaceWarpModList, data =>
+            MakeListItem(_enabledModList, data =>
             {
                 data.Guid = plugin.Guid;
-                data.SetInfo(plugin.SWInfo);
+                data.SetInfo(plugin);
 
                 if (SpaceWarpManager.ModsUnsupported[data.Guid])
                 {
@@ -202,51 +214,21 @@ internal class ModListController : MonoBehaviour
             });
         }
 
-        // foreach (var (plugin, modInfo) in SpaceWarpManager.NonSpaceWarpInfos)
-        // {
-        //     MakeListItem(_otherInfoModList, data =>
-        //     {
-        //         data.Guid = plugin.Info.Metadata.GUID;
-        //         data.SetInfo(modInfo);
-        //
-        //         if (SpaceWarpManager.ModsUnsupported[data.Guid])
-        //         {
-        //             data.SetIsUnsupported();
-        //         }
-        //     });
-        // }
-
-        // foreach (var bepinPlugin in SpaceWarpManager.NonSpaceWarpPlugins)
-        // {
-        //     MakeListItem(_otherModList, data =>
-        //     {
-        //         data.Guid = bepinPlugin.Info.Metadata.GUID;
-        //         data.SetInfo(bepinPlugin.Info);
-        //     });
-        // }
-        //
-        // foreach (var (pluginInfo, modInfo) in SpaceWarpManager.DisabledInfoPlugins)
-        // {
-        //     MakeListItem(_disabledInfoModList, data =>
-        //     {
-        //         data.Guid = pluginInfo.Metadata.GUID;
-        //         data.SetInfo(modInfo);
-        //         data.SetIsDisabled();
-        //
-        //         if (SpaceWarpManager.ModsUnsupported[data.Guid])
-        //         {
-        //             data.SetIsUnsupported();
-        //         }
-        //     });
-        // }
-
         foreach (var pluginInfo in SpaceWarpManager.DisabledPlugins)
         {
             MakeListItem(_disabledModList, data =>
             {
                 data.Guid = pluginInfo.Guid;
-                data.SetInfo(pluginInfo.SWInfo);
+                data.SetInfo(pluginInfo);
                 data.SetIsDisabled();
+            });
+        }
+
+        foreach (var erroredPlugin in SpaceWarpManager.ErroredPlugins)
+        {
+            MakeListItem(_erroredModList, data => { 
+                data.Guid = erroredPlugin.Plugin.Guid;
+                erroredPlugin.Apply(data);
             });
         }
     }
@@ -358,54 +340,47 @@ internal class ModListController : MonoBehaviour
                 modItem[0].RemoveFromClassList("selected");
             }
         }
-
-        switch (data.Info)
+        
+        if (data.Info != null)
         {
-            // Handle non-selection (Escape to deselect everything)
-            case null:
-                ClearSelected();
-                return;
-
-            case ModInfo modInfo:
-                SetSelectedModInfo(data, modInfo);
-                return;
-
-            case PluginInfo plugin:
-                SetSelectedPluginInfo(data, plugin);
-                return;
+            SetSelectedModInfo(data,data.Info);
+        }
+        else
+        {
+            ClearSelected();
         }
     }
 
-    private void SetSelectedModInfo(ModListItemController data, ModInfo info)
+    private void SetSelectedModInfo(ModListItemController data, SpaceWarpPluginDescriptor descriptor)
     {
+        
+        //TODO: Add the ability to show errors at some point (Munix)
         SetSelected(
-            info.Name,
-            data.Guid,
-            info.Author,
-            info.Version,
-            info.Source,
-            info.Description,
-            info.SupportedKsp2Versions.ToString(),
-            info.Dependencies
+            descriptor.Name,
+            data.HasBadID ? descriptor.SWInfo.ModID : data.Guid, // So that I can show a mismatched ID if it is mismatched
+            descriptor.SWInfo.Author,
+            descriptor.SWInfo.Version,
+            descriptor.SWInfo.Source,
+            descriptor.SWInfo.Description,
+            descriptor.SWInfo.SupportedKsp2Versions.ToString(),
+            descriptor.SWInfo.Dependencies
                 ?.Select(dependencyInfo => (dependencyInfo.ID, dependencyInfo.Version.ToString()))
                 .ToList(),
             data.IsOutdated,
             data.IsUnsupported,
-            data.IsDisabled
+            data.IsDisabled,
+            data.HasBadID,
+            data.MissingSWInfo,
+            data.BadDirectory,
+            data.HasMismatchedVersion,
+            data.MissingDependencies,
+            data.ErroredDependencies,
+            data.UnsupportedDependencies,
+            data.UnspecifiedDependencies,
+            data.DisabledDependencies
         );
     }
-
-    private void SetSelectedPluginInfo(ModListItemController data, PluginInfo info)
-    {
-        SetSelected(
-            info.Metadata.Name,
-            data.Guid,
-            version: info.Metadata.Version.ToString(),
-            isOutdated: data.IsOutdated,
-            isUnsupported: data.IsUnsupported,
-            isDisabled: data.IsDisabled
-        );
-    }
+    
 
     private void SetSelected(
         string modName = "",
@@ -419,6 +394,15 @@ internal class ModListController : MonoBehaviour
         bool isOutdated = false,
         bool isUnsupported = false,
         bool isDisabled = false,
+        bool isMismatchedID = false,
+        bool isMissingSWInfo = false,
+        bool isBadDirectory = false,
+        bool isMismatchedVersion = false,
+        List<string> missingDependencies = null,
+        List<string> erroredDependencies = null,
+        List<string> unsupportedDependencies = null,
+        List<string> unspecifiedDependencies = null,
+        List<string> disabledDependencies = null,
         bool hasSelected = true
     )
     {
@@ -435,11 +419,28 @@ internal class ModListController : MonoBehaviour
         _detailsDescriptionLabel.text = description;
         _detailsKspVersionLabel.text = kspVersion;
 
-        SetDependencies(dependencies);
-        SetModWarnings(isOutdated, isUnsupported, isDisabled);
+        SetDependencies(dependencies,
+            missingDependencies,
+            erroredDependencies,
+            unsupportedDependencies,
+            unspecifiedDependencies,
+            disabledDependencies);
+        SetModWarnings(isOutdated,
+            isUnsupported,
+            isDisabled,
+            isMismatchedID,
+            isMissingSWInfo,
+            isBadDirectory,
+            isMismatchedVersion);
     }
 
-    private void SetDependencies(List<(string, string)> dependencies)
+    private void SetDependencies(
+        List<(string, string)> dependencies,
+        List<string> missingDependencies,
+        List<string> erroredDependencies,
+        List<string> unsupportedDependencies,
+        List<string> unspecifiedDependencies,
+        List<string> disabledDependencies)
     {
         _detailsDependenciesList.hierarchy.Clear();
         _detailsDependenciesFoldout.visible = dependencies is { Count: > 0 };
@@ -454,15 +455,58 @@ internal class ModListController : MonoBehaviour
             var dependencyElement = _dependencyTemplate.Instantiate();
             dependencyElement.Q<Label>(className: "details-key-label").text = id;
             dependencyElement.Q<Label>(className: "details-value-label").text = version;
+            var warning = dependencyElement.Q<Label>("WarningInformation");
+            warning.style.display = DisplayStyle.None;
+            if (missingDependencies.Contains(id))
+            {
+                warning.style.display = DisplayStyle.Flex;
+                warning.text = $"({_missingDependency})";
+            }
+
+            if (erroredDependencies.Contains(id))
+            {
+                warning.style.display = DisplayStyle.Flex;
+                warning.text = $"({_erroredDependency})";
+            }
+            
+            if (unsupportedDependencies.Contains(id))
+            {
+                warning.style.display = DisplayStyle.Flex;
+                warning.text = $"({_unsupportedDependency})";
+            }
+            
+            if (unspecifiedDependencies.Contains(id))
+            {
+                warning.style.display = DisplayStyle.Flex;
+                warning.text = $"({_unspecifiedDependency})";
+            }
+
+            if (disabledDependencies.Contains(id))
+            {
+                warning.style.display = DisplayStyle.Flex;
+                warning.text = $"({_disabledDependency})";
+            }
+            
+            
             _detailsDependenciesList.Add(dependencyElement);
         }
     }
 
-    private void SetModWarnings(bool isOutdated, bool isUnsupported, bool isDisabled)
+    private void SetModWarnings(bool isOutdated,
+        bool isUnsupported,
+        bool isDisabled,
+        bool isMismatchedID,
+        bool isMissingSWInfo,
+        bool isBadDirectory,
+        bool isMismatchedVersion)
     {
         _detailsOutdatedWarning.style.display = isOutdated ? DisplayStyle.Flex : DisplayStyle.None;
         _detailsUnsupportedWarning.style.display = isUnsupported ? DisplayStyle.Flex : DisplayStyle.None;
         _detailsDisabledWarning.style.display = isDisabled ? DisplayStyle.Flex : DisplayStyle.None;
+        _mismatchedIDWarning.style.display = isMismatchedID ? DisplayStyle.Flex : DisplayStyle.None;
+        _missingInfoWarning.style.display = isMissingSWInfo ? DisplayStyle.Flex : DisplayStyle.None;
+        _badDirectoryWarning.style.display = isBadDirectory ? DisplayStyle.Flex : DisplayStyle.None;
+        _mismatchedVersionWarning.style.display = isMismatchedVersion ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     private void ClearSelected()

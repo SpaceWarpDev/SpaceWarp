@@ -1,5 +1,5 @@
 {
-  "spec": "1.3.0",
+  "spec": "1.3",
   "mod_id": "com.github.x606.spacewarp",
   "name": "Space Warp",
   "author": "Space-Warp Team",
@@ -11,7 +11,14 @@
     {
       "id":  "UitkForKsp2",
       "version": {
-        "min": "1.0.0",
+        "min": "1.2.0",
+        "max": "*"
+      }
+    },
+    {
+      "id": "com.bepis.bepinex.configurationmanager",
+      "version": {
+        "min": "*",
         "max": "*"
       }
     }
