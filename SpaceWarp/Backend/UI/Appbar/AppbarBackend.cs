@@ -167,7 +167,7 @@ internal static class AppbarBackend
 
         // Set the button icon.
         var image = oabTrayButton.GetComponent<Image>();
-        var tex = AssetManager.GetAsset<Texture2D>("spacewarp/images/oabTrayButton.png");
+        var tex = AssetManager.GetAsset<Texture2D>($"{SpaceWarpPlugin.ModGuid}/images/oabTrayButton.png");
         tex.filterMode = FilterMode.Point;
         image.sprite = Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f));
 
