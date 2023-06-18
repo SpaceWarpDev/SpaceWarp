@@ -102,7 +102,7 @@ internal static class ChainloaderPatch
             var loc = new DirectoryInfo(Assembly.GetExecutingAssembly().Location).Parent.FullName;
             foreach (var file in toLoad)
             {
-                trueLogger.LogError($"Loading: {file}");
+                trueLogger.LogInfo($"Loading: {file}");
                 Assembly.LoadFile(Path.Combine(loc, "lib", file + ".dll"));
             }
 
@@ -186,17 +186,17 @@ internal static class ChainloaderPatch
                 var parent = directory.Parent;
                 if (parent == null || !File.Exists(Path.Combine(parent.FullName, "swinfo.json"))) continue;
                 var id = parent.Name;
-                
-                
+
+
                 var logger = Logger.CreateLogSource(parent.Name + " compilation");
                 var allSource = AllSourceFiles(directory);
                 DateTime latestWriteTime = DateTime.FromBinary(0);
-                
+
 
                 var resultFileName = "roslyn-" + id;
                 var cached = Path.Combine(cacheLocation,resultFileName);
                 var cachedDLL = cached + ".dll";
-                
+
                 var combined = Path.Combine(parent.FullName, resultFileName);
                 var dll = combined + ".dll";
 
@@ -239,7 +239,7 @@ internal static class ChainloaderPatch
                     {
                         //Ignored
                     }
-                    
+
                     continue;
                 }
                 File.Copy(cachedDLL, dll);
