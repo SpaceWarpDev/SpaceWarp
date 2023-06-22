@@ -64,7 +64,7 @@ internal static class AppbarBackend
 
         // Say the magic words...
         var list = GameObject.Find(
-            "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Popup Canvas/Container/ButtonBar/BTN-App-Tray/appbar-others-group");
+            "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Scaled Popup Canvas/Container/ButtonBar/BTN-App-Tray/appbar-others-group");
         var resourceManger = list != null ? list.GetChild("BTN-Resource-Manager") : null;
 
         if (list == null || resourceManger == null)
