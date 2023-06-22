@@ -289,6 +289,7 @@ internal class ColorsPatch
         nameof(Module_Color.OnInitialize))]
     internal static void Postfix(Module_Color __instance)
     {
+
         var partName = __instance.OABPart is not null ? __instance.OABPart.PartName : __instance.part.Name;
         var trimmedPartName = TrimPartName(partName);
         if (DeclaredParts.Count > 0 && _allParts.Contains(trimmedPartName))
