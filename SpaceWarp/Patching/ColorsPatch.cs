@@ -186,11 +186,11 @@ internal class ColorsPatch
     }
 
 
-    private static void LoadTextures(string modGUID)
+    private static void LoadTextures(string modGuid)
     {
-        LogMessage($">Loading parts from {modGUID}");
+        LogMessage($">Loading parts from {modGuid}");
 
-        foreach (var partName in DeclaredParts[modGUID])
+        foreach (var partName in DeclaredParts[modGuid])
         {
             LogMessage($"\t>Loading {partName}");
             if (!TryAddUnique(partName))
@@ -202,7 +202,7 @@ internal class ColorsPatch
 
             var trimmedPartName = TrimPartName(partName);
             var pathWithoutSuffix =
-                $"{modGUID.ToLower()}/images/{trimmedPartName.ToLower()}/{trimmedPartName.ToLower()}";
+                $"{modGuid.ToLower()}/images/{trimmedPartName.ToLower()}/{trimmedPartName.ToLower()}";
 
 
             var count = 0; //already has diffuse
@@ -289,9 +289,9 @@ internal class ColorsPatch
         nameof(Module_Color.OnInitialize))]
     internal static void Postfix(Module_Color __instance)
     {
+
         var partName = __instance.OABPart is not null ? __instance.OABPart.PartName : __instance.part.Name;
         var trimmedPartName = TrimPartName(partName);
-
         if (DeclaredParts.Count > 0 && _allParts.Contains(trimmedPartName))
         {
             var mat = new Material(_ksp2Opaque);

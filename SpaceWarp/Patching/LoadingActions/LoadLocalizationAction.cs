@@ -2,15 +2,16 @@
 using System.IO;
 using KSP.Game.Flow;
 using SpaceWarp.API.Mods;
+using SpaceWarp.InternalUtilities;
 
 namespace SpaceWarp.Patching.LoadingActions;
 
 internal sealed class LoadLocalizationAction : FlowAction
 {
-    private readonly BaseSpaceWarpPlugin _plugin;
+    private readonly SpaceWarpPluginDescriptor _plugin;
 
-    public LoadLocalizationAction(BaseSpaceWarpPlugin plugin) : base(
-        $"Loading localizations for plugin {plugin.SpaceWarpMetadata.Name}")
+    public LoadLocalizationAction(SpaceWarpPluginDescriptor plugin) : base(
+        $"Loading localizations for plugin {plugin.SWInfo.Name}")
     {
         _plugin = plugin;
     }
@@ -19,13 +20,16 @@ internal sealed class LoadLocalizationAction : FlowAction
     {
         try
         {
-            var localizationsPath = Path.Combine(_plugin.PluginFolderPath, "localizations");
+            var localizationsPath = Path.Combine(_plugin.Folder.FullName, "localizations");
             AssetHelpers.LoadLocalizationFromFolder(localizationsPath);
             resolve();
         }
         catch (Exception e)
         {
-            _plugin.ModLogger.LogError(e.ToString());
+            if (_plugin.Plugin != null)
+                _plugin.Plugin.ModLogger.LogError(e.ToString());
+            else
+                SpaceWarpPlugin.Logger.LogError(_plugin.SWInfo.Name + ": " + e);   
             reject(null);
         }
     }

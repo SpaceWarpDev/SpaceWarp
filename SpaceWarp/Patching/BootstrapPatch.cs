@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using KSP.Game;
 using MonoMod.Cil;
 using SpaceWarp.API.Loading;
+using SpaceWarp.API.Mods;
 using SpaceWarp.Patching.LoadingActions;
 
 namespace SpaceWarp.Patching;
@@ -9,11 +11,14 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch]
 internal static class BootstrapPatch
 {
+    internal static bool ForceSpaceWarpLoadDueToError = false;
+    internal static SpaceWarpPluginDescriptor ErroredSWPluginDescriptor;
+    
     [HarmonyPrefix]
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.Awake))]
     private static void GetSpaceWarpMods()
     {
-        SpaceWarpManager.GetSpaceWarpPlugins();
+        SpaceWarpManager.GetAllPlugins();
     }
 
     [HarmonyILManipulator]
@@ -31,9 +36,14 @@ internal static class BootstrapPatch
 
         ilCursor.EmitDelegate(static () =>
         {
-            foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            if (ForceSpaceWarpLoadDueToError)
             {
-                GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
+                GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(SpaceWarpPlugin.Instance));
+            }
+            foreach (var plugin in SpaceWarpManager.AllPlugins)
+            {
+                if (plugin.Plugin != null)
+                    GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin.Plugin));
             }
         });
 
@@ -42,12 +52,38 @@ internal static class BootstrapPatch
         ilCursor.EmitDelegate(static () =>
         {
             var flow = GameManager.Instance.LoadingFlow;
+            IReadOnlyList<SpaceWarpPluginDescriptor> allPlugins;
+            if (ForceSpaceWarpLoadDueToError)
+            {
+                var l = new List<SpaceWarpPluginDescriptor> { ErroredSWPluginDescriptor };
+                l.AddRange(SpaceWarpManager.AllPlugins);
+                allPlugins = l;
+            }
+            else
+            {
+                allPlugins = SpaceWarpManager.AllPlugins;
+            }
 
-            foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            foreach (var plugin in allPlugins)
             {
                 flow.AddAction(new LoadAddressablesAction(plugin));
                 flow.AddAction(new LoadLocalizationAction(plugin));
-                foreach (var action in Loading.LoadingActionGenerators)
+                if (plugin.Plugin != null)
+                {
+                    foreach (var action in Loading.LoadingActionGenerators)
+                    {
+                        flow.AddAction(action(plugin.Plugin));
+                    }
+                }
+                else
+                {
+                    foreach (var action in Loading.FallbackDescriptorLoadingActionGenerators)
+                    {
+                        flow.AddAction(action(plugin));
+                    }
+                }
+
+                foreach (var action in Loading.DescriptorLoadingActionGenerators)
                 {
                     flow.AddAction(action(plugin));
                 }
@@ -58,14 +94,23 @@ internal static class BootstrapPatch
             {
                 flow.AddAction(action);
             }
-            foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            
+            foreach (var plugin in allPlugins)
             {
-                flow.AddAction(new InitializeModAction(plugin));
+                if (plugin.Plugin != null)
+                    flow.AddAction(new InitializeModAction(plugin.Plugin));
             }
-
-            foreach (var plugin in SpaceWarpManager.SpaceWarpPlugins)
+            
+            foreach (var plugin in allPlugins)
             {
-                flow.AddAction(new PostInitializeModAction(plugin));
+                flow.AddAction(new LoadLuaAction(plugin));
+            }
+            
+
+            foreach (var plugin in allPlugins)
+            {
+                if (plugin.Plugin != null)
+                    flow.AddAction(new PostInitializeModAction(plugin.Plugin));
             }
         });
     }

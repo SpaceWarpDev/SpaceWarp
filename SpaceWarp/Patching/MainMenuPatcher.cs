@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using I2.Loc;
 using KSP.Api.CoreTypes;
 using KSP.Game.StartupFlow;
@@ -11,6 +12,7 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch("Start")]
 internal class MainMenuPatcher
 {
+    internal static event Action MainMenuLoaded;
     public static void Postfix(LandingHUD __instance)
     {
         var menuItemsGroupTransform = __instance.transform.FindChildEx("MenuItemsGroup");
@@ -53,5 +55,6 @@ internal class MainMenuPatcher
             var localize = newButton.GetComponentInChildren<Localize>();
             localize.SetTerm(localizedMenuButtonToBeAddded.term);
         }
+        MainMenuLoaded?.Invoke();
     }
 }

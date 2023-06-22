@@ -8,6 +8,7 @@ import zipfile
 TEMPLATE_DIR = os.path.abspath("SpaceWarpBuildTemplate")
 SPACEWARP_DIR = os.path.abspath("SpaceWarp")
 PATCHER_DIR = os.path.abspath("SpaceWarpPatcher")
+PATCHER_LIB_DIR = os.path.abspath("SpaceWarpPatcherLibraries")
 BUILD_DIR = os.path.abspath("build")
 THIRD_PARTY = os.path.abspath("ThirdParty")
 
@@ -66,6 +67,11 @@ def build(release=False):
 
     for line in str(output.stderr, "utf-8").splitlines():
         print(f"        {line}")
+    
+    # patcher libraries
+    patcher_library_dir = os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "patchers", "SpaceWarp", "lib")
+    print(f"=> Copying Patcher Libraries")
+    shutil.copytree(PATCHER_LIB_DIR,patcher_library_dir)
 
     # patcher build
     patcher_dotnet_args = ["dotnet", "build", os.path.join(PATCHER_DIR, "SpaceWarpPatcher.csproj"), "-c",

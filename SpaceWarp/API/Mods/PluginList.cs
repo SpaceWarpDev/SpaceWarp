@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Bootstrap;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarpPatcher;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -17,6 +18,10 @@ namespace SpaceWarp.API.Mods;
 /// </summary>
 public static class PluginList
 {
+    /// <summary>
+    /// Set if the plugin list is different in any way since last run (version differences, new mods, mods removed, mods disabled, description differences, any different in any swinfo file and the disabled mod list)
+    /// </summary>
+    public static bool ModListChangedSinceLastRun => ChainloaderPatch.ModListChangedSinceLastRun;
     /// <summary>
     /// Contains information about all currently loaded plugins. The key is the BepInEx GUID of the plugin.
     /// </summary>
@@ -64,30 +69,31 @@ public static class PluginList
     /// <returns><see cref="ModInfo"/> of the plugin or null if not found</returns>
     public static ModInfo TryGetSwinfo(string guid)
     {
-        var swModInfo = SpaceWarpManager.SpaceWarpPlugins
-            .FirstOrDefault(item => item.Info.Metadata.GUID == guid);
+        var swModInfo = SpaceWarpManager.AllPlugins
+            .FirstOrDefault(item => item.Guid == guid);
 
         if (swModInfo != null)
         {
-            return swModInfo.SpaceWarpMetadata;
+            return swModInfo.SWInfo;
         }
-
-        var nonSwModInfo = SpaceWarpManager.NonSpaceWarpInfos
-            .Where(item => item.Item1.Info.Metadata.GUID == guid)
-            .Select(item => item.Item2)
-            .FirstOrDefault();
-
-        if (nonSwModInfo != null)
-        {
-            return nonSwModInfo;
-        }
-
-        var disabledModInfo = SpaceWarpManager.DisabledInfoPlugins
-            .Where(item => item.Item1.Metadata.GUID == guid)
-            .Select(item => item.Item2)
+        
+        var disabledModInfo = SpaceWarpManager.DisabledPlugins
+            .Where(item => item.Guid == guid)
+            .Select(item => item.SWInfo)
             .FirstOrDefault();
 
         return disabledModInfo;
+    }
+    /// <summary>
+    /// Retrieves the <see cref="SpaceWarpPluginDescriptor"/> of the specified plugin. Returns null if the specified plugin guid doesn't
+    /// have an associated <see cref="SpaceWarpPluginDescriptor"/>.
+    /// </summary>
+    /// <param name="guid">GUID of the plugin</param>
+    /// <returns><see cref="SpaceWarpPluginDescriptor"/> of the plugin or null if not found</returns>
+    public static SpaceWarpPluginDescriptor TryGetDescriptor(string guid)
+    {
+        return SpaceWarpManager.AllPlugins
+            .FirstOrDefault(item => item.Guid == guid);
     }
 
     /// <summary>
