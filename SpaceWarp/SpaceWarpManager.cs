@@ -4,7 +4,9 @@ using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
+using BepInEx.Configuration;
 using BepInEx.Logging;
+using KSP.Navigation;
 using Mono.Cecil;
 using SpaceWarpPatcher;
 using Newtonsoft.Json;
@@ -104,6 +106,12 @@ internal static class SpaceWarpManager
         ErroredPlugins = allErroredPlugins;
     }
 
+    internal static ConfigFile FindOrCreateConfigFile(string guid)
+    {
+        var path = $"{BepInEx.Paths.ConfigPath}/{guid}.cfg";
+        return new ConfigFile(path, true);
+    }
+    
     private static void SetupDisabledPlugins(
         IEnumerable<SpaceWarpPluginDescriptor> modDescriptors,
         IEnumerable<SpaceWarpErrorDescription> allErroredPlugins,
@@ -300,9 +308,13 @@ internal static class SpaceWarpManager
             var guid = swinfoData.ModID;
             // If we already know about this mod, ignore it
             if (Chainloader.PluginInfos.ContainsKey(guid)) continue;
+            
+            // Its disabled, so we skip it
+            if (ChainloaderPatch.DisabledPluginGuids.Contains(guid)) continue;
 
             // Now we can just add it to our plugin list
-            codelessInfos.Add(new SpaceWarpPluginDescriptor(null, guid,swinfoData.Name,swinfoData, swinfo.Directory));
+            codelessInfos.Add(new SpaceWarpPluginDescriptor(null, guid, swinfoData.Name, swinfoData, swinfo.Directory,
+                FindOrCreateConfigFile(guid)));
         }
     }
 
