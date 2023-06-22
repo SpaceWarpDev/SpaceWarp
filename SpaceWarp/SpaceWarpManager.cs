@@ -34,6 +34,7 @@ internal static class SpaceWarpManager
     internal static ConfigurationManager.ConfigurationManager ConfigurationManager;
 
     internal static string SpaceWarpFolder;
+
     // The plugin can be null
     internal static IReadOnlyList<SpaceWarpPluginDescriptor> AllPlugins;
     // internal static IReadOnlyList<BaseUnityPlugin> NonSpaceWarpPlugins;
@@ -44,7 +45,6 @@ internal static class SpaceWarpManager
     internal static IReadOnlyList<SpaceWarpPluginDescriptor> DisabledPlugins;
     internal static IReadOnlyList<(string, bool)> PluginGuidEnabledStatus;
     internal static IReadOnlyList<SpaceWarpErrorDescription> ErroredPlugins;
-    
 
 
     internal static readonly Dictionary<string, bool> ModsOutdated = new();
@@ -53,10 +53,10 @@ internal static class SpaceWarpManager
     private static GUISkin _skin;
 
     public static ModListController ModListController { get; internal set; }
-    
+
     public static SpaceWarpConsole SpaceWarpConsole { get; internal set; }
 
-    
+
     [Obsolete("Spacewarps support for IMGUI will not be getting updates, please use UITK instead")]
     internal static GUISkin Skin
     {
@@ -80,29 +80,29 @@ internal static class SpaceWarpManager
         var ignoredGUIDs = new List<string>();
         var allErroredPlugins = new List<SpaceWarpErrorDescription>();
 
-        GetCodeBasedSpaceWarpPlugins(spaceWarpPlugins, ignoredGUIDs, modDescriptors,allErroredPlugins);
+        GetCodeBasedSpaceWarpPlugins(spaceWarpPlugins, ignoredGUIDs, modDescriptors, allErroredPlugins);
 
-        GetCodeBasedNonSpaceWarpPlugins(spaceWarpPlugins, ignoredGUIDs, modDescriptors,allErroredPlugins);
+        GetCodeBasedNonSpaceWarpPlugins(spaceWarpPlugins, ignoredGUIDs, modDescriptors, allErroredPlugins);
 
         var disabledPlugins = new List<SpaceWarpPluginDescriptor>();
 
         GetDisabledPlugins(disabledPlugins);
 
         GetCodelessSpaceWarpPlugins(ignoredGUIDs, modDescriptors, allErroredPlugins);
-        
-        GetBepInExErroredPlugins(ignoredGUIDs,allErroredPlugins,modDescriptors,disabledPlugins);
+
+        GetBepInExErroredPlugins(ignoredGUIDs, allErroredPlugins, modDescriptors, disabledPlugins);
 
         ValidateSpec13Dependencies(allErroredPlugins, modDescriptors);
 
         GetTrueDependencyErrors(allErroredPlugins, modDescriptors, disabledPlugins);
 
         SetupDisabledPlugins(modDescriptors, allErroredPlugins, disabledPlugins, pluginGuidEnabledStatus);
-        
+
         AllPlugins = modDescriptors;
         DisabledPlugins = disabledPlugins;
         PluginGuidEnabledStatus = pluginGuidEnabledStatus;
         // Now we must do some funky shit :)
-        
+
         ErroredPlugins = allErroredPlugins;
     }
 
@@ -111,7 +111,7 @@ internal static class SpaceWarpManager
         var path = $"{BepInEx.Paths.ConfigPath}/{guid}.cfg";
         return new ConfigFile(path, true);
     }
-    
+
     private static void SetupDisabledPlugins(
         IEnumerable<SpaceWarpPluginDescriptor> modDescriptors,
         IEnumerable<SpaceWarpErrorDescription> allErroredPlugins,
@@ -138,11 +138,13 @@ internal static class SpaceWarpManager
                 {
                     erroredPlugin.UnsupportedDependencies.Add(dep);
                     erroredPlugin.MissingDependencies.RemoveAt(i);
-                } else if (allErroredPlugins.Any(x => x.Plugin.Guid == dep))
+                }
+                else if (allErroredPlugins.Any(x => x.Plugin.Guid == dep))
                 {
                     erroredPlugin.ErroredDependencies.Add(dep);
                     erroredPlugin.MissingDependencies.RemoveAt(i);
-                } else if (disabledPlugins.Any(x => x.Guid == dep))
+                }
+                else if (disabledPlugins.Any(x => x.Guid == dep))
                 {
                     erroredPlugin.DisabledDependencies.Add(dep);
                     erroredPlugin.MissingDependencies.RemoveAt(i);
@@ -184,7 +186,7 @@ internal static class SpaceWarpManager
     }
 
     private static void GetBepInExErroredPlugins(IReadOnlyCollection<string> ignoredGUIDS,
-        ICollection<SpaceWarpErrorDescription> errorDescriptions, 
+        ICollection<SpaceWarpErrorDescription> errorDescriptions,
         IReadOnlyCollection<SpaceWarpPluginDescriptor> allLoadedPlugins,
         IReadOnlyCollection<SpaceWarpPluginDescriptor> allDisabledPlugins)
     {
@@ -217,7 +219,7 @@ internal static class SpaceWarpManager
             }
         }
     }
-    
+
     private static void GetCodelessSpaceWarpPlugins(List<string> ignoredGUIDs,
         List<SpaceWarpPluginDescriptor> spaceWarpInfos,
         ICollection<SpaceWarpErrorDescription> errorDescriptions)
@@ -235,6 +237,7 @@ internal static class SpaceWarpManager
             errorDescriptions);
         spaceWarpInfos.AddRange(codelessInfosInOrder);
     }
+
     private static bool CodelessDependencyResolved(SpaceWarpPluginDescriptor descriptor,
         ICollection<string> ignoredGUIDs,
         ICollection<SpaceWarpPluginDescriptor> spaceWarpInfos,
@@ -251,6 +254,7 @@ internal static class SpaceWarpManager
 
         return true;
     }
+
     private static void ResolveCodelessPluginDependencyOrder(ICollection<string> ignoredGUIDs,
         ICollection<SpaceWarpPluginDescriptor> spaceWarpInfos,
         List<SpaceWarpPluginDescriptor> codelessInfosInOrder,
@@ -263,7 +267,8 @@ internal static class SpaceWarpManager
             changed = false;
             for (var i = codelessInfos.Count - 1; i >= 0; i--)
             {
-                if (!CodelessDependencyResolved(codelessInfos[i],ignoredGUIDs,spaceWarpInfos,codelessInfosInOrder)) continue;
+                if (!CodelessDependencyResolved(codelessInfos[i], ignoredGUIDs, spaceWarpInfos, codelessInfosInOrder))
+                    continue;
                 codelessInfosInOrder.Add(codelessInfos[i]);
                 codelessInfos.RemoveAt(i);
                 changed = true;
@@ -278,7 +283,6 @@ internal static class SpaceWarpManager
             {
                 MissingDependencies = info.SWInfo.Dependencies.Select(x => x.ID).ToList()
             });
-
         }
     }
 
@@ -308,7 +312,7 @@ internal static class SpaceWarpManager
             var guid = swinfoData.ModID;
             // If we already know about this mod, ignore it
             if (Chainloader.PluginInfos.ContainsKey(guid)) continue;
-            
+
             // Its disabled, so we skip it
             if (ChainloaderPatch.DisabledPluginGuids.Contains(guid)) continue;
 
@@ -383,7 +387,7 @@ internal static class SpaceWarpManager
                     // nonSWInfos.Add((plugin, info));
                     allPlugins.Add(new SpaceWarpPluginDescriptor(null, plugin.Info.Metadata.GUID,
                         plugin.Info.Metadata.Name, info,
-                        new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!)));
+                        new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!), plugin.Config));
                 }
                 catch
                 {
@@ -394,7 +398,7 @@ internal static class SpaceWarpManager
                         plugin.Info.Metadata.GUID,
                         plugin.Info.Metadata.Name,
                         BepinexToSWInfo(plugin.Info),
-                        new DirectoryInfo(folderPath)))
+                        new DirectoryInfo(folderPath), plugin.Config))
                     {
                         MissingSwinfo = true
                     });
@@ -408,7 +412,7 @@ internal static class SpaceWarpManager
                     plugin.Info.Metadata.GUID,
                     plugin.Info.Metadata.Name,
                     newInfo,
-                    new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!)));
+                    new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!), plugin.Config));
             }
         }
 
@@ -465,7 +469,7 @@ internal static class SpaceWarpManager
                     plugin.Info.Metadata.GUID,
                     plugin.Info.Metadata.Name,
                     BepinexToSWInfo(plugin.Info),
-                    new DirectoryInfo(folderPath)))
+                    new DirectoryInfo(folderPath), plugin.Config))
                 {
                     BadDirectory = true
                 });
@@ -483,7 +487,7 @@ internal static class SpaceWarpManager
                     plugin.Info.Metadata.GUID,
                     plugin.Info.Metadata.Name,
                     BepinexToSWInfo(plugin.Info),
-                    new DirectoryInfo(folderPath)))
+                    new DirectoryInfo(folderPath), plugin.Config))
                 {
                     MissingSwinfo = true
                 });
@@ -505,7 +509,7 @@ internal static class SpaceWarpManager
                     plugin.Info.Metadata.GUID,
                     plugin.Info.Metadata.Name,
                     BepinexToSWInfo(plugin.Info),
-                    new DirectoryInfo(folderPath)))
+                    new DirectoryInfo(folderPath), plugin.Config))
                 {
                     MissingSwinfo = true
                 });
@@ -525,7 +529,7 @@ internal static class SpaceWarpManager
                         plugin.Info.Metadata.GUID,
                         plugin.Info.Metadata.Name,
                         metadata,
-                        new DirectoryInfo(folderPath)))
+                        new DirectoryInfo(folderPath), plugin.Config))
                     {
                         BadID = true
                     });
@@ -542,7 +546,7 @@ internal static class SpaceWarpManager
                         plugin.Info.Metadata.GUID,
                         plugin.Info.Metadata.Name,
                         metadata,
-                        new DirectoryInfo(folderPath)))
+                        new DirectoryInfo(folderPath), plugin.Config))
                     {
                         MismatchedVersion = true
                     });
@@ -553,7 +557,8 @@ internal static class SpaceWarpManager
                 foreach (var dep in plugin.Info.Dependencies)
                 {
                     if (metadata.Dependencies.Any(x => x.ID == dep.DependencyGUID)) continue;
-                    Logger.LogError($"Found Space Warp Plugin {plugin.Info.Metadata.Name} that has an unspecified swinfo dependency found in its BepInDependencies: {dep.DependencyGUID}");
+                    Logger.LogError(
+                        $"Found Space Warp Plugin {plugin.Info.Metadata.Name} that has an unspecified swinfo dependency found in its BepInDependencies: {dep.DependencyGUID}");
                     unspecifiedDeps.Add(dep.DependencyGUID);
                     metadata.Dependencies.Add(new DependencyInfo
                     {
@@ -579,13 +584,14 @@ internal static class SpaceWarpManager
                     continue;
                 }
             }
+
             plugin.SpaceWarpMetadata = metadata;
             var directoryInfo = new FileInfo(modInfoPath).Directory;
             spaceWarpInfos.Add(new SpaceWarpPluginDescriptor(plugin,
                 plugin.Info.Metadata.GUID,
                 metadata.Name,
                 metadata,
-                directoryInfo));
+                directoryInfo, plugin.Config));
         }
     }
 
@@ -632,10 +638,10 @@ internal static class SpaceWarpManager
     }
 
 
-
     internal static void InitializeSpaceWarpsLoadingActions()
     {
-        Loading.AddAssetLoadingAction("bundles", "loading asset bundles", FunctionalLoadingActions.AssetBundleLoadingAction, "bundle");
+        Loading.AddAssetLoadingAction("bundles", "loading asset bundles",
+            FunctionalLoadingActions.AssetBundleLoadingAction, "bundle");
         Loading.AddAssetLoadingAction("images", "loading images", FunctionalLoadingActions.ImageLoadingAction);
     }
 }
