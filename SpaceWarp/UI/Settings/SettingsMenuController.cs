@@ -44,6 +44,7 @@ internal class SettingsMenuController : KerbalMonoBehaviour
     private GameObject _headerPrefab;
     private GameObject _dividerPrefab;
     private GameObject _sectionPrefab;
+    private bool _alreadySetup = false; 
     private void Start()
     {
         MainMenuPatcher.MainMenuLoaded += Setup;
@@ -51,6 +52,8 @@ internal class SettingsMenuController : KerbalMonoBehaviour
 
     private void Setup()
     {
+        if (_alreadySetup) return;
+        _alreadySetup = true;
         var categories = GameObject.Find(CategoriesPath);
         var graphics = GameObject.Find(GraphicsPath);
         var modsButton =Instantiate(graphics, categories.transform);
