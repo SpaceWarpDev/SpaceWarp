@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using Mono.Cecil;
 using SpaceWarpPatcher;
@@ -69,6 +70,11 @@ internal static class SpaceWarpManager
         }
     }
 
+    internal static ConfigFile FindOrCreateConfigFile(string guid)
+    {
+        var path = $"{Paths.ConfigPath}/{guid}.cfg";
+        return new ConfigFile(path, true);
+    }
     internal static void GetAllPlugins()
     {
         var pluginGuidEnabledStatus = new List<(string, bool)>();
@@ -307,7 +313,8 @@ internal static class SpaceWarpManager
             if (Chainloader.PluginInfos.ContainsKey(guid)) continue;
 
             // Now we can just add it to our plugin list
-            codelessInfos.Add(new SpaceWarpPluginDescriptor(null, guid,swinfoData.Name,swinfoData, swinfo.Directory));
+            codelessInfos.Add(new SpaceWarpPluginDescriptor(null, guid, swinfoData.Name, swinfoData, swinfo.Directory,
+                FindOrCreateConfigFile(guid)));
         }
     }
 
@@ -383,10 +390,18 @@ internal static class SpaceWarpManager
         }
         else
         {
-            allPlugins.Add(GetBepInExDescriptor(plugin.Info));
+            allPlugins.Add(GetBepInExDescriptor(plugin));
         }
     }
 
+    private static SpaceWarpPluginDescriptor GetBepInExDescriptor(BaseUnityPlugin plugin)
+    {
+        return new SpaceWarpPluginDescriptor(null,
+            plugin.Info.Metadata.GUID,
+            plugin.Info.Metadata.Name,
+            BepInExToSWInfo(plugin.Info),
+            new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!),plugin.Config);
+    }
     
     private static SpaceWarpPluginDescriptor GetBepInExDescriptor(PluginInfo info)
     {
@@ -460,7 +475,7 @@ internal static class SpaceWarpManager
             plugin.Info.Metadata.GUID,
             metadata.Name,
             metadata,
-            directoryInfo));
+            directoryInfo,plugin.Config));
     }
 
     private static bool AssertSpecificationCompliance(ICollection<string> ignoredGUIDs,
