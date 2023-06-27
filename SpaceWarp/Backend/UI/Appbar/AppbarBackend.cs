@@ -193,7 +193,7 @@ internal static class AppbarBackend
             ?.SetValue(tooltip, "App Tray");
 
         // Clone the tray from the flight UI.
-        var trayButton = GameManager.Instance.Game.UI.GetPopupCanvas().gameObject.GetChild("BTN-App-Tray");
+        var trayButton = GameManager.Instance.Game.UI.GetScaledPopupCanvas().gameObject.GetChild("BTN-App-Tray");
         var oabTray = UnityObject.Instantiate(trayButton.GetChild("appbar-others-group"), oabTrayButton.transform);
         oabTray.name = "OAB-AppTray";
 
@@ -258,7 +258,11 @@ internal static class AppbarBackend
 
         // Add our function call to the toggle.
         var utoggle = appButton.GetComponent<ToggleExtended>();
-        utoggle.onValueChanged.AddListener(state => function(state));
+        utoggle.onValueChanged.AddListener(state =>
+        {
+            Logger.LogInfo($"{buttonId}({state})");
+            function(state);
+        });
 
         // Set the initial state of the button.
         var toggle = appButton.GetComponent<UIValue_WriteBool_Toggle>();
@@ -268,7 +272,7 @@ internal static class AppbarBackend
         void Action() => SetOABTrayState(false);
         appButton.GetComponent<UIAction_Void_Toggle>().BindAction(new DelegateAction((Action)Action));
 
-        Logger.LogInfo($"Added appbar button: {buttonId}");
+        Logger.LogInfo($"Added OAB appbar button: {buttonId}");
     }
 
     private static void SetOABTrayState(bool state)
