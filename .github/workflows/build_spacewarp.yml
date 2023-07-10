@@ -89,20 +89,20 @@ jobs:
       run: mkdir -p ${{env.Build_Dir}}/SpaceWarp/BepInEx/patchers/SpaceWarp/lib
     
     - name: Coping Bepinex
-      run: Copy-Item "ThirdParty/BepInEx 5.4.21/BepInEx" -Destination ${{ env.Build_Dir }}/SpaceWarp -Recurse
+      run: Copy-Item "ThirdParty/BepInEx 5.4.21/BepInEx" -Destination ${{ env.Build_Dir }}/SpaceWarp -Recurse -Force
 
     
     - name: Copying ConfigurationManager
-      run: Copy-Item ${{ env.Third_Party }}/ConfigurationManager -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins -Recurse
+      run: Copy-Item ${{ env.Third_Party }}/ConfigurationManager -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins -Recurse -Force
       
     - name: Copying Template
-      run: Get-ChildItem ${{ env.Template_Dir }} | Copy-Item -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp -Recurse
+      run: Get-ChildItem ${{ env.Template_Dir }} | Copy-Item -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp -Recurse -Force
     
     - name: Build main plugin
       run: dotnet build ${{ env.SpaceWarp_Dir }}/SpaceWarp.csproj -c ${{ matrix.configuration }}
     
     - name: Copying patcher libraries
-      run: Get-ChildItem ${{ env.Patcher_Lib_Dir }} | Copy-Item -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp/lib -Recurse
+      run: Get-ChildItem ${{ env.Patcher_Lib_Dir }} | Copy-Item -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp/lib -Recurse -Force
       
     - name: Building patcher
       run: dotnet build ${{ env.Patcher_Dir }}/SpaceWarpPatcher.csproj -c ${{ matrix.configuration }}
@@ -110,13 +110,13 @@ jobs:
     - name: Copying build outputs
       run: |
         if (${{ matrix.configuration }} -eq "Debug") {
-          Copy-Item ${{ env.Patcher_Dir }}/bin/Debug/SpaceWarpPatcher.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp -Recurse
-          Copy-Item ${{ env.Patcher_Dir }}/bin/Debug/SpaceWarpPatcher.pdb -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp -Recurse
-          Copy-Item ${{ env.SpaceWarp_Dir }}/bin/Debug/SpaceWarp.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp -Recurse
-          Copy-Item ${{ env.SpaceWarp_Dir }}/bin/Debug/SpaceWarp.pdb -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp -Recurse
+          Copy-Item ${{ env.Patcher_Dir }}/bin/Debug/SpaceWarpPatcher.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp
+          Copy-Item ${{ env.Patcher_Dir }}/bin/Debug/SpaceWarpPatcher.pdb -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp
+          Copy-Item ${{ env.SpaceWarp_Dir }}/bin/Debug/SpaceWarp.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp
+          Copy-Item ${{ env.SpaceWarp_Dir }}/bin/Debug/SpaceWarp.pdb -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp
         } else {
-          Copy-Item ${{ env.Patcher_Dir }}/bin/Release/SpaceWarpPatcher.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp -Recurse
-          Copy-Item ${{ env.SpaceWarp_Dir }}/bin/Release/SpaceWarp.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp -Recurse
+          Copy-Item ${{ env.Patcher_Dir }}/bin/Release/SpaceWarpPatcher.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp
+          Copy-Item ${{ env.SpaceWarp_Dir }}/bin/Release/SpaceWarp.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp
         }
     - name: Compress SpaceWarp
       run: Compress-Archive ${{ env.Build_Dir }}/SpaceWarp/* -DestinationPath ${{env.Build_Dir}}/SpaceWarp.zip
