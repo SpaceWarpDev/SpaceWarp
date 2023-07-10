@@ -53,9 +53,10 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
     internal ConfigEntry<Color> ConfigAllColor;
     internal ConfigEntry<bool> ConfigCheckVersions;
+    internal ConfigEntry<bool> ConfigShowMainMenuWarningForOutdatedMods;
+    internal ConfigEntry<bool> ConfigShowMainMenuWarningForErroredMods;
     internal ConfigEntry<Color> ConfigDebugColor;
     internal ConfigEntry<int> ConfigDebugMessageLimit;
-
     
     internal ConfigEntry<Color> ConfigErrorColor;
     private ConfigEntry<bool> _configFirstLaunch;
@@ -120,8 +121,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user.");
         ConfigCheckVersions = Config.Bind("Version Checking", "Check Versions", false,
             "Whether or not Space Warp should check mod versions using their swinfo.json files");
+        ConfigShowMainMenuWarningForOutdatedMods = Config.Bind("Version Checking", "Show Warning for Outdated Mods", true,
+            "Whether or not Space Warp should display a warning in main menu if there are outdated mods");
+        ConfigShowMainMenuWarningForErroredMods = Config.Bind("Version Checking", "Show Warning for Errored Mods", true,
+            "Whether or not Space Warp should display a warning in main menu if there are errored mods");
     }
-
 
     private void SetupLuaState()
     {
@@ -148,7 +152,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             }
         }
     }
-
 
     public override void OnInitialized()
     {
@@ -188,9 +191,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public override void OnPostInitialized()
     {
         InitializeSettingsUI();
+        SpaceWarpManager.ModListController.AddMainMenuItem();
     }
-
-
 
     public void ClearVersions()
     {

@@ -86,8 +86,20 @@ internal class ModListController : MonoBehaviour
     {
         _listEntryTemplate = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/modlist/modlistitem.uxml");
         _dependencyTemplate = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/modlist/modlistdependency.uxml");
+    }
 
-        MainMenu.RegisterLocalizedMenuButton("SpaceWarp/Mods", ToggleWindow);
+    internal void AddMainMenuItem()
+    {
+        string term;
+
+        if (SpaceWarpPlugin.Instance.ConfigShowMainMenuWarningForErroredMods.Value && SpaceWarpManager.ErroredPlugins?.Count > 0)
+            term = "SpaceWarp/Mods/Errored";
+        else if (SpaceWarpPlugin.Instance.ConfigShowMainMenuWarningForOutdatedMods.Value && SpaceWarpManager.ModsOutdated.ContainsValue(true))
+            term = "SpaceWarp/Mods/Outdated";
+        else
+            term = "SpaceWarp/Mods";
+
+        MainMenu.RegisterLocalizedMenuButton(term, ToggleWindow);
     }
 
     private void OnEnable()
