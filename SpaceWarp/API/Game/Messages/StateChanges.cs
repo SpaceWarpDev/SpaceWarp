@@ -217,6 +217,5 @@ public static class StateChanges
         var msg = message as GameStateChangedMessage;
         GameStateChanged?.Invoke(msg!, msg!.PreviousState, msg!.CurrentState);
     }
-
     #endregion
 }

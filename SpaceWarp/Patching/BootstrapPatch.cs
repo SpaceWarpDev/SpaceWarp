@@ -90,9 +90,9 @@ internal static class BootstrapPatch
             }
 
             flow.AddAction(new LoadAddressablesLocalizationsAction());
-            foreach (var action in Loading.GeneralLoadingActions)
+            foreach (var actionGenerator in Loading.GeneralLoadingActions)
             {
-                flow.AddAction(action);
+                flow.AddAction(actionGenerator());
             }
             
             foreach (var plugin in allPlugins)

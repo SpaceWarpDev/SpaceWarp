@@ -21,7 +21,7 @@ public static class Loading
             new();
 
     internal static List<Func<BaseSpaceWarpPlugin, ModLoadingAction>> LoadingActionGenerators = new();
-    internal static List<FlowAction> GeneralLoadingActions = new();
+    internal static List<Func<FlowAction>> GeneralLoadingActions = new();
 
     /// <summary>
     /// Registers an asset loading function for space warp, will load assets from the subfolder
@@ -67,10 +67,10 @@ public static class Loading
     /// <summary>
     /// Registers a general loading action
     /// </summary>
-    /// <param name="action">The action</param>
-    public static void AddGeneralLoadingAction(FlowAction action)
+    /// <param name="action">The action generator</param>
+    public static void AddGeneralLoadingAction(Func<FlowAction> actionGenerator)
     {
-        GeneralLoadingActions.Add(action);
+        GeneralLoadingActions.Add(actionGenerator);
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public static class Loading
     public static void AddAddressablesLoadingAction<T>(string name, string label, Action<T> action)
         where T : UnityObject
     {
-        AddGeneralLoadingAction(new AddressableAction<T>(name, label, action));
+        AddGeneralLoadingAction(() => new AddressableAction<T>(name, label, action));
     }
 
 
