@@ -260,7 +260,8 @@ internal class ModListController : MonoBehaviour
 
         _disableAllButton.RegisterCallback<ClickEvent>(_ =>
         {
-            _toggles = _toggles.Keys.ToDictionary(key => key, _ => false);
+            _toggles = _toggles.Select(kv => (key: kv.Key, value: NoToggleGuids.Contains(kv.Key)))
+                .ToDictionary(x => x.key, x => x.value);
             UpdateToggles();
             UpdateChangesLabel();
             UpdateDisabledFile();
