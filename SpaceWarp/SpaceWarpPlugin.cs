@@ -54,6 +54,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<Color> ConfigAllColor;
     internal ConfigEntry<bool> ConfigCheckVersions;
     internal ConfigEntry<bool> ConfigShowMainMenuWarningForOutdatedMods;
+    internal ConfigEntry<bool> ConfigShowMainMenuWarningForErroredMods;
     internal ConfigEntry<Color> ConfigDebugColor;
     internal ConfigEntry<int> ConfigDebugMessageLimit;
     
@@ -122,6 +123,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             "Whether or not Space Warp should check mod versions using their swinfo.json files");
         ConfigShowMainMenuWarningForOutdatedMods = Config.Bind("Version Checking", "Show Warning for Outdated Mods", true,
             "Whether or not Space Warp should display a warning in main menu if there are outdated mods");
+        ConfigShowMainMenuWarningForErroredMods = Config.Bind("Version Checking", "Show Warning for Errored Mods", true,
+            "Whether or not Space Warp should display a warning in main menu if there are errored mods");
     }
 
     private void SetupLuaState()
