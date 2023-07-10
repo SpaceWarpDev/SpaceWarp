@@ -97,6 +97,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     private void SetupSpaceWarpConfiguration()
     {
+        // Set up the config file for spacewarp
         ConfigErrorColor = Config.Bind("Debug Console", "Color Error", Color.red,
             "The color for log messages that have the level: Error/Fatal (bolded)");
         ConfigWarningColor = Config.Bind("Debug Console", "Color Warning", Color.yellow,
