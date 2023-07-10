@@ -89,7 +89,7 @@ jobs:
       run: mkdir -p ${{env.Build_Dir}}/SpaceWarp/BepInEx/patchers/SpaceWarp/lib
     
     - name: Coping Bepinex
-      run: Copy-Item "ThirdParty/BepInEx 5.4.21/BepInEx" -Destination ${{ env.Build_Dir }}/SpaceWarp -Recurse -Force
+      run: Get-ChildItem "${{ env.Third_Party }}/BepInEx 5.4.21/" | Copy-Item -Destination ${{ env.Build_Dir }}/SpaceWarp -Recurse -Force
 
     
     - name: Copying ConfigurationManager
@@ -119,7 +119,7 @@ jobs:
           Copy-Item ${{ env.SpaceWarp_Dir }}/bin/Release/SpaceWarp.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp
         }
     - name: Compress SpaceWarp
-      run: Compress-Archive ${{ env.Build_Dir }}/SpaceWarp/* -DestinationPath ${{env.Build_Dir}}/SpaceWarp.zip
+      run: Get-ChildItem ${{ env.Build_Dir }}/SpaceWarp/* | Compress-Archive -DestinationPath ${{env.Build_Dir}}/SpaceWarp.zip
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
