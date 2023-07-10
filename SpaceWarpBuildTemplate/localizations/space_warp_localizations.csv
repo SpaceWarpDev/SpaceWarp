@@ -27,6 +27,7 @@ SpaceWarp/ModList/DisabledDependency,Text,,Dependency is disabled,Esta dependên
 SpaceWarp/ModList/UnspecifiedDependency,Text,,Dependency was not specified in SW info,Esta dependência não está presente no swinfo
 SpaceWarp/ModList/UnsupportedDependency,Text,,Dependency is of an unsupported version,Esta dependência é de uma versão nao suportada
 SpaceWarp/Mods,Text,,Mods,Mods
+SpaceWarp/Mods/Outdated,Text,,Mods <color=yellow>⚠</color>,Mods <color=yellow>⚠</color>
 SpaceWarp,Text,,Space Warp,Space Warp
 SpaceWarp/VersionChecking,Text,,Allow Space Warp to check versions for mods over the network?,Deixar SpaceWarp verificar a versão dos mods na internet?
 SpaceWarp/Yes,Text,,Yes,Sim
