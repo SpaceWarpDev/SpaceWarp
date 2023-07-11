@@ -1,0 +1,46 @@
+name: SpaceWarp Builder
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        run_args: ["" , "-r"]
+    
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          
+      - name: Run Python Script
+        run: sudo python builder.py ${{ matrix.run_args }} 
+        # I'm sure running it in sudo will cause NO issues what so ever.
+        
+      - name: Find Zip
+        id: find-zip
+        run: |
+          if [ "${{ matrix.run_args }}" == "-r" ]; then
+            echo "::set-output name=zip::$(ls -1 build/SpaceWarp-Release*.zip | head -n 1)"
+            echo "::set-output name=artifact_name::SpaceWarpRelease"
+          else
+            echo "::set-output name=zip::$(ls -1 build/SpaceWarp-Debug*.zip | head -n 1)"
+            echo "::set-output name=artifact_name::SpaceWarpDebug"
+          fi
+        # Least cursed Sinon code.
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.find-zip.outputs.artifact_name }}
+          path: ${{ steps.find-zip.outputs.zip }}
