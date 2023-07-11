@@ -1,5 +1,9 @@
 ![Cool Banner](assets/cool_banner.png)
 
+
+# Build Status
+[![Main Branch](https://github.com/SpaceWarpDev/SpaceWarp/actions/workflows/build_spacewarp.yml/badge.svg?branch=main)](https://github.com/SpaceWarpDev/SpaceWarp/actions/workflows/build_spacewarp.yml)
+
 # Space Warp
 [![Curseforge](http://cf.way2muchnoise.eu/full_831005_downloads.svg?badge_style=plastic)](https://www.curseforge.com/kerbal-space-program-2/mods/space-warp)
 ![Downloads](https://img.shields.io/github/downloads/X606/SpaceWarp/latest/total.svg?label=%E2%A4%93%20Downloads&style=plastic)  
