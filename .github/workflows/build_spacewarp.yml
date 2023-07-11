@@ -1,42 +1,4 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# This workflow will build, test, sign and package a WPF or Windows Forms desktop application
-# built on .NET Core.
-# To learn how to migrate your existing application to .NET Core,
-# refer to https://docs.microsoft.com/en-us/dotnet/desktop-wpf/migration/convert-project-from-net-framework
-#
-# To configure this workflow:
-#
-# 1. Configure environment variables
-# GitHub sets default environment variables for every workflow run.
-# Replace the variables relative to your project in the "env" section below.
-#
-# 2. Signing
-# Generate a signing certificate in the Windows Application
-# Packaging Project or add an existing signing certificate to the project.
-# Next, use PowerShell to encode the .pfx file using Base64 encoding
-# by running the following Powershell script to generate the output string:
-#
-# $pfx_cert = Get-Content '.\SigningCertificate.pfx' -Encoding Byte
-# [System.Convert]::ToBase64String($pfx_cert) | Out-File 'SigningCertificate_Encoded.txt'
-#
-# Open the output file, SigningCertificate_Encoded.txt, and copy the
-# string inside. Then, add the string to the repo as a GitHub secret
-# and name it "Base64_Encoded_Pfx."
-# For more information on how to configure your signing certificate for
-# this workflow, refer to https://github.com/microsoft/github-actions-for-desktop-apps#signing
-#
-# Finally, add the signing certificate password to the repo as a secret and name it "Pfx_Key".
-# See "Build the Windows Application Packaging project" below to see how the secret is used.
-#
-# For more information on GitHub Actions, refer to https://github.com/features/actions
-# For a complete CI/CD sample to get started with GitHub Action workflows for Desktop Applications,
-# refer to https://github.com/microsoft/github-actions-for-desktop-apps
-
-name: Build Space Warp
+name: SpaceWarp Builder
 
 on:
   push:
@@ -45,84 +7,40 @@ on:
     branches: [ "main", "dev" ]
 
 jobs:
-
   build:
-
+    runs-on: ubuntu-latest
+    
     strategy:
       matrix:
-        configuration: [Debug, Release]
-
-    runs-on: windows-latest  # For a list of available runner types, refer to
-                             # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
-
-    env:
-      Solution_Name: SpaceWarp.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
-      Template_Dir: SpaceWarpBuildTemplate
-      SpaceWarp_Dir: SpaceWarp
-      Patcher_Dir: SpaceWarpPatcher
-      Patcher_Lib_Dir: SpaceWarpPatcherLibraries
-      Build_Dir: build
-      Third_Party: ThirdParty
+        run_args: ["" , "-r"]
+    
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-
-    # Install the .NET Core workload
-    - name: Install .NET Core
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 7.0.x
-    
-    # Restore all nuget packages
-    - name: Restore
-      run: dotnet restore
-    
-    - name: Creating Build Directory
-      run: mkdir -p ${{env.Build_Dir}}/SpaceWarp
-  
-    - name: Creating BepInEx plugins directory
-      run: mkdir -p ${{env.Build_Dir}}/SpaceWarp/BepInEx/plugins/SpaceWarp
-    
-    - name: Creating Space Warp Patchers Directory
-      run: mkdir -p ${{env.Build_Dir}}/SpaceWarp/BepInEx/patchers/SpaceWarp/lib
-    
-    - name: Coping Bepinex
-      run: Get-ChildItem "${{ env.Third_Party }}/BepInEx 5.4.21/" | Copy-Item -Destination ${{ env.Build_Dir }}/SpaceWarp -Recurse -Force
-
-    
-    - name: Copying ConfigurationManager
-      run: Copy-Item ${{ env.Third_Party }}/ConfigurationManager -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins -Recurse -Force
+      - name: Check Out Repository
+        uses: actions/checkout@v2
       
-    - name: Copying Template
-      run: Get-ChildItem ${{ env.Template_Dir }} | Copy-Item -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp -Recurse -Force
-    
-    - name: Build main plugin
-      run: dotnet build ${{ env.SpaceWarp_Dir }}/SpaceWarp.csproj -c ${{ matrix.configuration }}
-    
-    - name: Copying patcher libraries
-      run: Get-ChildItem ${{ env.Patcher_Lib_Dir }} | Copy-Item -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp/lib -Recurse -Force
-      
-    - name: Building patcher
-      run: dotnet build ${{ env.Patcher_Dir }}/SpaceWarpPatcher.csproj -c ${{ matrix.configuration }}
-    
-    - name: Copying build outputs
-      run: |
-        if ("${{ matrix.configuration }}" -eq "Debug") {
-          Copy-Item ${{ env.Patcher_Dir }}/bin/Debug/SpaceWarpPatcher.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp
-          Copy-Item ${{ env.Patcher_Dir }}/bin/Debug/SpaceWarpPatcher.pdb -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp
-          Copy-Item ${{ env.SpaceWarp_Dir }}/bin/Debug/SpaceWarp.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp
-          Copy-Item ${{ env.SpaceWarp_Dir }}/bin/Debug/SpaceWarp.pdb -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp
-        } else {
-          Copy-Item ${{ env.Patcher_Dir }}/bin/Release/SpaceWarpPatcher.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/patchers/SpaceWarp
-          Copy-Item ${{ env.SpaceWarp_Dir }}/bin/Release/SpaceWarp.dll -Destination ${{ env.Build_Dir }}/SpaceWarp/BepInEx/plugins/SpaceWarp
-        }
-    - name: Compress SpaceWarp
-      run: Get-ChildItem ${{ env.Build_Dir }}/SpaceWarp/* | Compress-Archive -DestinationPath ${{env.Build_Dir}}/SpaceWarp.zip
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          
+      - name: Run Python Script
+        run: sudo python builder.py ${{ matrix.run_args }} 
+        # I'm sure running it in sudo will cause NO issues what so ever.
+        
+      - name: Find Zip
+        id: find-zip
+        run: |
+          if [ "${{ matrix.run_args }}" == "-r" ]; then
+            echo "::set-output name=zip::$(ls -1 build/SpaceWarp-Release*.zip | head -n 1)"
+            echo "::set-output name=artifact_name::SpaceWarpRelease"
+          else
+            echo "::set-output name=zip::$(ls -1 build/SpaceWarp-Debug*.zip | head -n 1)"
+            echo "::set-output name=artifact_name::SpaceWarpDebug"
+          fi
+        # Least cursed Sinon code.
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: Space Warp Package
-        path: ${{ env.Build_Dir }}/SpaceWarp.zip
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.find-zip.outputs.artifact_name }}
+          path: ${{ steps.find-zip.outputs.zip }}
