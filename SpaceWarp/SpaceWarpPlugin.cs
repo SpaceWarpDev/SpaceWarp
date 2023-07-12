@@ -36,6 +36,7 @@ using UitkForKsp2;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
+using SpaceWarp.Backend.Sound;
 
 namespace SpaceWarp;
 
@@ -89,6 +90,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
+
+        Soundbank.soundbanks = new();
 
         SpaceWarpManager.InitializeSpaceWarpsLoadingActions();
 

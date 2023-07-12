@@ -696,5 +696,6 @@ internal static class SpaceWarpManager
     {
         Loading.AddAssetLoadingAction("bundles", "loading asset bundles", FunctionalLoadingActions.AssetBundleLoadingAction, "bundle");
         Loading.AddAssetLoadingAction("images", "loading images", FunctionalLoadingActions.ImageLoadingAction);
+        Loading.AddAssetLoadingAction("soundbanks", "loading soundbanks", FunctionalLoadingActions.AssetSoundbankLoadingAction, "bnk");
     }
 }

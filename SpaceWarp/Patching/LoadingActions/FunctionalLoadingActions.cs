@@ -1,7 +1,14 @@
-﻿using System;
+﻿using AK.Wwise;
+using SpaceWarp.API.Sound;
+using SpaceWarp.Backend.Sound;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
+using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SpaceWarp.Patching.LoadingActions;
 
@@ -40,6 +47,22 @@ internal static class FunctionalLoadingActions
         }
 
         return assets;
+    }
+
+    internal static List<(string name, UnityObject asset)> AssetSoundbankLoadingAction(string internalPath, string filename)
+    {
+        var fileData = File.ReadAllBytes(filename);
+        //Since theres no UnityObject that relates to soundbanks it passes null, saving only the internalpath
+        List<(string name, UnityObject asset)> assets = new() { ($"soundbanks/{internalPath}", null) };
+
+        //Banks are identified under Bank.soundbanks with their internal path
+        if (SoundAPI.LoadBank($"soundbanks/{internalPath}", fileData, out var bank))
+        {
+            return assets;
+        }
+        else
+        throw new Exception(
+            $"Failed to load soundbank {internalPath}");
     }
 
     internal static List<(string name, UnityObject asset)> ImageLoadingAction(string internalPath, string filename)
