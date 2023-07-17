@@ -92,7 +92,7 @@ internal static class SpaceWarpManager
 
         GetDisabledPlugins(disabledPlugins);
 
-        GetCodelessSpaceWarpPlugins(ignoredGUIDs, modDescriptors, allErroredPlugins);
+        GetCodelessSpaceWarpPlugins(ignoredGUIDs, modDescriptors, allErroredPlugins,disabledPlugins);
         
         GetBepInExErroredPlugins(ignoredGUIDs,allErroredPlugins,modDescriptors,disabledPlugins);
 
@@ -224,10 +224,11 @@ internal static class SpaceWarpManager
     
     private static void GetCodelessSpaceWarpPlugins(List<string> ignoredGUIDs,
         List<SpaceWarpPluginDescriptor> spaceWarpInfos,
-        ICollection<SpaceWarpErrorDescription> errorDescriptions)
+        ICollection<SpaceWarpErrorDescription> errorDescriptions,
+        IReadOnlyCollection<SpaceWarpPluginDescriptor> disabledPlugins)
     {
         var codelessInfos = new List<SpaceWarpPluginDescriptor>();
-        FindAllCodelessSWInfos(codelessInfos);
+        FindAllCodelessSWInfos(codelessInfos,disabledPlugins);
 
         var codelessInfosInOrder =
             new List<SpaceWarpPluginDescriptor>();
@@ -285,7 +286,7 @@ internal static class SpaceWarpManager
         }
     }
 
-    private static void FindAllCodelessSWInfos(ICollection<SpaceWarpPluginDescriptor> codelessInfos)
+    private static void FindAllCodelessSWInfos(ICollection<SpaceWarpPluginDescriptor> codelessInfos, IReadOnlyCollection<SpaceWarpPluginDescriptor> disabledPlugins)
     {
         var pluginPath = new DirectoryInfo(Paths.PluginPath);
         foreach (var swinfo in pluginPath.GetFiles("swinfo.json", SearchOption.AllDirectories))
@@ -310,7 +311,7 @@ internal static class SpaceWarpManager
 
             var guid = swinfoData.ModID;
             // If we already know about this mod, ignore it
-            if (Chainloader.PluginInfos.ContainsKey(guid)) continue;
+            if (Chainloader.PluginInfos.ContainsKey(guid) || disabledPlugins.Any(x => x.Guid == guid)) continue;
 
             // Now we can just add it to our plugin list
             codelessInfos.Add(new SpaceWarpPluginDescriptor(null, guid, swinfoData.Name, swinfoData, swinfo.Directory,
