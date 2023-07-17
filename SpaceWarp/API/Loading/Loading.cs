@@ -133,7 +133,7 @@ public static class Loading
                     catch (Exception e)
                     {
                         if (plugin.Plugin != null)
-                            plugin.Plugin.ModLogger.LogError(e.ToString());
+                            plugin.Plugin.SWLogger.LogError(e.ToString());
                         else
                             SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
                     }
@@ -227,7 +227,7 @@ public static class Loading
                 catch (Exception e)
                 {
                     if (plugin.Plugin != null)
-                        plugin.Plugin.ModLogger.LogError(e.ToString());
+                        plugin.Plugin.SWLogger.LogError(e.ToString());
                     else
                         SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
                 }

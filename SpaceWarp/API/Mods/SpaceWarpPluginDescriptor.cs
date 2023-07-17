@@ -7,7 +7,7 @@ namespace SpaceWarp.API.Mods;
 
 public class SpaceWarpPluginDescriptor
 {
-    public SpaceWarpPluginDescriptor([CanBeNull] BaseSpaceWarpPlugin plugin, string guid, string name, ModInfo swInfo, DirectoryInfo folder, [CanBeNull] ConfigFile configFile = null)
+    public SpaceWarpPluginDescriptor([CanBeNull] ISpaceWarpMod plugin, string guid, string name, ModInfo swInfo, DirectoryInfo folder, [CanBeNull] ConfigFile configFile = null)
     {
         Plugin = plugin;
         Guid = guid;
@@ -17,7 +17,7 @@ public class SpaceWarpPluginDescriptor
         ConfigFile = configFile;
     }
 
-    [CanBeNull] public BaseSpaceWarpPlugin Plugin;
+    [CanBeNull] public ISpaceWarpMod Plugin;
     public readonly string Guid;
     public readonly string Name;
     public readonly ModInfo SWInfo;

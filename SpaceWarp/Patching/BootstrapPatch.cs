@@ -38,12 +38,14 @@ internal static class BootstrapPatch
         {
             if (ForceSpaceWarpLoadDueToError)
             {
-                GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(SpaceWarpPlugin.Instance));
+                GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(
+                    new SpaceWarpPluginDescriptor(SpaceWarpPlugin.Instance, SpaceWarpPlugin.ModGuid,
+                        SpaceWarpPlugin.ModName, null, null)));
             }
             foreach (var plugin in SpaceWarpManager.AllPlugins)
             {
                 if (plugin.Plugin != null)
-                    GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin.Plugin));
+                    GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
             }
         });
 
@@ -72,7 +74,7 @@ internal static class BootstrapPatch
                 {
                     foreach (var action in Loading.LoadingActionGenerators)
                     {
-                        flow.AddAction(action(plugin.Plugin));
+                        flow.AddAction(action((BaseSpaceWarpPlugin)plugin.Plugin));
                     }
                 }
                 else
@@ -98,7 +100,7 @@ internal static class BootstrapPatch
             foreach (var plugin in allPlugins)
             {
                 if (plugin.Plugin != null)
-                    flow.AddAction(new InitializeModAction(plugin.Plugin));
+                    flow.AddAction(new InitializeModAction(plugin));
             }
             
             foreach (var plugin in allPlugins)
@@ -110,7 +112,7 @@ internal static class BootstrapPatch
             foreach (var plugin in allPlugins)
             {
                 if (plugin.Plugin != null)
-                    flow.AddAction(new PostInitializeModAction(plugin.Plugin));
+                    flow.AddAction(new PostInitializeModAction(plugin));
             }
         });
     }

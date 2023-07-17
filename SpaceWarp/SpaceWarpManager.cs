@@ -314,7 +314,7 @@ internal static class SpaceWarpManager
             if (Chainloader.PluginInfos.ContainsKey(guid) || disabledPlugins.Any(x => x.Guid == guid)) continue;
 
             // Now we can just add it to our plugin list
-            codelessInfos.Add(new SpaceWarpPluginDescriptor(null, guid, swinfoData.Name, swinfoData, swinfo.Directory,
+            codelessInfos.Add(new SpaceWarpPluginDescriptor(new AssetOnlyMod(swinfoData.Name), guid, swinfoData.Name, swinfoData, swinfo.Directory,
                 FindOrCreateConfigFile(guid)));
         }
     }

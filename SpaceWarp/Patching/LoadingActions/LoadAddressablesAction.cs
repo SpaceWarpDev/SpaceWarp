@@ -40,7 +40,7 @@ internal sealed class LoadAddressablesAction : FlowAction
         catch (Exception e)
         {
             if (_plugin.Plugin != null)
-                _plugin.Plugin.ModLogger.LogError(e.ToString());
+                _plugin.Plugin.SWLogger.LogError(e.ToString());
             else
                 SpaceWarpPlugin.Logger.LogError(_plugin.SWInfo.Name + ": " + e);    
             reject(null);

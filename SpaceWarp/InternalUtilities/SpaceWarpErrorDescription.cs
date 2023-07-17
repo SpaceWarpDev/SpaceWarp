@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BepInEx;
 using SpaceWarp.API.Mods;
 using SpaceWarp.Patching;
 using SpaceWarp.UI.ModList;
@@ -27,15 +28,18 @@ internal class SpaceWarpErrorDescription
         // Essentially if we have an errored plugin, we delete the plugin code
         if (plugin.Plugin != null)
         {
-            // If and only if this is space warp we don't destroy it
-            // Then we inform our loading patcher to do space warp specially
-            if (plugin.Plugin.Info.Metadata.GUID == SpaceWarpPlugin.ModGuid)
+            switch (plugin.Plugin)
             {
-                BootstrapPatch.ForceSpaceWarpLoadDueToError = true;
-                BootstrapPatch.ErroredSWPluginDescriptor = plugin;
-                return;
+                // If and only if this is space warp we don't destroy it
+                // Then we inform our loading patcher to do space warp specially
+                case SpaceWarpPlugin:
+                    BootstrapPatch.ForceSpaceWarpLoadDueToError = true;
+                    BootstrapPatch.ErroredSWPluginDescriptor = plugin;
+                    return;
+                case BaseUnityPlugin unityPlugin:
+                    Object.Destroy(unityPlugin);
+                    break;
             }
-            Object.Destroy(plugin.Plugin);
         }
         plugin.Plugin = null;
     }
