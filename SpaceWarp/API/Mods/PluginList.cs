@@ -92,6 +92,7 @@ public static class PluginList
     /// <returns><see cref="SpaceWarpPluginDescriptor"/> of the plugin or null if not found</returns>
     public static SpaceWarpPluginDescriptor TryGetDescriptor(string guid)
     {
+        
         return SpaceWarpManager.AllPlugins
             .FirstOrDefault(item => item.Guid == guid);
     }

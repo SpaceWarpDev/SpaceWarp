@@ -4,13 +4,15 @@ using KSP.Game;
 using KSP.Messages;
 using KSP.VFX;
 using SpaceWarp.API.Mods.JSON;
+using JetBrains.Annotations;
+using SpaceWarp.API.Logging;
 
 namespace SpaceWarp.API.Mods;
 
 /// <summary>
 ///     Represents a KSP2 Mod, you should inherit from this and do your manager processing.
 /// </summary>
-public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin
+public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin, ISpaceWarpMod
 {
     #region KspBehaviour things
 
@@ -56,7 +58,8 @@ public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin
     public virtual void OnPostInitialized()
     {
     }
-
+    private BepInExLogger _logger;
+    public ILogger SWLogger => _logger ??= new BepInExLogger(Logger);
     internal static string GetGuidBySpec(PluginInfo pluginInfo, ModInfo modInfo)
     {
         return modInfo.Spec >= SpecVersion.V1_2
