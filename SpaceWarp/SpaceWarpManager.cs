@@ -385,7 +385,7 @@ internal static class SpaceWarpManager
                     out var metadata)) return;
             if (!AssertSpecificationCompliance(ignoredGUIDs, errorDescriptions, plugin, metadata, folderPath))
                 return;
-            allPlugins.Add(new SpaceWarpPluginDescriptor(null, plugin.Info.Metadata.GUID, plugin.Info.Metadata.Name,
+            allPlugins.Add(new SpaceWarpPluginDescriptor(null, plugin.Info.Metadata.GUID, metadata.Name,
                 metadata, new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!)));
         }
         else
@@ -696,5 +696,6 @@ internal static class SpaceWarpManager
     {
         Loading.AddAssetLoadingAction("bundles", "loading asset bundles", FunctionalLoadingActions.AssetBundleLoadingAction, "bundle");
         Loading.AddAssetLoadingAction("images", "loading images", FunctionalLoadingActions.ImageLoadingAction);
+        Loading.AddAssetLoadingAction("soundbanks", "loading soundbanks", FunctionalLoadingActions.AssetSoundbankLoadingAction, "bnk");
     }
 }
