@@ -34,7 +34,7 @@ internal static class SpaceWarpManager
 
     internal static string SpaceWarpFolder;
     // The plugin can be null
-    internal static IReadOnlyList<SpaceWarpPluginDescriptor> AllPlugins;
+    internal static IList<SpaceWarpPluginDescriptor> AllPlugins;
     // internal static IReadOnlyList<BaseUnityPlugin> NonSpaceWarpPlugins;
     // internal static IReadOnlyList<(BaseUnityPlugin, ModInfo)> NonSpaceWarpInfos;
 
@@ -48,6 +48,9 @@ internal static class SpaceWarpManager
 
     internal static readonly Dictionary<string, bool> ModsOutdated = new();
     internal static readonly Dictionary<string, bool> ModsUnsupported = new();
+
+    internal static List<SpaceWarpPluginDescriptor> InternalModLoaderMods;
+
 
     private static GUISkin _skin;
 

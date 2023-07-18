@@ -38,15 +38,16 @@ internal static class BootstrapPatch
         {
             if (ForceSpaceWarpLoadDueToError)
             {
-                GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(
-                    new SpaceWarpPluginDescriptor(SpaceWarpPlugin.Instance, SpaceWarpPlugin.ModGuid,
-                        SpaceWarpPlugin.ModName, null, null)));
+                GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(ErroredSWPluginDescriptor));
             }
             foreach (var plugin in SpaceWarpManager.AllPlugins)
             {
                 if (plugin.Plugin != null)
                     GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
             }
+
+            GameManager.Instance.LoadingFlow.AddAction(new RegisterKSPLoaderModsAction());
+
         });
 
         ilCursor.GotoLabel(endLabel, MoveType.Before);
@@ -54,7 +55,7 @@ internal static class BootstrapPatch
         ilCursor.EmitDelegate(static () =>
         {
             var flow = GameManager.Instance.LoadingFlow;
-            IReadOnlyList<SpaceWarpPluginDescriptor> allPlugins;
+            IList<SpaceWarpPluginDescriptor> allPlugins;
             if (ForceSpaceWarpLoadDueToError)
             {
                 var l = new List<SpaceWarpPluginDescriptor> { ErroredSWPluginDescriptor };
@@ -74,7 +75,8 @@ internal static class BootstrapPatch
                 {
                     foreach (var action in Loading.LoadingActionGenerators)
                     {
-                        flow.AddAction(action((BaseSpaceWarpPlugin)plugin.Plugin));
+                        if (plugin.Plugin is BaseSpaceWarpPlugin baseSpaceWarpPlugin)
+                            flow.AddAction(action(baseSpaceWarpPlugin));
                     }
                 }
                 else
@@ -91,6 +93,8 @@ internal static class BootstrapPatch
                 }
             }
 
+            flow.AddAction(new InjectKspModAssetLoadingActions());
+
             flow.AddAction(new LoadAddressablesLocalizationsAction());
             foreach (var actionGenerator in Loading.GeneralLoadingActions)
             {
@@ -102,6 +106,7 @@ internal static class BootstrapPatch
                 if (plugin.Plugin != null)
                     flow.AddAction(new InitializeModAction(plugin));
             }
+            flow.AddAction(new InjectKspModInitializationActions());
             
             foreach (var plugin in allPlugins)
             {
@@ -114,6 +119,7 @@ internal static class BootstrapPatch
                 if (plugin.Plugin != null)
                     flow.AddAction(new PostInitializeModAction(plugin));
             }
+            flow.AddAction(new InjectKspModPostInitializationActions());
         });
     }
 }
