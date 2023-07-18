@@ -42,12 +42,30 @@ public static class ModLoaderPatch
         };
         return newInfo;
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(KSP2Mod.Load))]
+    private static bool LoadPre(KSP2Mod __instance, ref bool __result)
+    {
+        SpaceWarpPlugin.Logger.LogInfo($"KSP2Mod.Load (Pre): {__instance.ModName}");
+        var disabled = ChainloaderPatch.DisabledPluginGuids.Contains(__instance.ModName);
+        if (!disabled) return true;
+        var path = __instance.ModRootPath;
+        var info = File.Exists(Path.Combine(path, "swinfo.json"))
+            ? JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path))
+            : KSPToSwinfo(__instance);
+        var descriptor = new SpaceWarpPluginDescriptor(null, info.ModID, info.Name, info, new DirectoryInfo(path));
+        SpaceWarpManager.DisabledPlugins.Add(descriptor);
+        SpaceWarpManager.PluginGuidEnabledStatus.Add((descriptor.Guid, false));
+        __result = false;
+        return false;
+    }
     
     [HarmonyPostfix]
     [HarmonyPatch(nameof(KSP2Mod.Load))]
-    private static void Load( KSP2Mod __instance, ref bool __result)
+    private static void LoadPost( KSP2Mod __instance, ref bool __result)
     {
-        SpaceWarpPlugin.Logger.LogInfo($"KSP2Mod.Load: {__instance.ModName}");
+        SpaceWarpPlugin.Logger.LogInfo($"KSP2Mod.Load (Post): {__instance.ModName}");
         var disabled = ChainloaderPatch.DisabledPluginGuids.Contains(__instance.ModName);
         if (!disabled)
         {
@@ -134,17 +152,6 @@ public static class ModLoaderPatch
             SpaceWarpManager.AllPlugins.Add(descriptor);
             SpaceWarpManager.InternalModLoaderMods.Add(descriptor);
             SpaceWarpManager.PluginGuidEnabledStatus.Add((descriptor.Guid, true));
-        }
-        else
-        {
-            var path = __instance.ModRootPath;
-            var info = File.Exists(Path.Combine(path, "swinfo.json"))
-                ? JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path))
-                : KSPToSwinfo(__instance);
-            var descriptor = new SpaceWarpPluginDescriptor(null, info.ModID, info.Name, info, new DirectoryInfo(path));
-            SpaceWarpManager.DisabledPlugins.Add(descriptor);
-            SpaceWarpManager.PluginGuidEnabledStatus.Add((descriptor.Guid, false));
-            
         }
     }
 }
