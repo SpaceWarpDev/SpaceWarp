@@ -46,7 +46,11 @@ public static class ModLoaderPatch
     private static void Load(ref bool __result, ref KSP2Mod __instance)
     {
         if (!__result) return;
-        ISpaceWarpMod swMod = new KspModAdapter(__instance);
+        // ISpaceWarpMod swMod = new KspModAdapter(__instance);
+        ISpaceWarpMod swMod = null;
+        var go = new GameObject(__instance.ModName);
+        go.Persist();
+        var addAdapter = true;
         if (__instance.EntryPoint != null)
         {
             // Lets take a simple guess at what needs to be done.
@@ -61,13 +65,12 @@ public static class ModLoaderPatch
                         foreach (var type in asm.GetTypes())
                         {
                             if (!typeof(Mod).IsAssignableFrom(type) || type.IsAbstract) continue;
-                            var go = new GameObject(__instance.ModName);
                             var comp = go.AddComponent(type);
                             if (comp is BaseKspLoaderSpaceWarpMod baseKspLoaderSpaceWarpMod)
                             {
                                 swMod = baseKspLoaderSpaceWarpMod;
+                                addAdapter = false;
                             }
-                            go.Persist();
                             break;
                         }
                     }
@@ -106,6 +109,12 @@ public static class ModLoaderPatch
             __instance.modType = KSP2ModType.ContentOnly;
         }
 
+        if (addAdapter)
+        {
+            var adapter = go.AddComponent<KspModAdapter>();
+            adapter.AdaptedMod = __instance;
+            swMod = adapter;
+        }
         var path = __instance.ModRootPath;
         var info = File.Exists(Path.Combine(path, "swinfo.json")) ? JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path)) : KSPToSwinfo(__instance);
         var descriptor = new SpaceWarpPluginDescriptor(swMod, info.ModID, info.Name, info, new DirectoryInfo(path));
