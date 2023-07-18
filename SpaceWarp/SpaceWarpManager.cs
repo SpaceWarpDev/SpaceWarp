@@ -247,7 +247,7 @@ internal static class SpaceWarpManager
         foreach (var dependency in descriptor.SWInfo.Dependencies)
         {
             Logger.LogInfo($"({descriptor.Name}) Attempting to check if dependency is resolved: {dependency.ID}");
-            var info = spaceWarpInfos.FirstOrDefault(x => x.Guid == dependency.ID) ??
+            var info = spaceWarpInfos.FirstOrDefault(x => string.Equals(x.Guid, dependency.ID, StringComparison.InvariantCultureIgnoreCase)) ??
                        codelessInfosInOrder.FirstOrDefault(x => string.Equals(x.Guid, dependency.ID, StringComparison.InvariantCultureIgnoreCase));
             if (info == null || !VersionUtility.IsSupported(info.SWInfo.Version, dependency.Version.Min,
                     dependency.Version.Max)) return false;
