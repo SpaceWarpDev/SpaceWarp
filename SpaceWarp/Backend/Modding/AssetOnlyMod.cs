@@ -1,9 +1,10 @@
 ﻿using BepInEx.Logging;
 using SpaceWarp.API.Logging;
+using SpaceWarp.API.Mods;
 
-namespace SpaceWarp.API.Mods;
+namespace SpaceWarp.Backend.Modding;
 
-public class AssetOnlyMod : ISpaceWarpMod
+internal class AssetOnlyMod : ISpaceWarpMod
 {
     public AssetOnlyMod(string name)
     {

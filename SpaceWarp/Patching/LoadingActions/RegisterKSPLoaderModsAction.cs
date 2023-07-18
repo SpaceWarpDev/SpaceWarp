@@ -7,6 +7,7 @@ using KSP.Modding;
 using Newtonsoft.Json;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.Backend.Modding;
 using SpaceWarp.InternalUtilities;
 using UnityEngine;
 

@@ -15,6 +15,7 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.API.Versions;
+using SpaceWarp.Backend.Modding;
 using SpaceWarp.Backend.UI.Appbar;
 using SpaceWarp.InternalUtilities;
 using SpaceWarp.Patching.LoadingActions;
@@ -49,7 +50,7 @@ internal static class SpaceWarpManager
     internal static readonly Dictionary<string, bool> ModsOutdated = new();
     internal static readonly Dictionary<string, bool> ModsUnsupported = new();
 
-    internal static List<SpaceWarpPluginDescriptor> InternalModLoaderMods;
+    internal static List<SpaceWarpPluginDescriptor> InternalModLoaderMods = new();
 
 
     private static GUISkin _skin;
