@@ -30,7 +30,7 @@ public static class Colors
     [Obsolete("Use the shader \"KSP2/Parts/Paintable\" or \"Parts Replace\" instead")]
     public static void DeclareParts(string modGuid, params string[] partNameList)
     {
-
+        ColorsPatch.DeclareParts(modGuid, partNameList);
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public static class Colors
     [Obsolete("Use the shader \"KSP2/Parts/Paintable\" or \"Parts Replace\" instead")]
     public static void DeclareParts(string modGuid, IEnumerable<string> partNameList)
     {
-
+        ColorsPatch.DeclareParts(modGuid, partNameList);
     }
     /// <summary>
     /// Retrieves all the texture list from your part. Textures not set will be null.

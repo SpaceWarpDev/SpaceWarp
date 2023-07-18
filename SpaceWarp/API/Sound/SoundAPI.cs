@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace SpaceWarp.API.Sound;
-    internal class SoundAPI
+internal class SoundAPI
 {
     public static bool LoadBank(string internalPath, byte[] BankData, out Soundbank soundbank)
     {
