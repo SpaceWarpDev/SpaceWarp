@@ -53,7 +53,7 @@ internal static class BootstrapPatch
         ilCursor.Index -= 1;
         ilCursor.EmitDelegate(static () =>
         {
-            GameManager.Instance.LoadingFlow.AddAction(new RegisterKSPLoaderModsAction());
+            GameManager.Instance.LoadingFlow.AddAction(new InjectKspModPreInitializationActions());
             var flow = GameManager.Instance.LoadingFlow;
             IList<SpaceWarpPluginDescriptor> allPlugins;
             if (ForceSpaceWarpLoadDueToError)

@@ -18,12 +18,12 @@ internal sealed class PreInitializeModAction : FlowAction
     {
         try
         {
-            _plugin.Plugin.OnPreInitialized();
+            _plugin.Plugin?.OnPreInitialized();
             resolve();
         }
         catch (Exception e)
         {
-            _plugin.Plugin.SWLogger.LogError(e.ToString());
+            _plugin.Plugin?.SWLogger.LogError(e.ToString());
             reject(null);
         }
     }
