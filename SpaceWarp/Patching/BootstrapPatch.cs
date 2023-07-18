@@ -46,7 +46,6 @@ internal static class BootstrapPatch
                     GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
             }
 
-            GameManager.Instance.LoadingFlow.AddAction(new RegisterKSPLoaderModsAction());
 
         });
 
@@ -54,6 +53,7 @@ internal static class BootstrapPatch
         ilCursor.Index -= 1;
         ilCursor.EmitDelegate(static () =>
         {
+            GameManager.Instance.LoadingFlow.AddAction(new RegisterKSPLoaderModsAction());
             var flow = GameManager.Instance.LoadingFlow;
             IList<SpaceWarpPluginDescriptor> allPlugins;
             if (ForceSpaceWarpLoadDueToError)
