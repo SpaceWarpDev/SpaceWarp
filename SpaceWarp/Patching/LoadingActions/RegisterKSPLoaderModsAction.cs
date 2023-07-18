@@ -7,6 +7,7 @@ using KSP.Modding;
 using Newtonsoft.Json;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.InternalUtilities;
 using UnityEngine;
 
 namespace SpaceWarp.Patching.LoadingActions;
@@ -47,7 +48,9 @@ internal class RegisterKSPLoaderModsAction : FlowAction
         ISpaceWarpMod swMod;
         if (kspLoaderSpaceWarpModTypes.TryGetValue(key, out var type))
         {
-            swMod = (ISpaceWarpMod)Activator.CreateInstance(type);
+            var go = new GameObject(key);
+            swMod = (ISpaceWarpMod)go.AddComponent(type);
+            go.Persist();
         }
         else
         {
