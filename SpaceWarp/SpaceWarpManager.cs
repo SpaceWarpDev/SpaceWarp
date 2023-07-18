@@ -35,22 +35,22 @@ internal static class SpaceWarpManager
 
     internal static string SpaceWarpFolder;
     // The plugin can be null
-    internal static IList<SpaceWarpPluginDescriptor> AllPlugins;
+    internal static List<SpaceWarpPluginDescriptor> AllPlugins = new();
     // internal static IReadOnlyList<BaseUnityPlugin> NonSpaceWarpPlugins;
     // internal static IReadOnlyList<(BaseUnityPlugin, ModInfo)> NonSpaceWarpInfos;
 
     // internal static IReadOnlyList<(PluginInfo, ModInfo)> DisabledInfoPlugins;
     // internal static IReadOnlyList<PluginInfo> DisabledNonInfoPlugins;
-    internal static IReadOnlyList<SpaceWarpPluginDescriptor> DisabledPlugins;
-    internal static IReadOnlyList<(string, bool)> PluginGuidEnabledStatus;
-    internal static IReadOnlyList<SpaceWarpErrorDescription> ErroredPlugins;
+    internal static List<SpaceWarpPluginDescriptor> DisabledPlugins = new();
+    internal static List<(string, bool)> PluginGuidEnabledStatus = new();
+    internal static List<SpaceWarpErrorDescription> ErroredPlugins = new();
     
 
 
     internal static readonly Dictionary<string, bool> ModsOutdated = new();
     internal static readonly Dictionary<string, bool> ModsUnsupported = new();
 
-    internal static List<SpaceWarpPluginDescriptor> InternalModLoaderMods;
+    internal static List<SpaceWarpPluginDescriptor> InternalModLoaderMods = new();
 
 
     private static GUISkin _skin;
@@ -81,37 +81,29 @@ internal static class SpaceWarpManager
     }
     internal static void GetAllPlugins()
     {
-        var pluginGuidEnabledStatus = new List<(string, bool)>();
 #pragma warning disable CS0618
         var spaceWarpPlugins = Chainloader.Plugins.OfType<BaseSpaceWarpPlugin>().ToList();
-        var modDescriptors = new List<SpaceWarpPluginDescriptor>();
+
         var ignoredGUIDs = new List<string>();
-        var allErroredPlugins = new List<SpaceWarpErrorDescription>();
 
-        GetCodeBasedSpaceWarpPlugins(spaceWarpPlugins, ignoredGUIDs, modDescriptors,allErroredPlugins);
+        GetCodeBasedSpaceWarpPlugins(spaceWarpPlugins, ignoredGUIDs, AllPlugins,ErroredPlugins);
 
-        GetCodeBasedNonSpaceWarpPlugins(spaceWarpPlugins, ignoredGUIDs, modDescriptors,allErroredPlugins);
+        GetCodeBasedNonSpaceWarpPlugins(spaceWarpPlugins, ignoredGUIDs, AllPlugins,ErroredPlugins);
 
-        var disabledPlugins = new List<SpaceWarpPluginDescriptor>();
 
-        GetDisabledPlugins(disabledPlugins);
+        GetDisabledPlugins(DisabledPlugins);
 
-        GetCodelessSpaceWarpPlugins(ignoredGUIDs, modDescriptors, allErroredPlugins,disabledPlugins);
+        GetCodelessSpaceWarpPlugins(ignoredGUIDs, AllPlugins, ErroredPlugins,DisabledPlugins);
         
-        GetBepInExErroredPlugins(ignoredGUIDs,allErroredPlugins,modDescriptors,disabledPlugins);
+        GetBepInExErroredPlugins(ignoredGUIDs,ErroredPlugins,AllPlugins,DisabledPlugins);
 
-        ValidateSpec13Dependencies(allErroredPlugins, modDescriptors);
+        ValidateSpec13Dependencies(ErroredPlugins, AllPlugins);
 
-        GetTrueDependencyErrors(allErroredPlugins, modDescriptors, disabledPlugins);
+        GetTrueDependencyErrors(ErroredPlugins, AllPlugins, DisabledPlugins);
 
-        SetupDisabledPlugins(modDescriptors, allErroredPlugins, disabledPlugins, pluginGuidEnabledStatus);
+        SetupDisabledPlugins(AllPlugins, ErroredPlugins, DisabledPlugins, PluginGuidEnabledStatus);
         
-        AllPlugins = modDescriptors;
-        DisabledPlugins = disabledPlugins;
-        PluginGuidEnabledStatus = pluginGuidEnabledStatus;
         // Now we must do some funky shit :)
-        
-        ErroredPlugins = allErroredPlugins;
     }
 
     private static void SetupDisabledPlugins(
