@@ -28,7 +28,8 @@ internal class ModListController : MonoBehaviour
     private Button _disableAllButton;
     private Button _revertChangesButton;
     private Label _changesLabel;
-    private readonly LocalizedString _changesLabelText = "SpaceWarp/ModList/ChangesDetected";
+    private readonly LocalizedString _multipleChangesLabelText = "SpaceWarp/ModList/multipleChangesDetected";
+    private readonly LocalizedString _singleChangeLabelText = "SpaceWarp/ModList/singleChangeDetected";
 
     private Foldout _enabledModFoldout;
     private VisualElement _enabledModList;
@@ -546,10 +547,15 @@ internal class ModListController : MonoBehaviour
             _initialToggles.ContainsKey(entry.Key) && _initialToggles[entry.Key] != entry.Value
         );
 
-        if (numChanges > 0)
+        if (numChanges == 1)
         {
             _changesLabel.style.display = DisplayStyle.Flex;
-            _changesLabel.text = string.Format(_changesLabelText, numChanges);
+            _changesLabel.text = _singleChangeLabelText;
+        }
+        else if (numChanges > 1)
+        {
+            _changesLabel.style.display = DisplayStyle.Flex;
+            _changesLabel.text = string.Format(_multipleChangesLabelText, numChanges);
         }
         else
         {

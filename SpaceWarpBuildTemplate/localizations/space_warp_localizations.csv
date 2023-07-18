@@ -2,7 +2,8 @@ Key,Type,Description,English,Portuguese BR
 SpaceWarp/ModList/EnableAll,Text,,Enable All,Ativar todos
 SpaceWarp/ModList/DisableAll,Text,,Disable All,Desativar todos
 SpaceWarp/ModList/RevertChanges,Text,,Revert Changes,Reverter alterações
-SpaceWarp/ModList/ChangesDetected,Text,,"{0} changes detected, please restart to apply them","{0} alterações detetadas, porfavor reinicie o jogo"
+SpaceWarp/ModList/multipleChangesDetected,Text,,"{0} changes detected, please restart to apply them","{0} alterações detetadas, porfavor reinicie o jogo"
+SpaceWarp/ModList/singleChangeDetected,Text,,"1 change detected, please restart to apply it","1 alteração detectada, reinicie para aplicá-la"
 SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist
 SpaceWarp/ModList/EnabledMods,Text,,Enabled Mods,Mods ativos
 SpaceWarp/ModList/ErroredMods,Text,,Errored Mods,Mods com erros
