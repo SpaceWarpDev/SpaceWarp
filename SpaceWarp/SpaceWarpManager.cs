@@ -41,8 +41,8 @@ internal static class SpaceWarpManager
 
     // internal static IReadOnlyList<(PluginInfo, ModInfo)> DisabledInfoPlugins;
     // internal static IReadOnlyList<PluginInfo> DisabledNonInfoPlugins;
-    internal static IReadOnlyList<SpaceWarpPluginDescriptor> DisabledPlugins;
-    internal static IReadOnlyList<(string, bool)> PluginGuidEnabledStatus;
+    internal static List<SpaceWarpPluginDescriptor> DisabledPlugins = new();
+    internal static List<(string, bool)> PluginGuidEnabledStatus = new();
     internal static IReadOnlyList<SpaceWarpErrorDescription> ErroredPlugins;
     
 
@@ -81,7 +81,6 @@ internal static class SpaceWarpManager
     }
     internal static void GetAllPlugins()
     {
-        var pluginGuidEnabledStatus = new List<(string, bool)>();
 #pragma warning disable CS0618
         var spaceWarpPlugins = Chainloader.Plugins.OfType<BaseSpaceWarpPlugin>().ToList();
         var modDescriptors = new List<SpaceWarpPluginDescriptor>();
@@ -92,23 +91,20 @@ internal static class SpaceWarpManager
 
         GetCodeBasedNonSpaceWarpPlugins(spaceWarpPlugins, ignoredGUIDs, modDescriptors,allErroredPlugins);
 
-        var disabledPlugins = new List<SpaceWarpPluginDescriptor>();
 
-        GetDisabledPlugins(disabledPlugins);
+        GetDisabledPlugins(DisabledPlugins);
 
-        GetCodelessSpaceWarpPlugins(ignoredGUIDs, modDescriptors, allErroredPlugins,disabledPlugins);
+        GetCodelessSpaceWarpPlugins(ignoredGUIDs, modDescriptors, allErroredPlugins,DisabledPlugins);
         
-        GetBepInExErroredPlugins(ignoredGUIDs,allErroredPlugins,modDescriptors,disabledPlugins);
+        GetBepInExErroredPlugins(ignoredGUIDs,allErroredPlugins,modDescriptors,DisabledPlugins);
 
         ValidateSpec13Dependencies(allErroredPlugins, modDescriptors);
 
-        GetTrueDependencyErrors(allErroredPlugins, modDescriptors, disabledPlugins);
+        GetTrueDependencyErrors(allErroredPlugins, modDescriptors, DisabledPlugins);
 
-        SetupDisabledPlugins(modDescriptors, allErroredPlugins, disabledPlugins, pluginGuidEnabledStatus);
+        SetupDisabledPlugins(modDescriptors, allErroredPlugins, DisabledPlugins, PluginGuidEnabledStatus);
         
         AllPlugins = modDescriptors;
-        DisabledPlugins = disabledPlugins;
-        PluginGuidEnabledStatus = pluginGuidEnabledStatus;
         // Now we must do some funky shit :)
         
         ErroredPlugins = allErroredPlugins;

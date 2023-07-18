@@ -9,6 +9,8 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.Backend.Modding;
 using SpaceWarp.InternalUtilities;
+using SpaceWarp.UI.ModList;
+using SpaceWarpPatcher;
 using UnityEngine;
 using UnityEngine.IO;
 using File = System.IO.File;
@@ -43,84 +45,106 @@ public static class ModLoaderPatch
     
     [HarmonyPostfix]
     [HarmonyPatch(nameof(KSP2Mod.Load))]
-    private static void Load(ref bool __result, ref KSP2Mod __instance)
+    private static void Load( KSP2Mod __instance, ref bool __result)
     {
-        if (!__result) return;
-        // ISpaceWarpMod swMod = new KspModAdapter(__instance);
-        ISpaceWarpMod swMod = null;
-        var go = new GameObject(__instance.ModName);
-        go.Persist();
-        var addAdapter = true;
-        if (__instance.EntryPoint != null)
+        SpaceWarpPlugin.Logger.LogInfo($"KSP2Mod.Load: {__instance.ModName}");
+        var disabled = ChainloaderPatch.DisabledPluginGuids.Contains(__instance.ModName);
+        if (!disabled)
         {
-            // Lets take a simple guess at what needs to be done.
-            if (File.Exists(Path.Combine(__instance.ModRootPath, __instance.EntryPoint)))
+            // ISpaceWarpMod swMod = new KspModAdapter(__instance);
+            ISpaceWarpMod swMod = null;
+            var go = new GameObject(__instance.ModName);
+            go.Persist();
+            var addAdapter = true;
+            if (__instance.EntryPoint != null)
             {
-                if (__instance.EntryPoint.EndsWith(".dll"))
+                // Lets take a simple guess at what needs to be done.
+                if (File.Exists(Path.Combine(__instance.ModRootPath, __instance.EntryPoint)))
                 {
-                    try
+                    if (__instance.EntryPoint.EndsWith(".dll"))
                     {
-                        var asm = Assembly.LoadFile(Path.Combine(__instance.ModRootPath, __instance.EntryPoint));
-                        __instance.modType = KSP2ModType.CSharp;
-                        foreach (var type in asm.GetTypes())
+                        try
                         {
-                            if (!typeof(Mod).IsAssignableFrom(type) || type.IsAbstract) continue;
-                            var comp = go.AddComponent(type);
-                            if (comp is BaseKspLoaderSpaceWarpMod baseKspLoaderSpaceWarpMod)
+                            var asm = Assembly.LoadFile(Path.Combine(__instance.ModRootPath, __instance.EntryPoint));
+                            __instance.modType = KSP2ModType.CSharp;
+                            foreach (var type in asm.GetTypes())
                             {
-                                swMod = baseKspLoaderSpaceWarpMod;
-                                addAdapter = false;
+                                if (!typeof(Mod).IsAssignableFrom(type) || type.IsAbstract) continue;
+                                var comp = go.AddComponent(type);
+                                if (comp is BaseKspLoaderSpaceWarpMod baseKspLoaderSpaceWarpMod)
+                                {
+                                    swMod = baseKspLoaderSpaceWarpMod;
+                                    addAdapter = false;
+                                }
+
+                                break;
                             }
-                            break;
+                        }
+                        catch (Exception e)
+                        {
+                            SpaceWarpPlugin.Logger.LogError(e);
+                            __instance.modType = KSP2ModType.Error;
+                            __result = false;
+                            return;
                         }
                     }
-                    catch
+                    else if (__instance.EntryPoint.EndsWith(".lua"))
                     {
-                        __instance.modType = KSP2ModType.Error;
-                        __result = false;
-                        return;
+                        try
+                        {
+                            __instance.modCore =
+                                new KSP2LuaModCore(__instance.APIVersion, __instance.ModName, __instance.EntryPoint,
+                                    __instance.ModRootPath);
+                            __instance.modType = KSP2ModType.Lua;
+                        }
+                        catch (Exception e)
+                        {
+                            SpaceWarpPlugin.Logger.LogError(e);
+                            __instance.modType = KSP2ModType.Error;
+                            __result = false;
+                            return;
+                        }
                     }
-                } else if (__instance.EntryPoint.EndsWith(".lua"))
+                }
+                else
                 {
-                    try
-                    {
-                        __instance.modCore =
-                            new KSP2LuaModCore(__instance.APIVersion, __instance.ModName, __instance.EntryPoint,
-                                __instance.ModRootPath);
-                        __instance.modType = KSP2ModType.Lua;
-                    }
-                    catch
-                    {
-                        __instance.modType = KSP2ModType.Error;
-                        __result = false;
-                        return;
-                    }
+                    __instance.modType = KSP2ModType.Error;
+                    __result = false;
+                    return;
                 }
             }
             else
             {
-                __instance.modType = KSP2ModType.Error;
-                __result = false;
-                return;
+                __instance.modType = KSP2ModType.ContentOnly;
             }
+
+            if (addAdapter)
+            {
+                var adapter = go.AddComponent<KspModAdapter>();
+                adapter.AdaptedMod = __instance;
+                swMod = adapter;
+            }
+
+            go.SetActive(true);
+            var path = __instance.ModRootPath;
+            var info = File.Exists(Path.Combine(path, "swinfo.json"))
+                ? JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path))
+                : KSPToSwinfo(__instance);
+            var descriptor = new SpaceWarpPluginDescriptor(swMod, info.ModID, info.Name, info, new DirectoryInfo(path));
+            SpaceWarpManager.AllPlugins.Add(descriptor);
+            SpaceWarpManager.InternalModLoaderMods.Add(descriptor);
+            SpaceWarpManager.PluginGuidEnabledStatus.Add((descriptor.Guid, true));
         }
         else
         {
-            __instance.modType = KSP2ModType.ContentOnly;
+            var path = __instance.ModRootPath;
+            var info = File.Exists(Path.Combine(path, "swinfo.json"))
+                ? JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path))
+                : KSPToSwinfo(__instance);
+            var descriptor = new SpaceWarpPluginDescriptor(null, info.ModID, info.Name, info, new DirectoryInfo(path));
+            SpaceWarpManager.DisabledPlugins.Add(descriptor);
+            SpaceWarpManager.PluginGuidEnabledStatus.Add((descriptor.Guid, false));
+            
         }
-
-        if (addAdapter)
-        {
-            var adapter = go.AddComponent<KspModAdapter>();
-            adapter.AdaptedMod = __instance;
-            swMod = adapter;
-        }
-
-        go.SetActive(true);
-        var path = __instance.ModRootPath;
-        var info = File.Exists(Path.Combine(path, "swinfo.json")) ? JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path)) : KSPToSwinfo(__instance);
-        var descriptor = new SpaceWarpPluginDescriptor(swMod, info.ModID, info.Name, info, new DirectoryInfo(path));
-        SpaceWarpManager.AllPlugins.Add(descriptor);
-        SpaceWarpManager.InternalModLoaderMods.Add(descriptor);
     }
 }
