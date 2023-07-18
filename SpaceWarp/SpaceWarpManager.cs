@@ -174,7 +174,7 @@ internal static class SpaceWarpManager
         if (plugin.SWInfo.Spec < SpecVersion.V1_3) return true;
         foreach (var dep in plugin.SWInfo.Dependencies)
         {
-            var descriptor = modDescriptors.FirstOrDefault(x => x.Guid == dep.ID);
+            var descriptor = modDescriptors.FirstOrDefault(x => string.Equals(x.Guid, dep.ID, StringComparison.InvariantCultureIgnoreCase));
             if (descriptor == null)
             {
                 missingDependencies.Add(dep.ID);
@@ -250,7 +250,7 @@ internal static class SpaceWarpManager
         foreach (var dependency in descriptor.SWInfo.Dependencies)
         {
             Logger.LogInfo($"({descriptor.Name}) Attempting to check if dependency is resolved: {dependency.ID}");
-            var info = spaceWarpInfos.FirstOrDefault(x => x.Guid == dependency.ID) ??
+            var info = spaceWarpInfos.FirstOrDefault(x => string.Equals(x.Guid, dependency.ID, StringComparison.InvariantCultureIgnoreCase)) ??
                        codelessInfosInOrder.FirstOrDefault(x => x.Guid == dependency.ID);
             if (info == null || !VersionUtility.IsSupported(info.SWInfo.Version, dependency.Version.Min,
                     dependency.Version.Max)) return false;
