@@ -12,11 +12,6 @@ internal class KspModAdapter : MonoBehaviour, ISpaceWarpMod
 {
     public KSP2Mod AdaptedMod;
 
-    public KspModAdapter(KSP2Mod adaptedMod)
-    {
-        SWLogger = new UnityLogSource(adaptedMod.ModName);
-    }
-
     public void OnPreInitialized()
     {
         AdaptedMod.modCore?.ModStart();
