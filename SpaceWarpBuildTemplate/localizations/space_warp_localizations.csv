@@ -39,3 +39,6 @@ SpaceWarp/Console/Clear,Text,,Clear,Limpar
 SpaceWarp/Console/AutoScroll,Text,,Auto Scroll,Scroll automatico
 SpaceWarp/Console/On,Text,,On,On
 SpaceWarp/Console/Off,Text,,Off,Off
+SpaceWarp/AvcDialog/Title,Text,,spacewarp.avc,spacewarp.avc
+SpaceWarp/AvcDialog/MainText,Text,,Allow SpaceWarp to automatically check for mod updates online?,Allow SpaceWarp to automatically check for mod updates online?
+SpaceWarp/AvcDialog/MinorText,Text,,*You can change this later in the Configuration Manager.,*You can change this later in the Configuration Manager.

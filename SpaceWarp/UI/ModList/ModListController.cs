@@ -85,8 +85,8 @@ internal class ModListController : MonoBehaviour
 
     private void Awake()
     {
-        _listEntryTemplate = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/modlist/modlistitem.uxml");
-        _dependencyTemplate = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/modlist/modlistdependency.uxml");
+        _listEntryTemplate = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/modlist/ui/modlist/modlistitem.uxml");
+        _dependencyTemplate = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/modlist/ui/modlist/modlistdependency.uxml");
     }
 
     internal void AddMainMenuItem()
@@ -165,7 +165,7 @@ internal class ModListController : MonoBehaviour
 
         _disabledModFoldout = _container.Q<Foldout>("disabled-mod-foldout");
         _disabledModList = _container.Q<VisualElement>("disabled-mod-list");
-        
+
         _erroredModFoldout = _container.Q<Foldout>("errored-mod-foldout");
         _erroredModList = _container.Q<VisualElement>("errored-mod-list");
 
@@ -190,7 +190,7 @@ internal class ModListController : MonoBehaviour
         _missingInfoWarning = _container.Q<VisualElement>("details-missing-info-error");
         _mismatchedVersionWarning = _container.Q<VisualElement>("details-mismatched-error");
         _badDirectoryWarning = _container.Q<VisualElement>("details-bad-directory-error");
-        
+
         _detailsDependenciesFoldout = _container.Q<Foldout>("details-dependencies-foldout");
         _detailsDependenciesList = _container.Q<VisualElement>("details-dependencies-list");
 
@@ -204,7 +204,7 @@ internal class ModListController : MonoBehaviour
         {
             _disabledModFoldout.style.display = DisplayStyle.Flex;
         }
-        
+
         if (SpaceWarpManager.ErroredPlugins.Count > 0)
         {
             _erroredModFoldout.style.display = DisplayStyle.Flex;
@@ -239,7 +239,7 @@ internal class ModListController : MonoBehaviour
 
         foreach (var erroredPlugin in SpaceWarpManager.ErroredPlugins)
         {
-            MakeListItem(_erroredModList, data => { 
+            MakeListItem(_erroredModList, data => {
                 data.Guid = erroredPlugin.Plugin.Guid;
                 erroredPlugin.Apply(data);
             });
@@ -354,7 +354,7 @@ internal class ModListController : MonoBehaviour
                 modItem[0].RemoveFromClassList("selected");
             }
         }
-        
+
         if (data.Info != null)
         {
             SetSelectedModInfo(data,data.Info);
@@ -367,7 +367,7 @@ internal class ModListController : MonoBehaviour
 
     private void SetSelectedModInfo(ModListItemController data, SpaceWarpPluginDescriptor descriptor)
     {
-        
+
         //TODO: Add the ability to show errors at some point (Munix)
         SetSelected(
             descriptor.Name,
@@ -394,7 +394,7 @@ internal class ModListController : MonoBehaviour
             data.DisabledDependencies
         );
     }
-    
+
 
     private void SetSelected(
         string modName = "",
@@ -482,13 +482,13 @@ internal class ModListController : MonoBehaviour
                 warning.style.display = DisplayStyle.Flex;
                 warning.text = $"({_erroredDependency})";
             }
-            
+
             if (unsupportedDependencies.Contains(id))
             {
                 warning.style.display = DisplayStyle.Flex;
                 warning.text = $"({_unsupportedDependency})";
             }
-            
+
             if (unspecifiedDependencies.Contains(id))
             {
                 warning.style.display = DisplayStyle.Flex;
@@ -500,8 +500,8 @@ internal class ModListController : MonoBehaviour
                 warning.style.display = DisplayStyle.Flex;
                 warning.text = $"({_disabledDependency})";
             }
-            
-            
+
+
             _detailsDependenciesList.Add(dependencyElement);
         }
     }

@@ -37,6 +37,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
 using SpaceWarp.Backend.Sound;
+using SpaceWarp.UI.AvcDialog;
 
 namespace SpaceWarp;
 
@@ -59,19 +60,18 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigEntry<bool> ConfigShowMainMenuWarningForErroredMods;
     internal ConfigEntry<Color> ConfigDebugColor;
     internal ConfigEntry<int> ConfigDebugMessageLimit;
-    
+
     internal ConfigEntry<Color> ConfigErrorColor;
-    private ConfigEntry<bool> _configFirstLaunch;
+    internal ConfigEntry<bool> ConfigFirstLaunch;
     internal ConfigEntry<Color> ConfigInfoColor;
     internal ConfigEntry<Color> ConfigMessageColor;
     internal ConfigEntry<bool> ConfigShowConsoleButton;
     internal ConfigEntry<bool> ConfigShowTimeStamps;
     internal ConfigEntry<string> ConfigTimeStampFormat;
     internal ConfigEntry<Color> ConfigWarningColor;
-    internal ConfigEntry<Color> ConfigAutoScrollEnabledColor;
 
     internal ScriptEnvironment GlobalLuaState;
-    
+
     private string _kspVersion;
 
     internal new static ManualLogSource Logger;
@@ -87,7 +87,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         _kspVersion = typeof(VersionID).GetField("VERSION_TEXT", BindingFlags.Static | BindingFlags.Public)
             ?.GetValue(null) as string;
         SetupSpaceWarpConfiguration();
-        
+
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
@@ -121,7 +121,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             "The format for the timestamps in the debug console.");
         ConfigDebugMessageLimit = Config.Bind("Debug Console", "Message Limit", 1000,
             "The maximum number of messages to keep in the debug console.");
-        _configFirstLaunch = Config.Bind("Version Checking", "First Launch", true,
+        ConfigFirstLaunch = Config.Bind("Version Checking", "First Launch", true,
             "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user.");
         ConfigCheckVersions = Config.Bind("Version Checking", "Check Versions", false,
             "Whether or not Space Warp should check mod versions using their swinfo.json files");
@@ -169,13 +169,14 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         Game.Messages.Subscribe(typeof(TrackingStationUnloadedMessage), StateLoadings.TrackingStationUnloadedHandler, false, true);
         Game.Messages.Subscribe(typeof(TrainingCenterLoadedMessage), StateLoadings.TrainingCenterLoadedHandler, false, true);
 
-        if (_configFirstLaunch.Value)
+        if (ConfigFirstLaunch.Value)
         {
-            _configFirstLaunch.Value = false;
             // Generate a prompt for whether or not space warp should check mod versions
-            var o = new GameObject();
-            var prompt = o.AddComponent<VersionCheckPrompt>();
-            prompt.spaceWarpPlugin = this;
+            var avcDialogUxml = AssetManager.GetAsset<VisualTreeAsset>($"{ModGuid}/avcdialog/ui/avcdialog/avcdialog.uxml");
+            var avcDialog = Window.CreateFromUxml(avcDialogUxml, "Space Warp AVC Dialog", transform, true);
+
+            var avcDialogController = avcDialog.gameObject.AddComponent<AvcDialogController>();
+            avcDialogController.Plugin = this;
         }
 
         SpaceWarpManager.CheckKspVersions();
@@ -306,20 +307,16 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
             (ConfigurationManager.ConfigurationManager)Chainloader
                 .PluginInfos[ConfigurationManager.ConfigurationManager.GUID].Instance;
 
-        var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"{ModGuid}/modlist/modlist.uxml");
+        var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"{ModGuid}/modlist/ui/modlist/modlist.uxml");
         var modList = Window.CreateFromUxml(modListUxml, "Space Warp Mod List", transform, true);
-        
-        var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>($"{ModGuid}/uitkswconsole/spacewarp.console/ConsoleWindow.uxml");
-        var swConsole = Window.CreateFromUxml(swConsoleUxml, "Space Warp Console", transform, true);
-        
         SpaceWarpManager.ModListController = modList.gameObject.AddComponent<ModListController>();
-        modList.gameObject.Persist();
 
+        var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>($"{ModGuid}/swconsole/ui/console/console.uxml");
+        var swConsole = Window.CreateFromUxml(swConsoleUxml, "Space Warp Console", transform, true);
         SpaceWarpManager.SpaceWarpConsole = swConsole.gameObject.AddComponent<SpaceWarpConsole>();
-        swConsole.gameObject.Persist();
     }
 
-    private void InitializeSettingsUI()
+    private static void InitializeSettingsUI()
     {
         GameObject settingsController = new("Settings Controller");
         settingsController.Persist();
