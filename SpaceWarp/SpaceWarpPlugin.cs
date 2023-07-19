@@ -21,6 +21,7 @@ using MoonSharp.Interpreter.Interop.RegistrationPolicies;
 using UitkForKsp2.API;
 using Newtonsoft.Json;
 using SpaceWarp.API.Assets;
+using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Game.Messages;
 using SpaceWarp.API.Lua;
 using SpaceWarp.API.Mods;
@@ -54,21 +55,21 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public const string ModGuid = "com.github.x606.spacewarp";
     public const string ModName = "Space Warp";
     public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
-    internal ConfigEntry<Color> ConfigAllColor;
-    internal ConfigEntry<bool> ConfigCheckVersions;
-    internal ConfigEntry<bool> ConfigShowMainMenuWarningForOutdatedMods;
-    internal ConfigEntry<bool> ConfigShowMainMenuWarningForErroredMods;
-    internal ConfigEntry<Color> ConfigDebugColor;
-    internal ConfigEntry<int> ConfigDebugMessageLimit;
+    internal ConfigValue<Color> ConfigAllColor;
+    internal ConfigValue<bool> ConfigCheckVersions;
+    internal ConfigValue<bool> ConfigShowMainMenuWarningForOutdatedMods;
+    internal ConfigValue<bool> ConfigShowMainMenuWarningForErroredMods;
+    internal ConfigValue<Color> ConfigDebugColor;
+    internal ConfigValue<int> ConfigDebugMessageLimit;
 
-    internal ConfigEntry<Color> ConfigErrorColor;
-    internal ConfigEntry<bool> ConfigFirstLaunch;
-    internal ConfigEntry<Color> ConfigInfoColor;
-    internal ConfigEntry<Color> ConfigMessageColor;
-    internal ConfigEntry<bool> ConfigShowConsoleButton;
-    internal ConfigEntry<bool> ConfigShowTimeStamps;
-    internal ConfigEntry<string> ConfigTimeStampFormat;
-    internal ConfigEntry<Color> ConfigWarningColor;
+    internal ConfigValue<Color> ConfigErrorColor;
+    internal ConfigValue<bool> ConfigFirstLaunch;
+    internal ConfigValue<Color> ConfigInfoColor;
+    internal ConfigValue<Color> ConfigMessageColor;
+    internal ConfigValue<bool> ConfigShowConsoleButton;
+    internal ConfigValue<bool> ConfigShowTimeStamps;
+    internal ConfigValue<string> ConfigTimeStampFormat;
+    internal ConfigValue<Color> ConfigWarningColor;
 
     internal ScriptEnvironment GlobalLuaState;
 
@@ -101,34 +102,34 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     private void SetupSpaceWarpConfiguration()
     {
-        ConfigErrorColor = Config.Bind("Debug Console", "Color Error", Color.red,
-            "The color for log messages that have the level: Error/Fatal (bolded)");
-        ConfigWarningColor = Config.Bind("Debug Console", "Color Warning", Color.yellow,
-            "The color for log messages that have the level: Warning");
-        ConfigMessageColor = Config.Bind("Debug Console", "Color Message", Color.white,
-            "The color for log messages that have the level: Message");
-        ConfigInfoColor = Config.Bind("Debug Console", "Color Info", Color.cyan,
-            "The color for log messages that have the level: Info");
-        ConfigDebugColor = Config.Bind("Debug Console", "Color Debug", Color.green,
-            "The color for log messages that have the level: Debug");
-        ConfigAllColor = Config.Bind("Debug Console", "Color All", Color.magenta,
-            "The color for log messages that have the level: All");
-        ConfigShowConsoleButton = Config.Bind("Debug Console", "Show Console Button", false,
-            "Show console button in app.bar, requires restart");
-        ConfigShowTimeStamps = Config.Bind("Debug Console", "Show Timestamps", true,
-            "Show time stamps in debug console");
-        ConfigTimeStampFormat = Config.Bind("Debug Console", "Timestamp Format", "HH:mm:ss.fff",
-            "The format for the timestamps in the debug console.");
-        ConfigDebugMessageLimit = Config.Bind("Debug Console", "Message Limit", 1000,
-            "The maximum number of messages to keep in the debug console.");
-        ConfigFirstLaunch = Config.Bind("Version Checking", "First Launch", true,
-            "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user.");
-        ConfigCheckVersions = Config.Bind("Version Checking", "Check Versions", false,
-            "Whether or not Space Warp should check mod versions using their swinfo.json files");
-        ConfigShowMainMenuWarningForOutdatedMods = Config.Bind("Version Checking", "Show Warning for Outdated Mods", true,
-            "Whether or not Space Warp should display a warning in main menu if there are outdated mods");
-        ConfigShowMainMenuWarningForErroredMods = Config.Bind("Version Checking", "Show Warning for Errored Mods", true,
-            "Whether or not Space Warp should display a warning in main menu if there are errored mods");
+        ConfigErrorColor = new (SWConfiguration.Bind("Debug Console", "Color Error", Color.red,
+            "The color for log messages that have the level: Error/Fatal (bolded)"));
+        ConfigWarningColor = new (SWConfiguration.Bind("Debug Console", "Color Warning", Color.yellow,
+            "The color for log messages that have the level: Warning"));
+        ConfigMessageColor = new (SWConfiguration.Bind("Debug Console", "Color Message", Color.white,
+            "The color for log messages that have the level: Message"));
+        ConfigInfoColor = new (SWConfiguration.Bind("Debug Console", "Color Info", Color.cyan,
+            "The color for log messages that have the level: Info"));
+        ConfigDebugColor = new (SWConfiguration.Bind("Debug Console", "Color Debug", Color.green,
+            "The color for log messages that have the level: Debug"));
+        ConfigAllColor = new (SWConfiguration.Bind("Debug Console", "Color All", Color.magenta,
+            "The color for log messages that have the level: All"));
+        ConfigShowConsoleButton = new (SWConfiguration.Bind("Debug Console", "Show Console Button", false,
+            "Show console button in app.bar, requires restart"));
+        ConfigShowTimeStamps = new (SWConfiguration.Bind("Debug Console", "Show Timestamps", true,
+            "Show time stamps in debug console"));
+        ConfigTimeStampFormat = new (SWConfiguration.Bind("Debug Console", "Timestamp Format", "HH:mm:ss.fff",
+            "The format for the timestamps in the debug console."));
+        ConfigDebugMessageLimit = new (SWConfiguration.Bind("Debug Console", "Message Limit", 1000,
+            "The maximum number of messages to keep in the debug console."));
+        ConfigFirstLaunch = new (SWConfiguration.Bind("Version Checking", "First Launch", true,
+            "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user."));
+        ConfigCheckVersions = new (SWConfiguration.Bind("Version Checking", "Check Versions", false,
+            "Whether or not Space Warp should check mod versions using their swinfo.json files"));
+        ConfigShowMainMenuWarningForOutdatedMods = new (SWConfiguration.Bind("Version Checking", "Show Warning for Outdated Mods", true,
+            "Whether or not Space Warp should display a warning in main menu if there are outdated mods"));
+        ConfigShowMainMenuWarningForErroredMods = new (SWConfiguration.Bind("Version Checking", "Show Warning for Errored Mods", true,
+            "Whether or not Space Warp should display a warning in main menu if there are errored mods"));
     }
 
     private void SetupLuaState()
