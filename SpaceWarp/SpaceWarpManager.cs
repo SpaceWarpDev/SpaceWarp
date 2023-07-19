@@ -10,6 +10,7 @@ using Mono.Cecil;
 using SpaceWarpPatcher;
 using Newtonsoft.Json;
 using SpaceWarp.API.Assets;
+using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Loading;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
@@ -311,7 +312,7 @@ internal static class SpaceWarpManager
 
             // Now we can just add it to our plugin list
             codelessInfos.Add(new SpaceWarpPluginDescriptor(new AssetOnlyMod(swinfoData.Name), guid, swinfoData.Name, swinfoData, swinfo.Directory,
-                FindOrCreateConfigFile(guid)));
+                new BepInExConfigFile(FindOrCreateConfigFile(guid))));
         }
     }
 
@@ -397,7 +398,7 @@ internal static class SpaceWarpManager
             plugin.Info.Metadata.GUID,
             plugin.Info.Metadata.Name,
             BepInExToSWInfo(plugin.Info),
-            new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!),plugin.Config);
+            new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!),new BepInExConfigFile(plugin.Config));
     }
     
     private static SpaceWarpPluginDescriptor GetBepInExDescriptor(PluginInfo info)
@@ -472,7 +473,7 @@ internal static class SpaceWarpManager
             plugin.Info.Metadata.GUID,
             metadata.Name,
             metadata,
-            directoryInfo,plugin.Config));
+            directoryInfo,new BepInExConfigFile(plugin.Config)));
     }
 
     private static bool AssertSpecificationCompliance(ICollection<string> ignoredGUIDs,

@@ -1,4 +1,5 @@
-﻿using SpaceWarp.API.Logging;
+﻿using SpaceWarp.API.Configuration;
+using SpaceWarp.API.Logging;
 
 namespace SpaceWarp.API.Mods;
 
@@ -11,4 +12,6 @@ public interface ISpaceWarpMod
     public void OnPostInitialized();
 
     public ILogger SWLogger { get; }
+
+    public IConfigFile SWConfiguration { get; }
 }

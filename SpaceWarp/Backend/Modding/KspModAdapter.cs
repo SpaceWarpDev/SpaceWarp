@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using KSP.Modding;
+using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 using SpaceWarp.API.Mods;
 using UnityEngine;
@@ -15,6 +16,7 @@ internal class KspModAdapter : MonoBehaviour, ISpaceWarpMod
     public void OnPreInitialized()
     {
         AdaptedMod.modCore?.ModStart();
+        SWLogger = new UnityLogSource(AdaptedMod.ModName);
     }
 
     public void OnInitialized()
@@ -30,5 +32,6 @@ internal class KspModAdapter : MonoBehaviour, ISpaceWarpMod
         AdaptedMod.modCore?.ModUpdate();
     }
 
-    public ILogger SWLogger { get; }
+    public ILogger SWLogger { get; private set; }
+    public IConfigFile SWConfiguration => new EmptyConfigFile();
 }

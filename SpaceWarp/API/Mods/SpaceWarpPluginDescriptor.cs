@@ -1,13 +1,14 @@
 ﻿using System.IO;
 using BepInEx.Configuration;
 using JetBrains.Annotations;
+using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Mods.JSON;
 
 namespace SpaceWarp.API.Mods;
 
 public class SpaceWarpPluginDescriptor
 {
-    public SpaceWarpPluginDescriptor([CanBeNull] ISpaceWarpMod plugin, string guid, string name, ModInfo swInfo, DirectoryInfo folder, [CanBeNull] ConfigFile configFile = null)
+    public SpaceWarpPluginDescriptor([CanBeNull] ISpaceWarpMod plugin, string guid, string name, ModInfo swInfo, DirectoryInfo folder, [CanBeNull] IConfigFile configFile = null)
     {
         Plugin = plugin;
         Guid = guid;
@@ -22,5 +23,5 @@ public class SpaceWarpPluginDescriptor
     public readonly string Name;
     public readonly ModInfo SWInfo;
     public readonly DirectoryInfo Folder;
-    [CanBeNull] public readonly ConfigFile ConfigFile;
+    [CanBeNull] public readonly IConfigFile ConfigFile;
 }

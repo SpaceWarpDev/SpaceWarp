@@ -5,6 +5,7 @@ using KSP.Messages;
 using KSP.VFX;
 using SpaceWarp.API.Mods.JSON;
 using JetBrains.Annotations;
+using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 
 namespace SpaceWarp.API.Mods;
@@ -60,6 +61,9 @@ public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin, ISpaceWarpMod
     }
     private BepInExLogger _logger;
     public ILogger SWLogger => _logger ??= new BepInExLogger(Logger);
+    private BepInExConfigFile _configFile;
+    public IConfigFile SWConfiguration => _configFile ??= new BepInExConfigFile(Config);
+
     internal static string GetGuidBySpec(PluginInfo pluginInfo, ModInfo modInfo)
     {
         return modInfo.Spec >= SpecVersion.V1_2

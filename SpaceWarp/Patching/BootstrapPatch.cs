@@ -46,7 +46,6 @@ internal static class BootstrapPatch
                     GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
             }
 
-
         });
 
         ilCursor.GotoLabel(endLabel, MoveType.Before);

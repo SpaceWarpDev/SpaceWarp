@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BepInEx.Configuration;
 using KSP.UI;
+using SpaceWarp.API.Configuration;
 using SpaceWarp.API.UI.Settings;
 using UnityEngine;
 
@@ -54,6 +55,31 @@ internal class ModsSubMenu : SettingsSubMenu
                 var header = GenerateSectionHeader(config.Key);
                 header.transform.SetParent(transform);
                 foreach (var drawer in config.Value.Select(ModsPropertyDrawers.Drawer).Where(drawer => drawer != null))
+                {
+                    drawer.transform.SetParent(header.transform);
+                }
+                GenerateDivider().transform.SetParent(transform);
+            }
+        }
+
+        foreach (var mod in SpaceWarpManager.InternalModLoaderMods.Where(mod =>
+                     mod.ConfigFile != null && mod.ConfigFile.Sections.Count > 0 &&
+                     mod.ConfigFile.Sections.Any(x => mod.ConfigFile[x].Count > 0)))
+        {
+            GenerateTitle(mod.Name).transform.SetParent(transform);
+            GenerateDivider().transform.SetParent(transform);
+            Dictionary<string, List<(string name, IConfigEntry entry)>> modConfigCategories = new();
+            foreach (var section in mod.ConfigFile!.Sections)
+            {
+                if (mod.ConfigFile[section].Count <= 0) continue;
+                var list = modConfigCategories[section] = new();
+                list.AddRange(mod.ConfigFile[section].Select(entry => (entry, mod.ConfigFile[section, entry])));
+            }
+            foreach (var config in modConfigCategories)
+            {
+                var header = GenerateSectionHeader(config.Key);
+                header.transform.SetParent(transform);
+                foreach (var drawer in config.Value.Select(x => ModsPropertyDrawers.Drawer(x.name, x.entry)).Where(drawer => drawer != null))
                 {
                     drawer.transform.SetParent(header.transform);
                 }

@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 using SpaceWarp.API.Mods;
 
@@ -24,4 +25,5 @@ internal class AssetOnlyMod : ISpaceWarpMod
     }
 
     public ILogger SWLogger { get; }
+    public IConfigFile SWConfiguration => new EmptyConfigFile();
 }
