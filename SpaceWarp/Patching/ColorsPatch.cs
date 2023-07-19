@@ -4,6 +4,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using KSP.Game;
 using KSP.Modules;
+using KSP.OAB;
 using SpaceWarp.API.Assets;
 using UnityEngine;
 
@@ -11,29 +12,41 @@ namespace SpaceWarp.Patching;
 
 /// <summary>
 ///     This patch is meant to give modders a way to use the new colors system on KSP2.
-///     How to: On unity, set the shader of your mesh to Standard. On your Plugin/{ModID} folder, add at assets/Images your
-///     textures,
-///     Textures should be named {PartName}_{MapType}, check the suffixes for more information.
-///     Parts with multiple sizes (such as XS, S, M, L, XL) are supported, just be sure that your part config is named
-///     accordingly.
-///     Ie:partXS, partS, partM, partL, partXL.
-///     this patch will import the textures to all part variants.
-///     if you want your parts to be loaded before, just add them to partsToLoad.
+///     The patch will replace any renderer that has a "Parts Replace" or a "KSP2/Parts/Paintable" shader on it.
+///     It will copy all its values onto the new material, including the material name.
+///     Note: "Parts Replace" is obsolete and might be deleted on a later version.
 ///     Patch created by LuxStice.
 /// </summary>
 [HarmonyPatch]
 internal class ColorsPatch
 {
+    private const string KSP2_OPAQUE_PATH = "KSP2/Scenery/Standard (Opaque)",
+        KSP2_TRANSPARENT_PATH = "KSP2/Scenery/Standard (Transparent)",
+        UNITY_STANDARD = "Standard";
+
+    [HarmonyPatch(typeof(ObjectAssemblyPartTracker), nameof(ObjectAssemblyPartTracker.OnPartPrefabLoaded))]
+    public static void Prefix(IObjectAssemblyAvailablePart obj, ref GameObject prefab)
+    {
+        foreach(var renderer in prefab.GetComponentsInChildren<Renderer>())
+        {
+            string shaderName = renderer.material.shader.name;
+            if (shaderName == "Parts Replace" || shaderName == "KSP2/Parts/Paintable")
+            {
+                var mat = new Material(Shader.Find(KSP2_OPAQUE_PATH));
+                mat.name = renderer.material.name;
+                mat.CopyPropertiesFromMaterial(renderer.material);
+                renderer.material = mat;
+            }
+        }
+    }
+
+    //Everything below this point will be removed in the next patch
     private const int DIFFUSE = 0;
     private const int METTALLIC = 1;
     private const int BUMP = 2;
     private const int OCCLUSION = 3;
     private const int EMISSION = 4;
     private const int PAINT_MAP = 5;
-
-    private const string KSP2_OPAQUE_PATH = "KSP2/Scenery/Standard (Opaque)",
-        KSP2_TRANSPARENT_PATH = "KSP2/Scenery/Standard (Transparent)",
-        UNITY_STANDARD = "Standard";
 
 
     private const string displayName = "TTR"; //Taste the Rainbow - name by munix
@@ -289,7 +302,6 @@ internal class ColorsPatch
         nameof(Module_Color.OnInitialize))]
     internal static void Postfix(Module_Color __instance)
     {
-
         var partName = __instance.OABPart is not null ? __instance.OABPart.PartName : __instance.part.Name;
         var trimmedPartName = TrimPartName(partName);
         if (DeclaredParts.Count > 0 && _allParts.Contains(trimmedPartName))
@@ -313,22 +325,8 @@ internal class ColorsPatch
                     renderer.SetMaterial(mat); //Sometimes the material Set doesn't work, this seems to be more reliable.
                 }
             }
+            __instance.SomeColorUpdated();
         }
-        else 
-        {
-            foreach (var renderer in __instance.GetComponentsInChildren<MeshRenderer>(true))
-            {
-                if (renderer.material.shader.name == "Parts Replace")
-                {
-                    var mat = new Material(_ksp2Opaque);
-                    mat.name = renderer.material.name;
-                    mat.CopyPropertiesFromMaterial(renderer.material);
-                    renderer.material = mat;
-                }
-            }
-        }//New way to render textures
-
-        __instance.SomeColorUpdated();
     }
 
     private static void LogMessage(object data)

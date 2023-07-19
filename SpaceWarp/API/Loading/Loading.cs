@@ -24,7 +24,7 @@ public static class Loading
     internal static List<Func<FlowAction>> GeneralLoadingActions = new();
 
     /// <summary>
-    /// Registers an asset loading function for space warp, will load assets from the subfolder
+    /// Registers an asset loading function for space warp, will load assets from the subfolder. Should be added either on Awake() or Start().
     /// </summary>
     /// <param name="subfolder">The subfolder under "assets" that this loader matches</param>
     /// <param name="name">The name to be displayed for this loader, it gets displayed like the following "Mod Name: [name]"</param>
@@ -55,7 +55,7 @@ public static class Loading
     }
 
     /// <summary>
-    /// Registers a per mod loading action (but more general)
+    /// Registers a per mod loading action (but more general). Should be added either on Awake() or Start().
     /// </summary>
     /// <param name="name">The name of the action</param>
     /// <param name="action">The action</param>
@@ -65,7 +65,7 @@ public static class Loading
     }
 
     /// <summary>
-    /// Registers a general loading action
+    /// Registers a general loading action. Should be added either on Awake() or Start().
     /// </summary>
     /// <param name="action">The action generator</param>
     public static void AddGeneralLoadingAction(Func<FlowAction> actionGenerator)
@@ -74,7 +74,7 @@ public static class Loading
     }
 
     /// <summary>
-    /// Registers an action to be done on addressables after addressables have been loaded
+    /// Registers an action to be done on addressables after addressables have been loaded. Should be added either on Awake() or Start().
     /// </summary>
     /// <param name="name">The name of the action</param>
     /// <param name="label">The addressables label to hook into</param>
@@ -133,7 +133,7 @@ public static class Loading
                     catch (Exception e)
                     {
                         if (plugin.Plugin != null)
-                            plugin.Plugin.ModLogger.LogError(e.ToString());
+                            plugin.Plugin.SWLogger.LogError(e.ToString());
                         else
                             SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
                     }
@@ -227,7 +227,7 @@ public static class Loading
                 catch (Exception e)
                 {
                     if (plugin.Plugin != null)
-                        plugin.Plugin.ModLogger.LogError(e.ToString());
+                        plugin.Plugin.SWLogger.LogError(e.ToString());
                     else
                         SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
                 }

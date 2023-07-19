@@ -2,7 +2,8 @@ Key,Type,Description,English,Portuguese BR
 SpaceWarp/ModList/EnableAll,Text,,Enable All,Ativar todos
 SpaceWarp/ModList/DisableAll,Text,,Disable All,Desativar todos
 SpaceWarp/ModList/RevertChanges,Text,,Revert Changes,Reverter alterações
-SpaceWarp/ModList/ChangesDetected,Text,,"{0} changes detected, please restart to apply them","{0} alterações detetadas, porfavor reinicie o jogo"
+SpaceWarp/ModList/multipleChangesDetected,Text,,"{0} changes detected, please restart to apply them","{0} alterações detetadas, porfavor reinicie o jogo"
+SpaceWarp/ModList/singleChangeDetected,Text,,"1 change detected, please restart to apply it","1 alteração detectada, reinicie para aplicá-la"
 SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist
 SpaceWarp/ModList/EnabledMods,Text,,Enabled Mods,Mods ativos
 SpaceWarp/ModList/ErroredMods,Text,,Errored Mods,Mods com erros
@@ -27,6 +28,8 @@ SpaceWarp/ModList/DisabledDependency,Text,,Dependency is disabled,Esta dependên
 SpaceWarp/ModList/UnspecifiedDependency,Text,,Dependency was not specified in SW info,Esta dependência não está presente no swinfo
 SpaceWarp/ModList/UnsupportedDependency,Text,,Dependency is of an unsupported version,Esta dependência é de uma versão nao suportada
 SpaceWarp/Mods,Text,,Mods,Mods
+SpaceWarp/Mods/Outdated,Text,,Mods <color=yellow>⚠</color>,Mods <color=yellow>⚠</color>
+SpaceWarp/Mods/Errored,Text,,Mods <color=red>⚠</color>,Mods <color=red>⚠</color>
 SpaceWarp,Text,,Space Warp,Space Warp
 SpaceWarp/VersionChecking,Text,,Allow Space Warp to check versions for mods over the network?,Deixar SpaceWarp verificar a versão dos mods na internet?
 SpaceWarp/Yes,Text,,Yes,Sim
@@ -36,3 +39,6 @@ SpaceWarp/Console/Clear,Text,,Clear,Limpar
 SpaceWarp/Console/AutoScroll,Text,,Auto Scroll,Scroll automatico
 SpaceWarp/Console/On,Text,,On,On
 SpaceWarp/Console/Off,Text,,Off,Off
+SpaceWarp/AvcDialog/Title,Text,,spacewarp.avc,spacewarp.avc
+SpaceWarp/AvcDialog/MainText,Text,,Allow SpaceWarp to automatically check for mod updates online?,Allow SpaceWarp to automatically check for mod updates online?
+SpaceWarp/AvcDialog/MinorText,Text,,*You can change this later in the Configuration Manager.,*You can change this later in the Configuration Manager.

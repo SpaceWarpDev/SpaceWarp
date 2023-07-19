@@ -6,10 +6,10 @@ namespace SpaceWarp.Patching.LoadingActions;
 
 internal sealed class PreInitializeModAction : FlowAction
 {
-    private readonly BaseSpaceWarpPlugin _plugin;
+    private readonly SpaceWarpPluginDescriptor _plugin;
 
-    public PreInitializeModAction(BaseSpaceWarpPlugin plugin) : base(
-        $"Pre-initialization for plugin {plugin.Info.Metadata.Name}")
+    public PreInitializeModAction(SpaceWarpPluginDescriptor plugin) : base(
+        $"Pre-initialization for plugin {plugin.Name}")
     {
         _plugin = plugin;
     }
@@ -18,12 +18,12 @@ internal sealed class PreInitializeModAction : FlowAction
     {
         try
         {
-            _plugin.OnPreInitialized();
+            _plugin.Plugin?.OnPreInitialized();
             resolve();
         }
         catch (Exception e)
         {
-            _plugin.ModLogger.LogError(e.ToString());
+            _plugin.Plugin?.SWLogger.LogError(e.ToString());
             reject(null);
         }
     }

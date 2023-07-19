@@ -14,7 +14,8 @@ public static class Colors
     ///     Value is list of strings containing the partNames.
     ///     Only parts in this list will be modified.
     /// </summary>
-    public static Dictionary<string, string[]> DeclaredParts => ColorsPatch.DeclaredParts;
+    [Obsolete("Use the shader \"KSP2/Parts/Paintable\" or \"Parts Replace\" instead")]
+    public static Dictionary<string, string[]> DeclaredParts => new();
 
     /// <summary>
     ///     Adds <paramref name="partNameList" /> to internal parts list under <paramref name="modGuid" />
@@ -26,7 +27,7 @@ public static class Colors
     ///     part,
     ///     Example: partNameS, partNameM, partNameL, partNameXL are all treated as partName
     /// </param>
-    [Obsolete("This should only be used for testing purposes (for easier reloading of textures). Use the shader \"Parts Replace\" instead")]
+    [Obsolete("Use the shader \"KSP2/Parts/Paintable\" or \"Parts Replace\" instead")]
     public static void DeclareParts(string modGuid, params string[] partNameList)
     {
         ColorsPatch.DeclareParts(modGuid, partNameList);
@@ -42,7 +43,7 @@ public static class Colors
     ///     part.
     ///     Example: partNameS, partNameM, partNameL, partNameXL are all treated as partName
     /// </param>
-    [Obsolete("This should only be used for testing purposes (for easier reloading of textures). Use the shader \"Parts Replace\" instead")]
+    [Obsolete("Use the shader \"KSP2/Parts/Paintable\" or \"Parts Replace\" instead")]
     public static void DeclareParts(string modGuid, IEnumerable<string> partNameList)
     {
         ColorsPatch.DeclareParts(modGuid, partNameList);
@@ -52,5 +53,6 @@ public static class Colors
     /// </summary>
     /// <param name="partName">Name of the part as described in the .json.</param>
     /// <returns></returns>
-    public static UnityEngine.Texture[] GetTextures(string partName) => ColorsPatch.GetTextures(partName);
+    [Obsolete("Use the shader \"KSP2/Parts/Paintable\" or \"Parts Replace\" instead")]
+    public static UnityEngine.Texture[] GetTextures(string partName) => new UnityEngine.Texture[0];
 }
