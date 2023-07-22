@@ -8,7 +8,7 @@ namespace SpaceWarp.API.Mods;
 
 public class SpaceWarpPluginDescriptor
 {
-    public SpaceWarpPluginDescriptor([CanBeNull] ISpaceWarpMod plugin, string guid, string name, ModInfo swInfo, DirectoryInfo folder, [CanBeNull] IConfigFile configFile = null)
+    public SpaceWarpPluginDescriptor([CanBeNull] ISpaceWarpMod plugin, string guid, string name, ModInfo swInfo, DirectoryInfo folder,  bool doLoadingActions = true, [CanBeNull] IConfigFile configFile = null)
     {
         Plugin = plugin;
         Guid = guid;
@@ -23,5 +23,13 @@ public class SpaceWarpPluginDescriptor
     public readonly string Name;
     public readonly ModInfo SWInfo;
     public readonly DirectoryInfo Folder;
+    public readonly bool DoLoadingActions = false;
     [CanBeNull] public readonly IConfigFile ConfigFile;
+
+
+    // Set by the version checking system
+    public bool Outdated = false;
+    public bool Errored = false;
+    // Used to check for mods that have not been pre-initialized
+    public bool LatePreInitialize = false;
 }

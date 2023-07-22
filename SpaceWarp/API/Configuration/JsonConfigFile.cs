@@ -18,10 +18,9 @@ public class JsonConfigFile : IConfigFile
     private readonly string _file;
 
 
-    public JsonConfigFile(DirectoryInfo path)
+    public JsonConfigFile(string file)
     {
         // Use .cfg as this is going to have comments and that will be an issue
-        var file = Path.Combine(path.FullName, "config.cfg");
         if (File.Exists(file))
         {
             try

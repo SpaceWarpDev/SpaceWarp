@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using BepInEx;
-using SpaceWarp.API.Mods;
 using SpaceWarp.Patching;
-using SpaceWarp.UI.ModList;
 using UnityEngine;
-using static UnityEngine.GameObject;
 
-namespace SpaceWarp.InternalUtilities;
+namespace SpaceWarp.API.Mods;
 
-internal class SpaceWarpErrorDescription
+public class SpaceWarpErrorDescription
 {
     public SpaceWarpPluginDescriptor Plugin;
     public bool MissingSwinfo = false;
@@ -44,37 +41,4 @@ internal class SpaceWarpErrorDescription
         plugin.Plugin = null;
     }
 
-    public void Apply(ModListItemController controller)
-    {
-        controller.SetInfo(Plugin);
-        controller.SetIsErrored();
-        if (MissingSwinfo) controller.SetMissingSWInfo();
-        if (BadDirectory) controller.SetBadDirectory();
-        if (BadID) controller.SetBadID();
-        if (MismatchedVersion) controller.SetMismatchedVersion();
-        foreach (var disabledDependency in DisabledDependencies)
-        {
-            controller.SetIsDependencyDisabled(disabledDependency);
-        }
-
-        foreach (var erroredDependency in ErroredDependencies)
-        {
-            controller.SetIsDependencyErrored(erroredDependency);
-        }
-
-        foreach (var missingDependency in MissingDependencies)
-        {
-            controller.SetIsDependencyMissing(missingDependency);
-        }
-        
-        foreach (var unsupportedDependency in UnsupportedDependencies)
-        {
-            controller.SetIsDependencyUnsupported(unsupportedDependency);
-        }
-
-        foreach (var unspecifiedDependency in UnspecifiedDependencies)
-        {
-            controller.SetIsDependencyUnspecified(unspecifiedDependency);
-        }
-    }
 }

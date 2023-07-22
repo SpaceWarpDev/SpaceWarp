@@ -4,6 +4,7 @@ using BepInEx;
 using BepInEx.Bootstrap;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarpPatcher;
+using Enumerable = UniLinq.Enumerable;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -18,6 +19,8 @@ namespace SpaceWarp.API.Mods;
 /// </summary>
 public static class PluginList
 {
+    #region Reading Plugins
+
     /// <summary>
     /// Set if the plugin list is different in any way since last run (version differences, new mods, mods removed, mods disabled, description differences, any different in any swinfo file and the disabled mod list)
     /// </summary>
@@ -69,7 +72,7 @@ public static class PluginList
     /// <returns><see cref="ModInfo"/> of the plugin or null if not found</returns>
     public static ModInfo TryGetSwinfo(string guid)
     {
-        var swModInfo = SpaceWarpManager.AllPlugins
+        var swModInfo = AllEnabledAndActivePlugins
             .FirstOrDefault(item => item.Guid == guid);
 
         if (swModInfo != null)
@@ -77,7 +80,7 @@ public static class PluginList
             return swModInfo.SWInfo;
         }
         
-        var disabledModInfo = SpaceWarpManager.DisabledPlugins
+        var disabledModInfo = AllDisabledPlugins
             .Where(item => item.Guid == guid)
             .Select(item => item.SWInfo)
             .FirstOrDefault();
@@ -93,7 +96,7 @@ public static class PluginList
     public static SpaceWarpPluginDescriptor TryGetDescriptor(string guid)
     {
         
-        return SpaceWarpManager.AllPlugins
+        return AllEnabledAndActivePlugins
             .FirstOrDefault(item => item.Guid == guid);
     }
 
@@ -112,4 +115,105 @@ public static class PluginList
     /// <returns>Plugin instance or null if not found</returns>
     public static T TryGetPlugin<T>(string guid) where T : BaseUnityPlugin =>
         Chainloader.Plugins.Find(plugin => plugin.Info.Metadata.GUID == guid) as T;
+    #endregion
+
+    #region Registering Plugins
+
+    
+    private static List<SpaceWarpPluginDescriptor> _allEnabledAndActivePlugins = new();
+    /// <summary>
+    /// All plugins that are enabled, and active (not errored)
+    /// </summary>
+    public static IReadOnlyList<SpaceWarpPluginDescriptor> AllEnabledAndActivePlugins => _allEnabledAndActivePlugins;
+    
+    private static List<SpaceWarpPluginDescriptor> _allDisabledPlugins = new();
+    
+    /// <summary>
+    /// All disabled plugins
+    /// </summary>
+    public static IReadOnlyList<SpaceWarpPluginDescriptor> AllDisabledPlugins => _allDisabledPlugins;
+
+    private static List<SpaceWarpErrorDescription> _allErroredPlugins = new();
+    public static IReadOnlyList<SpaceWarpErrorDescription> AllErroredPlugins => _allErroredPlugins;
+
+    public static IEnumerable<SpaceWarpPluginDescriptor> AllPlugins => _allEnabledAndActivePlugins
+        .Concat(_allDisabledPlugins).Concat(_allErroredPlugins.Select(x => x.Plugin));
+
+    public static void RegisterPlugin(SpaceWarpPluginDescriptor plugin)
+    {
+        if (AllPlugins.Any(x => x.Guid == plugin.Guid))
+        {
+            SpaceWarpPlugin.Logger.LogError($"Attempting to register a mod with a duplicate GUID: {plugin.Guid}");
+        }
+
+        SpaceWarpPlugin.Logger.LogInfo($"Registered plugin: {plugin.Guid}");
+        _allEnabledAndActivePlugins.Add(plugin);
+    }
+
+    public static void RegisterDisabledPlugin(SpaceWarpPluginDescriptor plugin)
+    {
+        if (AllPlugins.Any(x => x.Guid == plugin.Guid))
+        {
+            SpaceWarpPlugin.Logger.LogError($"Attempting to register a mod with a duplicate GUID: {plugin.Guid}");
+        }
+        SpaceWarpPlugin.Logger.LogInfo($"Registered disabled plugin: {plugin.Guid}");
+        _allDisabledPlugins.Add(plugin);
+    }
+
+    private static SpaceWarpErrorDescription GetErrorDescriptor(SpaceWarpPluginDescriptor plugin)
+    {
+        if (_allErroredPlugins.Any(x => x.Plugin == plugin))
+        {
+            return _allErroredPlugins.First(x => x.Plugin == plugin);
+        }
+        if (_allEnabledAndActivePlugins.Any(x => x == plugin))
+        {
+            _allEnabledAndActivePlugins.Remove(plugin);
+        }
+        var newError = new SpaceWarpErrorDescription(plugin);
+        _allErroredPlugins.Add(newError);
+        return newError;
+    }
+    
+    public static void NoteMissingSwinfoError(SpaceWarpPluginDescriptor plugin)
+    {
+        var errorDescriptor = GetErrorDescriptor(plugin);
+        errorDescriptor.MissingSwinfo = true;
+    }
+
+    public static void NoteBadDirectoryError(SpaceWarpPluginDescriptor plugin)
+    {
+        var errorDescriptor = GetErrorDescriptor(plugin);
+        errorDescriptor.BadDirectory = true;
+    }
+
+    public static void NoteBadIDError(SpaceWarpPluginDescriptor plugin)
+    {
+        var errorDescriptor = GetErrorDescriptor(plugin);
+        errorDescriptor.BadID = true;
+    }
+
+    public static void NoteMismatchedVersionError(SpaceWarpPluginDescriptor plugin)
+    {
+        var errorDescriptor = GetErrorDescriptor(plugin);
+        errorDescriptor.MismatchedVersion = true;
+    }
+
+    public static void NoteUnspecifiedDependencyError(SpaceWarpPluginDescriptor plugin, string dependency)
+    {
+        var errorDescriptor = GetErrorDescriptor(plugin);
+        errorDescriptor.UnspecifiedDependencies.Add(dependency);
+    }
+
+    /// <summary>
+    /// This is done after Awake/LoadModule(), so that everything else can use it
+    /// </summary>
+    internal static void ResolveDependenciesAndLoadOrder()
+    {
+        
+    }
+    
+
+    #endregion
+    
 }

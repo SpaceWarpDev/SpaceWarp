@@ -195,7 +195,7 @@ internal class ModListController : MonoBehaviour
         _detailsDependenciesList = _container.Q<VisualElement>("details-dependencies-list");
 
         // Show only categories that have any mods in them
-        if (SpaceWarpManager.AllPlugins.Count > 0)
+        if (SpaceWarpManager.AllPluginsInternal.Count > 0)
         {
             _enabledModFoldout.style.display = DisplayStyle.Flex;
         }
@@ -213,7 +213,7 @@ internal class ModListController : MonoBehaviour
 
     private void FillModLists()
     {
-        foreach (var plugin in SpaceWarpManager.AllPlugins)
+        foreach (var plugin in SpaceWarpManager.AllPluginsInternal)
         {
             MakeListItem(_enabledModList, data =>
             {

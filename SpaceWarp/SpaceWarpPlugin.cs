@@ -22,7 +22,6 @@ using UitkForKsp2.API;
 using Newtonsoft.Json;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Configuration;
-using SpaceWarp.API.Game.Messages;
 using SpaceWarp.API.Lua;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
@@ -38,6 +37,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
 using SpaceWarp.Backend.Sound;
+using SpaceWarp.Modules;
 using SpaceWarp.UI.AvcDialog;
 
 namespace SpaceWarp;
@@ -61,7 +61,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ConfigValue<bool> ConfigShowMainMenuWarningForErroredMods;
     internal ConfigValue<Color> ConfigDebugColor;
     internal ConfigValue<int> ConfigDebugMessageLimit;
-
+    
     internal ConfigValue<Color> ConfigErrorColor;
     internal ConfigValue<bool> ConfigFirstLaunch;
     internal ConfigValue<Color> ConfigInfoColor;
@@ -85,6 +85,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     public void Awake()
     {
+        ModuleManager.LoadAllModules();
+
         _kspVersion = typeof(VersionID).GetField("VERSION_TEXT", BindingFlags.Static | BindingFlags.Public)
             ?.GetValue(null) as string;
         SetupSpaceWarpConfiguration();
@@ -94,6 +96,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
 
         Soundbank.soundbanks = new();
+        
+        PluginList.ResolveDependenciesAndLoadOrder();
 
         SpaceWarpManager.InitializeSpaceWarpsLoadingActions();
 
@@ -102,34 +106,34 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     private void SetupSpaceWarpConfiguration()
     {
-        ConfigErrorColor = new (SWConfiguration.Bind("Debug Console", "Color Error", Color.red,
-            "The color for log messages that have the level: Error/Fatal (bolded)"));
-        ConfigWarningColor = new (SWConfiguration.Bind("Debug Console", "Color Warning", Color.yellow,
-            "The color for log messages that have the level: Warning"));
-        ConfigMessageColor = new (SWConfiguration.Bind("Debug Console", "Color Message", Color.white,
-            "The color for log messages that have the level: Message"));
-        ConfigInfoColor = new (SWConfiguration.Bind("Debug Console", "Color Info", Color.cyan,
-            "The color for log messages that have the level: Info"));
-        ConfigDebugColor = new (SWConfiguration.Bind("Debug Console", "Color Debug", Color.green,
-            "The color for log messages that have the level: Debug"));
-        ConfigAllColor = new (SWConfiguration.Bind("Debug Console", "Color All", Color.magenta,
-            "The color for log messages that have the level: All"));
-        ConfigShowConsoleButton = new (SWConfiguration.Bind("Debug Console", "Show Console Button", false,
-            "Show console button in app.bar, requires restart"));
-        ConfigShowTimeStamps = new (SWConfiguration.Bind("Debug Console", "Show Timestamps", true,
-            "Show time stamps in debug console"));
-        ConfigTimeStampFormat = new (SWConfiguration.Bind("Debug Console", "Timestamp Format", "HH:mm:ss.fff",
-            "The format for the timestamps in the debug console."));
-        ConfigDebugMessageLimit = new (SWConfiguration.Bind("Debug Console", "Message Limit", 1000,
-            "The maximum number of messages to keep in the debug console."));
-        ConfigFirstLaunch = new (SWConfiguration.Bind("Version Checking", "First Launch", true,
-            "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user."));
-        ConfigCheckVersions = new (SWConfiguration.Bind("Version Checking", "Check Versions", false,
-            "Whether or not Space Warp should check mod versions using their swinfo.json files"));
-        ConfigShowMainMenuWarningForOutdatedMods = new (SWConfiguration.Bind("Version Checking", "Show Warning for Outdated Mods", true,
-            "Whether or not Space Warp should display a warning in main menu if there are outdated mods"));
-        ConfigShowMainMenuWarningForErroredMods = new (SWConfiguration.Bind("Version Checking", "Show Warning for Errored Mods", true,
-            "Whether or not Space Warp should display a warning in main menu if there are errored mods"));
+        // ConfigErrorColor = new (SWConfiguration.Bind("Debug Console", "Color Error", Color.red,
+        //     "The color for log messages that have the level: Error/Fatal (bolded)"));
+        // ConfigWarningColor = new (SWConfiguration.Bind("Debug Console", "Color Warning", Color.yellow,
+        //     "The color for log messages that have the level: Warning"));
+        // ConfigMessageColor = new (SWConfiguration.Bind("Debug Console", "Color Message", Color.white,
+        //     "The color for log messages that have the level: Message"));
+        // ConfigInfoColor = new (SWConfiguration.Bind("Debug Console", "Color Info", Color.cyan,
+        //     "The color for log messages that have the level: Info"));
+        // ConfigDebugColor = new (SWConfiguration.Bind("Debug Console", "Color Debug", Color.green,
+        //     "The color for log messages that have the level: Debug"));
+        // ConfigAllColor = new (SWConfiguration.Bind("Debug Console", "Color All", Color.magenta,
+        //     "The color for log messages that have the level: All"));
+        // ConfigShowConsoleButton = new (SWConfiguration.Bind("Debug Console", "Show Console Button", false,
+        //     "Show console button in app.bar, requires restart"));
+        // ConfigShowTimeStamps = new (SWConfiguration.Bind("Debug Console", "Show Timestamps", true,
+        //     "Show time stamps in debug console"));
+        // ConfigTimeStampFormat = new (SWConfiguration.Bind("Debug Console", "Timestamp Format", "HH:mm:ss.fff",
+        //     "The format for the timestamps in the debug console."));
+        // ConfigDebugMessageLimit = new (SWConfiguration.Bind("Debug Console", "Message Limit", 1000,
+        //     "The maximum number of messages to keep in the debug console."));
+        // ConfigFirstLaunch = new (SWConfiguration.Bind("Version Checking", "First Launch", true,
+        //     "Whether or not this is the first launch of space warp, used to show the version checking prompt to the user."));
+        // ConfigCheckVersions = new (SWConfiguration.Bind("Version Checking", "Check Versions", false,
+        //     "Whether or not Space Warp should check mod versions using their swinfo.json files"));
+        // ConfigShowMainMenuWarningForOutdatedMods = new (SWConfiguration.Bind("Version Checking", "Show Warning for Outdated Mods", true,
+        //     "Whether or not Space Warp should display a warning in main menu if there are outdated mods"));
+        // ConfigShowMainMenuWarningForErroredMods = new (SWConfiguration.Bind("Version Checking", "Show Warning for Errored Mods", true,
+        //     "Whether or not Space Warp should display a warning in main menu if there are errored mods"));
     }
 
     private void SetupLuaState()
@@ -158,17 +162,18 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
     }
 
+    public override void OnPreInitialized()
+    {
+        ModuleManager.PreInitializeAllModules();
+    }
+
+
     public override void OnInitialized()
     {
-        base.OnInitialized();
+        ModuleManager.InitializeAllModules();
         SetupLuaState();
 
-        Game.Messages.Subscribe(typeof(GameStateEnteredMessage), StateChanges.OnGameStateEntered, false, true);
-        Game.Messages.Subscribe(typeof(GameStateLeftMessage), StateChanges.OnGameStateLeft, false, true);
-        Game.Messages.Subscribe(typeof(GameStateChangedMessage), StateChanges.OnGameStateChanged, false, true);
-        Game.Messages.Subscribe(typeof(TrackingStationLoadedMessage), StateLoadings.TrackingStationLoadedHandler, false, true);
-        Game.Messages.Subscribe(typeof(TrackingStationUnloadedMessage), StateLoadings.TrackingStationUnloadedHandler, false, true);
-        Game.Messages.Subscribe(typeof(TrainingCenterLoadedMessage), StateLoadings.TrainingCenterLoadedHandler, false, true);
+
 
         if (ConfigFirstLaunch.Value)
         {
@@ -196,13 +201,14 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     public override void OnPostInitialized()
     {
+        ModuleManager.PostInitializeAllModules();
         InitializeSettingsUI();
         SpaceWarpManager.ModListController.AddMainMenuItem();
     }
 
     public void ClearVersions()
     {
-        foreach (var plugin in SpaceWarpManager.AllPlugins)
+        foreach (var plugin in SpaceWarpManager.AllPluginsInternal)
         {
             SpaceWarpManager.ModsOutdated[plugin.Guid] = false;
         }
@@ -211,7 +217,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public void CheckVersions()
     {
         ClearVersions();
-        foreach (var plugin in SpaceWarpManager.AllPlugins)
+        foreach (var plugin in SpaceWarpManager.AllPluginsInternal)
         {
             if (plugin.SWInfo.VersionCheck != null)
             {

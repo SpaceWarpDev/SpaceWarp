@@ -1,4 +1,5 @@
-﻿using UitkForKsp2.API;
+﻿using SpaceWarp.Modules;
+using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -6,7 +7,7 @@ namespace SpaceWarp.UI.AvcDialog;
 
 public class AvcDialogController : MonoBehaviour
 {
-    internal SpaceWarpPlugin Plugin;
+    internal VersionChecking Module;
 
     private void Awake()
     {
@@ -18,16 +19,16 @@ public class AvcDialogController : MonoBehaviour
 
         container.Q<Button>("yes-button").RegisterCallback<ClickEvent>(_ =>
         {
-            Plugin.ConfigFirstLaunch.Value = false;
-            Plugin.ConfigCheckVersions.Value = true;
-            Plugin.CheckVersions();
+            Module.ConfigFirstLaunch.Value = false;
+            Module.ConfigCheckVersions.Value = true;
+            Module.CheckVersions();
             gameObject.SetActive(false);
         });
 
         container.Q<Button>("no-button").RegisterCallback<ClickEvent>(_ =>
         {
-            Plugin.ConfigFirstLaunch.Value = false;
-            Plugin.ConfigCheckVersions.Value = false;
+            Module.ConfigFirstLaunch.Value = false;
+            Module.ConfigCheckVersions.Value = false;
             gameObject.SetActive(false);
         });
     }

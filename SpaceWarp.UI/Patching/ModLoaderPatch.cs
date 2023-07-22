@@ -99,7 +99,7 @@ public static class ModLoaderPatch
             ? JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path))
             : KSPToSwinfo(__instance);
         var descriptor = new SpaceWarpPluginDescriptor(swMod, info.ModID, info.Name, info, new DirectoryInfo(path), configFile);
-        SpaceWarpManager.AllPlugins.Add(descriptor);
+        SpaceWarpManager.AllPluginsInternal.Add(descriptor);
         SpaceWarpManager.InternalModLoaderMods.Add(descriptor);
         SpaceWarpManager.PluginGuidEnabledStatus.Add((descriptor.Guid, true));
     }
@@ -166,7 +166,7 @@ public static class ModLoaderPatch
                     baseKspLoaderSpaceWarpMod.SWLogger = new UnityLogSource(__instance.ModName);
                     // baseKspLoaderSpaceWarpMod.modFolder = __instance.ModRootPath;
                     configFile = baseKspLoaderSpaceWarpMod.SWConfiguration =
-                        new JsonConfigFile(new DirectoryInfo(__instance.ModRootPath));
+                        new JsonConfigFile(Path.Combine(__instance.ModRootPath, "config.cfg"));
                     swMod = baseKspLoaderSpaceWarpMod;
                     addAdapter = false;
                 }
