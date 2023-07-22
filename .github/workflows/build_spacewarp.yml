@@ -16,10 +16,10 @@ jobs:
     
     steps:
       - name: Check Out Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
           
@@ -31,16 +31,16 @@ jobs:
         id: find-zip
         run: |
           if [ "${{ matrix.run_args }}" == "-r" ]; then
-            echo "::set-output name=zip::$(ls -1 build/SpaceWarp-Release*.zip | head -n 1)"
-            echo "::set-output name=artifact_name::SpaceWarpRelease"
+            echo "zip=$(ls -1 build/SpaceWarp-Release*.zip | head -n 1)" >> $GITHUB_ENV
+            echo "artifact_name=SpaceWarpRelease" >> $GITHUB_ENV
           else
-            echo "::set-output name=zip::$(ls -1 build/SpaceWarp-Debug*.zip | head -n 1)"
-            echo "::set-output name=artifact_name::SpaceWarpDebug"
+            echo "zip=$(ls -1 build/SpaceWarp-Debug*.zip | head -n 1)" >> $GITHUB_ENV
+            echo "artifact_name=SpaceWarpDebug" >> $GITHUB_ENV
           fi
         # Least cursed Sinon code.
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ steps.find-zip.outputs.artifact_name }}
-          path: ${{ steps.find-zip.outputs.zip }}
+          name: ${{ env.artifact_name }}
+          path: ${{ env.zip }}
