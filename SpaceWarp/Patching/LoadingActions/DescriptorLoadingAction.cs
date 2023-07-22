@@ -21,7 +21,8 @@ public class DescriptorLoadingAction : FlowAction
     {
         try
         {
-            _action(_plugin);
+            if (_plugin.DoLoadingActions)
+                _action(_plugin);
             resolve();
         }
         catch (Exception e)

@@ -30,4 +30,6 @@ public abstract class BaseKspLoaderSpaceWarpMod : Mod, ISpaceWarpMod
         get;
         internal set;
     }
+    
+    public SpaceWarpPluginDescriptor SWMetadata { get; set; }
 }

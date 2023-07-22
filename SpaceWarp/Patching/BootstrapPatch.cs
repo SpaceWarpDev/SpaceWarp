@@ -51,19 +51,19 @@ internal static class BootstrapPatch
             flow.AddAction(actionGenerator());
         }
 
-        foreach (var plugin in allPlugins.Where(plugin => plugin.DoLoadingActions))
+        foreach (var plugin in allPlugins)
         {
             if (plugin.Plugin != null)
                 flow.AddAction(new InitializeModAction(plugin));
         }
 
-        foreach (var plugin in allPlugins.Where(plugin => plugin.DoLoadingActions))
+        foreach (var plugin in allPlugins)
         {
             flow.AddAction(new LoadLuaAction(plugin));
         }
 
 
-        foreach (var plugin in allPlugins.Where(plugin => plugin.DoLoadingActions))
+        foreach (var plugin in allPlugins)
         {
             if (plugin.Plugin != null)
                 flow.AddAction(new PostInitializeModAction(plugin));
@@ -72,7 +72,7 @@ internal static class BootstrapPatch
 
     private static void DoLoadingActions(IList<SpaceWarpPluginDescriptor> allPlugins, SequentialFlow flow)
     {
-        foreach (var plugin in allPlugins.Where(plugin => plugin.DoLoadingActions))
+        foreach (var plugin in allPlugins)
         {
             flow.AddAction(new LoadAddressablesAction(plugin));
             flow.AddAction(new LoadLocalizationAction(plugin));
@@ -92,7 +92,9 @@ internal static class BootstrapPatch
             foreach (var action in Loading.LoadingActionGenerators)
             {
                 if (plugin.Plugin is BaseSpaceWarpPlugin baseSpaceWarpPlugin)
+                {
                     flow.AddAction(action(baseSpaceWarpPlugin));
+                }
             }
         }
         else
@@ -141,7 +143,6 @@ internal static class BootstrapPatch
 
         foreach (var plugin in PluginList.AllPlugins)
         {
-            if (!plugin.DoLoadingActions) continue;
             if (plugin.Plugin != null && !plugin.LatePreInitialize)
                 GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
         }

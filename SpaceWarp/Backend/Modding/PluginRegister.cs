@@ -9,10 +9,9 @@ using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
-using SpaceWarp.Backend.Modding;
 using SpaceWarpPatcher;
 
-namespace SpaceWarp.Backend.Mods;
+namespace SpaceWarp.Backend.Modding;
 
 internal static class PluginRegister
 {
@@ -132,11 +131,10 @@ internal static class PluginRegister
         string folderPath) =>
         AssertMatchingModID(descriptor,plugin, metadata, folderPath) &&
         AssertMatchingVersions(descriptor,plugin, metadata, folderPath) &&
-        AssertAllDependenciesAreSpecified(descriptor,plugin, metadata, folderPath);
+        AssertAllDependenciesAreSpecified(descriptor,plugin, metadata);
     private static bool AssertAllDependenciesAreSpecified(SpaceWarpPluginDescriptor descriptor,
         BaseUnityPlugin plugin,
-        ModInfo metadata,
-        string folderPath)
+        ModInfo metadata)
     {
         return plugin.Info.Dependencies.Aggregate(true, (current, dep) => current && AssertDependencyIsSpecified(plugin, descriptor, dep, metadata));
     }
@@ -200,7 +198,7 @@ internal static class PluginRegister
             metadata.Name,
             metadata,
             directoryInfo,true, new BepInExConfigFile(plugin.Config));
-        
+        descriptor.Plugin!.SWMetadata = descriptor;
         if (!AssertSpecificationCompliance(descriptor, plugin, metadata, folderPath)) return;
 
         PluginList.RegisterPlugin(descriptor);
@@ -219,11 +217,12 @@ internal static class PluginRegister
         {
             if (!TryReadModInfo(plugin, modInfoPath, folderPath,
                     out var metadata)) return;
-            var descriptor = new SpaceWarpPluginDescriptor(null,
+            var descriptor = new SpaceWarpPluginDescriptor(new BepInExModAdapter(plugin),
                 plugin.Info.Metadata.GUID,
                 metadata.Name,
                 metadata,
                 directoryInfo,false, new BepInExConfigFile(plugin.Config));
+            descriptor.Plugin!.SWMetadata = descriptor;
             if (!AssertSpecificationCompliance(descriptor, plugin, metadata, folderPath))
                 return;
             PluginList.RegisterPlugin(descriptor);
@@ -293,10 +292,12 @@ internal static class PluginRegister
             var guid = swinfoData.ModID;
             // If we already know about this mod, ignore it
             if (PluginList.AllPlugins.Any(x => string.Equals(x.Guid,guid,StringComparison.InvariantCultureIgnoreCase))) continue;
-
+            var descriptor = new SpaceWarpPluginDescriptor(new AssetOnlyMod(swinfoData.Name), guid, swinfoData.Name,
+                swinfoData, swinfo.Directory, true,
+                new BepInExConfigFile(FindOrCreateConfigFile(guid)));
+            descriptor.Plugin!.SWMetadata = descriptor;
             // Now we can just add it to our plugin list
-            PluginList.RegisterPlugin(new SpaceWarpPluginDescriptor(new AssetOnlyMod(swinfoData.Name), guid, swinfoData.Name, swinfoData, swinfo.Directory,true,
-                new BepInExConfigFile(FindOrCreateConfigFile(guid))));
+            PluginList.RegisterPlugin(descriptor);
         }
     }
     private static ConfigFile FindOrCreateConfigFile(string guid)
@@ -304,16 +305,92 @@ internal static class PluginRegister
         var path = $"{Paths.ConfigPath}/{guid}.cfg";
         return new ConfigFile(path, true);
     }
+
+    private static ModInfo KspToSwinfo(Ksp2ModInfo mod)
+    {
+        var newInfo = new ModInfo
+        {
+            Spec = SpecVersion.V1_3,
+            ModID = mod.ModName,
+            Name = mod.ModName,
+            Author = mod.ModAuthor,
+            Description = mod.ModDescription,
+            Source = "<unknown>",
+            Version = mod.ModVersion.ToString(),
+            Dependencies = new List<DependencyInfo>(),
+            SupportedKsp2Versions = new SupportedVersionsInfo
+            {
+                Min = "*",
+                Max = "*"
+            },
+            VersionCheck = null,
+            VersionCheckType = VersionCheckType.SwInfo
+        };
+        return newInfo;
+    }
+    private static void RegisterSingleKspMod(DirectoryInfo folder)
+    {
+        ModInfo metadata;
+        if (File.Exists(Path.Combine(folder.FullName, "swinfo.json")))
+        { 
+            metadata = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(Path.Combine(folder.FullName, "swinfo.json")));
+        }
+        else if (File.Exists(Path.Combine(folder.FullName, "modinfo.json")))
+        {
+            var modinfo =
+                JsonConvert.DeserializeObject<Ksp2ModInfo>(
+                    File.ReadAllText(Path.Combine(folder.FullName, "modinfo.json")));
+            metadata = KspToSwinfo(modinfo);
+        }
+        else return;
+
+        // This descriptor *will* be modified later
+        var descriptor =
+            new SpaceWarpPluginDescriptor(null, metadata.ModID, metadata.Name, metadata, folder, true, null)
+                {
+                    LatePreInitialize = true
+                };
+        PluginList.RegisterPlugin(descriptor);
+    }
+    
     private static void RegisterAllKspMods()
     {
         var pluginPath = new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods"));
         // Lets quickly register every KSP loader loaded mod into the load order before anything, with late pre-initialize
-        // Ignoring disabled ones of course
+        foreach (var plugin in pluginPath.EnumerateDirectories())
+        {
+            RegisterSingleKspMod(plugin);
+        }
     }
 
     private static void RegisterAllErroredMods()
     {
-        
+        // Lets do some magic here by copying some code to just get all the plugin types
+        var allPlugins = TypeLoader.FindPluginTypes(Paths.PluginPath,
+            Chainloader.ToPluginInfo,
+            Chainloader.HasBepinPlugins,
+            "chainloader");
+        foreach (var plugin in allPlugins)
+        {
+            foreach (var info in plugin.Value)
+            {
+                info.Location = plugin.Key;
+                if (PluginList.AllPlugins.Any(x =>
+                        string.Equals(x.Guid, info.Metadata.GUID, StringComparison.InvariantCultureIgnoreCase)))
+                    continue;
+                {
+                    var descriptor = new SpaceWarpPluginDescriptor(null,
+                        info.Metadata.GUID,
+                        info.Metadata.Name,
+                        BepInExToSWInfo(info),
+                        new DirectoryInfo(Path.GetDirectoryName(info.Location)!));
+                    var errored = PluginList.GetErrorDescriptor(descriptor);
+                    errored.MissingDependencies = info.Dependencies.Select(x => x.DependencyGUID)
+                        .Where(guid => PluginList.AllEnabledAndActivePlugins.All(x => x.Guid != guid))
+                        .ToList();
+                }
+            }
+        }
     }
 
     private static void GetDisabledPlugins()

@@ -1,17 +1,13 @@
-﻿using BepInEx.Logging;
+﻿using BepInEx;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 using SpaceWarp.API.Mods;
 
 namespace SpaceWarp.Backend.Modding;
 
-internal class AssetOnlyMod : ISpaceWarpMod
+public class BepInExModAdapter : ISpaceWarpMod
 {
-    public AssetOnlyMod(string name)
-    {
-        SWLogger = new BepInExLogger(new ManualLogSource(name));
-    }
-    
+    public BaseUnityPlugin Plugin;
     public void OnPreInitialized()
     {
     }
@@ -24,7 +20,12 @@ internal class AssetOnlyMod : ISpaceWarpMod
     {
     }
 
-    public ILogger SWLogger { get; }
-    public IConfigFile SWConfiguration => new EmptyConfigFile();
+    public ILogger SWLogger => new BepInExLogger(Plugin.Logger);
+    public IConfigFile SWConfiguration => new BepInExConfigFile(Plugin.Config);
     public SpaceWarpPluginDescriptor SWMetadata { get; set; }
+
+    public BepInExModAdapter(BaseUnityPlugin plugin)
+    {
+        Plugin = plugin;
+    }
 }

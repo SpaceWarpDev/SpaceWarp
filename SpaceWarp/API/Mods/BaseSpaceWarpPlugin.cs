@@ -63,6 +63,7 @@ public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin, ISpaceWarpMod
     public ILogger SWLogger => _logger ??= new BepInExLogger(Logger);
     private BepInExConfigFile _configFile;
     public IConfigFile SWConfiguration => _configFile ??= new BepInExConfigFile(Config);
+    public SpaceWarpPluginDescriptor SWMetadata { get; set; }
 
     internal static string GetGuidBySpec(PluginInfo pluginInfo, ModInfo modInfo)
     {

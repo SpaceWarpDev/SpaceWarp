@@ -23,8 +23,8 @@ public class SpaceWarpPluginDescriptor
     public readonly string Name;
     public readonly ModInfo SWInfo;
     public readonly DirectoryInfo Folder;
-    public readonly bool DoLoadingActions = false;
-    [CanBeNull] public readonly IConfigFile ConfigFile;
+    public bool DoLoadingActions = false;
+    [CanBeNull] public IConfigFile ConfigFile;
 
 
     // Set by the version checking system

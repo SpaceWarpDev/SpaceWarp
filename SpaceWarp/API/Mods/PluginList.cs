@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Bootstrap;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.API.Versions;
 using SpaceWarpPatcher;
+using UnityEngine.Yoga;
 using Enumerable = UniLinq.Enumerable;
 
 // ReSharper disable UnusedMember.Global
@@ -161,7 +163,7 @@ public static class PluginList
         }
     }
 
-    private static SpaceWarpErrorDescription GetErrorDescriptor(SpaceWarpPluginDescriptor plugin)
+    public static SpaceWarpErrorDescription GetErrorDescriptor(SpaceWarpPluginDescriptor plugin)
     {
         if (_allErroredPlugins.Any(x => x.Plugin == plugin))
         {
@@ -206,12 +208,79 @@ public static class PluginList
         errorDescriptor.UnspecifiedDependencies.Add(dependency);
     }
 
+    private static bool DependencyResolved(SpaceWarpPluginDescriptor descriptor, List<SpaceWarpPluginDescriptor> resolvedPlugins)
+    {
+        if (descriptor.SWInfo.Spec < SpecVersion.V1_3) return true;
+        return !(from dependency in descriptor.SWInfo.Dependencies
+            let info = resolvedPlugins.FirstOrDefault(x => string.Equals(x.Guid,
+                dependency.ID,
+                StringComparison.InvariantCultureIgnoreCase))
+            where info == null ||
+                  !VersionUtility.IsSupported(info.SWInfo.Version,
+                      dependency.Version.Min,
+                      dependency.Version.Max)
+            select dependency).Any();
+    }
+
+    private static void GetLoadOrder()
+    {
+        var changed = true;
+        List<SpaceWarpPluginDescriptor> newOrder = new();
+        while (changed)
+        {
+            changed = false;
+            for (var i = _allEnabledAndActivePlugins.Count - 1; i >= 0; i--)
+            {
+                if (!DependencyResolved(_allEnabledAndActivePlugins[i], newOrder)) continue;
+                newOrder.Add(_allEnabledAndActivePlugins[i]);
+                _allEnabledAndActivePlugins.RemoveAt(i);
+                changed = true;
+            }
+        }
+
+        foreach (var info in _allEnabledAndActivePlugins)
+        {
+            SpaceWarpPlugin.Logger.LogError($"Missing dependency for mod: {info.Name}, this mod will not be loaded");
+            var error = GetErrorDescriptor(info);
+            error.MissingDependencies = info.SWInfo.Dependencies.Select(x => x.ID).Where(x =>
+                !newOrder.Any(y => string.Equals(x, y.Guid, StringComparison.InvariantCultureIgnoreCase))).ToList();
+        }
+        _allEnabledAndActivePlugins = newOrder;
+    }
+
+    private static void GetDependencyErrors()
+    {
+        foreach (var erroredPlugin in _allErroredPlugins.Where(erroredPlugin =>
+                     erroredPlugin.MissingDependencies.Count != 0))
+        {
+            for (var i = erroredPlugin.MissingDependencies.Count - 1; i >= 0; i--)
+            {
+                var dep = erroredPlugin.MissingDependencies[i];
+                if (AllEnabledAndActivePlugins.Any(x => string.Equals(x.Guid, dep, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    erroredPlugin.UnsupportedDependencies.Add(dep);
+                    erroredPlugin.MissingDependencies.RemoveAt(i);
+                } else if (AllErroredPlugins.Any(x => string.Equals(x.Plugin.Guid, dep, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    erroredPlugin.ErroredDependencies.Add(dep);
+                    erroredPlugin.MissingDependencies.RemoveAt(i);
+                } else if (AllDisabledPlugins.Any(x => string.Equals(x.Guid, dep, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    erroredPlugin.DisabledDependencies.Add(dep);
+                    erroredPlugin.MissingDependencies.RemoveAt(i);
+                }
+            }
+        }
+    }
+    
+    
     /// <summary>
     /// This is done after Awake/LoadModule(), so that everything else can use it
     /// </summary>
     internal static void ResolveDependenciesAndLoadOrder()
     {
-        
+        GetLoadOrder();
+        GetDependencyErrors();
     }
     
 

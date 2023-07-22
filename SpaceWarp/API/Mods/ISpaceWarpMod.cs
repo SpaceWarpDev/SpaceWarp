@@ -14,4 +14,6 @@ public interface ISpaceWarpMod
     public ILogger SWLogger { get; }
 
     public IConfigFile SWConfiguration { get; }
+
+    public SpaceWarpPluginDescriptor SWMetadata { get; set; }
 }
