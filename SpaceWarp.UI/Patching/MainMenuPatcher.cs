@@ -5,6 +5,7 @@ using KSP.Api.CoreTypes;
 using KSP.Game.StartupFlow;
 using SpaceWarp.API.UI;
 using TMPro;
+using UnityObject = UnityEngine.Object;
 
 namespace SpaceWarp.Patching;
 

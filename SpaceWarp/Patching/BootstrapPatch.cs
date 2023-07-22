@@ -41,11 +41,7 @@ internal static class BootstrapPatch
         var allPlugins = GetAllPlugins();
 
         LatePreinitialize(allPlugins);
-
         DoLoadingActions(allPlugins, flow);
-
-        // Gonna finally get rid of this one
-        flow.AddAction(new LoadAddressablesLocalizationsAction());
         foreach (var actionGenerator in Loading.GeneralLoadingActions)
         {
             flow.AddAction(actionGenerator());

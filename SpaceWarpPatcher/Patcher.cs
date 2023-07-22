@@ -70,10 +70,10 @@ internal static class Delayer
 }
 
 [HarmonyPatch]
-internal static class ChainloaderPatch
+public static class ChainloaderPatch
 {
     internal static string[] DisabledPluginGuids;
-    internal static string DisabledPluginsFilepath;
+    public static string DisabledPluginsFilepath;
     internal static ManualLogSource LogSource;
     internal static List<PluginInfo> DisabledPlugins;
     internal static bool ModListChangedSinceLastRun;

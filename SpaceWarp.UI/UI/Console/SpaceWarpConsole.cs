@@ -62,7 +62,7 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
         CheckFilter(entry);
 
         //First in first out
-        if (_consoleContent.contentContainer.childCount > SpaceWarpPlugin.Instance.ConfigDebugMessageLimit.Value)
+        if (_consoleContent.contentContainer.childCount > Modules.UI.Instance.ConfigDebugMessageLimit.Value)
             _consoleContent.contentContainer.RemoveAt(0); 
         if(_toggleAutoScroll.value)
             AutoScrollToBottom();
@@ -253,12 +253,12 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
         return logLevel switch
         {
             LogLevel.Fatal => Color.red,
-            LogLevel.Error => SpaceWarpPlugin.Instance.ConfigErrorColor.Value,
-            LogLevel.Warning => SpaceWarpPlugin.Instance.ConfigWarningColor.Value,
-            LogLevel.Message => SpaceWarpPlugin.Instance.ConfigMessageColor.Value,
-            LogLevel.Info => SpaceWarpPlugin.Instance.ConfigInfoColor.Value,
-            LogLevel.Debug => SpaceWarpPlugin.Instance.ConfigDebugColor.Value,
-            _ => SpaceWarpPlugin.Instance.ConfigMessageColor.Value
+            LogLevel.Error => Modules.UI.Instance.ConfigErrorColor.Value,
+            LogLevel.Warning => Modules.UI.Instance.ConfigWarningColor.Value,
+            LogLevel.Message => Modules.UI.Instance.ConfigMessageColor.Value,
+            LogLevel.Info => Modules.UI.Instance.ConfigInfoColor.Value,
+            LogLevel.Debug => Modules.UI.Instance.ConfigDebugColor.Value,
+            _ => Modules.UI.Instance.ConfigMessageColor.Value
         };
     }
 

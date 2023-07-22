@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using BepInEx.Configuration;
 using I2.Loc;
-using KSP;
-using KSP.Api.CoreTypes;
 using KSP.UI;
-using KSP.UI.Binding;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.Backend.UI.Settings;
-using SpaceWarp.InternalUtilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityObject = UnityEngine.Object;
 
 namespace SpaceWarp.API.UI.Settings;
 

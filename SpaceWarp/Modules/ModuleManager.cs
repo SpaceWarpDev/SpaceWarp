@@ -7,6 +7,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
+using UnityEngine.UIElements;
 
 namespace SpaceWarp.Modules;
 
@@ -36,6 +37,9 @@ internal static class ModuleManager
             }
         }
 
+        
+        TopologicallySortModules();
+        
         foreach (var module in AllSpaceWarpModules)
         {
             try
@@ -54,6 +58,30 @@ internal static class ModuleManager
         }
     }
 
+    private static void TopologicallySortModules()
+    {
+        var topologicalOrder = new List<SpaceWarpModule>();
+        var clone = AllSpaceWarpModules.ToList();
+
+        var changed = true;
+        while (changed)
+        {
+            changed = false;
+            for (int i = clone.Count - 1; i >= 0; i--)
+            {
+                var module = clone[i];
+                var resolved = module.Prerequisites.All(prerequisite => AllSpaceWarpModules.All(x => x.Name != prerequisite) || topologicalOrder.Any(x => x.Name == prerequisite));
+                changed = changed || resolved;
+                if (resolved)
+                {
+                    clone.RemoveAt(i);
+                    topologicalOrder.Add(module);
+                }
+            }
+        }
+        AllSpaceWarpModules = topologicalOrder;
+    }
+    
     internal static void PreInitializeAllModules()
     {
         foreach (var module in AllSpaceWarpModules)

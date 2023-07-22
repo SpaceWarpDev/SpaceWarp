@@ -30,6 +30,8 @@ public class SpaceWarpPluginDescriptor
     // Set by the version checking system
     public bool Outdated = false;
     public bool Errored = false;
+
+    public bool Unsupported = false;
     // Used to check for mods that have not been pre-initialized
     public bool LatePreInitialize = false;
 }

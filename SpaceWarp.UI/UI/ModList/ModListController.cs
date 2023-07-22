@@ -11,8 +11,10 @@ using SpaceWarp.API.UI;
 using SpaceWarpPatcher;
 using UitkForKsp2;
 using UitkForKsp2.API;
+using UniLinq;
 using UnityEngine;
 using UnityEngine.UIElements;
+using SpaceWarp.Backend.Extensions;
 
 namespace SpaceWarp.UI.ModList;
 
@@ -93,9 +95,11 @@ internal class ModListController : MonoBehaviour
     {
         string term;
 
-        if (SpaceWarpPlugin.Instance.ConfigShowMainMenuWarningForErroredMods.Value && SpaceWarpManager.ErroredPlugins?.Count > 0)
+        if (Modules.UI.Instance.ConfigShowMainMenuWarningForErroredMods.Value &&
+            PluginList.AllErroredPlugins.Count > 0) 
             term = "SpaceWarp/Mods/Errored";
-        else if (SpaceWarpPlugin.Instance.ConfigShowMainMenuWarningForOutdatedMods.Value && SpaceWarpManager.ModsOutdated.ContainsValue(true))
+        else if (Modules.UI.Instance.ConfigShowMainMenuWarningForOutdatedMods.Value &&
+                 PluginList.AllPlugins.Any(x => x.Outdated)) 
             term = "SpaceWarp/Mods/Outdated";
         else
             term = "SpaceWarp/Mods";
@@ -195,17 +199,17 @@ internal class ModListController : MonoBehaviour
         _detailsDependenciesList = _container.Q<VisualElement>("details-dependencies-list");
 
         // Show only categories that have any mods in them
-        if (SpaceWarpManager.AllPluginsInternal.Count > 0)
+        if (PluginList.AllEnabledAndActivePlugins.Count > 0)
         {
             _enabledModFoldout.style.display = DisplayStyle.Flex;
         }
 
-        if (SpaceWarpManager.DisabledPlugins.Count > 0)
+        if (PluginList.AllDisabledPlugins.Count > 0)
         {
             _disabledModFoldout.style.display = DisplayStyle.Flex;
         }
 
-        if (SpaceWarpManager.ErroredPlugins.Count > 0)
+        if (PluginList.AllErroredPlugins.Count > 0)
         {
             _erroredModFoldout.style.display = DisplayStyle.Flex;
         }
@@ -213,21 +217,21 @@ internal class ModListController : MonoBehaviour
 
     private void FillModLists()
     {
-        foreach (var plugin in SpaceWarpManager.AllPluginsInternal)
+        foreach (var plugin in PluginList.AllEnabledAndActivePlugins)
         {
             MakeListItem(_enabledModList, data =>
             {
                 data.Guid = plugin.Guid;
                 data.SetInfo(plugin);
 
-                if (SpaceWarpManager.ModsUnsupported[data.Guid])
+                if (plugin.Unsupported)
                 {
                     data.SetIsUnsupported();
                 }
             });
         }
 
-        foreach (var pluginInfo in SpaceWarpManager.DisabledPlugins)
+        foreach (var pluginInfo in PluginList.AllDisabledPlugins)
         {
             MakeListItem(_disabledModList, data =>
             {
@@ -237,7 +241,7 @@ internal class ModListController : MonoBehaviour
             });
         }
 
-        foreach (var erroredPlugin in SpaceWarpManager.ErroredPlugins)
+        foreach (var erroredPlugin in PluginList.AllErroredPlugins)
         {
             MakeListItem(_erroredModList, data => {
                 data.Guid = erroredPlugin.Plugin.Guid;
@@ -248,9 +252,11 @@ internal class ModListController : MonoBehaviour
 
     private void SetupToggles()
     {
-        _initialToggles = SpaceWarpManager.PluginGuidEnabledStatus.Where(
-            item => !NoToggleGuids.Contains(item.Item1)
-        ).ToDictionary(item => item.Item1, item => item.Item2);
+        _initialToggles = PluginList.AllPlugins.Where(
+            item => !NoToggleGuids.Contains(item.Guid)
+        ).ToDictionary(item => item.Guid,
+            item => PluginList.AllDisabledPlugins.Any(x =>
+                string.Equals(item.Guid, x.Guid, StringComparison.InvariantCultureIgnoreCase)));
         _toggles = new Dictionary<string, bool>(_initialToggles);
         UpdateToggles();
 
@@ -307,7 +313,7 @@ internal class ModListController : MonoBehaviour
             explorer.Start();
         });
 
-        var configManager = SpaceWarpManager.ConfigurationManager;
+        var configManager = Modules.UI.Instance.ConfigurationManager;
         _openConfigManagerButton.RegisterCallback<ClickEvent>(_ =>
         {
             configManager.DisplayingWindow = !configManager.DisplayingWindow;

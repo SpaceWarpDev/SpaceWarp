@@ -27,6 +27,9 @@
             <IncludeAssets>SpaceWarpPatcher.dll</IncludeAssets>
         </ProjectReference>
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="API\Sound\" />
+    </ItemGroup>
     <!-- Nuget packaging configuration -->
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

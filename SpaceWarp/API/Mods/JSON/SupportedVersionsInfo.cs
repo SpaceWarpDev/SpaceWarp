@@ -9,8 +9,8 @@ namespace SpaceWarp.API.Mods.JSON;
 [JsonObject(MemberSerialization.OptIn)]
 public sealed class SupportedVersionsInfo
 {
-    internal const string DefaultMin = "0.0.0";
-    internal const string DefaultMax = "*";
+    public const string DefaultMin = "0.0.0";
+    public const string DefaultMax = "*";
 
     [JsonProperty("min")] public string Min { get; internal set; } = DefaultMin;
 

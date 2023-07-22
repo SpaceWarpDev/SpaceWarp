@@ -10,29 +10,29 @@ internal static class AssetHelpers
 {
     public static void LoadAddressable(string catalog)
     {
-        SpaceWarpManager.Logger.LogInfo($"Attempting to load {catalog}");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Attempting to load {catalog}");
         var operation = Addressables.LoadContentCatalogAsync(catalog);
         operation.WaitForCompletion();
         if (operation.Status == AsyncOperationStatus.Failed)
         {
-            SpaceWarpManager.Logger.LogError($"Failed to load addressables catalog {catalog}");
+            SpaceWarpPlugin.Instance.SWLogger.LogError($"Failed to load addressables catalog {catalog}");
         }
         else
         {
-            SpaceWarpManager.Logger.LogInfo($"Loaded addressables catalog {catalog}");
+            SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Loaded addressables catalog {catalog}");
             var locator = operation.Result;
-            SpaceWarpManager.Logger.LogInfo($"{catalog} ----- {locator.LocatorId}");
+            SpaceWarpPlugin.Instance.SWLogger.LogInfo($"{catalog} ----- {locator.LocatorId}");
             GameManager.Instance.Game.Assets.RegisterResourceLocator(locator);
         }
     }
 
     internal static void LoadLocalizationFromFolder(string folder)
     {
-        SpaceWarpManager.Logger.LogInfo($"Attempting to load localizations from {folder}");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Attempting to load localizations from {folder}");
         LanguageSourceData languageSourceData = null;
         if (!Directory.Exists(folder))
         {
-            SpaceWarpManager.Logger.LogInfo($"{folder} does not exist, not loading localizations.");
+            SpaceWarpPlugin.Instance.SWLogger.LogInfo($"{folder} does not exist, not loading localizations.");
             return;
         }
 
@@ -55,12 +55,12 @@ internal static class AssetHelpers
         if (languageSourceData != null)
         {
             languageSourceData.OnMissingTranslation = LanguageSourceData.MissingTranslationAction.Fallback;
-            SpaceWarpManager.Logger.LogInfo($"Loaded localizations from {folder}");
+            SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Loaded localizations from {folder}");
             LocalizationManager.AddSource(languageSourceData);
         }
         else
         {
-            SpaceWarpManager.Logger.LogInfo($"No localizations found in {folder}");
+            SpaceWarpPlugin.Instance.SWLogger.LogInfo($"No localizations found in {folder}");
         }
     }
 }

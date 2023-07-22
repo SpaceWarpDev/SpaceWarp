@@ -1,4 +1,5 @@
 import argparse
+from ast import mod
 import os
 import shutil
 import subprocess
@@ -11,6 +12,8 @@ PATCHER_DIR = os.path.abspath("SpaceWarpPatcher")
 PATCHER_LIB_DIR = os.path.abspath("SpaceWarpPatcherLibraries")
 BUILD_DIR = os.path.abspath("build")
 THIRD_PARTY = os.path.abspath("ThirdParty")
+
+MODULES = ["Game","Sound","UI","VersionChecking"]
 
 
 parser = argparse.ArgumentParser()
@@ -68,6 +71,36 @@ def build(release=False):
     for line in str(output.stderr, "utf-8").splitlines():
         print(f"        {line}")
     
+    print("=> Compiling Modules")    
+    os.makedirs(os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "SpaceWarp","modules"), True)
+    for module in MODULES:
+        path = os.path.abspath("SpaceWarp." +module)
+        csproj = os.path.join(path,"SpaceWarp."+module+".csproj")
+        module_args = ["dotnet", "build", csproj, "-c", "Release" if release else "Debug"]
+        module_build_output_dir = os.path.join(path,"bin","Release" if release else "Debug")
+        module_output_dir = os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "SpaceWarp","modules")
+
+        print(f"=> Executing: {' '.join(module_args)}")
+
+        output = subprocess.run(args=module_args, capture_output=True)
+        print("    |=>| STDOUT")
+
+        for line in str(output.stdout, "utf-8").splitlines():
+            print(f"        {line}")
+
+        print("    |=>| STDERR")
+
+        for line in str(output.stderr, "utf-8").splitlines():
+            print(f"        {line}")
+
+        print("=> Copying module")
+    
+        def shutil_copy_module(file):
+            shutil.copyfile(os.path.join(module_build_output_dir, file), os.path.join(module_output_dir, file))
+        if not release and os.path.exists(os.path.join(module_build_output_dir,"SpaceWarp."+module+".pdb")):
+            shutil_copy_module("SpaceWarp."+module+".pdb")
+        shutil_copy_module("SpaceWarp."+module+".dll")
+        
     # patcher libraries
     patcher_library_dir = os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "patchers", "SpaceWarp", "lib")
     print(f"=> Copying Patcher Libraries")

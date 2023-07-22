@@ -20,7 +20,7 @@ internal class SoundAPI
         }
         else
         {
-            SpaceWarpManager.Logger.LogError($"Soundbank loading failed with result {result}");
+            Modules.Sound.Instance.ModuleLogger.LogError($"Soundbank loading failed with result {result}");
             soundbank = null;
             return false;
         }

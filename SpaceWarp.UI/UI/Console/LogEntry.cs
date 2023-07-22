@@ -30,8 +30,8 @@ namespace SpaceWarp.UI.Console
             set
             {
                 _timeDate = value;
-                if (SpaceWarpPlugin.Instance.ConfigShowTimeStamps.Value)
-                    _timeDateLabel.text = value.ToString(SpaceWarpPlugin.Instance.ConfigTimeStampFormat.Value);
+                if (Modules.UI.Instance.ConfigShowTimeStamps.Value)
+                    _timeDateLabel.text = value.ToString(Modules.UI.Instance.ConfigTimeStampFormat.Value);
                 else
                     _timeDateLabel.style.display = DisplayStyle.None;
             }

@@ -8,14 +8,14 @@ internal sealed class SpaceWarpConsoleLogListener : ILogListener
 {	
     internal static readonly List<string> DebugMessages = new();
     internal static readonly List<LogInfo> LogMessages = new();   
-    private readonly SpaceWarpPlugin _spaceWarpPluginInstance;
+    private readonly Modules.UI _uiModule;
 
     public static event Action<string> OnNewMessage;
     public static event Action<LogInfo> OnNewLog;
 
-    public SpaceWarpConsoleLogListener(SpaceWarpPlugin spaceWarpPluginInstance)	
+    public SpaceWarpConsoleLogListener(Modules.UI uiModule)	
     {	
-        _spaceWarpPluginInstance = spaceWarpPluginInstance;	
+        _uiModule = uiModule;	
     }	
 
     public void LogEvent(object sender, LogEventArgs eventArgs)
@@ -46,7 +46,7 @@ internal sealed class SpaceWarpConsoleLogListener : ILogListener
 
     private void LogMessageJanitor()	
     {	
-        var configDebugMessageLimit = _spaceWarpPluginInstance.ConfigDebugMessageLimit.Value;	
+        var configDebugMessageLimit = _uiModule.ConfigDebugMessageLimit.Value;	
         if (DebugMessages.Count > configDebugMessageLimit)	
             DebugMessages.RemoveRange(0, DebugMessages.Count - configDebugMessageLimit);
         if (LogMessages.Count > configDebugMessageLimit)
@@ -55,8 +55,8 @@ internal sealed class SpaceWarpConsoleLogListener : ILogListener
 
     private string TimestampMessage()	
     {	
-        return _spaceWarpPluginInstance.ConfigShowTimeStamps.Value	
-            ? "[" + DateTime.Now.ToString(_spaceWarpPluginInstance.ConfigTimeStampFormat.Value) + "] "	
+        return _uiModule.ConfigShowTimeStamps.Value	
+            ? "[" + DateTime.Now.ToString(_uiModule.ConfigTimeStampFormat.Value) + "] "	
             : "";	
     }	
 
