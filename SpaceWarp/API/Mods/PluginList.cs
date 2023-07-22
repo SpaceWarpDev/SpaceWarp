@@ -150,14 +150,15 @@ public static class PluginList
         _allEnabledAndActivePlugins.Add(plugin);
     }
 
-    public static void RegisterDisabledPlugin(SpaceWarpPluginDescriptor plugin)
+    public static void Disable(string guid)
     {
-        if (AllPlugins.Any(x => x.Guid == plugin.Guid))
+        var descriptor = _allEnabledAndActivePlugins.FirstOrDefault(x =>
+            string.Equals(x.Guid, guid, StringComparison.InvariantCultureIgnoreCase));
+        if (descriptor != null)
         {
-            SpaceWarpPlugin.Logger.LogError($"Attempting to register a mod with a duplicate GUID: {plugin.Guid}");
+            _allEnabledAndActivePlugins.Remove(descriptor);
+            _allDisabledPlugins.Add(descriptor);
         }
-        SpaceWarpPlugin.Logger.LogInfo($"Registered disabled plugin: {plugin.Guid}");
-        _allDisabledPlugins.Add(plugin);
     }
 
     private static SpaceWarpErrorDescription GetErrorDescriptor(SpaceWarpPluginDescriptor plugin)

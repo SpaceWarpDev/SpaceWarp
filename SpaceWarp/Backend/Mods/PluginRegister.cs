@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using BepInEx;
 using BepInEx.Bootstrap;
+using BepInEx.Configuration;
 using Newtonsoft.Json;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.Backend.Modding;
+using SpaceWarpPatcher;
 
 namespace SpaceWarp.Backend.Mods;
 
@@ -18,9 +21,11 @@ internal static class PluginRegister
     public static void RegisterAllMods()
     {
         RegisterAllBepInExMods();
+        GetDisabledPlugins();
         RegisterAllCodelessMods();
         RegisterAllKspMods();
         RegisterAllErroredMods();
+        DisableMods();
     }
     
     private static ILogger Logger = (BepInExLogger)SpaceWarpPlugin.Logger;
@@ -109,50 +114,69 @@ internal static class PluginRegister
     }
     
     private static bool AssertSpecificationCompliance(
+        SpaceWarpPluginDescriptor descriptor,
         BaseUnityPlugin plugin,
         ModInfo metadata,
         string folderPath) =>
         metadata.Spec < SpecVersion.V1_3 ||
         AssertSpecVersion13Compliance(
+            descriptor,
             plugin,
             metadata,
             folderPath);
 
     private static bool AssertSpecVersion13Compliance(
+        SpaceWarpPluginDescriptor descriptor,
         BaseUnityPlugin plugin,
         ModInfo metadata,
         string folderPath) =>
-        AssertMatchingModID(plugin, metadata, folderPath) &&
-        AssertMatchingVersions(plugin, metadata, folderPath) &&
-        AssertAllDependenciesAreSpecified(plugin, metadata, folderPath);
+        AssertMatchingModID(descriptor,plugin, metadata, folderPath) &&
+        AssertMatchingVersions(descriptor,plugin, metadata, folderPath) &&
+        AssertAllDependenciesAreSpecified(descriptor,plugin, metadata, folderPath);
+    private static bool AssertAllDependenciesAreSpecified(SpaceWarpPluginDescriptor descriptor,
+        BaseUnityPlugin plugin,
+        ModInfo metadata,
+        string folderPath)
+    {
+        return plugin.Info.Dependencies.Aggregate(true, (current, dep) => current && AssertDependencyIsSpecified(plugin, descriptor, dep, metadata));
+    }
+    private static bool AssertDependencyIsSpecified(BaseUnityPlugin plugin, SpaceWarpPluginDescriptor descriptor,
+        BepInDependency dep,
+        ModInfo metadata)
+    {
+        if (metadata.Dependencies.Any(x => string.Equals(x.ID ,dep.DependencyGUID,StringComparison.InvariantCultureIgnoreCase))) return true;
+        Logger.LogError(
+            $"Found Space Warp Plugin {plugin.Info.Metadata.Name} that has an unspecified swinfo dependency found in its BepInDependencies: {dep.DependencyGUID}");
+        PluginList.NoteUnspecifiedDependencyError(descriptor, dep.DependencyGUID);
+        metadata.Dependencies.Add(new DependencyInfo
+        {
+            ID = dep.DependencyGUID,
+            Version = new SupportedVersionsInfo
+            {
+                Min = dep.MinimumVersion.ToString(),
+                Max = "*"
+            }
+        });
+        return false;
+    }
     
-    
-    private static bool AssertMatchingVersions(BaseUnityPlugin plugin, ModInfo metadata, string folderPath)
+    private static bool AssertMatchingVersions(SpaceWarpPluginDescriptor descriptor, BaseUnityPlugin plugin, ModInfo metadata, string folderPath)
     {
         if (new Version(metadata.Version) == plugin.Info.Metadata.Version) return true;
         Logger.LogError(
             $"Found Space Warp plugin {plugin.Info.Metadata.Name} that's swinfo version does not match the plugin version, this mod will not be initialized");
-        PluginList.NoteMismatchedVersionError(new SpaceWarpPluginDescriptor(plugin as BaseSpaceWarpPlugin,
-            plugin.Info.Metadata.GUID,
-            plugin.Info.Metadata.Name,
-            metadata,
-            new DirectoryInfo(folderPath)));
+        PluginList.NoteMismatchedVersionError(descriptor);
         return false;
 
     }
     
-    private static bool AssertMatchingModID(BaseUnityPlugin plugin, ModInfo metadata, string folderPath)
+    private static bool AssertMatchingModID(SpaceWarpPluginDescriptor descriptor, BaseUnityPlugin plugin, ModInfo metadata, string folderPath)
     {
         var modID = metadata.ModID;
         if (modID == plugin.Info.Metadata.GUID) return true;
         Logger.LogError(
             $"Found Space Warp plugin {plugin.Info.Metadata.Name} that has an swinfo.json w/ spec version >= 1.3 that's ModID is not the same as the plugins GUID, This mod will not be initialized.");
-        PluginList.NoteBadIDError(new SpaceWarpPluginDescriptor(
-            plugin as BaseSpaceWarpPlugin,
-            plugin.Info.Metadata.GUID,
-            plugin.Info.Metadata.Name,
-            metadata,
-            new DirectoryInfo(folderPath)));
+        PluginList.NoteBadIDError(descriptor);
         return false;
 
     }
@@ -169,8 +193,6 @@ internal static class PluginRegister
 
         if (!TryReadModInfo(plugin, modInfoPath, folderPath, out var metadata)) return;
 
-        if (!AssertSpecificationCompliance(plugin, metadata, folderPath)) return;
-
         plugin.SpaceWarpMetadata = metadata;
         var directoryInfo = new FileInfo(modInfoPath).Directory;
         var descriptor = new SpaceWarpPluginDescriptor(plugin,
@@ -178,39 +200,167 @@ internal static class PluginRegister
             metadata.Name,
             metadata,
             directoryInfo,true, new BepInExConfigFile(plugin.Config));
+        
+        if (!AssertSpecificationCompliance(descriptor, plugin, metadata, folderPath)) return;
+
         PluginList.RegisterPlugin(descriptor);
     }
+    private static void RegisterSingleBepInExPlugin(BaseUnityPlugin plugin)
+    {
+        if (PluginList.AllPlugins.Any(x => x.Plugin is BaseUnityPlugin bup && bup == plugin))
+        {
+            return;
+        }
+
+        var folderPath = Path.GetDirectoryName(plugin.Info.Location);
+        var modInfoPath = Path.Combine(folderPath!, "swinfo.json");
+        var directoryInfo = new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!);
+        if (File.Exists(modInfoPath))
+        {
+            if (!TryReadModInfo(plugin, modInfoPath, folderPath,
+                    out var metadata)) return;
+            var descriptor = new SpaceWarpPluginDescriptor(null,
+                plugin.Info.Metadata.GUID,
+                metadata.Name,
+                metadata,
+                directoryInfo,false, new BepInExConfigFile(plugin.Config));
+            if (!AssertSpecificationCompliance(descriptor, plugin, metadata, folderPath))
+                return;
+            PluginList.RegisterPlugin(descriptor);
+        }
+        else
+        {
+            PluginList.RegisterPlugin(GetBepInExDescriptor(plugin));
+        }
+    }
+    
+    private static SpaceWarpPluginDescriptor GetBepInExDescriptor(BaseUnityPlugin plugin)
+    {
+        return new SpaceWarpPluginDescriptor(null,
+            plugin.Info.Metadata.GUID,
+            plugin.Info.Metadata.Name,
+            BepInExToSWInfo(plugin.Info),
+            new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!),false, new BepInExConfigFile(plugin.Config));
+    }
+
+    private static SpaceWarpPluginDescriptor GetBepInExDescriptor(PluginInfo info)
+    {
+        return new SpaceWarpPluginDescriptor(null,
+            info.Metadata.GUID,
+            info.Metadata.Name,
+            BepInExToSWInfo(info),
+            new DirectoryInfo(Path.GetDirectoryName(info.Location)!));
+    }
+    
     private static void RegisterAllBepInExMods()
     {
-        foreach (var plugin in Chainloader.PluginInfos)
+        foreach (var instance in Chainloader.PluginInfos.Select(plugin => plugin.Value).Select(info => info.Instance))
         {
-            var guid = plugin.Key;
-            var info = plugin.Value;
-            var instance = info.Instance;
-            
             if (instance is SpaceWarpPlugin spaceWarpMod)
             {
                 RegisterSingleSpaceWarpPlugin(spaceWarpMod);
             }
             else
             {
-                
+                RegisterSingleBepInExPlugin(instance);
             }
         }
     }
 
     private static void RegisterAllCodelessMods()
     {
-        
-    }
+        var pluginPath = new DirectoryInfo(Paths.PluginPath);
+        foreach (var swinfo in pluginPath.GetFiles("swinfo.json", SearchOption.AllDirectories))
+        {
+            ModInfo swinfoData;
+            try
+            {
+                swinfoData = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(swinfo.FullName));
+            }
+            catch
+            {
+                Logger.LogError($"Error reading metadata file: {swinfo.FullName}, this mod will be ignored");
+                continue;
+            }
 
+            if (swinfoData.Spec < SpecVersion.V1_3)
+            {
+                Logger.LogWarning(
+                    $"Found swinfo information for: {swinfoData.Name}, but its spec is less than v1.3, if this describes a \"codeless\" mod, it will be ignored");
+                continue;
+            }
+
+            var guid = swinfoData.ModID;
+            // If we already know about this mod, ignore it
+            if (PluginList.AllPlugins.Any(x => string.Equals(x.Guid,guid,StringComparison.InvariantCultureIgnoreCase))) continue;
+
+            // Now we can just add it to our plugin list
+            PluginList.RegisterPlugin(new SpaceWarpPluginDescriptor(new AssetOnlyMod(swinfoData.Name), guid, swinfoData.Name, swinfoData, swinfo.Directory,true,
+                new BepInExConfigFile(FindOrCreateConfigFile(guid))));
+        }
+    }
+    private static ConfigFile FindOrCreateConfigFile(string guid)
+    {
+        var path = $"{Paths.ConfigPath}/{guid}.cfg";
+        return new ConfigFile(path, true);
+    }
     private static void RegisterAllKspMods()
     {
-        
+        var pluginPath = new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods"));
+        // Lets quickly register every KSP loader loaded mod into the load order before anything, with late pre-initialize
+        // Ignoring disabled ones of course
     }
 
     private static void RegisterAllErroredMods()
     {
         
+    }
+
+    private static void GetDisabledPlugins()
+    {
+        foreach (var plugin in ChainloaderPatch.DisabledPlugins)
+        {
+            GetSingleDisabledPlugin(plugin);
+        }
+    }
+
+    private static void GetSingleDisabledPlugin(PluginInfo plugin)
+    {
+        var folderPath = Path.GetDirectoryName(plugin.Location);
+        var swInfoPath = Path.Combine(folderPath!, "swinfo.json");
+        if (Path.GetFileName(folderPath) != "plugins" && File.Exists(swInfoPath))
+        {
+            try
+            {
+                var swInfo = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(swInfoPath));
+                var descriptor = new SpaceWarpPluginDescriptor(null,
+                    plugin.Metadata.GUID,
+                    plugin.Metadata.Name,
+                    swInfo,
+                    new DirectoryInfo(folderPath));
+                PluginList.RegisterPlugin(descriptor);
+                PluginList.Disable(descriptor.Guid);
+            }
+            catch
+            {
+                var descriptor = GetBepInExDescriptor(plugin);
+                PluginList.RegisterPlugin(descriptor);
+                PluginList.Disable(descriptor.Guid);
+            }
+        }
+        else
+        {
+            var descriptor = GetBepInExDescriptor(plugin);
+            PluginList.RegisterPlugin(descriptor);
+            PluginList.Disable(descriptor.Guid);
+        }
+    }
+    
+    private static void DisableMods()
+    {
+        foreach (var mod in ChainloaderPatch.DisabledPluginGuids)
+        {
+            PluginList.Disable(mod);
+        }
     }
 }
