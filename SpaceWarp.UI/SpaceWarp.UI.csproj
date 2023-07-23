@@ -6,9 +6,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Reference Include="BepInEx.ConfigurationManager" Private="false" Publicize="true">
+            <HintPath>..\ThirdParty\ConfigurationManager\ConfigurationManager.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\SpaceWarp.Core\SpaceWarp.Core.csproj" />
       <ProjectReference Include="..\SpaceWarp.VersionChecking\SpaceWarp.VersionChecking.csproj" />
       <ProjectReference Include="..\SpaceWarpPatcher\SpaceWarpPatcher.csproj" />
-      <ProjectReference Include="..\SpaceWarp\SpaceWarp.csproj" />
     </ItemGroup>
 
     <ItemGroup>

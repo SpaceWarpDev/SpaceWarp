@@ -123,7 +123,7 @@ internal static class BootstrapPatch
         if (ForceSpaceWarpLoadDueToError)
         {
             var l = new List<SpaceWarpPluginDescriptor> { ErroredSWPluginDescriptor };
-            l.AddRange(PluginList.AllPlugins);
+            l.AddRange(PluginList.AllEnabledAndActivePlugins);
             allPlugins = l;
         }
         else
@@ -141,7 +141,7 @@ internal static class BootstrapPatch
             GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(ErroredSWPluginDescriptor));
         }
 
-        foreach (var plugin in PluginList.AllPlugins)
+        foreach (var plugin in PluginList.AllEnabledAndActivePlugins)
         {
             if (plugin.Plugin != null && !plugin.LatePreInitialize)
                 GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));

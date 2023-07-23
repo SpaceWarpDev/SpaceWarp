@@ -162,7 +162,7 @@ internal static class PluginRegister
     {
         if (new Version(metadata.Version) == plugin.Info.Metadata.Version) return true;
         Logger.LogError(
-            $"Found Space Warp plugin {plugin.Info.Metadata.Name} that's swinfo version does not match the plugin version, this mod will not be initialized");
+            $"Found Space Warp plugin {plugin.Info.Metadata.Name} that's swinfo version ({metadata.Version}) does not match the plugin version ({plugin.Info.Metadata.Version}), this mod will not be initialized");
         PluginList.NoteMismatchedVersionError(descriptor);
         return false;
 

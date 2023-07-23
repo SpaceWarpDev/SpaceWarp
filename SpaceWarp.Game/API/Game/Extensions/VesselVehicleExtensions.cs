@@ -1,4 +1,5 @@
-﻿using KSP.Sim.impl;
+﻿using System.Runtime.CompilerServices;
+using KSP.Sim.impl;
 using KSP.Sim.State;
 using UnityEngine;
 

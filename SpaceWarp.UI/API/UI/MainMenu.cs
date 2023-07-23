@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace SpaceWarp.API.UI;
-
 public static class MainMenu
 {
     internal static readonly List<(string name, Action onClicked)> MenuButtonsToBeAdded = new();

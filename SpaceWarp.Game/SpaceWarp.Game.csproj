@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SpaceWarp\SpaceWarp.csproj" />
+      <ProjectReference Include="..\SpaceWarp.Core\SpaceWarp.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

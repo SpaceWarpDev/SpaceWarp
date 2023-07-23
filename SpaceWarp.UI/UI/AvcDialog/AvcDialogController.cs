@@ -1,4 +1,5 @@
-﻿using SpaceWarp.Modules;
+﻿using System.Runtime.CompilerServices;
+using SpaceWarp.Modules;
 using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;

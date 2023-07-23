@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
@@ -16,20 +14,57 @@ using Microsoft.CodeAnalysis.CSharp;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using MonoMod.Utils;
 using Newtonsoft.Json.Linq;
 
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
 
-[assembly: InternalsVisibleTo("SpaceWarp")]
+[assembly: InternalsVisibleTo("SpaceWarp.Core")]
+
 
 namespace SpaceWarpPatcher;
 
 public static class Patcher
 {
-    public static IEnumerable<string> TargetDLLs => new[] { "UnityEngine.CoreModule.dll" };
+    public static IEnumerable<string> TargetDLLs => new[] { "UnityEngine.CoreModule.dll"};
 
-    public static void Patch(AssemblyDefinition asm)
+    public static void Patch(ref AssemblyDefinition asm)
+    {
+        switch (asm.Name.Name)
+        {
+            // case "SpaceWarp":
+            //     PatchSpaceWarp(asm);
+            //     break;
+            case "UnityEngine.CoreModule":
+                PatchCoreModule(asm);
+                break;
+        }
+    }
+
+    // private static void PatchSpaceWarp(AssemblyDefinition asm)
+    // {
+    //     var modulePaths = $"{Paths.PluginPath}\\SpaceWarp\\modules";
+    //     var modules = new DirectoryInfo(modulePaths).EnumerateFiles("*.dll").Select(x => x.FullName)
+    //         .Select(AssemblyDefinition.ReadAssembly);
+    //     var types = modules.SelectMany(x => x.Modules).SelectMany(x => x.GetTypes()).Where(x => x.IsPublic);
+    //     var mainModule = asm.MainModule;
+    //     var importedTypes = types.Select(x => mainModule.ImportReference(x));
+    //     var constructor =
+    //         mainModule.ImportReference(typeof(TypeForwardedToAttribute).GetConstructor(new[] { typeof(Type) }));
+    //     var systemType = mainModule.ImportReference(typeof(Type));
+    //     
+    //     CustomAttribute GetTypeForwardedToAttribute(TypeReference typeReference)
+    //     {
+    //         var attr = new CustomAttribute(constructor);
+    //         attr.ConstructorArguments.Add(new CustomAttributeArgument(systemType,typeReference.FullName));
+    //         return null;
+    //     }
+    //     mainModule.CustomAttributes.AddRange(importedTypes.Select(GetTypeForwardedToAttribute));
+    //     asm.Write("SpaceWarpPatched.dll");
+    // }
+
+    private static void PatchCoreModule(AssemblyDefinition asm)
     {
         // is this necessary? I (Windows10CE) didn't think so until i had to do it!
         var targetType = asm.MainModule.GetType("UnityEngine.Application");

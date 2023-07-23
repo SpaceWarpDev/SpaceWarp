@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using BepInEx.Bootstrap;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Configuration;
+using SpaceWarp.API.UI.Appbar;
+using SpaceWarp.Backend.UI.Appbar;
 using SpaceWarp.InternalUtilities;
 using SpaceWarp.UI.AvcDialog;
 using SpaceWarp.UI.Console;
@@ -43,6 +46,8 @@ public class UI : SpaceWarpModule
     
     public override void LoadModule()
     {
+        AppbarBackend.AppBarInFlightSubscriber.AddListener(Appbar.LoadAllButtons);
+        AppbarBackend.AppBarOABSubscriber.AddListener(Appbar.LoadOABButtons);
         Instance = this;
         ConfigErrorColor = new (ModuleConfiguration.Bind("Debug Console", "Color Error", Color.red,
             "The color for log messages that have the level: Error/Fatal (bolded)"));

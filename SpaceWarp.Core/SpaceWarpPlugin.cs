@@ -1,6 +1,7 @@
 ﻿global using UnityObject = UnityEngine.Object;
 global using System.Linq;
 using System;
+using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
@@ -24,7 +25,7 @@ using UnityEngine;
 
 namespace SpaceWarp;
 
-[BepInDependency(ConfigurationManager.ConfigurationManager.GUID, ConfigurationManager.ConfigurationManager.Version)]
+[BepInDependency("com.bepis.bepinex.configurationmanager", "17.1")]
 [BepInDependency(UitkForKsp2Plugin.ModGuid, UitkForKsp2Plugin.ModVer)]
 [BepInIncompatibility("com.shadow.quantum")]
 [BepInPlugin(ModGuid, ModName, ModVer)]
@@ -32,11 +33,9 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 {
 
     public static SpaceWarpPlugin Instance;
-
-
     public const string ModGuid = "com.github.x606.spacewarp";
     public const string ModName = "Space Warp";
-    public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
+    public const string ModVer = "1.4.0"; // TODO: Don't hard code this, but I don't know much msbuild stuff so @munix wil have to do that
 
     internal ScriptEnvironment GlobalLuaState;
     
@@ -44,6 +43,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     public SpaceWarpPlugin()
     {
+        Assembly.LoadFile(
+            $"{new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName}\\SpaceWarp.dll");
         Logger = base.Logger;
         Instance = this;
     }
@@ -64,7 +65,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
         ModuleManager.LoadAllModules();
-        
         
         Loading.AddAssetLoadingAction("bundles", "loading asset bundles", FunctionalLoadingActions.AssetBundleLoadingAction, "bundle");
         Loading.AddAssetLoadingAction("images", "loading images", FunctionalLoadingActions.ImageLoadingAction);

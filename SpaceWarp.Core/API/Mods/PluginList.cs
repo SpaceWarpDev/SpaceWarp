@@ -238,8 +238,9 @@ public static class PluginList
             }
         }
 
-        foreach (var info in _allEnabledAndActivePlugins)
+        for (var i = _allEnabledAndActivePlugins.Count - 1; i >= 0; i--)
         {
+            var info = _allEnabledAndActivePlugins[i];
             SpaceWarpPlugin.Logger.LogError($"Missing dependency for mod: {info.Name}, this mod will not be loaded");
             var error = GetErrorDescriptor(info);
             error.MissingDependencies = info.SWInfo.Dependencies.Select(x => x.ID).Where(x =>

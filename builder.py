@@ -8,6 +8,7 @@ import zipfile
 
 TEMPLATE_DIR = os.path.abspath("SpaceWarpBuildTemplate")
 SPACEWARP_DIR = os.path.abspath("SpaceWarp")
+SPACEWARP_CORE_DIR = os.path.abspath("SpaceWarp.Core")
 PATCHER_DIR = os.path.abspath("SpaceWarpPatcher")
 PATCHER_LIB_DIR = os.path.abspath("SpaceWarpPatcherLibraries")
 BUILD_DIR = os.path.abspath("build")
@@ -21,6 +22,7 @@ parser.add_argument("-r", "--release", help="Build a release version", action="s
 
 
 def clean():
+    # Need to add modules and such to this
     if os.path.exists(BUILD_DIR):
         shutil.rmtree(BUILD_DIR)
 
@@ -39,7 +41,9 @@ def clean():
 
 def build(release=False):
     dotnet_args = ["dotnet", "build", os.path.join(SPACEWARP_DIR,"SpaceWarp.csproj"),  "-c", "Release" if release else "Debug"]
+    dotnet_core_args = ["dotnet", "build", os.path.join(SPACEWARP_CORE_DIR,"SpaceWarp.Core.csproj"),  "-c", "Release" if release else "Debug"]
     build_output_dir = os.path.join(SPACEWARP_DIR, "bin", "Release" if release else "Debug")
+    build_output_dir_core = os.path.join(SPACEWARP_CORE_DIR, "bin", "Release" if release else "Debug")
     output_dir = os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "SpaceWarp")
     # copy over the internals of the template
     print("=> Creating build directory...")
@@ -71,6 +75,19 @@ def build(release=False):
     for line in str(output.stderr, "utf-8").splitlines():
         print(f"        {line}")
     
+    print(f"=> Executing: {' '.join(dotnet_core_args)}")
+
+    output = subprocess.run(args=dotnet_core_args, capture_output=True)
+    print("    |=>| STDOUT")
+
+    for line in str(output.stdout, "utf-8").splitlines():
+        print(f"        {line}")
+
+    print("    |=>| STDERR")
+
+    for line in str(output.stderr, "utf-8").splitlines():
+        print(f"        {line}")
+
     print("=> Compiling Modules")    
     os.makedirs(os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "SpaceWarp","modules"), True)
     for module in MODULES:
@@ -129,16 +146,20 @@ def build(release=False):
 
     def shutil_copy(file):
         shutil.copyfile(os.path.join(build_output_dir, file), os.path.join(output_dir, file))
-
+    def shutil_copy_core(file):
+        shutil.copyfile(os.path.join(build_output_dir_core, file), os.path.join(output_dir, file))
     def shutil_copy_patcher(file):
         shutil.copyfile(os.path.join(patcher_build_output_dir, file), os.path.join(patcher_output_dir, file))
 
+    if not release and os.path.exists(os.path.join(build_output_dir_core,"SpaceWarp.Core.pdb")):
+        shutil_copy_core("SpaceWarp.Core.pdb")
     if not release and os.path.exists(os.path.join(build_output_dir, "SpaceWarp.pdb")):
         shutil_copy("SpaceWarp.pdb")
     if not release and os.path.exists(os.path.join(patcher_build_output_dir, "SpaceWarpPatcher.pdb")):
         shutil_copy_patcher("SpaceWarpPatcher.pdb")
     shutil_copy("SpaceWarp.dll")
     shutil_copy_patcher("SpaceWarpPatcher.dll")
+    shutil_copy_core("SpaceWarp.Core.dll")
 
 
 def create_zip_name(prefix):
