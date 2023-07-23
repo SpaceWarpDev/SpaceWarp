@@ -18,12 +18,13 @@ internal sealed class PostInitializeModAction : FlowAction
     {
         try
         {
-            _plugin.Plugin.OnPostInitialized();
+            if (_plugin.DoLoadingActions)
+                _plugin.Plugin.OnPostInitialized();
             resolve();
         }
         catch (Exception e)
         {
-            _plugin.Plugin.SWLogger.LogError(e.ToString());
+            (_plugin.Plugin ?? SpaceWarpPlugin.Instance).SWLogger.LogError(e.ToString());
             reject(null);
         }
     }

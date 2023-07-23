@@ -173,6 +173,6 @@ public class VersionChecking : SpaceWarpModule
             ModuleLogger.LogError($"Unable to check KSP version for {guid} due to error {e}");
         }
 
-        info.Unsupported = true;
+        info.Unsupported = unsupported;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using JetBrains.Annotations;
+using KSP.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -86,7 +87,7 @@ public class JsonConfigFile : IConfigFile
             }
         }
 
-        var serialized = JsonConvert.SerializeObject(entry.Value.Value, Formatting.Indented);
+        var serialized = IOProvider.ToJson(entry.Value.Value);
         var serializedLines = serialized.Split('\n').Select(x => x.TrimEnd()).ToArray();
         if (serializedLines.Length > 1)
         {

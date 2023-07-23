@@ -16,5 +16,5 @@ public class BepInExLogger : BaseLogger
         _log.Log((BepInEx.Logging.LogLevel)level, x);
     }
 
-    public static implicit operator BepInExLogger(ManualLogSource log) => new BepInExLogger(log);
+    public static implicit operator BepInExLogger(ManualLogSource log) => new(log);
 }

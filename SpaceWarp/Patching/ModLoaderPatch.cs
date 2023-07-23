@@ -83,6 +83,7 @@ public static class ModLoaderPatch
         {
             __instance.modType = KSP2ModType.ContentOnly;
         }
+        SpaceWarpPlugin.Logger.LogInfo($"KSP2Mod.Load (Loaded stuff): {__instance.ModName}");
 
         if (addAdapter)
         {
@@ -156,6 +157,7 @@ public static class ModLoaderPatch
                 var comp = go.AddComponent(type);
                 if (comp is BaseKspLoaderSpaceWarpMod baseKspLoaderSpaceWarpMod)
                 {
+                    SpaceWarpPlugin.Logger.LogInfo($"Loading mod: {comp}");
                     isSWMod = true;
                     baseKspLoaderSpaceWarpMod.SWLogger = new UnityLogSource(__instance.ModName);
                     // baseKspLoaderSpaceWarpMod.modFolder = __instance.ModRootPath;

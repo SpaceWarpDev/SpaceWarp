@@ -5,6 +5,7 @@ using KSP.Game.Flow;
 using MonoMod.Cil;
 using SpaceWarp.API.Loading;
 using SpaceWarp.API.Mods;
+using SpaceWarp.Backend.Modding;
 using SpaceWarp.Patching.LoadingActions;
 
 namespace SpaceWarp.Patching;
@@ -14,7 +15,15 @@ internal static class BootstrapPatch
 {
     internal static bool ForceSpaceWarpLoadDueToError = false;
     internal static SpaceWarpPluginDescriptor ErroredSWPluginDescriptor;
-    
+
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.Awake))]
+    [HarmonyPrefix]
+    private static void GetAllMods()
+    {
+        PluginRegister.RegisterAllMods();
+        PluginList.ResolveDependenciesAndLoadOrder();
+    }
+
     [HarmonyILManipulator]
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.StartBootstrap))]
     private static void PatchInitializationsIL(ILContext ilContext, ILLabel endLabel)
@@ -49,8 +58,7 @@ internal static class BootstrapPatch
 
         foreach (var plugin in allPlugins)
         {
-            if (plugin.Plugin != null)
-                flow.AddAction(new InitializeModAction(plugin));
+            flow.AddAction(new InitializeModAction(plugin));
         }
 
         foreach (var plugin in allPlugins)
@@ -61,8 +69,7 @@ internal static class BootstrapPatch
 
         foreach (var plugin in allPlugins)
         {
-            if (plugin.Plugin != null)
-                flow.AddAction(new PostInitializeModAction(plugin));
+            flow.AddAction(new PostInitializeModAction(plugin));
         }
     }
 
@@ -104,12 +111,9 @@ internal static class BootstrapPatch
 
     private static void LatePreinitialize(IList<SpaceWarpPluginDescriptor> allPlugins)
     {
-        foreach (var plugin in allPlugins.Where(plugin => plugin.DoLoadingActions && plugin.LatePreInitialize))
+        foreach (var plugin in allPlugins.Where(plugin => plugin.LatePreInitialize))
         {
-            if (plugin.Plugin != null)
-            {
-                GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
-            }
+            GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
         }
     }
 

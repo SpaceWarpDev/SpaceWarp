@@ -255,7 +255,7 @@ internal class ModListController : MonoBehaviour
         _initialToggles = PluginList.AllPlugins.Where(
             item => !NoToggleGuids.Contains(item.Guid)
         ).ToDictionary(item => item.Guid,
-            item => PluginList.AllDisabledPlugins.Any(x =>
+            item => !PluginList.AllDisabledPlugins.Any(x =>
                 string.Equals(item.Guid, x.Guid, StringComparison.InvariantCultureIgnoreCase)));
         _toggles = new Dictionary<string, bool>(_initialToggles);
         UpdateToggles();

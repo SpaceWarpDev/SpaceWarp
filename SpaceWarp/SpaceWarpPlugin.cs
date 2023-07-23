@@ -6,6 +6,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using I2.Loc;
+using KSP.IO;
 using KSP.ScriptInterop.impl.moonsharp;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
@@ -19,6 +20,7 @@ using UitkForKsp2;
 using UnityEngine.UIElements;
 using SpaceWarp.Modules;
 using SpaceWarp.Patching.LoadingActions;
+using UnityEngine;
 
 namespace SpaceWarp;
 
@@ -37,9 +39,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
 
     internal ScriptEnvironment GlobalLuaState;
-
-    private string _kspVersion;
-
+    
     internal new static ManualLogSource Logger;
 
     public SpaceWarpPlugin()
@@ -60,15 +60,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     }
     public void Awake()
     {
-        ModuleManager.LoadAllModules();
-
-        _kspVersion = typeof(VersionID).GetField("VERSION_TEXT", BindingFlags.Static | BindingFlags.Public)
-            ?.GetValue(null) as string;
+        IOProvider.Init();
         
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
+        ModuleManager.LoadAllModules();
         
-        PluginRegister.RegisterAllMods();
-        PluginList.ResolveDependenciesAndLoadOrder();
         
         Loading.AddAssetLoadingAction("bundles", "loading asset bundles", FunctionalLoadingActions.AssetBundleLoadingAction, "bundle");
         Loading.AddAssetLoadingAction("images", "loading images", FunctionalLoadingActions.ImageLoadingAction);

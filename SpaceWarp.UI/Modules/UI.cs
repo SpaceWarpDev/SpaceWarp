@@ -74,6 +74,11 @@ public class UI : SpaceWarpModule
 
     public override void PreInitializeModule()
     {
+    }
+
+    public override void InitializeModule()
+    {
+        ModuleLogger.LogInfo("Initializing UI");
         if (VersionChecking.Instance.ConfigFirstLaunch.Value)
         {
             var ui = new GameObject("Version Check Dialog");
@@ -91,12 +96,11 @@ public class UI : SpaceWarpModule
         InitializeUI();
     }
 
-    public override void InitializeModule()
-    {
-    }
-
     public override void PostInitializeModule()
     {
+        ModuleLogger.LogInfo("Post Initializing UI");
+        InitializeSettingsUI();
+        ModListController.AddMainMenuItem();
     }
 
     public override List<string> Prerequisites => new()
@@ -121,7 +125,6 @@ public class UI : SpaceWarpModule
         var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/swconsole/ui/console/console.uxml");
         var swConsole = Window.CreateFromUxml(swConsoleUxml, "Space Warp Console", ui.transform, true);
         SpaceWarpConsole = swConsole.gameObject.AddComponent<SpaceWarpConsole>();
-        InitializeSettingsUI();
     }
     
     

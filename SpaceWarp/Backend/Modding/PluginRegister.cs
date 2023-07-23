@@ -253,15 +253,19 @@ internal static class PluginRegister
     
     private static void RegisterAllBepInExMods()
     {
-        foreach (var instance in Chainloader.PluginInfos.Select(plugin => plugin.Value).Select(info => info.Instance))
+#pragma warning disable CS0618
+        foreach (var plugin in Chainloader.Plugins)
+#pragma warning restore CS0618
         {
-            if (instance is SpaceWarpPlugin spaceWarpMod)
+            if (plugin is BaseSpaceWarpPlugin spaceWarpMod)
             {
+                Logger.LogInfo($"Registering SpaceWarp plugin: {plugin.Info.Metadata.Name}");
                 RegisterSingleSpaceWarpPlugin(spaceWarpMod);
             }
             else
             {
-                RegisterSingleBepInExPlugin(instance);
+                Logger.LogInfo($"Registering BIE plugin: {plugin.Info.Metadata.Name}");
+                RegisterSingleBepInExPlugin(plugin);
             }
         }
     }
@@ -288,14 +292,15 @@ internal static class PluginRegister
                     $"Found swinfo information for: {swinfoData.Name}, but its spec is less than v1.3, if this describes a \"codeless\" mod, it will be ignored");
                 continue;
             }
-
-            var guid = swinfoData.ModID;
-            // If we already know about this mod, ignore it
-            if (PluginList.AllPlugins.Any(x => string.Equals(x.Guid,guid,StringComparison.InvariantCultureIgnoreCase))) continue;
-            var descriptor = new SpaceWarpPluginDescriptor(new AssetOnlyMod(swinfoData.Name), guid, swinfoData.Name,
+            var descriptor = new SpaceWarpPluginDescriptor(new AssetOnlyMod(swinfoData.Name), swinfoData.ModID, swinfoData.Name,
                 swinfoData, swinfo.Directory, true,
-                new BepInExConfigFile(FindOrCreateConfigFile(guid)));
+                new BepInExConfigFile(FindOrCreateConfigFile(swinfoData.ModID)));
             descriptor.Plugin!.SWMetadata = descriptor;
+
+            Logger.LogInfo($"Attempting to register codeless mod: {swinfoData.ModID}, {swinfoData.Name}");
+            
+            if (PluginList.AllPlugins.Any(x => string.Equals(x.Guid,swinfoData.ModID,StringComparison.InvariantCultureIgnoreCase))) continue;
+           
             // Now we can just add it to our plugin list
             PluginList.RegisterPlugin(descriptor);
         }
@@ -346,7 +351,7 @@ internal static class PluginRegister
 
         // This descriptor *will* be modified later
         var descriptor =
-            new SpaceWarpPluginDescriptor(null, metadata.ModID, metadata.Name, metadata, folder, true, null)
+            new SpaceWarpPluginDescriptor(null, metadata.ModID, metadata.Name, metadata, folder, false, null)
                 {
                     LatePreInitialize = true
                 };
@@ -356,9 +361,11 @@ internal static class PluginRegister
     private static void RegisterAllKspMods()
     {
         var pluginPath = new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods"));
+        Logger.LogInfo($"KSP Loaded mods path: {pluginPath.FullName}");
         // Lets quickly register every KSP loader loaded mod into the load order before anything, with late pre-initialize
         foreach (var plugin in pluginPath.EnumerateDirectories())
         {
+            Logger.LogInfo($"Attempting to register KSP loaded mod at {pluginPath.FullName}");
             RegisterSingleKspMod(plugin);
         }
     }

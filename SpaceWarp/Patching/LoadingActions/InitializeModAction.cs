@@ -18,12 +18,13 @@ internal sealed class InitializeModAction : FlowAction
     {
         try
         {
-            _plugin.Plugin.OnInitialized();
+            if (_plugin.DoLoadingActions)
+                _plugin.Plugin.OnInitialized();
             resolve();
         }
         catch (Exception e)
         {
-            _plugin.Plugin.SWLogger.LogError(e.ToString());
+            (_plugin.Plugin ?? SpaceWarpPlugin.Instance).SWLogger.LogError(e.ToString());
             reject(null);
         }
     }
