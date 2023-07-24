@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SpaceWarp</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="BepInEx.ConfigurationManager" Private="false" Publicize="true">
+            <HintPath>..\ThirdParty\ConfigurationManager\ConfigurationManager.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\SpaceWarp.Core\SpaceWarp.Core.csproj" />
+      <ProjectReference Include="..\SpaceWarp.VersionChecking\SpaceWarp.VersionChecking.csproj" />
+      <ProjectReference Include="..\SpaceWarpPatcher\SpaceWarpPatcher.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
+        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.3" Publicize="true" />
+      <PackageReference Include="UitkForKsp2" Version="1.4.0" Publicize="true" />
+        <PackageReference Include="UnityEngine.Modules" Version="2020.3.33.1" Publicize="true" />
+        <PackageReference Include="UnityEngine.UITK" Version="2020.3.33.1" Publicize="true" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="ConfigurationManager">
+        <HintPath>..\SpaceWarp\obj\Debug\publicized\ConfigurationManager.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>
