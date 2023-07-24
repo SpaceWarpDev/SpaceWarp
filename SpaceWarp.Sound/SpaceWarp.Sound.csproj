@@ -9,7 +9,6 @@
         <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.3" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Backend\" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\SpaceWarp.Core\SpaceWarp.Core.csproj" />
