@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BepInEx.Logging;
 using SpaceWarp.API.Lua;
 using SpaceWarp.Patching;
 

@@ -1,6 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
-using KSP.Modding;
+﻿using KSP.Modding;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 using SpaceWarp.API.Mods;

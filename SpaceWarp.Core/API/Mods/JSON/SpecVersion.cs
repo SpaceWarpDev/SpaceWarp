@@ -29,9 +29,10 @@ public sealed record SpecVersion
     public static SpecVersion V1_2 { get; } = new(1, 2);
 
     /// <summary>
-    /// Specification version 1.3 (SpaceWarp 1.3.x), adds back the ModID field, but enforces that it is the same as the BepInEx plugin GUID if there is a BepInEx plugin attached to the swinfo
-    /// Which w/ version 1.3 there does not have to be a plugin
-    /// Also enforces that all dependencies use BepInEx GUID, and that they are loaded
+    /// Specification version 1.3 (SpaceWarp 1.3.x), adds back the ModID field, but enforces that it is the same
+    /// as the BepInEx plugin GUID if there is a BepInEx plugin attached to the swinfo, since w/ version 1.3 there
+    /// does not have to be a plugin.
+    /// Also enforces that all dependencies use BepInEx GUID, and that they are loaded.
     /// </summary>
     public static SpecVersion V1_3 { get; } = new(1, 3);
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using KSP.Messages;
 
 namespace SpaceWarp.API.Game.Messages;
@@ -12,7 +11,7 @@ public class StateLoadings
     public static void TrainingCenterLoadedHandler(MessageCenterMessage message)
     {
         TrainingCenterLoaded?.Invoke(message as TrainingCenterLoadedMessage);
-    }    
+    }
     public static void TrackingStationLoadedHandler(MessageCenterMessage message)
     {
         TrackingStationLoaded?.Invoke(message as TrackingStationLoadedMessage);
@@ -22,5 +21,5 @@ public class StateLoadings
     {
         TrackingStationUnloaded?.Invoke(message as TrackingStationUnloadedMessage);
     }
-    
+
 }

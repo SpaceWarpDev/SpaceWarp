@@ -9,7 +9,7 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch(nameof(Utils.FindPlugins))]
 public class ConfigurationPatch
 {
-    static void Postfix(ref BaseUnityPlugin[] __result)
+    private static void Postfix(ref BaseUnityPlugin[] __result)
     {
         //Disable because I know what I am doing.
         #pragma warning disable CS0618

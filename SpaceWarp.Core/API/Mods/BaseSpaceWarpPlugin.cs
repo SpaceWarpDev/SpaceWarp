@@ -4,7 +4,6 @@ using KSP.Game;
 using KSP.Messages;
 using KSP.VFX;
 using SpaceWarp.API.Mods.JSON;
-using JetBrains.Annotations;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 

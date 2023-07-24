@@ -13,7 +13,6 @@ using SpaceWarp.Backend.Modding;
 using SpaceWarp.InternalUtilities;
 using SpaceWarpPatcher;
 using UnityEngine;
-using UnityEngine.IO;
 using File = System.IO.File;
 
 namespace SpaceWarp.Patching;
@@ -57,7 +56,7 @@ public static class ModLoaderPatch
         __state = disabled;
         return !disabled;
     }
-    
+
     [HarmonyPostfix]
     [HarmonyPatch(nameof(KSP2Mod.Load))]
     private static void LoadPost( KSP2Mod __instance, ref bool __result, ref bool __state)

@@ -1,35 +1,29 @@
 ﻿using SpaceWarp.Backend.Sound;
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace SpaceWarp.API.Sound;
 
 internal class SoundAPI
 {
-    public static bool LoadBank(string internalPath, byte[] BankData, out Soundbank soundbank)
+    public static bool LoadBank(string internalPath, byte[] bankData, out Soundbank soundbank)
     {
-        Soundbank bank = new Soundbank(BankData);
-        AKRESULT result = bank.Load();
+        var bank = new Soundbank(bankData);
+        var result = bank.Load();
 
-        if (result == AKRESULT.AK_Success)
-        {
-            bank.InternalPath = internalPath;
-            Soundbank.soundbanks.Add(bank.InternalPath, bank);
-            soundbank = bank;
-            return true;
-        }
-        else
+        if (result != AKRESULT.AK_Success)
         {
             Modules.Sound.Instance.ModuleLogger.LogError($"Soundbank loading failed with result {result}");
             soundbank = null;
             return false;
         }
+
+        bank.InternalPath = internalPath;
+        Soundbank.LoadedSoundbanks.Add(bank.InternalPath, bank);
+        soundbank = bank;
+        return true;
     }
 
     public static Soundbank GetSoundbankWithID(string internalPath)
     {
-        return Soundbank.soundbanks[internalPath];
+        return Soundbank.LoadedSoundbanks[internalPath];
     }
 }

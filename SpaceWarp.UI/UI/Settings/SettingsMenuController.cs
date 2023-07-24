@@ -1,9 +1,7 @@
-﻿using System;
-using I2.Loc;
+﻿using I2.Loc;
 using KSP.Api;
 using KSP.Api.CoreTypes;
 using KSP.Game;
-using KSP.Rendering;
 using KSP.UI;
 using KSP.UI.Binding;
 using KSP.UI.Binding.Core;
@@ -38,13 +36,13 @@ internal class SettingsMenuController : KerbalMonoBehaviour
     private const string SliderPrefabPath = $"{ContentPath}/GameplaySettingsMenu/Simulation/MaxPatchesToDisplay";
 
     private const string InputFieldPrefabPath = "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Main Canvas/MainMenu(Clone)/CampaignMenu/CreateCampaignMenu/Menu/CampaignOptions/CampaignName/CampaignNameInputField";
-    
+
 
     private ModsSubMenu _modsSubMenu;
     private GameObject _headerPrefab;
     private GameObject _dividerPrefab;
     private GameObject _sectionPrefab;
-    private bool _alreadySetup = false; 
+    private bool _alreadySetup = false;
     private void Start()
     {
         MainMenuPatcher.MainMenuLoaded += Setup;
@@ -79,10 +77,10 @@ internal class SettingsMenuController : KerbalMonoBehaviour
         Destroy(ddPrefab.GetComponent<UIValue_ReadBool_SetActive>());
         ddPrefab.Persist();
         var dropdown = ddPrefab.GetChild("Setting").GetChild("KSP2DropDown");
-        // This will be redone once I add a specific 
+        // This will be redone once I add a specific
         Destroy(dropdown.GetComponent<UIValue_ReadDropdownOption_Text>());
         Destroy(dropdown.GetComponent<SettingsElementDescriptionController>());
-        
+
         ddPrefab.SetActive(false);
         ModsPropertyDrawers.DropdownPrefab = ddPrefab;
 
@@ -102,7 +100,7 @@ internal class SettingsMenuController : KerbalMonoBehaviour
             if (alpha != null) Destroy(alpha);
             var beta = radioSettingPrefab.GetComponent<UIAction_Void_Toggle>();
             if (beta != null) Destroy(beta);
-            
+
         }
         radioPrefab.SetActive(false);
         radioSettingPrefab.SetActive(false);
@@ -136,8 +134,8 @@ internal class SettingsMenuController : KerbalMonoBehaviour
         Destroy(amount.GetComponentInChildren<UIValue_ReadString_Text>());
         sliderPrefab.SetActive(false);
         ModsPropertyDrawers.SliderPrefab = sliderPrefab;
-        
-        
+
+
         modsButton.GetComponentInChildren<Localize>().Term = "";
         var text = modsButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
         text.text = "Mods";

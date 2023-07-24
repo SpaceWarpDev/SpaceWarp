@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using JetBrains.Annotations;
 using KSP.IO;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
@@ -37,7 +36,7 @@ public class JsonConfigFile : IConfigFile
 
         _file = file;
     }
-    
+
     public void Save()
     {
         if (!_currentEntries.Any(value => value.Value.Count > 0)) return;
@@ -147,12 +146,12 @@ public class JsonConfigFile : IConfigFile
                 previousSection[key] = new JsonConfigEntry(this, typeof(T), description, defaultValue);
                 // ignored
             }
-        } 
+        }
         else
         {
             previousSection[key] = new JsonConfigEntry(this, typeof(T), description, defaultValue);
         }
-        
+
         Save();
         return previousSection[key];
     }

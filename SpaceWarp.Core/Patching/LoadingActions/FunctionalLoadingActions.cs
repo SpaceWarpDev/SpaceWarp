@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
-using Unity.Collections;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SpaceWarp.Patching.LoadingActions;
 
@@ -46,7 +42,7 @@ internal static class FunctionalLoadingActions
         return assets;
     }
 
-    
+
 
     internal static List<(string name, UnityObject asset)> ImageLoadingAction(string internalPath, string filename)
     {

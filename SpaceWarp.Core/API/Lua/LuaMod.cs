@@ -1,13 +1,9 @@
-﻿
-using System;
+﻿using System;
 using BepInEx.Logging;
 using KSP.Game;
 using MoonSharp.Interpreter;
-using UnityEngine;
-using Logger = BepInEx.Logging.Logger;
 
 namespace SpaceWarp.API.Lua;
-
 
 
 [MoonSharpUserData]
@@ -15,27 +11,27 @@ public class LuaMod : KerbalMonoBehaviour
 {
     public Table ModTable;
     // TODO: Add more than just this to the behaviour but for now
-    
+
     #region Message Definitions
     // Start
-    private Closure _start = null;
+    private Closure _start;
 
     // Update Functions
-    private Closure _update = null;
-    private Closure _fixedUpdate = null;
-    private Closure _lateUpdate = null;
-    
+    private Closure _update;
+    private Closure _fixedUpdate;
+    private Closure _lateUpdate;
+
     // Enable/Disable
-    private Closure _onEnable = null;
-    private Closure _onDisable = null;
-    
+    private Closure _onEnable;
+    private Closure _onDisable;
+
     // Destruction
-    private Closure _onDestroy = null;
-    
+    private Closure _onDestroy;
+
     // Reset
-    private Closure _reset = null;
+    private Closure _reset;
     #endregion
-    
+
     public ManualLogSource Logger;
 
     // First a pass through to the wrapped table
@@ -67,7 +63,7 @@ public class LuaMod : KerbalMonoBehaviour
         }
         method = null;
     }
-    
+
     public void Awake()
     {
         if (ModTable.Get("Awake") != null && ModTable.Get("Awake").Type == DataType.Function)
@@ -91,7 +87,7 @@ public class LuaMod : KerbalMonoBehaviour
         TryRegister(nameof(OnDestroy), out _onDestroy);
 
         TryRegister(nameof(Reset), out _reset);
-        
+
     }
 
     // Start
@@ -128,7 +124,7 @@ public class LuaMod : KerbalMonoBehaviour
             TryCallMethod(_lateUpdate, this);
         }
     }
-    
+
     // Enable/Disable
 
     public void OnEnable()
@@ -146,7 +142,7 @@ public class LuaMod : KerbalMonoBehaviour
             TryCallMethod(_onDisable, this);
         }
     }
-    
+
     // Destruction
 
     public void OnDestroy()

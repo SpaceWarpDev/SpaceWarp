@@ -15,7 +15,6 @@ public class Sound : SpaceWarpModule
     public override void LoadModule()
     {
         Instance = this;
-        Soundbank.soundbanks = new();
         Loading.AddAssetLoadingAction("soundbanks", "loading soundbanks", AssetSoundbankLoadingAction, "bnk");
     }
 

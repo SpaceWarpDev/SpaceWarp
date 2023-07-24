@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using BepInEx.Bootstrap;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Configuration;
@@ -25,7 +24,7 @@ public class UI : SpaceWarpModule
 
 
     internal static UI Instance;
-    
+
     internal ConfigValue<Color> ConfigAllColor;
     internal ConfigValue<bool> ConfigCheckVersions;
     internal ConfigValue<bool> ConfigShowMainMenuWarningForOutdatedMods;
@@ -42,8 +41,8 @@ public class UI : SpaceWarpModule
     internal ConfigManager ConfigurationManager;
     internal ModListController ModListController;
     internal SpaceWarpConsole SpaceWarpConsole;
-    
-    
+
+
     public override void LoadModule()
     {
         AppbarBackend.AppBarInFlightSubscriber.AddListener(Appbar.LoadAllButtons);
@@ -74,7 +73,7 @@ public class UI : SpaceWarpModule
         ConfigShowMainMenuWarningForErroredMods = new (ModuleConfiguration.Bind("Version Checking", "Show Warning for Errored Mods", true,
             "Whether or not Space Warp should display a warning in main menu if there are errored mods"));
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
-        
+
     }
 
     public override void PreInitializeModule()
@@ -89,14 +88,14 @@ public class UI : SpaceWarpModule
             var ui = new GameObject("Version Check Dialog");
             ui.Persist();
             ui.SetActive(true);
-            
+
             // Generate a prompt for whether or not space warp should check mod versions
             var avcDialogUxml = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/avcdialog/ui/avcdialog/avcdialog.uxml");
             var avcDialog = Window.CreateFromUxml(avcDialogUxml, "Space Warp AVC Dialog", ui.transform, true);
 
             var avcDialogController = avcDialog.gameObject.AddComponent<AvcDialogController>();
             avcDialogController.Module = VersionChecking.Instance;
-            
+
         }
         InitializeUI();
     }
@@ -112,27 +111,27 @@ public class UI : SpaceWarpModule
     {
         "SpaceWarp.VersionChecking"
     };
-    
+
     private void InitializeUI()
     {
         ConfigurationManager =
             (ConfigurationManager.ConfigurationManager)Chainloader
                 .PluginInfos[ConfigManager.GUID].Instance;
-        
+
         var ui = new GameObject("Space Warp UI");
         ui.Persist();
         ui.SetActive(true);
-        
+
         var modListUxml = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/modlist/ui/modlist/modlist.uxml");
         var modList = Window.CreateFromUxml(modListUxml, "Space Warp Mod List", ui.transform, true);
         ModListController = modList.gameObject.AddComponent<ModListController>();
-        
+
         var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/swconsole/ui/console/console.uxml");
         var swConsole = Window.CreateFromUxml(swConsoleUxml, "Space Warp Console", ui.transform, true);
         SpaceWarpConsole = swConsole.gameObject.AddComponent<SpaceWarpConsole>();
     }
-    
-    
+
+
     private static void InitializeSettingsUI()
     {
         GameObject settingsController = new("Space Warp Settings Controller");

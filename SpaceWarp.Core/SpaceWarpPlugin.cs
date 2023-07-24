@@ -11,17 +11,12 @@ using KSP.IO;
 using KSP.ScriptInterop.impl.moonsharp;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using UitkForKsp2.API;
-using SpaceWarp.API.Assets;
 using SpaceWarp.API.Loading;
 using SpaceWarp.API.Lua;
 using SpaceWarp.API.Mods;
-using SpaceWarp.Backend.Modding;
 using UitkForKsp2;
-using UnityEngine.UIElements;
 using SpaceWarp.Modules;
 using SpaceWarp.Patching.LoadingActions;
-using UnityEngine;
 
 namespace SpaceWarp;
 
@@ -38,7 +33,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public const string ModVer = "1.4.0"; // TODO: Don't hard code this, but I don't know much msbuild stuff so @munix wil have to do that
 
     internal ScriptEnvironment GlobalLuaState;
-    
+
     internal new static ManualLogSource Logger;
 
     public SpaceWarpPlugin()
@@ -62,10 +57,10 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public void Awake()
     {
         IOProvider.Init();
-        
+
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
         ModuleManager.LoadAllModules();
-        
+
         Loading.AddAssetLoadingAction("bundles", "loading asset bundles", FunctionalLoadingActions.AssetBundleLoadingAction, "bundle");
         Loading.AddAssetLoadingAction("images", "loading images", FunctionalLoadingActions.ImageLoadingAction);
         Loading.AddAddressablesLoadingAction<LanguageSourceAsset>("localization","language_source",OnLanguageSourceAssetLoaded);

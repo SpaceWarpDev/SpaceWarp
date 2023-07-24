@@ -1,8 +1,6 @@
-﻿using AK.Wwise;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using UnityEngine;
 
 namespace SpaceWarp.Backend.Sound;
 internal class Soundbank
@@ -63,5 +61,5 @@ internal class Soundbank
     /// <summary>
     /// Lookup table that saves all loaded soundbanks. Key is the asset internal path.
     /// </summary>
-    internal static Dictionary<string, Soundbank> soundbanks;
+    internal static Dictionary<string, Soundbank> LoadedSoundbanks = new();
 }

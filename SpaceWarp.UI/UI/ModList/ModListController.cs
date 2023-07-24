@@ -6,7 +6,6 @@ using BepInEx;
 using I2.Loc;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
-using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.UI;
 using SpaceWarpPatcher;
 using UitkForKsp2;
@@ -96,10 +95,10 @@ internal class ModListController : MonoBehaviour
         string term;
 
         if (Modules.UI.Instance.ConfigShowMainMenuWarningForErroredMods.Value &&
-            PluginList.AllErroredPlugins.Count > 0) 
+            PluginList.AllErroredPlugins.Count > 0)
             term = "SpaceWarp/Mods/Errored";
         else if (Modules.UI.Instance.ConfigShowMainMenuWarningForOutdatedMods.Value &&
-                 PluginList.AllPlugins.Any(x => x.Outdated)) 
+                 PluginList.AllPlugins.Any(x => x.Outdated))
             term = "SpaceWarp/Mods/Outdated";
         else
             term = "SpaceWarp/Mods";

@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using BepInEx;
 using SpaceWarp.API.Mods;
-using SpaceWarp.API.Mods.JSON;
 using UnityEngine.UIElements;
 
 namespace SpaceWarp.UI.ModList;
@@ -21,7 +19,7 @@ internal class ModListItemController
     internal bool IsOutdated { get; private set; }
     internal bool IsUnsupported { get; private set; }
     internal bool IsDisabled { get; private set; }
-    
+
     internal bool IsErrored { get; private set; }
 
     internal bool HasBadID { get; private set; }
@@ -93,7 +91,7 @@ internal class ModListItemController
         SetIsErrored();
         BadDirectory = true;
     }
-    
+
     internal void SetIsDependencyErrored(string erroredDependency)
     {
         ErroredDependencies.Add(erroredDependency);
@@ -111,8 +109,8 @@ internal class ModListItemController
         DisabledDependencies.Add(disabledDependency);
         SetIsErrored();
     }
-    
-    
+
+
     internal void SetIsDependencyUnsupported(string unsupportedDependency)
     {
         UnsupportedDependencies.Add(unsupportedDependency);

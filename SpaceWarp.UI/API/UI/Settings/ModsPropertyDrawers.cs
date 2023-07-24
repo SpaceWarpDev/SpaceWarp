@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using BepInEx.Configuration;
 using I2.Loc;
 using KSP.UI;
@@ -310,7 +309,7 @@ public static class ModsPropertyDrawers
                     return (GameObject)valueRangeMethod.Invoke(null, new object[] { entry, entry.Description.AcceptableValues });
                 }
             }
-            
+
             var inputFieldCopy = UnityObject.Instantiate(InputFieldPrefab);
             var lab = inputFieldCopy.GetChild("Label");
             lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
@@ -334,7 +333,7 @@ public static class ModsPropertyDrawers
             return inputFieldCopy;
         };
     }
-    
+
     private static Func<string, IConfigEntry, GameObject> GenerateAbstractGenericDrawerFor(Type entrySettingType)
     {
         var valueListMethod = typeof(ModsPropertyDrawers).GetMethod(nameof(CreateFromAcceptableValueList),
@@ -345,7 +344,7 @@ public static class ModsPropertyDrawers
             ?.MakeGenericMethod(entrySettingType);
         return (name, entry) =>
         {
-            
+
             var inputFieldCopy = UnityObject.Instantiate(InputFieldPrefab);
             var lab = inputFieldCopy.GetChild("Label");
             lab.GetComponent<Localize>().SetTerm(name);
@@ -369,8 +368,8 @@ public static class ModsPropertyDrawers
             return inputFieldCopy;
         };
     }
-    
-    
+
+
     private static GameObject CreateBoolConfig(ConfigEntryBase baseEntry)
     {
         var entry = (ConfigEntry<bool>)baseEntry;
@@ -429,7 +428,7 @@ public static class ModsPropertyDrawers
         radioCopy.name = entry.Definition.Key;
         return radioCopy;
     }
-    
+
     private static GameObject CreateBoolConfigAbstracted(string name, IConfigEntry entry)
     {
         var radioCopy = UnityObject.Instantiate(RadioPrefab);
@@ -517,7 +516,7 @@ public static class ModsPropertyDrawers
     }
 
     internal static GameObject SliderPrefab;
-    
+
     // We should just assume that stuff can be converted to a float for this
     private static GameObject CreateFromAcceptableValueRange<T>(ConfigEntry<T> entry,
         AcceptableValueRange<T> acceptableValues) where T : IComparable
@@ -629,7 +628,7 @@ public static class ModsPropertyDrawers
         inputFieldCopy.name = name;
         return inputFieldCopy;
     }
-    
+
     private static GameObject CreateColorConfig(ConfigEntryBase entryBase)
     {
         var entry = (ConfigEntry<Color>)entryBase;

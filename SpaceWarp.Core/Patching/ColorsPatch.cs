@@ -20,37 +20,38 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch]
 internal class ColorsPatch
 {
-    private const string KSP2_OPAQUE_PATH = "KSP2/Scenery/Standard (Opaque)",
-        KSP2_TRANSPARENT_PATH = "KSP2/Scenery/Standard (Transparent)",
-        UNITY_STANDARD = "Standard";
+    private const string Ksp2OpaquePath = "KSP2/Scenery/Standard (Opaque)";
+    private const string Ksp2TransparentPath = "KSP2/Scenery/Standard (Transparent)";
+    private const string UnityStandard = "Standard";
 
     [HarmonyPatch(typeof(ObjectAssemblyPartTracker), nameof(ObjectAssemblyPartTracker.OnPartPrefabLoaded))]
     public static void Prefix(IObjectAssemblyAvailablePart obj, ref GameObject prefab)
     {
         foreach(var renderer in prefab.GetComponentsInChildren<Renderer>())
         {
-            string shaderName = renderer.material.shader.name;
-            if (shaderName == "Parts Replace" || shaderName == "KSP2/Parts/Paintable")
+            var shaderName = renderer.material.shader.name;
+            if (shaderName is not ("Parts Replace" or "KSP2/Parts/Paintable")) continue;
+            Material material;
+            var mat = new Material(Shader.Find(Ksp2OpaquePath))
             {
-                var mat = new Material(Shader.Find(KSP2_OPAQUE_PATH));
-                mat.name = renderer.material.name;
-                mat.CopyPropertiesFromMaterial(renderer.material);
-                renderer.material = mat;
-            }
+                name = (material = renderer.material).name
+            };
+            mat.CopyPropertiesFromMaterial(material);
+            renderer.material = mat;
         }
     }
 
     //Everything below this point will be removed in the next patch
-    private const int DIFFUSE = 0;
-    private const int METTALLIC = 1;
-    private const int BUMP = 2;
-    private const int OCCLUSION = 3;
-    private const int EMISSION = 4;
-    private const int PAINT_MAP = 5;
+    private const int Diffuse = 0;
+    private const int Metallic = 1;
+    private const int Bump = 2;
+    private const int Occlusion = 3;
+    private const int Emission = 4;
+    private const int PaintMap = 5;
 
-
-    private const string displayName = "TTR"; //Taste the Rainbow - name by munix
+    private const string DisplayName = "TTR"; //Taste the Rainbow - name by munix
     private const bool LoadOnInit = true;
+
     private static string[] _allParts;
 
     private static Dictionary<string, Texture[]> _partHash;
@@ -103,11 +104,11 @@ internal class ColorsPatch
             Shader.PropertyToID("_PaintMaskGlossMap")
         };
 
-        _ksp2Opaque = Shader.Find(KSP2_OPAQUE_PATH);
-        _ksp2Transparent = Shader.Find(KSP2_TRANSPARENT_PATH);
-        _unityStandard = Shader.Find(UNITY_STANDARD);
+        _ksp2Opaque = Shader.Find(Ksp2OpaquePath);
+        _ksp2Transparent = Shader.Find(Ksp2TransparentPath);
+        _unityStandard = Shader.Find(UnityStandard);
 
-        Logger = BepInEx.Logging.Logger.CreateLogSource(displayName);
+        Logger = BepInEx.Logging.Logger.CreateLogSource(DisplayName);
 
         return true; // TODO: add config to enable/disable this patch, if disabled return false.
     }
@@ -219,11 +220,11 @@ internal class ColorsPatch
 
 
             var count = 0; //already has diffuse
-            if (AssetManager.TryGetAsset($"{pathWithoutSuffix}_{TextureSuffixes[DIFFUSE]}", out Texture2D dTex))
+            if (AssetManager.TryGetAsset($"{pathWithoutSuffix}_{TextureSuffixes[Diffuse]}", out Texture2D dTex))
             {
-                _partHash[trimmedPartName][DIFFUSE] = dTex;
+                _partHash[trimmedPartName][Diffuse] = dTex;
                 count++;
-                LogMessage($"\t\t>({count}/6) Loaded {TextureNames[DIFFUSE]} texture");
+                LogMessage($"\t\t>({count}/6) Loaded {TextureNames[Diffuse]} texture");
             }
             else
             {
@@ -237,7 +238,7 @@ internal class ColorsPatch
                 {
                     count++;
 
-                    if (i == ColorsPatch.BUMP) //Converting texture to Bump texture
+                    if (i == ColorsPatch.Bump) //Converting texture to Bump texture
                     {
                         Texture2D normalTexture = new Texture2D(Tex.width, Tex.height, TextureFormat.RGBA32, false, true);
                         Graphics.CopyTexture(Tex, normalTexture);

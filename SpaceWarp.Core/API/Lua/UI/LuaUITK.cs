@@ -2,7 +2,6 @@
 using MoonSharp.Interpreter;
 using SpaceWarp.API.Assets;
 using UnityEngine.UIElements;
-using UitkForKsp2.API;
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -30,7 +29,7 @@ public static class LuaUITK
         var parent = mod.transform;
         return UitkForKsp2.API.Window.Create(out _, id, parent, true);
     }
-    
+
     #region Element Creation
 
     public static VisualElement VisualElement()
@@ -42,7 +41,7 @@ public static class LuaUITK
     {
         return new ScrollView();
     }
-    
+
     public static ListView ListView()
     {
         return new ListView();
@@ -120,9 +119,9 @@ public static class LuaUITK
             highLimit = maxLimit
         };
     }
-    
+
     #endregion
-    
+
     #endregion
 
     #region Callbacks
@@ -303,9 +302,9 @@ public static class LuaUITK
         bool trickleDown = false) => RegisterGenericCallback<MouseOutEvent>(element, callback, self, trickleDown);
 
     #endregion
-    
+
     #region Pointer Events
-    
+
     public static void RegisterPointerDownCallback(VisualElement element, Closure callback,
         [CanBeNull] DynValue self = null,
         bool trickleDown = false) => RegisterGenericCallback<PointerDownEvent>(element, callback, self, trickleDown);
@@ -317,7 +316,7 @@ public static class LuaUITK
     public static void RegisterPointerMoveCallback(VisualElement element, Closure callback,
         [CanBeNull] DynValue self = null,
         bool trickleDown = false) => RegisterGenericCallback<PointerMoveEvent>(element, callback, self, trickleDown);
-    
+
     public static void RegisterPointerEnterCallback(VisualElement element, Closure callback,
         [CanBeNull] DynValue self = null,
         bool trickleDown = false) => RegisterGenericCallback<PointerEnterEvent>(element, callback, self, trickleDown);
@@ -334,9 +333,9 @@ public static class LuaUITK
         [CanBeNull] DynValue self = null,
         bool trickleDown = false) => RegisterGenericCallback<PointerOutEvent>(element, callback, self, trickleDown);
     #endregion
-    
+
     #region Panel Events
-    
+
     public static void RegisterAttachToPanelCallback(VisualElement element, Closure callback,
         [CanBeNull] DynValue self = null,
         bool trickleDown = false) => RegisterGenericCallback<AttachToPanelEvent>(element, callback, self, trickleDown);
