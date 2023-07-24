@@ -2,6 +2,7 @@
     <PropertyGroup>
         <SpaceWarpVersion>1.4.0</SpaceWarpVersion>
         <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SpaceWarp</RootNamespace>
         <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
