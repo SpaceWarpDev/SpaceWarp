@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using KSP.Game;
 using KSP.Sim.impl;
 using UnityEngine;
@@ -7,6 +8,7 @@ using UnityEngine.Serialization;
 namespace SpaceWarp.API.UI.Appbar;
 
 [Obsolete("Spacewarps support for IMGUI will not be getting updates, please use UITK instead")]
+[PublicAPI]
 public abstract class AppbarMenu : KerbalBehavior
 {
     [FormerlySerializedAs("Title")] public string title;

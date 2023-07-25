@@ -1,7 +1,9 @@
 ﻿using BepInEx.Logging;
+using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Logging;
 
+[PublicAPI]
 public class BepInExLogger : BaseLogger
 {
     private ManualLogSource _log;

@@ -1,11 +1,13 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Versions;
 
+[PublicAPI]
 public static class VersionUtility
 {
     /// <summary>
-    ///     Checks if one semantic version is newer than another
+    /// Checks if one semantic version is newer than another
     /// </summary>
     /// <param name="version1">The first version</param>
     /// <param name="version2">The second version</param>
@@ -16,7 +18,7 @@ public static class VersionUtility
     }
 
     /// <summary>
-    ///     Checks if one semantic version is older than another
+    /// Checks if one semantic version is older than another
     /// </summary>
     /// <param name="version1">The first version</param>
     /// <param name="version2">The second version</param>
@@ -32,11 +34,13 @@ public static class VersionUtility
     }
 
     /// <summary>
-    ///     Compares 2 semantic versions
+    /// Compares 2 semantic versions
     /// </summary>
     /// <param name="version1">The first version</param>
     /// <param name="version2">The second version</param>
-    /// <returns>0 if version1 equals version2, -1 if version1 is less than version2, 1 if version1 is greater than version2 </returns>
+    /// <returns>
+    /// 0 if version1 equals version2, -1 if version1 is less than version2, 1 if version1 is greater than version2
+    /// </returns>
     public static int CompareSemanticVersionStrings(string version1, string version2)
     {
         var version1Parts = version1.Split('.');

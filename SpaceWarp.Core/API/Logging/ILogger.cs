@@ -1,5 +1,8 @@
-﻿namespace SpaceWarp.API.Logging;
+﻿using JetBrains.Annotations;
 
+namespace SpaceWarp.API.Logging;
+
+[PublicAPI]
 public interface ILogger
 {
     public void Log(LogLevel level, object x);
@@ -12,5 +15,4 @@ public interface ILogger
     public void LogInfo(object x);
     public void LogDebug(object x);
     public void LogAll(object x);
-
 }

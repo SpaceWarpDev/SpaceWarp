@@ -1,12 +1,13 @@
 ﻿using System;
 using BepInEx.Logging;
+using JetBrains.Annotations;
 using KSP.Game;
 using MoonSharp.Interpreter;
 
 namespace SpaceWarp.API.Lua;
 
-
 [MoonSharpUserData]
+[PublicAPI]
 public class LuaMod : KerbalMonoBehaviour
 {
     public Table ModTable;

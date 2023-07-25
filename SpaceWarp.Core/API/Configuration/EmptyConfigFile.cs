@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Configuration;
 
+[PublicAPI]
 public class EmptyConfigFile : IConfigFile
 {
     public void Save()

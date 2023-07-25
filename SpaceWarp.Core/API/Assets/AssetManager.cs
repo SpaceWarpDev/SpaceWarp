@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using SpaceWarp.API.Lua;
 using UnityEngine;
 using Logger = BepInEx.Logging.Logger;
 
-
 namespace SpaceWarp.API.Assets;
 
 [SpaceWarpLuaAPI("Assets")]
+[PublicAPI]
 public static class AssetManager
 {
     private static readonly Dictionary<string, UnityObject> AllAssets = new();
@@ -136,7 +137,7 @@ public static class AssetManager
 
         return true;
     }
-    
+
     /// <summary>
     ///     Gets an asset from the specified asset path
     /// </summary>

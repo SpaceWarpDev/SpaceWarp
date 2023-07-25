@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using SpaceWarp.API.Lua;
 using SpaceWarp.Patching;
+using UnityEngine;
 
 namespace SpaceWarp.API.Parts;
 
 [SpaceWarpLuaAPI("Colors")]
+[PublicAPI]
 public static class Colors
 {
     /// <summary>
@@ -53,5 +56,5 @@ public static class Colors
     /// <param name="partName">Name of the part as described in the .json.</param>
     /// <returns></returns>
     [Obsolete("Use the shader \"KSP2/Parts/Paintable\" or \"Parts Replace\" instead")]
-    public static UnityEngine.Texture[] GetTextures(string partName) => new UnityEngine.Texture[0];
+    public static Texture[] GetTextures(string partName) => Array.Empty<Texture>();
 }

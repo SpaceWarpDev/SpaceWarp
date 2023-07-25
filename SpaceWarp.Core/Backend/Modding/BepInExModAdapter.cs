@@ -8,6 +8,7 @@ namespace SpaceWarp.Backend.Modding;
 public class BepInExModAdapter : ISpaceWarpMod
 {
     public BaseUnityPlugin Plugin;
+
     public void OnPreInitialized()
     {
     }

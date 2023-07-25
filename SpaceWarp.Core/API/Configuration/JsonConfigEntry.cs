@@ -1,7 +1,9 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Configuration;
 
+[PublicAPI]
 public class JsonConfigEntry : IConfigEntry
 {
     private readonly JsonConfigFile _configFile;

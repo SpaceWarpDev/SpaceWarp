@@ -1,7 +1,9 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Configuration;
 
+[PublicAPI]
 public interface IConfigEntry
 {
     public object Value { get; set; }

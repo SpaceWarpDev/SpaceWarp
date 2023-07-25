@@ -6,7 +6,7 @@ namespace SpaceWarp.InternalUtilities;
 internal static class PathHelpers
 {
     /// <summary>
-    ///     Creates a relative path from one file or folder to another.
+    /// Creates a relative path from one file or folder to another.
     /// </summary>
     /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
     /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>

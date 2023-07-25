@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using JetBrains.Annotations;
 using KSP.Game;
 using KSP.Messages;
 using KSP.VFX;
@@ -10,8 +11,9 @@ using SpaceWarp.API.Logging;
 namespace SpaceWarp.API.Mods;
 
 /// <summary>
-///     Represents a KSP2 Mod, you should inherit from this and do your manager processing.
+/// Represents a KSP2 Mod, you should inherit from this and do your manager processing.
 /// </summary>
+[PublicAPI]
 public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin, ISpaceWarpMod
 {
     #region KspBehaviour things

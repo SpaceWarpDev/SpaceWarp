@@ -1,7 +1,9 @@
 ﻿using System.IO;
+using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Mods;
 
+[PublicAPI]
 public static class GlobalModDefines
 {
     public static readonly string AssetBundlesFolder = Path.Combine("assets", "bundles");

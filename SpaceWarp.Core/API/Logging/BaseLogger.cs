@@ -1,5 +1,8 @@
-﻿namespace SpaceWarp.API.Logging;
+﻿using JetBrains.Annotations;
 
+namespace SpaceWarp.API.Logging;
+
+[PublicAPI]
 public abstract class BaseLogger : ILogger
 {
     public abstract void Log(LogLevel level, object x);

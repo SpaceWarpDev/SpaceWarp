@@ -1,12 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace SpaceWarp.API.Mods.JSON;
 
 /// <summary>
-///     Represents the json property info. Properties have to use the same name as in the JSON file, that's why they break
-///     convention.
+/// Represents the json property info. Properties have to use the same name as in the JSON file, that's why they break
+/// convention.
 /// </summary>
 [JsonObject(MemberSerialization.OptIn)]
+[PublicAPI]
 public sealed class DependencyInfo
 {
     [JsonProperty("id")] public string ID { get; internal set; }

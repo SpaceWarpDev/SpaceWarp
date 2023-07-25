@@ -1,8 +1,10 @@
 ﻿using System;
+using JetBrains.Annotations;
 using KSP.Messages;
 
 namespace SpaceWarp.API.Game.Messages;
 
+[PublicAPI]
 public class StateLoadings
 {
     public static event Action<TrainingCenterLoadedMessage> TrainingCenterLoaded;

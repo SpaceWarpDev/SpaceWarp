@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Reflection;
 using System.Xml;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Mods;
@@ -11,6 +12,7 @@ using UnityEngine.Networking;
 
 namespace SpaceWarp.Modules;
 
+[PublicAPI]
 public class VersionChecking : SpaceWarpModule
 {
     public override string Name => "SpaceWarp.VersionChecking";

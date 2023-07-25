@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using SpaceWarp.API.Mods.JSON.Converters;
 
@@ -8,6 +9,7 @@ namespace SpaceWarp.API.Mods.JSON;
 /// Represents the version of the API specification from the swinfo.json file.
 /// </summary>
 [JsonConverter(typeof(SpecVersionConverter))]
+[PublicAPI]
 public sealed record SpecVersion
 {
     private const int DefaultMajor = 1;
@@ -92,10 +94,11 @@ public sealed record SpecVersion
 /// <summary>
 /// Thrown if the specification version string is invalid.
 /// </summary>
+[PublicAPI]
 public sealed class InvalidSpecVersionException : Exception
 {
-    public InvalidSpecVersionException(string version) : base(
-        $"Invalid spec version: {version}. The correct format is \"major.minor\".")
+    public InvalidSpecVersionException(string version) :
+        base($"Invalid spec version: {version}. The correct format is \"major.minor\".")
     {
     }
 }
@@ -103,11 +106,11 @@ public sealed class InvalidSpecVersionException : Exception
 /// <summary>
 /// Thrown if a property is deprecated in the current specification version.
 /// </summary>
+[PublicAPI]
 public sealed class DeprecatedSwinfoPropertyException : Exception
 {
-    public DeprecatedSwinfoPropertyException(string property, SpecVersion deprecationVersion) : base(
-        $"The swinfo.json property \"{property}\" is deprecated in the spec version {deprecationVersion} and will be removed completely in the future."
-    )
+    public DeprecatedSwinfoPropertyException(string property, SpecVersion deprecationVersion) :
+        base($"The swinfo.json property \"{property}\" is deprecated in the spec version {deprecationVersion} and will be removed completely in the future.")
     {
     }
 }

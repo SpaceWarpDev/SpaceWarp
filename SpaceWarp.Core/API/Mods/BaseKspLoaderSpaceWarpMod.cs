@@ -1,9 +1,11 @@
-﻿using KSP.Modding;
+﻿using JetBrains.Annotations;
+using KSP.Modding;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 
 namespace SpaceWarp.API.Mods;
 
+[PublicAPI]
 public abstract class BaseKspLoaderSpaceWarpMod : Mod, ISpaceWarpMod
 {
     public virtual void OnPreInitialized()

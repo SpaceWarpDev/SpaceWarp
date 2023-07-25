@@ -1,14 +1,14 @@
 ﻿using BepInEx.Bootstrap;
+using JetBrains.Annotations;
 using MoonSharp.Interpreter;
 using SpaceWarp.InternalUtilities;
 using UnityEngine;
 using Logger = BepInEx.Logging.Logger;
-// ReSharper disable UnusedMember.Global
 
 namespace SpaceWarp.API.Lua;
 
 [SpaceWarpLuaAPI("SpaceWarp")]
-// ReSharper disable once UnusedType.Global
+[PublicAPI]
 public static class SpaceWarpInterop
 {
     public static LuaMod RegisterMod(string name, Table modTable)

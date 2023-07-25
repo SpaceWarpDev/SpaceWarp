@@ -1,6 +1,8 @@
-﻿namespace SpaceWarp.API.Logging;
+﻿using JetBrains.Annotations;
 
+namespace SpaceWarp.API.Logging;
 
+[PublicAPI]
 public enum LogLevel
 {
     None = 0,

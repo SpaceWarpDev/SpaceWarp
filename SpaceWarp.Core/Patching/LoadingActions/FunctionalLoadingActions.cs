@@ -7,7 +7,10 @@ namespace SpaceWarp.Patching.LoadingActions;
 
 internal static class FunctionalLoadingActions
 {
-    internal static List<(string name, UnityObject asset)> AssetBundleLoadingAction(string internalPath, string filename)
+    internal static List<(string name, UnityObject asset)> AssetBundleLoadingAction(
+        string internalPath,
+        string filename
+    )
     {
         var assetBundle = AssetBundle.LoadFromFile(filename);
         if (assetBundle == null)
@@ -41,7 +44,6 @@ internal static class FunctionalLoadingActions
 
         return assets;
     }
-
 
 
     internal static List<(string name, UnityObject asset)> ImageLoadingAction(string internalPath, string filename)
