@@ -1,10 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using BepInEx.Bootstrap;
+using KSP.Assets;
+using KSP.Game;
+using KSP.Game.Flow;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Configuration;
+using SpaceWarp.API.Loading;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.Backend.UI.Appbar;
+using SpaceWarp.Backend.UI.Loading;
 using SpaceWarp.InternalUtilities;
 using SpaceWarp.UI.AvcDialog;
 using SpaceWarp.UI.Console;
@@ -42,6 +48,7 @@ public class UI : SpaceWarpModule
     internal ConfigManager ConfigurationManager;
     internal ModListController ModListController;
     internal SpaceWarpConsole SpaceWarpConsole;
+    internal LoadingScreenManager LoadingScreenManager;
     
     
     public override void LoadModule()
@@ -74,11 +81,13 @@ public class UI : SpaceWarpModule
         ConfigShowMainMenuWarningForErroredMods = new (ModuleConfiguration.Bind("Version Checking", "Show Warning for Errored Mods", true,
             "Whether or not Space Warp should display a warning in main menu if there are errored mods"));
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
-        
+        LoadingScreenManager = new();
     }
 
     public override void PreInitializeModule()
     {
+        LoadingScreenManager.LoadScreens();
+        LoadingScreenManager.SetupResourceLocator();
     }
 
     public override void InitializeModule()
