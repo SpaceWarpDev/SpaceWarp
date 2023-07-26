@@ -1,12 +1,7 @@
-﻿using System;
-using BepInEx.Bootstrap;
-using JetBrains.Annotations;
-using KSP.UI.Flight;
+﻿using BepInEx.Bootstrap;
 using MoonSharp.Interpreter;
-using SpaceWarp.API.Assets;
 using SpaceWarp.InternalUtilities;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Logger = BepInEx.Logging.Logger;
 // ReSharper disable UnusedMember.Global
 
@@ -18,7 +13,7 @@ public static class SpaceWarpInterop
 {
     public static LuaMod RegisterMod(string name, Table modTable)
     {
-        GameObject go = new GameObject(name);
+        var go = new GameObject(name);
         go.Persist();
         go.transform.SetParent(Chainloader.ManagerObject.transform);
         go.SetActive(false);
@@ -28,6 +23,4 @@ public static class SpaceWarpInterop
         go.SetActive(true);
         return mod;
     }
-
-    
 }

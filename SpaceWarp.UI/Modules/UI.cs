@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using BepInEx.Bootstrap;
 using KSP.Assets;
@@ -98,14 +97,14 @@ public class UI : SpaceWarpModule
             var ui = new GameObject("Version Check Dialog");
             ui.Persist();
             ui.SetActive(true);
-            
+
             // Generate a prompt for whether or not space warp should check mod versions
             var avcDialogUxml = AssetManager.GetAsset<VisualTreeAsset>($"{SpaceWarpPlugin.ModGuid}/avcdialog/ui/avcdialog/avcdialog.uxml");
             var avcDialog = Window.CreateFromUxml(avcDialogUxml, "Space Warp AVC Dialog", ui.transform, true);
 
             var avcDialogController = avcDialog.gameObject.AddComponent<AvcDialogController>();
             avcDialogController.Module = VersionChecking.Instance;
-            
+
         }
         InitializeUI();
     }

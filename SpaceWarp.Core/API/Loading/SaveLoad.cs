@@ -37,7 +37,7 @@ public static class SaveLoad
     /// <exception cref="InvalidOperationException">Thrown if <c>FlowActionType</c> does not have a valid Constructor</exception>
     public static void AddFlowActionToGameLoadAfter<FlowActionType>(string referenceAction) where FlowActionType : FlowAction
     {
-        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(FlowActionType), SequentialFlowLoadersPatcher.FLOW_METHOD_STARTGAME);
+        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(FlowActionType), SequentialFlowLoadersPatcher.FlowMethodStartgame);
     }
 
     /// <summary>
@@ -67,7 +67,7 @@ public static class SaveLoad
     /// <param name="referenceAction">The name of the action to insert a FlowActionType after. Use <c>null</c> to insert it at the start.</param>
     public static void AddFlowActionToGameLoadAfter(FlowAction flowAction, string referenceAction)
     {
-        SequentialFlowLoadersPatcher.AddFlowAction(referenceAction, flowAction, SequentialFlowLoadersPatcher.FLOW_METHOD_STARTGAME);
+        SequentialFlowLoadersPatcher.AddFlowAction(referenceAction, flowAction, SequentialFlowLoadersPatcher.FlowMethodStartgame);
     }
 
     /// <summary>
@@ -148,7 +148,7 @@ public static class SaveLoad
     /// <exception cref="InvalidOperationException">Thrown if <c>FlowActionType</c> does not have a valid Constructor</exception>
     public static void AddFlowActionToCampaignLoadAfter<FlowActionType>(string referenceAction) where FlowActionType : FlowAction
     {
-        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(FlowActionType), SequentialFlowLoadersPatcher.FLOW_METHOD_PRIVATELOADCOMMON);
+        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(FlowActionType), SequentialFlowLoadersPatcher.FlowMethodPrivateloadcommon);
     }
 
     /// <summary>
@@ -219,7 +219,7 @@ public static class SaveLoad
     /// <param name="referenceAction">The name of the action to insert a FlowActionType after. Use <c>null</c> to insert it at the start.</param>
     public static void AddFlowActionToCampaignLoadAfter(FlowAction flowAction, string referenceAction)
     {
-        SequentialFlowLoadersPatcher.AddFlowAction(referenceAction, flowAction, SequentialFlowLoadersPatcher.FLOW_METHOD_PRIVATELOADCOMMON);
+        SequentialFlowLoadersPatcher.AddFlowAction(referenceAction, flowAction, SequentialFlowLoadersPatcher.FlowMethodPrivateloadcommon);
     }
 
     /// <summary>
@@ -261,7 +261,7 @@ public static class SaveLoad
     /// <exception cref="InvalidOperationException">Thrown if <c>FlowActionType</c> does not have a valid Constructor</exception>
     public static void AddFlowActionToCampaignSaveAfter<FlowActionType>(string referenceAction) where FlowActionType : FlowAction
     {
-        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(FlowActionType), SequentialFlowLoadersPatcher.FLOW_METHOD_PRIVATESAVECOMMON);
+        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(FlowActionType), SequentialFlowLoadersPatcher.FlowMethodPrivatesavecommon);
     }
 
     /// <summary>
@@ -294,6 +294,6 @@ public static class SaveLoad
     /// <param name="referenceAction">The name of the action to insert a FlowActionType after. Use <c>null</c> to insert it at the start.</param>
     public static void AddFlowActionToCampaignSaveAfter(FlowAction flowAction, string referenceAction)
     {
-        SequentialFlowLoadersPatcher.AddFlowAction(referenceAction, flowAction, SequentialFlowLoadersPatcher.FLOW_METHOD_PRIVATESAVECOMMON);
+        SequentialFlowLoadersPatcher.AddFlowAction(referenceAction, flowAction, SequentialFlowLoadersPatcher.FlowMethodPrivatesavecommon);
     }
 }

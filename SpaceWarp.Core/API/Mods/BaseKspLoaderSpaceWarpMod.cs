@@ -1,8 +1,6 @@
-﻿using System.IO;
-using KSP.Modding;
+﻿using KSP.Modding;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
-using UnityEngine.Serialization;
 
 namespace SpaceWarp.API.Mods;
 
@@ -10,7 +8,7 @@ public abstract class BaseKspLoaderSpaceWarpMod : Mod, ISpaceWarpMod
 {
     public virtual void OnPreInitialized()
     {
-        
+
     }
 
     public virtual void OnInitialized()
@@ -20,7 +18,7 @@ public abstract class BaseKspLoaderSpaceWarpMod : Mod, ISpaceWarpMod
     public virtual void OnPostInitialized()
     {
     }
-    
+
     /// <summary>
     /// Gets set automatically, before awake is called
     /// </summary>
@@ -30,6 +28,6 @@ public abstract class BaseKspLoaderSpaceWarpMod : Mod, ISpaceWarpMod
         get;
         internal set;
     }
-    
+
     public SpaceWarpPluginDescriptor SWMetadata { get; set; }
 }

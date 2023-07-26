@@ -1,13 +1,13 @@
-﻿using AK.Wwise;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Runtime.InteropServices;
-using UnityEngine;
+using JetBrains.Annotations;
 
-namespace SpaceWarp.Backend.Sound;
-internal class Soundbank
+namespace SpaceWarp.API.Sound;
+
+[PublicAPI]
+public class Soundbank
 {
-    internal Soundbank(byte[] bankData)
+    public Soundbank(byte[] bankData)
     {
         BankData = bankData;
         Size = (uint)bankData.Length;
@@ -16,40 +16,44 @@ internal class Soundbank
     /// <summary>
     /// Pointer to bank data
     /// </summary>
-    internal IntPtr? BankDataPtr;
+    public IntPtr? BankDataPtr;
 
     /// <summary>
     /// BankData supplied by the user
     /// </summary>
-    internal byte[] BankData;
+    public byte[] BankData;
 
     /// <summary>
     /// Handle for BankData array
     /// </summary>
-    internal GCHandle? Memory;
+    public GCHandle? Memory;
 
     /// <summary>
     /// Size of the bank in bytes
     /// </summary>
-    internal uint Size;
+    public uint Size;
 
     /// <summary>
     /// Spacewarp's asset ID. Also used to get the Soundbank.
     /// </summary>
-    internal string InternalPath;
+    public string InternalPath;
 
     /// <summary>
     /// Identifier for the engine
     /// </summary>
-    internal uint WwiseID;
+    public uint WwiseID;
 
-    internal AKRESULT Load()
+    public AKRESULT Load()
     {
         // Pins BankData array in memory
         BankDataPtr ??= (Memory = GCHandle.Alloc(BankData, GCHandleType.Pinned)).Value.AddrOfPinnedObject();
 
         // Loads the entire array as a bank
-        var result = AkSoundEngine.LoadBankMemoryView(BankDataPtr!.Value, (uint)BankData.Length, out WwiseID);
+        var result = AkSoundEngine.LoadBankMemoryView(
+            BankDataPtr!.Value,
+            (uint)BankData.Length,
+            out WwiseID
+        );
 
         if (result == AKRESULT.AK_Success)
         {
@@ -59,9 +63,4 @@ internal class Soundbank
 
         return result;
     }
-
-    /// <summary>
-    /// Lookup table that saves all loaded soundbanks. Key is the asset internal path.
-    /// </summary>
-    internal static Dictionary<string, Soundbank> soundbanks;
 }

@@ -15,8 +15,6 @@ namespace SpaceWarp.Backend.Modding;
 
 internal static class PluginRegister
 {
-    
-
     public static void RegisterAllMods()
     {
         RegisterAllBepInExMods();
@@ -26,7 +24,7 @@ internal static class PluginRegister
         RegisterAllErroredMods();
         DisableMods();
     }
-    
+
     private static ILogger Logger = (BepInExLogger)SpaceWarpPlugin.Logger;
     private static ModInfo BepInExToSWInfo(PluginInfo plugin)
     {
@@ -58,13 +56,13 @@ internal static class PluginRegister
         };
         return newInfo;
     }
-    
+
     private static bool AssertFolderPath(BaseSpaceWarpPlugin plugin, string folderPath)
     {
         if (Path.GetFileName(folderPath) != "plugins") return true;
         Logger.LogError(
             $"Found Space Warp mod {plugin.Info.Metadata.Name} in the BepInEx/plugins directory. This mod will not be initialized.");
-        
+
         var descriptor = new SpaceWarpPluginDescriptor(plugin,
             plugin.Info.Metadata.GUID,
             plugin.Info.Metadata.Name,
@@ -74,7 +72,7 @@ internal static class PluginRegister
         return false;
 
     }
-    
+
     private static bool AssertModInfoExistence(BaseSpaceWarpPlugin plugin, string modInfoPath, string folderPath)
     {
         if (File.Exists(modInfoPath)) return true;
@@ -87,7 +85,7 @@ internal static class PluginRegister
             new DirectoryInfo(folderPath)));
         return false;
     }
-    
+
     private static bool TryReadModInfo(BaseUnityPlugin plugin,
         string modInfoPath, string folderPath, out ModInfo metadata)
     {
@@ -111,7 +109,7 @@ internal static class PluginRegister
 
         return true;
     }
-    
+
     private static bool AssertSpecificationCompliance(
         SpaceWarpPluginDescriptor descriptor,
         BaseUnityPlugin plugin,
@@ -157,7 +155,7 @@ internal static class PluginRegister
         });
         return false;
     }
-    
+
     private static bool AssertMatchingVersions(SpaceWarpPluginDescriptor descriptor, BaseUnityPlugin plugin, ModInfo metadata, string folderPath)
     {
         if (new Version(metadata.Version) == plugin.Info.Metadata.Version) return true;
@@ -167,7 +165,7 @@ internal static class PluginRegister
         return false;
 
     }
-    
+
     private static bool AssertMatchingModID(SpaceWarpPluginDescriptor descriptor, BaseUnityPlugin plugin, ModInfo metadata, string folderPath)
     {
         var modID = metadata.ModID;
@@ -178,7 +176,7 @@ internal static class PluginRegister
         return false;
 
     }
-    
+
     private static void RegisterSingleSpaceWarpPlugin(BaseSpaceWarpPlugin plugin)
     {
         var folderPath = Path.GetDirectoryName(plugin.Info.Location);
@@ -232,7 +230,7 @@ internal static class PluginRegister
             PluginList.RegisterPlugin(GetBepInExDescriptor(plugin));
         }
     }
-    
+
     private static SpaceWarpPluginDescriptor GetBepInExDescriptor(BaseUnityPlugin plugin)
     {
         return new SpaceWarpPluginDescriptor(null,
@@ -250,7 +248,7 @@ internal static class PluginRegister
             BepInExToSWInfo(info),
             new DirectoryInfo(Path.GetDirectoryName(info.Location)!));
     }
-    
+
     private static void RegisterAllBepInExMods()
     {
 #pragma warning disable CS0618
@@ -298,9 +296,9 @@ internal static class PluginRegister
             descriptor.Plugin!.SWMetadata = descriptor;
 
             Logger.LogInfo($"Attempting to register codeless mod: {swinfoData.ModID}, {swinfoData.Name}");
-            
+
             if (PluginList.AllPlugins.Any(x => string.Equals(x.Guid,swinfoData.ModID,StringComparison.InvariantCultureIgnoreCase))) continue;
-           
+
             // Now we can just add it to our plugin list
             PluginList.RegisterPlugin(descriptor);
         }
@@ -337,7 +335,7 @@ internal static class PluginRegister
     {
         ModInfo metadata;
         if (File.Exists(Path.Combine(folder.FullName, "swinfo.json")))
-        { 
+        {
             metadata = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(Path.Combine(folder.FullName, "swinfo.json")));
         }
         else if (File.Exists(Path.Combine(folder.FullName, "modinfo.json")))
@@ -357,10 +355,11 @@ internal static class PluginRegister
                 };
         PluginList.RegisterPlugin(descriptor);
     }
-    
+
     private static void RegisterAllKspMods()
     {
         var pluginPath = new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods"));
+        if (!pluginPath.Exists) return;
         Logger.LogInfo($"KSP Loaded mods path: {pluginPath.FullName}");
         // Lets quickly register every KSP loader loaded mod into the load order before anything, with late pre-initialize
         foreach (var plugin in pluginPath.EnumerateDirectories())
@@ -439,7 +438,7 @@ internal static class PluginRegister
             PluginList.Disable(descriptor.Guid);
         }
     }
-    
+
     private static void DisableMods()
     {
         foreach (var mod in ChainloaderPatch.DisabledPluginGuids)

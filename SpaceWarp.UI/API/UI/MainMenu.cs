@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace SpaceWarp.API.UI;
 public static class MainMenu
@@ -17,7 +16,7 @@ public static class MainMenu
     {
         MenuButtonsToBeAdded.Add((name, onClicked));
     }
-    
+
     /// <summary>
     ///     Registers a localized button to be added to the main menu.
     /// </summary>
@@ -27,5 +26,5 @@ public static class MainMenu
     {
         LocalizedMenuButtonsToBeAdded.Add((term, onClicked));
     }
-    
+
 }

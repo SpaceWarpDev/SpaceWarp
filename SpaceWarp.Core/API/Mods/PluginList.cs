@@ -5,8 +5,6 @@ using BepInEx.Bootstrap;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
 using SpaceWarpPatcher;
-using UnityEngine.Yoga;
-using Enumerable = UniLinq.Enumerable;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -24,7 +22,8 @@ public static class PluginList
     #region Reading Plugins
 
     /// <summary>
-    /// Set if the plugin list is different in any way since last run (version differences, new mods, mods removed, mods disabled, description differences, any different in any swinfo file and the disabled mod list)
+    /// Set if the plugin list is different in any way since last run (version differences, new mods, mods removed,
+    /// mods disabled, description differences, any different in any swinfo file and the disabled mod list).
     /// </summary>
     public static bool ModListChangedSinceLastRun => ChainloaderPatch.ModListChangedSinceLastRun;
     /// <summary>
@@ -35,8 +34,8 @@ public static class PluginList
     /// <summary>
     /// Contains information about all currently disabled plugins. The key is the BepInEx GUID of the plugin.
     /// </summary>
-    public static Dictionary<string, PluginInfo> DisabledPluginInfos { get; } = SpaceWarpPatcher.ChainloaderPatch
-        .DisabledPluginGuids.Zip(SpaceWarpPatcher.ChainloaderPatch.DisabledPlugins, (guid, info) => new { guid, info })
+    public static Dictionary<string, PluginInfo> DisabledPluginInfos { get; } = ChainloaderPatch
+        .DisabledPluginGuids.Zip(ChainloaderPatch.DisabledPlugins, (guid, info) => new { guid, info })
         .ToDictionary(item => item.guid, item => item.info);
 
     /// <summary>
@@ -81,7 +80,7 @@ public static class PluginList
         {
             return swModInfo.SWInfo;
         }
-        
+
         var disabledModInfo = AllDisabledPlugins
             .Where(item => item.Guid == guid)
             .Select(item => item.SWInfo)
@@ -97,7 +96,7 @@ public static class PluginList
     /// <returns><see cref="SpaceWarpPluginDescriptor"/> of the plugin or null if not found</returns>
     public static SpaceWarpPluginDescriptor TryGetDescriptor(string guid)
     {
-        
+
         return AllEnabledAndActivePlugins
             .FirstOrDefault(item => item.Guid == guid);
     }
@@ -121,15 +120,15 @@ public static class PluginList
 
     #region Registering Plugins
 
-    
+
     private static List<SpaceWarpPluginDescriptor> _allEnabledAndActivePlugins = new();
     /// <summary>
     /// All plugins that are enabled, and active (not errored)
     /// </summary>
     public static IReadOnlyList<SpaceWarpPluginDescriptor> AllEnabledAndActivePlugins => _allEnabledAndActivePlugins;
-    
+
     private static List<SpaceWarpPluginDescriptor> _allDisabledPlugins = new();
-    
+
     /// <summary>
     /// All disabled plugins
     /// </summary>
@@ -177,7 +176,7 @@ public static class PluginList
         _allErroredPlugins.Add(newError);
         return newError;
     }
-    
+
     public static void NoteMissingSwinfoError(SpaceWarpPluginDescriptor plugin)
     {
         var errorDescriptor = GetErrorDescriptor(plugin);
@@ -273,8 +272,8 @@ public static class PluginList
             }
         }
     }
-    
-    
+
+
     /// <summary>
     /// This is done after Awake/LoadModule(), so that everything else can use it
     /// </summary>
@@ -283,8 +282,8 @@ public static class PluginList
         GetLoadOrder();
         GetDependencyErrors();
     }
-    
+
 
     #endregion
-    
+
 }

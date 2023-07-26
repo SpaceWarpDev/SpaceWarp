@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using KSP.Game;
-using KSP.UI;
 using UnityEngine.EventSystems;
 using DG.Tweening;
-using DG.Tweening.Core;
-using UnityEngine.Serialization;
 
 namespace SpaceWarp.Backend.UI.Settings;
 
 public class CustomSettingsElementDescriptionController :
     KerbalMonoBehaviour,
     IPointerEnterHandler,
-    IEventSystemHandler,
     IPointerExitHandler
 {
 
@@ -25,7 +20,7 @@ public class CustomSettingsElementDescriptionController :
     public void OnPointerEnter(PointerEventData eventData) => OnHover(true);
 
     public void OnPointerExit(PointerEventData eventData) => OnHover(false);
-    
+
 
     private void OnHover(bool isHovered)
     {

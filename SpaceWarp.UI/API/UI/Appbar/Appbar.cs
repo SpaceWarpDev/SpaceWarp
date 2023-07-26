@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using BepInEx.Bootstrap;
 using KSP.UI.Binding;
 using SpaceWarp.Backend.UI.Appbar;

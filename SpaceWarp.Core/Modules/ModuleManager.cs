@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using BepInEx.Configuration;
 using HarmonyLib;
-using KSP.IO;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
-using UnityEngine;
-using UnityEngine.UIElements;
 using ILogger = SpaceWarp.API.Logging.ILogger;
 
 namespace SpaceWarp.Modules;
@@ -24,9 +20,9 @@ public static class ModuleManager
         module = AllSpaceWarpModules.FirstOrDefault(x => x.Name == name);
         return module != null;
     }
-    
+
     internal static void LoadAllModules()
-    {;
+    {
         var location = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
         var modules = new DirectoryInfo(Path.Combine(location!.FullName, "modules"));
         ModuleManagerLogSource.LogInfo($"Modules location: {modules}");
@@ -55,10 +51,10 @@ public static class ModuleManager
             }
         }
 
-        
+
         TopologicallySortModules();
         List<SpaceWarpModule> toRemove = new();
-        
+
         foreach (var module in AllSpaceWarpModules)
         {
             try
@@ -103,7 +99,7 @@ public static class ModuleManager
         }
         AllSpaceWarpModules = topologicalOrder;
     }
-    
+
     internal static void PreInitializeAllModules()
     {
         List<SpaceWarpModule> toRemove = new();

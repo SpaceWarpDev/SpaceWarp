@@ -21,9 +21,9 @@ public class VersionChecking : SpaceWarpModule
     public override void LoadModule()
     {
         Instance = this;
-        ConfigFirstLaunch = new(ModuleConfiguration.Bind("Main", "First Launch", true,
+        ConfigFirstLaunch = new ConfigValue<bool>(ModuleConfiguration.Bind("Main", "First Launch", true,
             "Set this to false to get the version check prompt next launch"));
-        ConfigCheckVersions = new(ModuleConfiguration.Bind("Main", "Check Versions", false,
+        ConfigCheckVersions = new ConfigValue<bool>(ModuleConfiguration.Bind("Main", "Check Versions", false,
             "Set this to true to automatically check versions over the internet"));
     }
 
@@ -35,7 +35,7 @@ public class VersionChecking : SpaceWarpModule
 
     public override void InitializeModule()
     {
-        
+
         if (ConfigCheckVersions.Value)
         {
             CheckVersions();
@@ -47,7 +47,7 @@ public class VersionChecking : SpaceWarpModule
     {
         ConfigFirstLaunch.Value = false;
     }
-    
+
     public void ClearVersions()
     {
         foreach (var plugin in PluginList.AllPlugins)
@@ -143,10 +143,10 @@ public class VersionChecking : SpaceWarpModule
         }
 
         var isOutdated = VersionUtility.IsOlderThan(version, checkVersion);
-        
+
         return isOutdated;
     }
-    
+
     internal void CheckKspVersions()
     {
         foreach (var plugin in PluginList.AllEnabledAndActivePlugins)

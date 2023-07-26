@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using KSP.Game;
+﻿using KSP.Game;
 using KSP.Sim.impl;
 using SpaceWarp.API.Lua;
 

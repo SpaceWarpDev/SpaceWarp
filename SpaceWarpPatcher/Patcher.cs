@@ -14,7 +14,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using MonoMod.Utils;
 using Newtonsoft.Json.Linq;
 
 // ReSharper disable UnusedType.Global
@@ -53,7 +52,7 @@ public static class Patcher
     //     var constructor =
     //         mainModule.ImportReference(typeof(TypeForwardedToAttribute).GetConstructor(new[] { typeof(Type) }));
     //     var systemType = mainModule.ImportReference(typeof(Type));
-    //     
+    //
     //     CustomAttribute GetTypeForwardedToAttribute(TypeReference typeReference)
     //     {
     //         var attr = new CustomAttribute(constructor);
@@ -89,7 +88,7 @@ internal static class Delayer
     public static void PatchChainloaderStart()
     {
         ChainloaderPatch.LogSource = Logger.CreateLogSource("SW BIE Extensions");
-        string disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
+        var disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
         ChainloaderPatch.DisabledPluginsFilepath = disabledPluginsFilepath;
         if (!File.Exists(disabledPluginsFilepath))
         {
@@ -99,7 +98,7 @@ internal static class Delayer
         }
 
         ChainloaderPatch.DisabledPluginGuids = File.ReadAllLines(disabledPluginsFilepath);
-        ChainloaderPatch.DisabledPlugins = new();
+        ChainloaderPatch.DisabledPlugins = new List<PluginInfo>();
         Harmony.CreateAndPatchAll(typeof(ChainloaderPatch));
     }
 }
@@ -248,15 +247,15 @@ public static class ChainloaderPatch
                 (new DirectoryInfo(Path.Combine(Paths.BepInExRootPath, "plugins")))
                 .EnumerateFiles("swinfo.json", SearchOption.AllDirectories).Select(x => File.ReadAllText(x.FullName)));
             allPluginsSwinfo += File.ReadAllText(disabledPluginsFilepath);
-            var hash = "";
-            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            string hash;
+            using (var md5 = System.Security.Cryptography.MD5.Create())
             {
-                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(allPluginsSwinfo);
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
-                StringBuilder sb = new System.Text.StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
+                var inputBytes = Encoding.ASCII.GetBytes(allPluginsSwinfo);
+                var hashBytes = md5.ComputeHash(inputBytes);
+                var sb = new StringBuilder();
+                foreach (var b in hashBytes)
                 {
-                    sb.Append(hashBytes[i].ToString("X2"));
+                    sb.Append(b.ToString("X2"));
                 }
 
                 hash = sb.ToString();
@@ -328,7 +327,7 @@ public static class ChainloaderPatch
 
                 var logger = Logger.CreateLogSource(parent.Name + " compilation");
                 var allSource = AllSourceFiles(directory);
-                DateTime latestWriteTime = DateTime.FromBinary(0);
+                var latestWriteTime = DateTime.FromBinary(0);
 
 
                 var resultFileName = "roslyn-" + id;

@@ -1,5 +1,4 @@
 ﻿using SpaceWarp.API.Mods;
-using SpaceWarp.InternalUtilities;
 using SpaceWarp.UI.ModList;
 
 namespace SpaceWarp.Backend.Extensions;
@@ -28,7 +27,7 @@ internal static class ErrorDescriptionExtensions
         {
             controller.SetIsDependencyMissing(missingDependency);
         }
-        
+
         foreach (var unsupportedDependency in instance.UnsupportedDependencies)
         {
             controller.SetIsDependencyUnsupported(unsupportedDependency);

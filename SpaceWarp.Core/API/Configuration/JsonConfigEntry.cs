@@ -1,5 +1,4 @@
 ﻿using System;
-using Newtonsoft.Json.Linq;
 
 namespace SpaceWarp.API.Configuration;
 
@@ -15,14 +14,11 @@ public class JsonConfigEntry : IConfigEntry
         Description = description;
         ValueType = type;
     }
-    
+
 
     public object Value
     {
-        get
-        {
-            return _value;
-        }
+        get => _value;
         set
         {
             _value = value;

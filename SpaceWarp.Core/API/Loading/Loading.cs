@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using JetBrains.Annotations;
 using KSP.Game.Flow;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
-using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.InternalUtilities;
 using SpaceWarp.Patching.LoadingActions;
 
@@ -67,7 +65,7 @@ public static class Loading
     /// <summary>
     /// Registers a general loading action. Should be added either on Awake() or Start().
     /// </summary>
-    /// <param name="action">The action generator</param>
+    /// <param name="actionGenerator">The action generator</param>
     public static void AddGeneralLoadingAction(Func<FlowAction> actionGenerator)
     {
         GeneralLoadingActions.Add(actionGenerator);

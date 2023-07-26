@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using KSP.Game;
 using KSP.Messages;
 

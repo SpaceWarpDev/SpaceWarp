@@ -3,14 +3,17 @@
     <PropertyGroup>
         <Version>$(SpaceWarpVersion)</Version>
     </PropertyGroup>
+
     <ItemGroup>
         <Reference Include="BepInEx.ConfigurationManager" Private="false" Publicize="true">
             <HintPath>..\ThirdParty\ConfigurationManager\ConfigurationManager.dll</HintPath>
         </Reference>
     </ItemGroup>
+
     <ItemGroup>
         <PackageReference Remove="PolySharp" />
     </ItemGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\SpaceWarp.Core\SpaceWarp.Core.csproj" />
         <ProjectReference Include="..\SpaceWarp.Game\SpaceWarp.Game.csproj" />
@@ -23,6 +26,7 @@
             <IncludeAssets>SpaceWarpPatcher.dll</IncludeAssets>
         </ProjectReference>
     </ItemGroup>
+
     <!-- Nuget packaging configuration -->
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -39,6 +43,7 @@
         <Title>Space Warp</Title>
         <NoWarn>$(NoWarn),NU5118,NU5125</NoWarn>
     </PropertyGroup>
+
     <Target Name="IncludeAllFilesInTargetDir" AfterTargets="Build">
         <ItemGroup>
             <None Include="..\images\icon.png" Pack="true" PackagePath="\" />
