@@ -13,7 +13,7 @@ namespace SpaceWarp.Backend.UI.Loading;
 
 internal class LoadingScreenManager : ResourceProviderBase
 {
-    private Dictionary<string, Sprite> _loadingScreens = new();
+    public Dictionary<string, Sprite> LoadingScreens = new();
     private List<ResourceLocationData> _locations = new();
     
     public void SetupResourceLocator()
@@ -21,7 +21,7 @@ internal class LoadingScreenManager : ResourceProviderBase
         Addressables.AddResourceLocator(new ResourceLocationMap("sw-loading-screen-map", _locations));
         Addressables.ResourceManager.ResourceProviders.Add(this);
     }
-    public void LoadScreens()
+    public void LoadScreens(Curtain curtain)
     {
         List<string> allKeysToAdd = new();
         foreach (var mod in PluginList.AllEnabledAndActivePlugins.Where(x => x.DoLoadingActions))
@@ -36,7 +36,7 @@ internal class LoadingScreenManager : ResourceProviderBase
             }
         }
 
-        foreach (var screen in GameManager.Instance.Game.UI.Curtain.LoadingScreens.Values.Distinct())
+        foreach (var screen in curtain.LoadingScreens.Values.Distinct())
         {
             screen.ScreenKeys.AddRange(allKeysToAdd);
         }
@@ -49,18 +49,18 @@ internal class LoadingScreenManager : ResourceProviderBase
         tex.LoadImage(bytes);
         var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         sprite.name = location;
-        _loadingScreens.Add(location,sprite);
+        LoadingScreens.Add(location,sprite);
         _locations.Add(new ResourceLocationData(new[] { location }, location, typeof(Sprite), typeof(Sprite)));
     }
 
     public override void Provide(ProvideHandle provideHandle)
     {
-        if (!_loadingScreens.ContainsKey(provideHandle.Location.PrimaryKey))
+        if (!LoadingScreens.ContainsKey(provideHandle.Location.PrimaryKey))
         {
             provideHandle.Complete<Sprite>(null, false,
                 new ProviderException($"Unknown loading screen {provideHandle.Location.PrimaryKey}"));
         }
 
-        provideHandle.Complete(_loadingScreens[provideHandle.Location.PrimaryKey], true, null);
+        provideHandle.Complete(LoadingScreens[provideHandle.Location.PrimaryKey], true, null);
     }
 }
