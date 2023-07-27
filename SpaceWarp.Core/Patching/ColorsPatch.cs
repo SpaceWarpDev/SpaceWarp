@@ -11,11 +11,11 @@ using UnityEngine;
 namespace SpaceWarp.Patching;
 
 /// <summary>
-///     This patch is meant to give modders a way to use the new colors system on KSP2.
-///     The patch will replace any renderer that has a "Parts Replace" or a "KSP2/Parts/Paintable" shader on it.
-///     It will copy all its values onto the new material, including the material name.
-///     Note: "Parts Replace" is obsolete and might be deleted on a later version.
-///     Patch created by LuxStice.
+/// This patch is meant to give modders a way to use the new colors system on KSP2.
+/// The patch will replace any renderer that has a "Parts Replace" or a "KSP2/Parts/Paintable" shader on it.
+/// It will copy all its values onto the new material, including the material name.
+/// Note: "Parts Replace" is obsolete and might be deleted in a later version.
+/// Patch created by LuxStice.
 /// </summary>
 [HarmonyPatch]
 internal class ColorsPatch
@@ -27,7 +27,7 @@ internal class ColorsPatch
     [HarmonyPatch(typeof(ObjectAssemblyPartTracker), nameof(ObjectAssemblyPartTracker.OnPartPrefabLoaded))]
     public static void Prefix(IObjectAssemblyAvailablePart obj, ref GameObject prefab)
     {
-        foreach(var renderer in prefab.GetComponentsInChildren<Renderer>())
+        foreach (var renderer in prefab.GetComponentsInChildren<Renderer>())
         {
             var shaderName = renderer.material.shader.name;
             if (shaderName is not ("Parts Replace" or "KSP2/Parts/Paintable")) continue;
@@ -114,55 +114,53 @@ internal class ColorsPatch
     }
 
     /// <summary>
-    ///     Adds <paramref name="partNameList" /> to internal parts list under <paramref name="modGUID" />
+    ///     Adds <paramref name="partNameList" /> to internal parts list under <paramref name="modGuid" />
     ///     allowing them to have the patch applied.
     /// </summary>
-    /// <param name="modGUID">guid of the mod that owns the parts.</param>
+    /// <param name="modGuid">guid of the mod that owns the parts.</param>
     /// <param name="partNameList">
     ///     Collection of partNames. Names that end in XS, S, M, L or XL will be counted as the same
     ///     part,
     /// </param>
-    internal static void DeclareParts(string modGUID, params string[] partNameList)
+    internal static void DeclareParts(string modGuid, params string[] partNameList)
     {
-        DeclareParts(modGUID, partNameList.ToList());
+        DeclareParts(modGuid, partNameList.ToList());
     }
 
     /// <summary>
-    ///     Adds <paramref name="partNameList" /> to internal parts list under <paramref name="modGUID" />
+    ///     Adds <paramref name="partNameList" /> to internal parts list under <paramref name="modGuid" />
     ///     allowing them to have the patch applied.
     /// </summary>
-    /// <param name="modGUID">guid of the mod that owns the parts.</param>
+    /// <param name="modGuid">guid of the mod that owns the parts.</param>
     /// <param name="partNameList">
     ///     Collection of partNames. Names that end in XS, S, M, L or XL will be counted as the same
     ///     part.
     /// </param>
-    internal static void DeclareParts(string modGUID, IEnumerable<string> partNameList)
+    internal static void DeclareParts(string modGuid, IEnumerable<string> partNameList)
     {
-        if (DeclaredParts.ContainsKey(modGUID))
+        if (DeclaredParts.ContainsKey(modGuid))
         {
-            LogWarning($"{modGUID} tried to declare their parts twice. Ignoring second call.");
+            LogWarning($"{modGuid} tried to declare their parts twice. Ignoring second call.");
             return;
         }
 
         var nameList = partNameList as string[] ?? partNameList.ToArray();
         if (!nameList.Any())
         {
-            LogWarning($"{modGUID} tried to declare no parts. Ignoring this call.");
+            LogWarning($"{modGuid} tried to declare no parts. Ignoring this call.");
             return;
         }
 
-        DeclaredParts.Add(modGUID, nameList.ToArray());
+        DeclaredParts.Add(modGuid, nameList.ToArray());
     }
 
     internal static Texture[] GetTextures(string partName)
     {
         if (_partHash.ContainsKey(partName))
             return _partHash[partName];
-        else
-        {
-            LogError($"Requested textures from {partName} but part doesn't exist on declared parts!");
-            return null;
-        }
+
+        LogError($"Requested textures from {partName} but part doesn't exist on declared parts!");
+        return null;
     }
 
     private static void LoadDeclaredParts()
@@ -177,11 +175,11 @@ internal class ColorsPatch
 
         if (LoadOnInit)
         {
-            foreach (var modGUID in DeclaredParts.Keys)
+            foreach (var modGuid in DeclaredParts.Keys)
             {
-                LoadTextures(modGUID);
+                LoadTextures(modGuid);
 
-                allPartsTemp.AddRange(DeclaredParts[modGUID].Select(partName => TrimPartName(partName)));
+                allPartsTemp.AddRange(DeclaredParts[modGuid].Select(partName => TrimPartName(partName)));
             }
         }
 
@@ -234,19 +232,19 @@ internal class ColorsPatch
 
             for (int i = 1; i < _propertyIds.Length; i++)
             {
-                if (AssetManager.TryGetAsset($"{pathWithoutSuffix}_{TextureSuffixes[i]}", out Texture2D Tex))
-                {
-                    count++;
+                if (!AssetManager.TryGetAsset($"{pathWithoutSuffix}_{TextureSuffixes[i]}", out Texture2D tex)) continue;
 
-                    if (i == ColorsPatch.Bump) //Converting texture to Bump texture
-                    {
-                        Texture2D normalTexture = new Texture2D(Tex.width, Tex.height, TextureFormat.RGBA32, false, true);
-                        Graphics.CopyTexture(Tex, normalTexture);
-                        Tex = normalTexture;
-                    }
-                    _partHash[trimmedPartName][i] = Tex;
-                    LogMessage($"\t\t>({count}/6) Loaded {TextureNames[i]} texture");
+                count++;
+
+                if (i == Bump) //Converting texture to Bump texture
+                {
+                    var normalTexture = new Texture2D(tex.width, tex.height, TextureFormat.RGBA32, false, true);
+                    Graphics.CopyTexture(tex, normalTexture);
+                    tex = normalTexture;
                 }
+
+                _partHash[trimmedPartName][i] = tex;
+                LogMessage($"\t\t>({count}/6) Loaded {TextureNames[i]} texture");
             }
 
             if (count == 6)
@@ -305,29 +303,31 @@ internal class ColorsPatch
     {
         var partName = __instance.OABPart is not null ? __instance.OABPart.PartName : __instance.part.Name;
         var trimmedPartName = TrimPartName(partName);
-        if (DeclaredParts.Count > 0 && _allParts.Contains(trimmedPartName))
+        if (DeclaredParts.Count <= 0 || !_allParts.Contains(trimmedPartName)) return;
+
+        var mat = new Material(_ksp2Opaque)
         {
-            var mat = new Material(_ksp2Opaque);
-            mat.name = __instance.GetComponentInChildren<MeshRenderer>().material.name;
+            name = __instance.GetComponentInChildren<MeshRenderer>().material.name
+        };
 
-            foreach (var renderer in __instance.GetComponentsInChildren<MeshRenderer>(true))
+        foreach (var renderer in __instance.GetComponentsInChildren<MeshRenderer>(true))
+        {
+            if (renderer.material.shader.name != _unityStandard.name)
             {
-                if (renderer.material.shader.name != _unityStandard.name)
-                {
-                    continue;
-                }
-
-                SetTexturesToMaterial(trimmedPartName, ref mat);
-
-                renderer.material = mat;
-
-                if (renderer.material.shader.name != _ksp2Opaque.name)
-                {
-                    renderer.SetMaterial(mat); //Sometimes the material Set doesn't work, this seems to be more reliable.
-                }
+                continue;
             }
-            __instance.SomeColorUpdated();
+
+            SetTexturesToMaterial(trimmedPartName, ref mat);
+
+            renderer.material = mat;
+
+            if (renderer.material.shader.name != _ksp2Opaque.name)
+            {
+                renderer.SetMaterial(mat); //Sometimes the material Set doesn't work, this seems to be more reliable.
+            }
         }
+
+        __instance.SomeColorUpdated();
     }
 
     private static void LogMessage(object data)

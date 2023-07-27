@@ -7,6 +7,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using I2.Loc;
+using JetBrains.Annotations;
 using KSP.IO;
 using KSP.ScriptInterop.impl.moonsharp;
 using MoonSharp.Interpreter;
@@ -26,12 +27,13 @@ namespace SpaceWarp;
 [BepInPlugin(ModGuid, ModName, ModVer)]
 public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 {
-
     public static SpaceWarpPlugin Instance;
-    public const string ModGuid = "com.github.x606.spacewarp";
-    public const string ModName = "Space Warp";
-    public const string ModVer = "1.5.0"; // TODO: Don't hard code this, but I don't know much msbuild stuff so @munix wil have to do that
 
+    [PublicAPI] public const string ModGuid = "com.github.x606.spacewarp";
+    [PublicAPI] public const string ModName = "Space Warp";
+    [PublicAPI] public const string ModVer = "1.5.0"; // TODO: Don't hard code this, but I don't know much msbuild stuff so @munix wil have to do that,
+                                                      //       and @munix is really lazy to do it right now but he definitely will at some point :P
+                                                      
     internal ScriptEnvironment GlobalLuaState;
 
     internal new static ManualLogSource Logger;
@@ -96,7 +98,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     {
         ModuleManager.PreInitializeAllModules();
     }
-
 
     public override void OnInitialized()
     {

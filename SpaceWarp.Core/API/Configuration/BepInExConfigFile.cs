@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using BepInEx.Configuration;
+using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Configuration;
 
+[PublicAPI]
 public class BepInExConfigFile : IConfigFile
 {
-    
+
     public readonly ConfigFile AdaptedConfigFile;
 
     public BepInExConfigFile(ConfigFile adaptedConfigFile)

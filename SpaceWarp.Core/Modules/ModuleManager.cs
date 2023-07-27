@@ -14,7 +14,6 @@ public static class ModuleManager
     internal static List<SpaceWarpModule> AllSpaceWarpModules = new();
     private static readonly ILogger ModuleManagerLogSource = new UnityLogSource("SpaceWarp.ModuleManager");
 
-
     public static bool TryGetModule(string name, out SpaceWarpModule module)
     {
         module = AllSpaceWarpModules.FirstOrDefault(x => x.Name == name);
@@ -43,6 +42,7 @@ public static class ModuleManager
                     ModuleManagerLogSource.LogInfo($"Module name: {mod.Name}");
                     AllSpaceWarpModules.Add(mod);
                 }
+
                 Harmony.CreateAndPatchAll(assembly);
             }
             catch (Exception e)
@@ -60,8 +60,9 @@ public static class ModuleManager
             try
             {
                 module.ModuleLogger = new UnityLogSource(module.Name);
-                module.ModuleConfiguration =
-                    new JsonConfigFile(Path.Combine(configDirectory.FullName, module.Name + ".cfg"));
+                module.ModuleConfiguration = new JsonConfigFile(
+                    Path.Combine(configDirectory.FullName, module.Name + ".cfg")
+                );
                 module.LoadModule();
             }
             catch (Exception e)
@@ -90,13 +91,17 @@ public static class ModuleManager
             for (var i = clone.Count - 1; i >= 0; i--)
             {
                 var module = clone[i];
-                var resolved = module.Prerequisites.All(prerequisite => AllSpaceWarpModules.All(x => x.Name != prerequisite) || topologicalOrder.Any(x => x.Name == prerequisite));
+                var resolved = module.Prerequisites.All(prerequisite =>
+                    AllSpaceWarpModules.All(x => x.Name != prerequisite) ||
+                    topologicalOrder.Any(x => x.Name == prerequisite)
+                );
                 changed = changed || resolved;
                 if (!resolved) continue;
                 clone.RemoveAt(i);
                 topologicalOrder.Add(module);
             }
         }
+
         AllSpaceWarpModules = topologicalOrder;
     }
 
@@ -117,6 +122,7 @@ public static class ModuleManager
                 toRemove.Add(module);
             }
         }
+
         foreach (var module in toRemove)
         {
             AllSpaceWarpModules.Remove(module);
@@ -140,6 +146,7 @@ public static class ModuleManager
                 toRemove.Add(module);
             }
         }
+
         foreach (var module in toRemove)
         {
             AllSpaceWarpModules.Remove(module);

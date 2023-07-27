@@ -1,19 +1,21 @@
 ﻿using System;
+using JetBrains.Annotations;
 using KSP.Game;
 using KSP.Messages;
 
 namespace SpaceWarp.API.Game.Messages;
 
 /// <summary>
-///     A class that contains a list of events that are published either when a state is entered or left
+/// A class that contains a list of events that are published either when a state is entered or left
 /// </summary>
+[PublicAPI]
 public static class StateChanges
 {
     #region State changing
 
     /// <summary>
-    ///     Invoked when the game state is changed
-    ///     <para>Action(Message,PreviousState,CurrentState)</para>
+    /// Invoked when the game state is changed
+    /// <para>Action(Message,PreviousState,CurrentState)</para>
     /// </summary>
     public static event Action<GameStateChangedMessage, GameState, GameState> GameStateChanged;
 
@@ -141,7 +143,6 @@ public static class StateChanges
         }
     }
 
-
     internal static void OnGameStateLeft(MessageCenterMessage message)
     {
         var msg = message as GameStateLeftMessage;
@@ -217,5 +218,6 @@ public static class StateChanges
         var msg = message as GameStateChangedMessage;
         GameStateChanged?.Invoke(msg!, msg!.PreviousState, msg!.CurrentState);
     }
+
     #endregion
 }

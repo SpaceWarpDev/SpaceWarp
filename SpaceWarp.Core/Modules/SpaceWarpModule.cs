@@ -8,10 +8,11 @@ public abstract class SpaceWarpModule
 {
     public ILogger ModuleLogger;
     public IConfigFile ModuleConfiguration;
+
     public abstract string Name { get; }
 
     public abstract void LoadModule();
-    
+
     public abstract void PreInitializeModule();
 
     public abstract void InitializeModule();

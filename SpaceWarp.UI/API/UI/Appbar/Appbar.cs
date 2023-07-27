@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BepInEx.Bootstrap;
+using JetBrains.Annotations;
 using KSP.UI.Binding;
 using SpaceWarp.Backend.UI.Appbar;
 using SpaceWarp.InternalUtilities;
@@ -8,6 +9,7 @@ using UnityEngine;
 
 namespace SpaceWarp.API.UI.Appbar;
 
+[PublicAPI]
 public static class Appbar
 {
     private static readonly List<(string text, Sprite icon, string ID, Action<bool> action)> ButtonsToBeLoaded = new();
@@ -16,7 +18,7 @@ public static class Appbar
         new();
 
     /// <summary>
-    ///     Register a appbar menu for the game
+    /// Register an appbar menu for the game
     /// </summary>
     /// <param name="text">The text in the appbar menu</param>
     /// <param name="title">The title of the menu</param>
@@ -38,7 +40,7 @@ public static class Appbar
     }
 
     /// <summary>
-    ///     Register a appbar menu for the game
+    /// Register a appbar menu for the game
     /// </summary>
     /// <param name="text">The text in the appbar menu</param>
     /// <param name="title">The title of the menu</param>
@@ -52,7 +54,7 @@ public static class Appbar
     }
 
     /// <summary>
-    ///     Register a button on the games AppBar
+    /// Register a button on the games AppBar
     /// </summary>
     /// <param name="text">The text in the appbar menu</param>
     /// <param name="id">A unique id for the appbar menu eg: "BTN-Example"</param>
@@ -64,7 +66,7 @@ public static class Appbar
     }
 
     /// <summary>
-    ///     Register a button on the games AppBar
+    /// Register a button on the games AppBar
     /// </summary>
     /// <param name="text">The text in the appbar menu</param>
     /// <param name="id">A unique id for the appbar menu eg: "BTN-Example"</param>
@@ -76,7 +78,7 @@ public static class Appbar
     }
 
     /// <summary>
-    ///     Register a button on the OAB AppBar
+    /// Register a button on the OAB AppBar
     /// </summary>
     /// <param name="text">The text in the appbar menu</param>
     /// <param name="id">A unique id for the appbar menu eg: "BTN-ExampleOAB"</param>
@@ -88,7 +90,7 @@ public static class Appbar
     }
 
     /// <summary>
-    ///     Register a button on the OAB AppBar
+    /// Register a button on the OAB AppBar
     /// </summary>
     /// <param name="text">The text in the appbar menu</param>
     /// <param name="id">A unique id for the appbar menu eg: "BTN-ExampleOAB"</param>
@@ -100,7 +102,7 @@ public static class Appbar
     }
 
     /// <summary>
-    ///     Convert a Texture2D to a Sprite
+    /// Convert a Texture2D to a Sprite
     /// </summary>
     /// <param name="texture">The Texture2D</param>
     /// <param name="width">The width of the sprite, 0 for inferring</param>
@@ -123,7 +125,7 @@ public static class Appbar
 
 
     /// <summary>
-    ///     Sets an app bar buttons indicator (the green sprite to the side of it)
+    /// Sets an app bar buttons indicator (the green sprite to the side of it)
     /// </summary>
     /// <param name="id">The id of the button, what you set when registering the app bar button</param>
     /// <param name="indicator">The state of the indicator, true for on, false for off</param>

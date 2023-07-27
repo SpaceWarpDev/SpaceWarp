@@ -18,8 +18,10 @@ internal sealed class LoadAddressablesLocalizationsAction : FlowAction
     {
         try
         {
-            GameManager.Instance.Game.Assets.LoadByLabel("language_source",
-                OnLanguageSourceAssetLoaded, delegate(IList<LanguageSourceAsset> languageAssetLocations)
+            GameManager.Instance.Game.Assets.LoadByLabel(
+                "language_source",
+                OnLanguageSourceAssetLoaded,
+                delegate(IList<LanguageSourceAsset> languageAssetLocations)
                 {
                     if (languageAssetLocations != null)
                     {
@@ -27,7 +29,8 @@ internal sealed class LoadAddressablesLocalizationsAction : FlowAction
                     }
 
                     resolve();
-                });
+                }
+            );
         }
         catch (Exception e)
         {

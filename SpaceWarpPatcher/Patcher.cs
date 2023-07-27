@@ -9,6 +9,7 @@ using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using HarmonyLib;
+using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Mono.Cecil;
@@ -16,18 +17,17 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Newtonsoft.Json.Linq;
 
-// ReSharper disable UnusedType.Global
-// ReSharper disable UnusedMember.Global
-
 [assembly: InternalsVisibleTo("SpaceWarp.Core")]
-
 
 namespace SpaceWarpPatcher;
 
+[UsedImplicitly]
 public static class Patcher
 {
+    [UsedImplicitly]
     public static IEnumerable<string> TargetDLLs => new[] { "UnityEngine.CoreModule.dll"};
 
+    [UsedImplicitly]
     public static void Patch(ref AssemblyDefinition asm)
     {
         switch (asm.Name.Name)
@@ -83,8 +83,10 @@ public static class Patcher
     }
 }
 
+[UsedImplicitly]
 internal static class Delayer
 {
+    [UsedImplicitly]
     public static void PatchChainloaderStart()
     {
         ChainloaderPatch.LogSource = Logger.CreateLogSource("SW BIE Extensions");

@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Bootstrap;
+using JetBrains.Annotations;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
 using SpaceWarpPatcher;
-
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 // Disable obsolete warning for Chainloader.Plugins
 #pragma warning disable CS0618
@@ -17,6 +15,7 @@ namespace SpaceWarp.API.Mods;
 /// <summary>
 /// API for accessing information about currently loaded and disabled plugins.
 /// </summary>
+[PublicAPI]
 public static class PluginList
 {
     #region Reading Plugins
@@ -26,6 +25,7 @@ public static class PluginList
     /// mods disabled, description differences, any different in any swinfo file and the disabled mod list).
     /// </summary>
     public static bool ModListChangedSinceLastRun => ChainloaderPatch.ModListChangedSinceLastRun;
+
     /// <summary>
     /// Contains information about all currently loaded plugins. The key is the BepInEx GUID of the plugin.
     /// </summary>
@@ -88,6 +88,7 @@ public static class PluginList
 
         return disabledModInfo;
     }
+
     /// <summary>
     /// Retrieves the <see cref="SpaceWarpPluginDescriptor"/> of the specified plugin. Returns null if the specified plugin guid doesn't
     /// have an associated <see cref="SpaceWarpPluginDescriptor"/>.
@@ -96,7 +97,6 @@ public static class PluginList
     /// <returns><see cref="SpaceWarpPluginDescriptor"/> of the plugin or null if not found</returns>
     public static SpaceWarpPluginDescriptor TryGetDescriptor(string guid)
     {
-
         return AllEnabledAndActivePlugins
             .FirstOrDefault(item => item.Guid == guid);
     }
@@ -116,12 +116,13 @@ public static class PluginList
     /// <returns>Plugin instance or null if not found</returns>
     public static T TryGetPlugin<T>(string guid) where T : BaseUnityPlugin =>
         Chainloader.Plugins.Find(plugin => plugin.Info.Metadata.GUID == guid) as T;
+
     #endregion
 
     #region Registering Plugins
 
-
     private static List<SpaceWarpPluginDescriptor> _allEnabledAndActivePlugins = new();
+
     /// <summary>
     /// All plugins that are enabled, and active (not errored)
     /// </summary>
@@ -168,10 +169,12 @@ public static class PluginList
         {
             return _allErroredPlugins.First(x => x.Plugin == plugin);
         }
+
         if (_allEnabledAndActivePlugins.Any(x => x == plugin))
         {
             _allEnabledAndActivePlugins.Remove(plugin);
         }
+
         var newError = new SpaceWarpErrorDescription(plugin);
         _allErroredPlugins.Add(newError);
         return newError;
@@ -207,17 +210,23 @@ public static class PluginList
         errorDescriptor.UnspecifiedDependencies.Add(dependency);
     }
 
-    private static bool DependencyResolved(SpaceWarpPluginDescriptor descriptor, List<SpaceWarpPluginDescriptor> resolvedPlugins)
+    private static bool DependencyResolved(
+        SpaceWarpPluginDescriptor descriptor,
+        List<SpaceWarpPluginDescriptor> resolvedPlugins
+    )
     {
         if (descriptor.SWInfo.Spec < SpecVersion.V1_3) return true;
         return !(from dependency in descriptor.SWInfo.Dependencies
-            let info = resolvedPlugins.FirstOrDefault(x => string.Equals(x.Guid,
+            let info = resolvedPlugins.FirstOrDefault(x => string.Equals(
+                x.Guid,
                 dependency.ID,
-                StringComparison.InvariantCultureIgnoreCase))
-            where info == null ||
-                  !VersionUtility.IsSupported(info.SWInfo.Version,
-                      dependency.Version.Min,
-                      dependency.Version.Max)
+                StringComparison.InvariantCultureIgnoreCase)
+            )
+            where info == null || !VersionUtility.IsSupported(
+                info.SWInfo.Version,
+                dependency.Version.Min,
+                dependency.Version.Max
+            )
             select dependency).Any();
     }
 
@@ -245,6 +254,7 @@ public static class PluginList
             error.MissingDependencies = info.SWInfo.Dependencies.Select(x => x.ID).Where(x =>
                 !newOrder.Any(y => string.Equals(x, y.Guid, StringComparison.InvariantCultureIgnoreCase))).ToList();
         }
+
         _allEnabledAndActivePlugins = newOrder;
     }
 
@@ -256,15 +266,20 @@ public static class PluginList
             for (var i = erroredPlugin.MissingDependencies.Count - 1; i >= 0; i--)
             {
                 var dep = erroredPlugin.MissingDependencies[i];
-                if (AllEnabledAndActivePlugins.Any(x => string.Equals(x.Guid, dep, StringComparison.InvariantCultureIgnoreCase)))
+                if (AllEnabledAndActivePlugins.Any(x =>
+                        string.Equals(x.Guid, dep, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     erroredPlugin.UnsupportedDependencies.Add(dep);
                     erroredPlugin.MissingDependencies.RemoveAt(i);
-                } else if (AllErroredPlugins.Any(x => string.Equals(x.Plugin.Guid, dep, StringComparison.InvariantCultureIgnoreCase)))
+                }
+                else if (AllErroredPlugins.Any(x =>
+                             string.Equals(x.Plugin.Guid, dep, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     erroredPlugin.ErroredDependencies.Add(dep);
                     erroredPlugin.MissingDependencies.RemoveAt(i);
-                } else if (AllDisabledPlugins.Any(x => string.Equals(x.Guid, dep, StringComparison.InvariantCultureIgnoreCase)))
+                }
+                else if (AllDisabledPlugins.Any(x =>
+                             string.Equals(x.Guid, dep, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     erroredPlugin.DisabledDependencies.Add(dep);
                     erroredPlugin.MissingDependencies.RemoveAt(i);
@@ -272,7 +287,6 @@ public static class PluginList
             }
         }
     }
-
 
     /// <summary>
     /// This is done after Awake/LoadModule(), so that everything else can use it
@@ -283,7 +297,5 @@ public static class PluginList
         GetDependencyErrors();
     }
 
-
     #endregion
-
 }

@@ -9,14 +9,13 @@ using UnityEngine;
 
 namespace SpaceWarp.API.Configuration;
 
+[PublicAPI]
 public class JsonConfigFile : IConfigFile
 {
-    [CanBeNull] private JObject _previousConfigObject = null;
-
+    [CanBeNull] private JObject _previousConfigObject;
 
     private Dictionary<string, Dictionary<string, JsonConfigEntry>> _currentEntries = new();
     private readonly string _file;
-
 
     public JsonConfigFile(string file)
     {

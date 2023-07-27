@@ -1,12 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using JetBrains.Annotations;
+using Newtonsoft.Json;
 using SpaceWarp.API.Versions;
 
 namespace SpaceWarp.API.Mods.JSON;
 
 /// <summary>
-///     Representation of the supported version info of a mod from a JSON file.
+/// Representation of the supported version info of a mod from a JSON file.
 /// </summary>
 [JsonObject(MemberSerialization.OptIn)]
+[PublicAPI]
 public sealed class SupportedVersionsInfo
 {
     public const string DefaultMin = "0.0.0";

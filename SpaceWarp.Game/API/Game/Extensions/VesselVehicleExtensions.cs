@@ -1,9 +1,11 @@
-﻿using KSP.Sim.impl;
+﻿using JetBrains.Annotations;
+using KSP.Sim.impl;
 using KSP.Sim.State;
 using UnityEngine;
 
 namespace SpaceWarp.API.Game.Extensions;
 
+[PublicAPI]
 public static class VesselVehicleExtensions
 {
     public static void SetMainThrottle(this VesselVehicle vehicle, float throttle)

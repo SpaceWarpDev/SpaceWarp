@@ -1,20 +1,22 @@
 ﻿using System;
+using JetBrains.Annotations;
 using KSP.Game.Flow;
 using SpaceWarp.Patching;
 
 namespace SpaceWarp.API.Loading;
 
+[PublicAPI]
 public static class SaveLoad
 {
     /// <summary>
     ///     <para>Construct and add a <cref>FlowAction</cref> to the Game's load sequence.</para>
-    ///     
+    ///
     ///     <para>FlowActionType must have a public constructor that takes either no arguments,
     ///     or a single GameManager.</para>
-    ///     
+    ///
     ///     <para>The action will be run after the first FlowAction with a name equal to referenceAction.
     ///     If referenceAction is <c>null</c>, the action will be the first action run.</para>
-    ///     
+    ///
     ///     <para>
     ///         The FlowActions that occur in this sequence by default are: (Updated for KSP 0.1.1.0)
     ///         <list type="number">
@@ -42,10 +44,10 @@ public static class SaveLoad
 
     /// <summary>
     ///     <para>Add a <cref>FlowAction</cref> to the Game's load sequence.</para>
-    ///     
+    ///
     ///     <para>The action will be run after the first FlowAction with a name equal to referenceAction.
     ///     If referenceAction is <c>null</c>, the action will be the first action run.</para>
-    ///     
+    ///
     ///     <para>
     ///         The FlowActions that occur in this sequence by default are: (Updated for KSP 0.1.1.0)
     ///         <list type="number">
@@ -72,7 +74,7 @@ public static class SaveLoad
 
     /// <summary>
     ///     <para>Add a <cref>FlowAction</cref> to the save file loading sequence. A new <c>FlowActionType</c> is constructed every load.</para>
-    ///     
+    ///
     ///     <para>
     ///         FlowActionType must have a public constructor that at most one of each of the following types:
     ///         <list type="bullet">
@@ -81,10 +83,10 @@ public static class SaveLoad
     ///             <item><cref>LoadGameData</cref></item>
     ///         </list>
     ///     </para>
-    ///     
+    ///
     ///     <para>The action will be run after the first FlowAction with a name equal to referenceAction.
     ///     If referenceAction is <c>null</c>, the action will be the first action run.</para>
-    ///     
+    ///
     ///     <para>
     ///         The FlowActions that occur in this sequence by default are: (Updated for KSP 0.1.1.0)
     ///         <list type="number">
@@ -153,10 +155,10 @@ public static class SaveLoad
 
     /// <summary>
     ///     <para>Add a <cref>FlowAction</cref> to the save file loading sequence. The same object is used for every load.</para>
-    ///     
+    ///
     ///     <para>The action will be run after the first FlowAction with a name equal to referenceAction.
     ///     If referenceAction is <c>null</c>, the action will be the first action run.</para>
-    ///     
+    ///
     ///     <para>
     ///         The FlowActions that occur in this sequence by default are: (Updated for KSP 0.1.1.0)
     ///         <list type="number">
@@ -224,7 +226,7 @@ public static class SaveLoad
 
     /// <summary>
     ///     <para>Add a <cref>FlowAction</cref> to the save file writing sequence. A new <c>FlowActionType</c> is constructed every load.</para>
-    ///     
+    ///
     ///     <para>
     ///         FlowActionType must have a public constructor that at most one of each of the following types:
     ///         <list type="bullet">
@@ -232,10 +234,10 @@ public static class SaveLoad
     ///             <item><cref>LoadOrSaveCampaignTicket</cref></item>
     ///         </list>
     ///     </para>
-    ///     
+    ///
     ///     <para>The action will be run after the first FlowAction with a name equal to referenceAction.
     ///     If referenceAction is <c>null</c>, the action will be the first action run.</para>
-    ///     
+    ///
     ///     <para>
     ///         The FlowActions that occur in this sequence by default are: (Updated for KSP 0.1.1.0)
     ///         <list type="number">
@@ -266,10 +268,10 @@ public static class SaveLoad
 
     /// <summary>
     ///     <para>Add a <cref>FlowAction</cref> to the save file writing sequence. The same object is used for every load.</para>
-    ///     
+    ///
     ///     <para>The action will be run after the first FlowAction with a name equal to referenceAction.
     ///     If referenceAction is <c>null</c>, the action will be the first action run.</para>
-    ///     
+    ///
     ///     <para>
     ///         The FlowActions that occur in this sequence by default are: (Updated for KSP 0.1.1.0)
     ///         <list type="number">

@@ -34,7 +34,8 @@ internal class ModsSubMenu : SettingsSubMenu
         }
 
         foreach (var module in ModuleManager.AllSpaceWarpModules.Where(
-                     mod => mod.ModuleConfiguration.Sections.Count > 0))
+                     mod => mod.ModuleConfiguration.Sections.Count > 0
+                 ))
         {
             GenerateTitle(module.Name).transform.SetParent(transform);
             GenerateDivider().transform.SetParent(transform);
@@ -42,24 +43,30 @@ internal class ModsSubMenu : SettingsSubMenu
             foreach (var section in module.ModuleConfiguration!.Sections)
             {
                 if (module.ModuleConfiguration[section].Count <= 0) continue;
-                var list = modConfigCategories[section] = new();
-                list.AddRange(module.ModuleConfiguration[section].Select(entry => (entry, module.ModuleConfiguration[section, entry])));
+                var list = modConfigCategories[section] = new List<(string name, IConfigEntry entry)>();
+                list.AddRange(module.ModuleConfiguration[section].Select(
+                    entry => (entry, module.ModuleConfiguration[section, entry])
+                ));
             }
+
             foreach (var config in modConfigCategories)
             {
                 var header = GenerateSectionHeader(config.Key);
                 header.transform.SetParent(transform);
-                foreach (var drawer in config.Value.Select(x => ModsPropertyDrawers.Drawer(x.name, x.entry)).Where(drawer => drawer != null))
+                foreach (var drawer in config.Value.Select(x => ModsPropertyDrawers.Drawer(x.name, x.entry))
+                             .Where(drawer => drawer != null))
                 {
                     drawer.transform.SetParent(header.transform);
                 }
+
                 GenerateDivider().transform.SetParent(transform);
             }
         }
-        
+
         // Now here is where we go through every single mod
 #pragma warning disable CS0618
-        foreach (var mod in BepInEx.Bootstrap.Chainloader.Plugins.Where(mod => mod.Config.Count > 0 && mod is not ConfigurationManager.ConfigurationManager))
+        foreach (var mod in BepInEx.Bootstrap.Chainloader.Plugins.Where(mod =>
+                     mod.Config.Count > 0 && mod is not ConfigurationManager.ConfigurationManager))
         {
             // This is where do a "Add Name" function
             GenerateTitle(mod.Info.Metadata.Name).transform.SetParent(transform);
@@ -87,13 +94,15 @@ internal class ModsSubMenu : SettingsSubMenu
                 {
                     drawer.transform.SetParent(header.transform);
                 }
+
                 GenerateDivider().transform.SetParent(transform);
             }
         }
 
         foreach (var mod in PluginList.AllEnabledAndActivePlugins.Where(mod =>
                      mod.ConfigFile != null && mod.ConfigFile.Sections.Count > 0 &&
-                     mod.ConfigFile.Sections.Any(x => mod.ConfigFile[x].Count > 0 && mod.Plugin is not BepInExModAdapter or BaseSpaceWarpPlugin)))
+                     mod.ConfigFile.Sections.Any(x =>
+                         mod.ConfigFile[x].Count > 0 && mod.Plugin is not BepInExModAdapter or BaseSpaceWarpPlugin)))
         {
             GenerateTitle(mod.Name).transform.SetParent(transform);
             GenerateDivider().transform.SetParent(transform);
@@ -104,14 +113,17 @@ internal class ModsSubMenu : SettingsSubMenu
                 var list = modConfigCategories[section] = new();
                 list.AddRange(mod.ConfigFile[section].Select(entry => (entry, mod.ConfigFile[section, entry])));
             }
+
             foreach (var config in modConfigCategories)
             {
                 var header = GenerateSectionHeader(config.Key);
                 header.transform.SetParent(transform);
-                foreach (var drawer in config.Value.Select(x => ModsPropertyDrawers.Drawer(x.name, x.entry)).Where(drawer => drawer != null))
+                foreach (var drawer in config.Value.Select(x => ModsPropertyDrawers.Drawer(x.name, x.entry))
+                             .Where(drawer => drawer != null))
                 {
                     drawer.transform.SetParent(header.transform);
                 }
+
                 GenerateDivider().transform.SetParent(transform);
             }
         }

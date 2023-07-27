@@ -66,7 +66,6 @@ internal static class BootstrapPatch
             flow.AddAction(new LoadLuaAction(plugin));
         }
 
-
         foreach (var plugin in allPlugins)
         {
             flow.AddAction(new PostInitializeModAction(plugin));

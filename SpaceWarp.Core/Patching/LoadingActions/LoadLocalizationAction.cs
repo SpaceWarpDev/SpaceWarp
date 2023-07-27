@@ -10,8 +10,8 @@ internal sealed class LoadLocalizationAction : FlowAction
 {
     private readonly SpaceWarpPluginDescriptor _plugin;
 
-    public LoadLocalizationAction(SpaceWarpPluginDescriptor plugin) : base(
-        $"Loading localizations for plugin {plugin.SWInfo.Name}")
+    public LoadLocalizationAction(SpaceWarpPluginDescriptor plugin)
+        : base($"Loading localizations for plugin {plugin.SWInfo.Name}")
     {
         _plugin = plugin;
     }
@@ -29,7 +29,7 @@ internal sealed class LoadLocalizationAction : FlowAction
             if (_plugin.Plugin != null)
                 _plugin.Plugin.SWLogger.LogError(e.ToString());
             else
-                SpaceWarpPlugin.Logger.LogError(_plugin.SWInfo.Name + ": " + e);   
+                SpaceWarpPlugin.Logger.LogError(_plugin.SWInfo.Name + ": " + e);
             reject(null);
         }
     }

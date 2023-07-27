@@ -50,7 +50,6 @@ internal static class AssetHelpers
             var i2CsvData = File.ReadAllText(i2CsvFile.FullName);
             languageSourceData.Import_I2CSV("", i2CsvData, eSpreadsheetUpdateMode.AddNewTerms);
         }
-        
 
         if (languageSourceData != null)
         {

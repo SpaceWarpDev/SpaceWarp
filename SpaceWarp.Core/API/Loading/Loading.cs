@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using JetBrains.Annotations;
 using KSP.Game.Flow;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
@@ -9,6 +10,7 @@ using SpaceWarp.Patching.LoadingActions;
 
 namespace SpaceWarp.API.Loading;
 
+[PublicAPI]
 public static class Loading
 {
     internal static List<Func<SpaceWarpPluginDescriptor, DescriptorLoadingAction>> DescriptorLoadingActionGenerators =

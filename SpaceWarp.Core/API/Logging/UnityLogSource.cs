@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 
 namespace SpaceWarp.API.Logging;
 
+[PublicAPI]
 public class UnityLogSource : BaseLogger
 {
     public string Name;
