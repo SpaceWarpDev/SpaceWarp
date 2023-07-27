@@ -1,9 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using BepInEx.Bootstrap;
+using KSP.Assets;
+using KSP.Game;
+using KSP.Game.Flow;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Configuration;
+using SpaceWarp.API.Loading;
 using SpaceWarp.API.UI.Appbar;
 using SpaceWarp.Backend.UI.Appbar;
+using SpaceWarp.Backend.UI.Loading;
 using SpaceWarp.InternalUtilities;
 using SpaceWarp.UI.AvcDialog;
 using SpaceWarp.UI.Console;
@@ -21,7 +27,7 @@ public class UI : SpaceWarpModule
     public override string Name => "SpaceWarp.UI";
 
     internal static UI Instance;
-
+    
     internal ConfigValue<Color> ConfigAllColor;
     internal ConfigValue<bool> ConfigCheckVersions;
     internal ConfigValue<bool> ConfigShowMainMenuWarningForOutdatedMods;
@@ -38,6 +44,7 @@ public class UI : SpaceWarpModule
     internal ConfigManager ConfigurationManager;
     internal ModListController ModListController;
     internal SpaceWarpConsole SpaceWarpConsole;
+
 
     public override void LoadModule()
     {
@@ -110,7 +117,7 @@ public class UI : SpaceWarpModule
     {
         "SpaceWarp.VersionChecking"
     };
-
+    
     private void InitializeUI()
     {
         ConfigurationManager = (ConfigurationManager.ConfigurationManager)Chainloader
@@ -129,11 +136,12 @@ public class UI : SpaceWarpModule
         var swConsoleUxml = AssetManager.GetAsset<VisualTreeAsset>(
             $"{SpaceWarpPlugin.ModGuid}/swconsole/ui/console/console.uxml"
         );
+        
         var swConsole = Window.CreateFromUxml(swConsoleUxml, "Space Warp Console", ui.transform, true);
         SpaceWarpConsole = swConsole.gameObject.AddComponent<SpaceWarpConsole>();
     }
-
-
+    
+    
     private static void InitializeSettingsUI()
     {
         GameObject settingsController = new("Space Warp Settings Controller");
