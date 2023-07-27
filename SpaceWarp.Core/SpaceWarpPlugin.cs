@@ -30,7 +30,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public static SpaceWarpPlugin Instance;
     public const string ModGuid = "com.github.x606.spacewarp";
     public const string ModName = "Space Warp";
-    public const string ModVer = "1.4.0"; // TODO: Don't hard code this, but I don't know much msbuild stuff so @munix wil have to do that
+    public const string ModVer = "1.5.0"; // TODO: Don't hard code this, but I don't know much msbuild stuff so @munix wil have to do that
 
     internal ScriptEnvironment GlobalLuaState;
 
