@@ -5,6 +5,8 @@ using HarmonyLib;
 using KSP.Game;
 using KSP.Modules;
 using KSP.OAB;
+using KSP.Sim;
+using KSP.Sim.impl;
 using SpaceWarp.API.Assets;
 using UnityEngine;
 
@@ -25,14 +27,26 @@ internal class ColorsPatch
         UNITY_STANDARD = "Standard";
 
     [HarmonyPatch(typeof(ObjectAssemblyPartTracker), nameof(ObjectAssemblyPartTracker.OnPartPrefabLoaded))]
-    public static void Prefix(IObjectAssemblyAvailablePart obj, ref GameObject prefab)
+    internal static void Prefix(IObjectAssemblyAvailablePart obj, ref GameObject prefab)
     {
-        foreach(var renderer in prefab.GetComponentsInChildren<Renderer>())
+        ReplaceShader(ref prefab, Shader.Find(KSP2_OPAQUE_PATH), "Parts Replace", "KSP2/Parts/Paintable");
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(SimulationObjectView), nameof(SimulationObjectView.InitializeView))]
+    internal static void ApplyOnGameObjectFlight(GameObject instance, IUniverseView universe, SimulationObjectModel model)
+    {
+        ReplaceShader(ref instance, Shader.Find(KSP2_OPAQUE_PATH), "Parts Replace", "KSP2/Parts/Paintable");
+    }
+
+    internal static void ReplaceShader(ref GameObject target, Shader shaderToReplace,params string[] allowedShaders)
+    {
+        foreach (var renderer in target.GetComponentsInChildren<Renderer>(true))
         {
             string shaderName = renderer.material.shader.name;
-            if (shaderName == "Parts Replace" || shaderName == "KSP2/Parts/Paintable")
+            if (allowedShaders.Contains(shaderName))
             {
-                var mat = new Material(Shader.Find(KSP2_OPAQUE_PATH));
+                var mat = new Material(shaderToReplace);
                 mat.name = renderer.material.name;
                 mat.CopyPropertiesFromMaterial(renderer.material);
                 renderer.material = mat;
