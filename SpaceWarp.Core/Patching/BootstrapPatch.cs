@@ -89,22 +89,10 @@ internal static class BootstrapPatch
 
     private static void DoOldStyleLoadingActions(SequentialFlow flow, SpaceWarpPluginDescriptor plugin)
     {
-        if (plugin.Plugin != null)
+        if (plugin.Plugin is not BaseSpaceWarpPlugin baseSpaceWarpPlugin) return;
+        foreach (var action in Loading.LoadingActionGenerators)
         {
-            foreach (var action in Loading.LoadingActionGenerators)
-            {
-                if (plugin.Plugin is BaseSpaceWarpPlugin baseSpaceWarpPlugin)
-                {
-                    flow.AddAction(action(baseSpaceWarpPlugin));
-                }
-            }
-        }
-        else
-        {
-            foreach (var action in Loading.FallbackDescriptorLoadingActionGenerators)
-            {
-                flow.AddAction(action(plugin));
-            }
+            flow.AddAction(action(baseSpaceWarpPlugin));
         }
     }
 

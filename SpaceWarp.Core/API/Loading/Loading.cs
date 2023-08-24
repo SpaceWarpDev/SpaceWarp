@@ -16,10 +16,6 @@ public static class Loading
     internal static List<Func<SpaceWarpPluginDescriptor, DescriptorLoadingAction>> DescriptorLoadingActionGenerators =
         new();
 
-    internal static List<Func<SpaceWarpPluginDescriptor, DescriptorLoadingAction>>
-        FallbackDescriptorLoadingActionGenerators =
-            new();
-
     internal static List<Func<BaseSpaceWarpPlugin, ModLoadingAction>> LoadingActionGenerators = new();
     internal static List<Func<FlowAction>> GeneralLoadingActions = new();
 
@@ -33,11 +29,7 @@ public static class Loading
     public static void AddAssetLoadingAction(string subfolder, string name,
         Func<string, string, List<(string name, UnityObject asset)>> importFunction, params string[] extensions)
     {
-        AddModLoadingAction(name,
-            extensions.Length == 0
-                ? CreateAssetLoadingActionWithoutExtension(subfolder, importFunction)
-                : CreateAssetLoadingActionWithExtensions(subfolder, importFunction, extensions));
-        FallbackDescriptorLoadingActionGenerators.Add(d => new DescriptorLoadingAction(name,
+        DescriptorLoadingActionGenerators.Add(d => new DescriptorLoadingAction(name,
             extensions.Length == 0
                 ? CreateAssetLoadingActionWithoutExtensionDescriptor(subfolder, importFunction)
                 : CreateAssetLoadingActionWithExtensionsDescriptor(subfolder, importFunction, extensions), d));
