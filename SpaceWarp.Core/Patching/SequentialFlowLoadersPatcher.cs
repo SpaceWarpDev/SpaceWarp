@@ -16,10 +16,13 @@ internal static class SequentialFlowLoadersPatcher
     internal const int FlowMethodPrivateloadcommon = 1;
     internal const int FlowMethodPrivatesavecommon = 2;
 
-    private static SequentialFlowAdditions[] _sequentialFlowAdditions = {
+    private static SequentialFlowAdditions[] _sequentialFlowAdditions =
+    {
         new(typeof(GameManager).GetMethod("StartGame")), // Must be index FLOW_METHOD_STARTGAME
-        new(AccessTools.Method("KSP.Game.SaveLoadManager:PrivateLoadCommon")), // Must be index FLOW_METHOD_PRIVATELOADCOMMON
-        new(AccessTools.Method("KSP.Game.SaveLoadManager:PrivateSaveCommon")), // Must be index FLOW_METHOD_PRIVATESAVECOMMON
+        new(AccessTools.Method(
+            "KSP.Game.SaveLoadManager:PrivateLoadCommon")), // Must be index FLOW_METHOD_PRIVATELOADCOMMON
+        new(AccessTools.Method(
+            "KSP.Game.SaveLoadManager:PrivateSaveCommon")), // Must be index FLOW_METHOD_PRIVATESAVECOMMON
     };
 
     internal static void AddConstructor(string after, Type flowAction, int methodIndex)
@@ -38,7 +41,10 @@ internal static class SequentialFlowLoadersPatcher
         return flow;
     }
 
-    private static IEnumerable<CodeInstruction> TranspileSequentialFlowBuilderMethod(IEnumerable<CodeInstruction> instructions, int methodIndex)
+    private static IEnumerable<CodeInstruction> TranspileSequentialFlowBuilderMethod(
+        IEnumerable<CodeInstruction> instructions,
+        int methodIndex
+    )
     {
         var startFlow = typeof(SequentialFlow).GetMethod("StartFlow");
 
@@ -51,7 +57,8 @@ internal static class SequentialFlowLoadersPatcher
 
                 // Get list of relevant arguments to pass to FlowAction constructors.
                 // `parameterCount` has a `+ 1` because `GetParameters()` doesn't include the instance parameter (this).
-                var parameters = _sequentialFlowAdditions[methodIndex].method.GetParameters().Where(parameter => !parameter.ParameterType.IsValueType).ToArray();
+                var parameters = _sequentialFlowAdditions[methodIndex].method.GetParameters()
+                    .Where(parameter => !parameter.ParameterType.IsValueType).ToArray();
                 var parameterCount = parameters.Length + 1;
 
                 // Creation of argument `methodArguments` to `Apply()`:
@@ -81,7 +88,10 @@ internal static class SequentialFlowLoadersPatcher
 
                 // Call `Apply()`.
                 // `flow` is already on the stack and does not need to be created.
-                yield return new CodeInstruction(OpCodes.Call, typeof(SequentialFlowLoadersPatcher).GetMethod("Apply"));
+                yield return new CodeInstruction(
+                    OpCodes.Call,
+                    typeof(SequentialFlowLoadersPatcher).GetMethod("Apply")
+                );
             }
 
             // Copy everything else.
@@ -94,13 +104,17 @@ internal static class SequentialFlowLoadersPatcher
     [HarmonyPrefix]
     public static void PrefixGameManagerStartGame(GameManager __instance)
     {
-        _sequentialFlowAdditions[FlowMethodStartgame].ApplyTo(__instance.LoadingFlow, new object[] { __instance });
+        _sequentialFlowAdditions[FlowMethodStartgame].ApplyTo(
+            __instance.LoadingFlow,
+            new object[] { __instance }
+        );
     }
 
     [HarmonyPatch(typeof(SaveLoadManager))]
     [HarmonyPatch("PrivateLoadCommon")]
     [HarmonyTranspiler]
-    public static IEnumerable<CodeInstruction> TranspileSaveLoadManagerPrivateLoadCommon(IEnumerable<CodeInstruction> instructions)
+    public static IEnumerable<CodeInstruction> TranspileSaveLoadManagerPrivateLoadCommon(
+        IEnumerable<CodeInstruction> instructions)
     {
         return TranspileSequentialFlowBuilderMethod(instructions, FlowMethodPrivateloadcommon);
     }
@@ -108,7 +122,8 @@ internal static class SequentialFlowLoadersPatcher
     [HarmonyPatch(typeof(SaveLoadManager))]
     [HarmonyPatch("PrivateSaveCommon")]
     [HarmonyTranspiler]
-    public static IEnumerable<CodeInstruction> TranspileSaveLoadManagerPrivateSaveCommon(IEnumerable<CodeInstruction> instructions)
+    public static IEnumerable<CodeInstruction> TranspileSaveLoadManagerPrivateSaveCommon(
+        IEnumerable<CodeInstruction> instructions)
     {
         return TranspileSequentialFlowBuilderMethod(instructions, FlowMethodPrivatesavecommon);
     }
@@ -121,46 +136,48 @@ internal static class SequentialFlowLoadersPatcher
 
         internal SequentialFlowAdditions(MethodInfo method)
         {
-            availableTypes = new HashSet<Type>(method.GetParameters().Select(parameter => parameter.ParameterType).Where(type => !type.IsValueType)) { method.DeclaringType };
+            availableTypes =
+                new HashSet<Type>(method.GetParameters().Select(parameter => parameter.ParameterType)
+                    .Where(type => !type.IsValueType)) { method.DeclaringType };
             this.method = method;
         }
 
         internal void AddConstructor(string after, Type flowAction)
         {
             // Determine the correct constructor to use.
-            var constructor = flowAction.GetConstructors().OrderByDescending(constructor => constructor.GetParameters().Length).Where(constructor =>
-            {
-                HashSet<Type> seen = new();
-
-                foreach (var parameter in constructor.GetParameters())
+            var constructor = flowAction.GetConstructors()
+                .OrderByDescending(constructor => constructor.GetParameters().Length).Where(constructor =>
                 {
-                    if (!availableTypes.Contains(parameter.ParameterType))
-                        return false;
+                    HashSet<Type> seen = new();
 
-                    if (!seen.Add(parameter.GetType()))
-                        return false;
-                }
+                    foreach (var parameter in constructor.GetParameters())
+                    {
+                        if (!availableTypes.Contains(parameter.ParameterType))
+                            return false;
 
-                return true;
-            }).FirstOrDefault() ?? throw new InvalidOperationException($"Flow action type {flowAction.Name} does not have a public constructor that has parameters compatible with {method.DeclaringType.Name}.{method.Name}");
+                        if (!seen.Add(parameter.GetType()))
+                            return false;
+                    }
 
-            insertAfter.Add(new(after, constructor));
+                    return true;
+                }).FirstOrDefault() ?? throw new InvalidOperationException(
+                $"Flow action type {flowAction.Name} does not have a public constructor that has parameters compatible with {method.DeclaringType.Name}.{method.Name}");
+
+            insertAfter.Add(new KeyValuePair<string, object>(after, constructor));
         }
 
         internal void AddAction(string after, FlowAction action)
         {
-            insertAfter.Add(new(after, action));
+            insertAfter.Add(new KeyValuePair<string, object>(after, action));
         }
 
         private static FlowAction Construct(ConstructorInfo constructor, object[] methodArguments)
         {
             // Figure out which type of object goes where in the arguments list.
-            Dictionary<Type, int> parameterIndices = new();
-
-            foreach (var parameter in constructor.GetParameters())
-            {
-                parameterIndices.Add(parameter.ParameterType, parameter.Position);
-            }
+            var parameterIndices = constructor.GetParameters().ToDictionary(
+                parameter => parameter.ParameterType,
+                parameter => parameter.Position
+            );
 
             // Create and populate the arguments list
             var arguments = new object[constructor.GetParameters().Length];
@@ -250,12 +267,14 @@ internal static class SequentialFlowLoadersPatcher
                 {
                     var actionType = constructor.DeclaringType;
                     var logger = Logger.CreateLogSource($"{actionType.Assembly.GetName().Name}/{actionType.Name}");
-                    logger.LogWarning($"Flow action {actionType.Name} was set to be inserted after \"{insertAfter[i].Key}\" in {method.Name}, however that action does not exist in that flow");
+                    logger.LogWarning(
+                        $"Flow action {actionType.Name} was set to be inserted after \"{insertAfter[i].Key}\" in {method.Name}, however that action does not exist in that flow");
                 }
                 else if (insertAfter[i].Value is FlowAction action)
                 {
                     var logger = Logger.CreateLogSource("SequentialFlow");
-                    logger.LogWarning($"Flow action \"{action.Name}\" was set to be inserted after \"{insertAfter[i].Key}\" in {method.Name}, however that action does not exist in that flow");
+                    logger.LogWarning(
+                        $"Flow action \"{action.Name}\" was set to be inserted after \"{insertAfter[i].Key}\" in {method.Name}, however that action does not exist in that flow");
                 }
             }
         }

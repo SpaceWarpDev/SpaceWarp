@@ -8,8 +8,8 @@ internal sealed class PostInitializeModAction : FlowAction
 {
     private readonly SpaceWarpPluginDescriptor _plugin;
 
-    public PostInitializeModAction(SpaceWarpPluginDescriptor plugin) : base(
-        $"Post-initialization for plugin {plugin.Name}")
+    public PostInitializeModAction(SpaceWarpPluginDescriptor plugin)
+        : base($"Post-initialization for plugin {plugin.Name}")
     {
         _plugin = plugin;
     }

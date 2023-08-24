@@ -11,7 +11,7 @@ internal class AssetOnlyMod : ISpaceWarpMod
     {
         SWLogger = new BepInExLogger(new ManualLogSource(name));
     }
-    
+
     public void OnPreInitialized()
     {
     }

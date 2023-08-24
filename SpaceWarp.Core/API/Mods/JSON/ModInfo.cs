@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace SpaceWarp.API.Mods.JSON;
 
 /// <summary>
-///     Representation of the mod info JSON file.
+/// Representation of the mod info JSON file.
 /// </summary>
 [JsonObject(MemberSerialization.OptIn)]
+[PublicAPI]
 public sealed class ModInfo
 {
     [JsonProperty("spec")] public SpecVersion Spec { get; internal set; } = new();
@@ -46,5 +48,6 @@ public sealed class ModInfo
     public string VersionCheck { get; internal set; }
 
     [JsonProperty("version_check_type")]
+    [Obsolete("Only swinfo.json version checking will be allowed in 2.0.0.")]
     public VersionCheckType VersionCheckType { get; internal set; } = VersionCheckType.SwInfo;
 }

@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Configuration;
 
+[PublicAPI]
 public interface IConfigFile
 {
     public void Save();
-
 
     public IConfigEntry this[string section, string key] { get; }
 

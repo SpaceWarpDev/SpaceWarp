@@ -1,17 +1,19 @@
 ﻿using System.Collections.Generic;
 using BepInEx;
+using JetBrains.Annotations;
 using SpaceWarp.Patching;
 using UnityEngine;
 
 namespace SpaceWarp.API.Mods;
 
+[PublicAPI]
 public class SpaceWarpErrorDescription
 {
     public SpaceWarpPluginDescriptor Plugin;
-    public bool MissingSwinfo = false;
-    public bool BadDirectory = false;
-    public bool BadID = false;
-    public bool MismatchedVersion = false;
+    public bool MissingSwinfo;
+    public bool BadDirectory;
+    public bool BadID;
+    public bool MismatchedVersion;
 
     public List<string> DisabledDependencies = new();
     public List<string> ErroredDependencies = new();

@@ -1,12 +1,15 @@
-﻿using KSP.Game;
+﻿using JetBrains.Annotations;
+using KSP.Game;
 using KSP.Messages;
 using SpaceWarp.API.Game.Messages;
 
 namespace SpaceWarp.Modules;
 
+[UsedImplicitly]
 public class Game : SpaceWarpModule
 {
     public override string Name => "SpaceWarp.Game";
+
     public override void LoadModule()
     {
     }

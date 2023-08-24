@@ -1,8 +1,10 @@
 ﻿using System;
 using BepInEx.Configuration;
+using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Configuration;
 
+[PublicAPI]
 public class BepInExConfigEntry :  IConfigEntry
 {
     public readonly ConfigEntryBase EntryBase;

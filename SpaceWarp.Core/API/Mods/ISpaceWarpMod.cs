@@ -1,8 +1,10 @@
-﻿using SpaceWarp.API.Configuration;
+﻿using JetBrains.Annotations;
+using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 
 namespace SpaceWarp.API.Mods;
 
+[PublicAPI]
 public interface ISpaceWarpMod
 {
     public void OnPreInitialized();

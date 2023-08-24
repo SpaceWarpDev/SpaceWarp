@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using BepInEx.Configuration;
 using I2.Loc;
+using JetBrains.Annotations;
 using KSP.UI;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.Backend.UI.Settings;
@@ -15,6 +16,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace SpaceWarp.API.UI.Settings;
 
+[PublicAPI]
 public static class ModsPropertyDrawers
 {
     private static readonly Dictionary<Type, Func<ConfigEntryBase, GameObject>> AllPropertyDrawers = new();
@@ -61,13 +63,10 @@ public static class ModsPropertyDrawers
         return AllAbstractedPropertyDrawers.TryGetValue(entry.ValueType, out var func) ? func(name,entry) : null;
     }
 
-
-
     internal static GameObject DropdownPrefab;
     internal static GameObject RadioPrefab;
     internal static GameObject RadioSettingPrefab;
     internal static GameObject InputFieldPrefab;
-
 
     private static Func<ConfigEntryBase, GameObject> GenerateEnumDrawerFor(Type t)
     {
@@ -368,7 +367,6 @@ public static class ModsPropertyDrawers
             return inputFieldCopy;
         };
     }
-
 
     private static GameObject CreateBoolConfig(ConfigEntryBase baseEntry)
     {
