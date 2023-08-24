@@ -71,12 +71,11 @@ internal static class BootstrapPatch
             {
                 flow.AddAction(new LoadAddressablesAction(plugin));
                 flow.AddAction(new LoadLocalizationAction(plugin));
-                if (plugin.Plugin != null)
+                if (plugin.Plugin is BaseSpaceWarpPlugin baseSpaceWarpPlugin)
                 {
                     foreach (var action in Loading.LoadingActionGenerators)
                     {
-                        if (plugin.Plugin is BaseSpaceWarpPlugin baseSpaceWarpPlugin)
-                            flow.AddAction(action(baseSpaceWarpPlugin));
+                        flow.AddAction(action(baseSpaceWarpPlugin));
                     }
                 }
                 else
