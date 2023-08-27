@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Versions;
@@ -33,6 +34,9 @@ public static class VersionUtility
         return !IsOlderThan(version, min) && !IsNewerThan(version, max);
     }
 
+    private static Regex _toClear = new("[^0-9.]");
+    private static string PreprocessSemanticVersion(string semver) => _toClear.Replace(semver, "");
+
     /// <summary>
     /// Compares 2 semantic versions
     /// </summary>
@@ -43,6 +47,8 @@ public static class VersionUtility
     /// </returns>
     public static int CompareSemanticVersionStrings(string version1, string version2)
     {
+        version1 = PreprocessSemanticVersion(version1);
+        version2 = PreprocessSemanticVersion(version2);
         var version1Parts = version1.Split('.');
         var version2Parts = version2.Split('.');
 
