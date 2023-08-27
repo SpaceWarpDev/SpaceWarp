@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
@@ -9,6 +10,7 @@ using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
+using SpaceWarp.API.Versions;
 using SpaceWarpPatcher;
 
 namespace SpaceWarp.Backend.Modding;
@@ -173,6 +175,12 @@ internal static class PluginRegister
         return false;
     }
 
+    private static string ClearPrerelease(string version)
+    {
+        var semver = new SemanticVersion(version);
+        return $"{semver.Major}.{semver.Minor}.{semver.Patch}{(semver.VersionNumbers.Count > 3 ? $".{semver.VersionNumbers[3]}" : "")}";
+    }
+    
     private static bool AssertMatchingVersions(
         SpaceWarpPluginDescriptor descriptor,
         BaseUnityPlugin plugin,
@@ -180,7 +188,7 @@ internal static class PluginRegister
         string folderPath
     )
     {
-        if (new Version(metadata.Version) == plugin.Info.Metadata.Version) return true;
+        if (new Version(ClearPrerelease(metadata.Version)) == plugin.Info.Metadata.Version) return true;
 
         Logger.LogError(
             $"Found Space Warp plugin {plugin.Info.Metadata.Name} that's swinfo version ({metadata.Version}) does not match the plugin version ({plugin.Info.Metadata.Version}), this mod will not be initialized");

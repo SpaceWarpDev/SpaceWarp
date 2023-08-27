@@ -91,12 +91,19 @@ public class VersionChecking : SpaceWarpModule
             var results = www.downloadHandler.text;
             try
             {
-                isOutdated = info.SWInfo.VersionCheckType switch
+                if (info.SWInfo.Spec >= SpecVersion.V2_0)
                 {
-                    VersionCheckType.SwInfo => CheckJsonVersion(guid, info.SWInfo.Version, results),
-                    VersionCheckType.Csproj => CheckCsprojVersion(guid, info.SWInfo.Version, results),
-                    _ => throw new ArgumentOutOfRangeException(nameof(info), "Invalid version_check_type")
-                };
+                    isOutdated = CheckSemanticVersion(guid, info.SWInfo.Version, results);
+                }
+                else
+                {
+                    isOutdated = info.SWInfo.VersionCheckType switch
+                    {
+                        VersionCheckType.SwInfo => CheckJsonVersion(guid, info.SWInfo.Version, results),
+                        VersionCheckType.Csproj => CheckCsprojVersion(guid, info.SWInfo.Version, results),
+                        _ => throw new ArgumentOutOfRangeException(nameof(info), "Invalid version_check_type")
+                    };
+                }
             }
             catch (Exception e)
             {
@@ -105,6 +112,17 @@ public class VersionChecking : SpaceWarpModule
 
             info.Outdated = isOutdated;
         }
+    }
+
+    private bool CheckSemanticVersion(string guid, string version, string json)
+    {
+        var checkInfo = JsonConvert.DeserializeObject<ModInfo>(json);
+        if (!checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion))
+        {
+            return false;
+        }
+
+        return new SemanticVersion(version) < new SemanticVersion(checkInfo.Version);
     }
 
     private bool CheckJsonVersion(string guid, string version, string json)

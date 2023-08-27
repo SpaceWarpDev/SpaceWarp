@@ -34,7 +34,7 @@ public static class VersionUtility
         return !IsOlderThan(version, min) && !IsNewerThan(version, max);
     }
 
-    private static Regex _toClear = new("[^0-9.]");
+    private static Regex _toClear = new("[^0-9.*]");
     private static string PreprocessSemanticVersion(string semver) => _toClear.Replace(semver, "");
 
 
@@ -50,6 +50,8 @@ public static class VersionUtility
     {
         var semanticVersion1 = PreprocessSemanticVersion(version1);
         var semanticVersion2 = PreprocessSemanticVersion(version2);
+        Console.WriteLine($"version 1: {version1} -> {semanticVersion1}");
+        Console.WriteLine($"version 2: {version2} -> {semanticVersion2}");
         var version1Parts = semanticVersion1.Split('.');
         var version2Parts = semanticVersion2.Split('.');
 
