@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using BepInEx.Bootstrap;
 using KSP.Assets;
@@ -110,6 +111,7 @@ public class UI : SpaceWarpModule
     {
         ModuleLogger.LogInfo("Post Initializing UI");
         InitializeSettingsUI();
+        InitializeSpaceWarpDetailsFoldout();
         ModListController.AddMainMenuItem();
     }
 
@@ -148,5 +150,29 @@ public class UI : SpaceWarpModule
         settingsController.Persist();
         settingsController.AddComponent<SettingsMenuController>();
         settingsController.SetActive(true);
+    }
+
+    private static void InitializeSpaceWarpDetailsFoldout()
+    {
+        VisualElement GenerateModulesText()
+        {
+            var x = new ScrollView();
+            var text = new TextElement();
+            x.Add(text);
+            text.visible = true;
+            text.style.display = DisplayStyle.Flex;
+            x.visible = true;
+            x.style.display = DisplayStyle.Flex;
+            var str = "Loaded modules: ";
+            foreach (var module in Modules.ModuleManager.AllSpaceWarpModules)
+            {
+                str += $"\n- {module.Name}";
+            }
+
+            text.text = str;
+            return x;
+        }
+
+        API.UI.ModList.RegisterDetailsFoldoutGenerator(SpaceWarpPlugin.ModGuid, GenerateModulesText);
     }
 }

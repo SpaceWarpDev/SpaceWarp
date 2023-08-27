@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SpaceWarp.API.Mods;
 using UnityEngine.UIElements;
 
@@ -132,4 +133,7 @@ internal class ModListItemController
 
         return name;
     }
+
+    internal Func<VisualElement> GetDetails = null;
+    internal VisualElement StoredDetails = null;
 }

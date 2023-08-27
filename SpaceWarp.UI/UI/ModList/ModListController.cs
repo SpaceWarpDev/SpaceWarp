@@ -59,6 +59,7 @@ internal class ModListController : MonoBehaviour
     private VisualElement _missingInfoWarning;
     private VisualElement _mismatchedVersionWarning;
     private VisualElement _badDirectoryWarning;
+    private Foldout _detailsFoldout;
     private Foldout _detailsDependenciesFoldout;
     private VisualElement _detailsDependenciesList;
 
@@ -76,6 +77,10 @@ internal class ModListController : MonoBehaviour
 
     private Dictionary<string, bool> _toggles;
     private Dictionary<string, bool> _initialToggles;
+
+    internal Dictionary<string, ModListItemController> BoundItems = new();
+
+    private EventCallback<ChangeEvent<bool>> _lastDetailsFoldoutCallback = null;
 
     private static readonly IReadOnlyList<string> NoToggleGuids = new List<string>
     {
@@ -194,6 +199,7 @@ internal class ModListController : MonoBehaviour
         _mismatchedVersionWarning = _container.Q<VisualElement>("details-mismatched-error");
         _badDirectoryWarning = _container.Q<VisualElement>("details-bad-directory-error");
 
+        _detailsFoldout = _container.Q<Foldout>("details-details-foldout");
         _detailsDependenciesFoldout = _container.Q<Foldout>("details-dependencies-foldout");
         _detailsDependenciesList = _container.Q<VisualElement>("details-dependencies-list");
 
@@ -326,6 +332,7 @@ internal class ModListController : MonoBehaviour
         var data = new ModListItemController(element);
         bindFunc(data);
         element.AddManipulator(new Clickable(OnModSelected));
+        if (data.Guid != null) BoundItems[data.Guid] = data;
 
         if (!NoToggleGuids.Contains(data.Guid))
         {
@@ -337,7 +344,7 @@ internal class ModListController : MonoBehaviour
             });
         }
 
-        _modItemElements[data.Guid] = element;
+        if (data.Guid != null) _modItemElements[data.Guid] = element;
         container.Add(element);
     }
 
@@ -396,11 +403,15 @@ internal class ModListController : MonoBehaviour
             data.ErroredDependencies,
             data.UnsupportedDependencies,
             data.UnspecifiedDependencies,
-            data.DisabledDependencies
+            data.DisabledDependencies,
+            data.StoredDetails,
+            data.GetDetails,
+            x => data.StoredDetails = x
         );
     }
 
-
+    
+    
     private void SetSelected(
         string modName = "",
         string id = "",
@@ -422,6 +433,9 @@ internal class ModListController : MonoBehaviour
         List<string> unsupportedDependencies = null,
         List<string> unspecifiedDependencies = null,
         List<string> disabledDependencies = null,
+        VisualElement details = null,
+        Func<VisualElement> detailsGenerator = null,
+        Action<VisualElement> setDetails = null,
         bool hasSelected = true
     )
     {
@@ -437,7 +451,53 @@ internal class ModListController : MonoBehaviour
             : _detailsSourceLinkInitialBorderWidth;
         _detailsDescriptionLabel.text = description;
         _detailsKspVersionLabel.text = kspVersion;
+        if (details == null && detailsGenerator == null)
+        {
+            _detailsFoldout.style.display = DisplayStyle.None;
+        }
+        else
+        {
+            if (_lastDetailsFoldoutCallback != null)
+            {
+                _detailsFoldout.UnregisterValueChangedCallback(_lastDetailsFoldoutCallback);
+                _lastDetailsFoldoutCallback = null;
+            }
 
+            _detailsFoldout.style.display = DisplayStyle.Flex;
+            _detailsFoldout.value = false;
+            if (details != null)
+            {
+                foreach (var child in _detailsContainer.Children())
+                {
+                    child.style.display = DisplayStyle.Flex;
+                }
+                details.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                
+                void GenerateFoldoutCallback(ChangeEvent<bool> evt)
+                {
+                    if (!evt.newValue) return;
+                    foreach (var child in _detailsContainer.Children())
+                    {
+                        child.style.display = DisplayStyle.Flex;
+                    }
+                    var element = detailsGenerator();
+                    setDetails(element);
+                    _detailsFoldout.Add(element);
+                    element.visible = true;
+                    element.style.display = DisplayStyle.Flex;
+                    _detailsFoldout.UnregisterValueChangedCallback(GenerateFoldoutCallback);
+                    _lastDetailsFoldoutCallback = null;
+                }
+
+                _detailsFoldout.RegisterValueChangedCallback(GenerateFoldoutCallback);
+
+                _lastDetailsFoldoutCallback = GenerateFoldoutCallback;
+            }
+        }
+        
         SetDependencies(dependencies,
             missingDependencies,
             erroredDependencies,
