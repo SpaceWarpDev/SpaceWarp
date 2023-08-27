@@ -10,6 +10,7 @@ public static class ModList
 {
     /// <summary>
     /// Register a function to generate a foldout in the mods list for your mods details
+    /// Use only in PostInitialize()
     /// </summary>
     /// <param name="modGuid">The guid of your mod</param>
     /// <param name="generateFoldoutOnOpenAction">The action that generates your foldout</param>
