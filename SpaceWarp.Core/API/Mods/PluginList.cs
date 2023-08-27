@@ -210,6 +210,25 @@ public static class PluginList
         errorDescriptor.UnspecifiedDependencies.Add(dependency);
     }
 
+    private static SemanticVersion PadVersion(string version)
+    {
+        var length = version.Split('.').Length;
+        for (var i = 0; i < 3-length; i++)
+        {
+            version += ".0";
+        }
+
+        return new SemanticVersion(version);
+    }
+
+    private static bool IsSupportedSemver(string version, string min, string max)
+    {
+        var basicVersion = PadVersion(version);
+        var minVersion = PadVersion(min.Replace("*", "0"));
+        var maxVersion = PadVersion(max.Replace("*", $"{int.MaxValue}"));
+        return basicVersion >= minVersion && basicVersion <= maxVersion;
+    }
+    
     private static bool DependencyResolved(
         SpaceWarpPluginDescriptor descriptor,
         List<SpaceWarpPluginDescriptor> resolvedPlugins
@@ -222,7 +241,7 @@ public static class PluginList
                 dependency.ID,
                 StringComparison.InvariantCultureIgnoreCase)
             )
-            where info == null || !VersionUtility.IsSupported(
+            where info == null || !IsSupportedSemver(
                 info.SWInfo.Version,
                 dependency.Version.Min,
                 dependency.Version.Max
