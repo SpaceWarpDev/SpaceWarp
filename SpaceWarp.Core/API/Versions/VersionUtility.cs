@@ -37,6 +37,9 @@ public static class VersionUtility
     private static Regex _toClear = new("[^0-9.]");
     private static string PreprocessSemanticVersion(string semver) => _toClear.Replace(semver, "");
 
+    private static Regex _notFullRelease = new("[0-9.]*-(\\w)+");
+    private static bool IsNotFullRelease(string version) => _notFullRelease.IsMatch(version);
+
     /// <summary>
     /// Compares 2 semantic versions
     /// </summary>
@@ -47,10 +50,10 @@ public static class VersionUtility
     /// </returns>
     public static int CompareSemanticVersionStrings(string version1, string version2)
     {
-        version1 = PreprocessSemanticVersion(version1);
-        version2 = PreprocessSemanticVersion(version2);
-        var version1Parts = version1.Split('.');
-        var version2Parts = version2.Split('.');
+        var semanticVersion1 = PreprocessSemanticVersion(version1);
+        var semanticVersion2 = PreprocessSemanticVersion(version2);
+        var version1Parts = semanticVersion1.Split('.');
+        var version2Parts = semanticVersion2.Split('.');
 
         var maxLength = Math.Max(version1Parts.Length, version2Parts.Length);
 
@@ -78,6 +81,16 @@ public static class VersionUtility
             }
         }
 
+        if (IsNotFullRelease(version1) && !IsNotFullRelease(version2))
+        {
+            return -1;
+        }
+
+        if (IsNotFullRelease(version2) && !IsNotFullRelease(version1))
+        {
+            return 1;
+        }
+        
         return 0;
     }
 }
