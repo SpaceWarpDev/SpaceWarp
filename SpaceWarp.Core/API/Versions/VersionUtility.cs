@@ -37,8 +37,6 @@ public static class VersionUtility
     private static Regex _toClear = new("[^0-9.]");
     private static string PreprocessSemanticVersion(string semver) => _toClear.Replace(semver, "");
 
-    private static Regex _notFullRelease = new("[0-9.]*-(\\w)+");
-    private static bool IsNotFullRelease(string version) => _notFullRelease.IsMatch(version);
 
     /// <summary>
     /// Compares 2 semantic versions
@@ -81,16 +79,70 @@ public static class VersionUtility
             }
         }
 
-        if (IsNotFullRelease(version1) && !IsNotFullRelease(version2))
+        return ComparePrereleaseSemanticVersions(version1, version2);
+    }
+
+    private static Regex _prereleaseVersion = new(@"(\D+)(\d+)");
+
+    private static int ComparePrereleaseSemanticVersions(string version1, string version2)
+    {
+        var dash1 = version1.IndexOf("-", StringComparison.Ordinal);
+        var dash2 = version2.IndexOf("-", StringComparison.Ordinal);
+        if (dash1 == -1 && dash2 == -1)
+        {
+            return 0;
+        }
+
+        if (dash1 == -1)
+        {
+            return 1;
+        }
+
+        if (dash2 == -1)
         {
             return -1;
         }
 
-        if (IsNotFullRelease(version2) && !IsNotFullRelease(version1))
+        var alphaVersion1 = version1[(dash1 + 1)..];
+        var alphaVersion2 = version2[(dash2 + 1)..];
+        // So now we get the numerics from the end of here
+        int alphaVersionNumber1 = 0;
+        int alphaVersionNumber2 = 0;
+        var alphaVersionName1 = alphaVersion1;
+        var alphaVersionName2 = alphaVersion2;
+        if (_prereleaseVersion.IsMatch(alphaVersion1))
         {
-            return 1;
+            var match = _prereleaseVersion.Match(alphaVersion1);
+            var name = match.Groups[1];
+            var number = match.Groups[2];
+            alphaVersionNumber1 = int.Parse(number.Value);
+            alphaVersionName1 = name.Value;
         }
         
-        return 0;
+        if (_prereleaseVersion.IsMatch(alphaVersion2))
+        {
+            var match = _prereleaseVersion.Match(alphaVersion2);
+            var name = match.Groups[1];
+            var number = match.Groups[2];
+            alphaVersionNumber2 = int.Parse(number.Value);
+            alphaVersionName2 = name.Value;
+        }
+
+        var comparison = string.CompareOrdinal(alphaVersionName1, alphaVersionName2);
+        if (comparison == 0)
+        {
+            if (alphaVersionNumber1 > alphaVersionNumber2)
+            {
+                return 1;
+            } else if (alphaVersionNumber1 == alphaVersionNumber2)
+            {
+                return 0;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        return comparison;
     }
 }
