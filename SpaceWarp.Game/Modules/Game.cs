@@ -8,10 +8,12 @@ namespace SpaceWarp.Modules;
 [UsedImplicitly]
 public class Game : SpaceWarpModule
 {
+    public static Game Instance;
     public override string Name => "SpaceWarp.Game";
 
     public override void LoadModule()
     {
+        Instance = this;
     }
 
     public override void PreInitializeModule()
