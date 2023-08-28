@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using BepInEx.Bootstrap;
+using JetBrains.Annotations;
 using KSP.Assets;
 using KSP.Game;
 using KSP.Game.Flow;
@@ -23,6 +24,7 @@ using ConfigManager = ConfigurationManager.ConfigurationManager;
 
 namespace SpaceWarp.Modules;
 
+[PublicAPI]
 public class UI : SpaceWarpModule
 {
     public override string Name => "SpaceWarp.UI";
