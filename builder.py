@@ -14,7 +14,7 @@ PATCHER_LIB_DIR = os.path.abspath("SpaceWarpPatcherLibraries")
 BUILD_DIR = os.path.abspath("build")
 THIRD_PARTY = os.path.abspath("ThirdParty")
 
-MODULES = ["Game","Sound","UI","VersionChecking"]
+MODULES = ["Game","Sound","UI","VersionChecking","Messaging"]
 
 
 parser = argparse.ArgumentParser()

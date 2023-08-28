@@ -27,6 +27,7 @@ SpaceWarp/ModList/ErroredDependency,Text,,Dependency had an error while loading,
 SpaceWarp/ModList/DisabledDependency,Text,,Dependency is disabled,Esta dependência esta desativada
 SpaceWarp/ModList/UnspecifiedDependency,Text,,Dependency was not specified in SW info,Esta dependência não está presente no swinfo
 SpaceWarp/ModList/UnsupportedDependency,Text,,Dependency is of an unsupported version,Esta dependência é de uma versão nao suportada
+SpaceWarp/ModList/Details,Text,,Details,Detalhes
 SpaceWarp/Mods,Text,,Mods,Mods
 SpaceWarp/Mods/Outdated,Text,,Mods <color=yellow>⚠</color>,Mods <color=yellow>⚠</color>
 SpaceWarp/Mods/Errored,Text,,Mods <color=red>⚠</color>,Mods <color=red>⚠</color>

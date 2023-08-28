@@ -156,21 +156,36 @@ public class UI : SpaceWarpModule
     {
         VisualElement GenerateModulesText()
         {
-            var x = new ScrollView();
-            var text = new TextElement();
-            x.Add(text);
-            text.visible = true;
-            text.style.display = DisplayStyle.Flex;
-            x.visible = true;
-            x.style.display = DisplayStyle.Flex;
+            var detailsContainer = new ScrollView();
+            var websiteContainer = new VisualElement();
+            websiteContainer.style.flexDirection = FlexDirection.Row;
+            detailsContainer.Add(websiteContainer);
+            var websiteHeader = new TextElement()
+            {
+                text = "Wiki: "
+            };
+            websiteContainer.Add(websiteHeader);
+            var websiteLink = new Button()
+            {
+                text = "https://wiki.spacewarp.org"
+            };
+            websiteLink.classList.Add("link");
+            websiteLink.RegisterCallback<ClickEvent>(_ => Application.OpenURL(websiteLink.text));
+            websiteContainer.Add(websiteLink);
+            var loadedModules = new TextElement();
+            detailsContainer.Add(loadedModules);
+            loadedModules.visible = true;
+            loadedModules.style.display = DisplayStyle.Flex;
+            detailsContainer.visible = true;
+            detailsContainer.style.display = DisplayStyle.Flex;
             var str = "Loaded modules: ";
-            foreach (var module in Modules.ModuleManager.AllSpaceWarpModules)
+            foreach (var module in ModuleManager.AllSpaceWarpModules)
             {
                 str += $"\n- {module.Name}";
             }
 
-            text.text = str;
-            return x;
+            loadedModules.text = str;
+            return detailsContainer;
         }
 
         API.UI.ModList.RegisterDetailsFoldoutGenerator(SpaceWarpPlugin.ModGuid, GenerateModulesText);
