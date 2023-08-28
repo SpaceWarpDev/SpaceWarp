@@ -5,7 +5,6 @@ public class Messaging : SpaceWarpModule
     public override string Name => "SpaceWarp.Messaging";
     public override void LoadModule()
     {
-        
     }
 
     public override void PreInitializeModule()

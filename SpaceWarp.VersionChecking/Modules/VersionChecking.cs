@@ -80,7 +80,7 @@ public class VersionChecking : SpaceWarpModule
     {
         var www = UnityWebRequest.Get(info.SWInfo.VersionCheck);
         yield return www.SendWebRequest();
-
+        
         if (www.result != UnityWebRequest.Result.Success)
         {
             ModuleLogger.LogInfo($"Unable to check version for {guid} due to error {www.error}");
@@ -88,19 +88,21 @@ public class VersionChecking : SpaceWarpModule
         else
         {
             var isOutdated = false;
+            var unsupported = false;
+            SupportedVersionsInfo newKSP2Versions = null;
             var results = www.downloadHandler.text;
             try
             {
                 if (info.SWInfo.Spec >= SpecVersion.V2_0)
                 {
-                    isOutdated = CheckSemanticVersion(guid, info.SWInfo.Version, results);
+                    isOutdated = CheckSemanticVersion(guid, info.SWInfo.Version, results, out unsupported, out newKSP2Versions);
                 }
                 else
                 {
                     isOutdated = info.SWInfo.VersionCheckType switch
                     {
-                        VersionCheckType.SwInfo => CheckJsonVersion(guid, info.SWInfo.Version, results),
-                        VersionCheckType.Csproj => CheckCsprojVersion(guid, info.SWInfo.Version, results),
+                        VersionCheckType.SwInfo => CheckJsonVersion(guid, info.SWInfo.Version, results, out unsupported, out newKSP2Versions),
+                        VersionCheckType.Csproj => CheckCsprojVersion(guid, info.SWInfo.Version, results, out unsupported, out newKSP2Versions),
                         _ => throw new ArgumentOutOfRangeException(nameof(info), "Invalid version_check_type")
                     };
                 }
@@ -111,33 +113,42 @@ public class VersionChecking : SpaceWarpModule
             }
 
             info.Outdated = isOutdated;
+            info.Unsupported = unsupported;
+            if (unsupported)
+            {
+                info.SWInfo.SupportedKsp2Versions = newKSP2Versions;
+            }
         }
     }
 
-    private bool CheckSemanticVersion(string guid, string version, string json)
+    private bool CheckSemanticVersion(string guid, string version, string json, out bool unsupported, out SupportedVersionsInfo checkVersions)
     {
         var checkInfo = JsonConvert.DeserializeObject<ModInfo>(json);
-        if (!checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion))
-        {
-            return false;
-        }
+        var semverOne = new SemanticVersion(version);
+        var semverTwo = new SemanticVersion(checkInfo.Version);
+        unsupported = false;
+        checkVersions = null;
+        if (semverOne != semverTwo) return semverOne < semverTwo;
+        if (checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion)) return false;
+        unsupported = true;
+        checkVersions = checkInfo.SupportedKsp2Versions;
+        return false;
 
-        return new SemanticVersion(version) < new SemanticVersion(checkInfo.Version);
     }
 
-    private bool CheckJsonVersion(string guid, string version, string json)
+    private bool CheckJsonVersion(string guid, string version, string json, out bool unsupported, out SupportedVersionsInfo checkVersions)
     {
         var checkInfo = JsonConvert.DeserializeObject<ModInfo>(json);
-        if (!checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion))
-        {
-            return false;
-        }
-
-        var isOutdated = VersionUtility.IsOlderThan(version, checkInfo.Version);
-        return isOutdated;
+        unsupported = false;
+        checkVersions = null;
+        if (version != checkInfo.Version) return VersionUtility.IsOlderThan(version, checkInfo.Version);
+        if (checkInfo.SupportedKsp2Versions.IsSupported(_kspVersion)) return false;
+        unsupported = true;
+        checkVersions = checkInfo.SupportedKsp2Versions;
+        return false;
     }
 
-    private bool CheckCsprojVersion(string guid, string version, string csproj)
+    private bool CheckCsprojVersion(string guid, string version, string csproj, out bool unsupported, out SupportedVersionsInfo checkVersions)
     {
         var document = new XmlDocument();
         document.LoadXml(csproj);
@@ -146,11 +157,12 @@ public class VersionChecking : SpaceWarpModule
             ?? SupportedVersionsInfo.DefaultMin;
         var ksp2VersionMax = document.GetElementsByTagName("Ksp2VersionMax")[0]?.InnerText
             ?? SupportedVersionsInfo.DefaultMax;
-
-        if (!VersionUtility.IsSupported(_kspVersion, ksp2VersionMin, ksp2VersionMax))
+        checkVersions = new SupportedVersionsInfo()
         {
-            return false;
-        }
+            Max = ksp2VersionMax,
+            Min = ksp2VersionMin
+        };
+        unsupported = false;
 
         var checkVersionTags = document.GetElementsByTagName("Version");
         var checkVersion = checkVersionTags[0]?.InnerText;
@@ -162,9 +174,10 @@ public class VersionChecking : SpaceWarpModule
             );
         }
 
-        var isOutdated = VersionUtility.IsOlderThan(version, checkVersion);
-
-        return isOutdated;
+        if (version != checkVersion) return VersionUtility.IsOlderThan(version, checkVersion);
+        if (checkVersions.IsSupported(_kspVersion)) return false;
+        unsupported = true;
+        return false;
     }
 
     internal void CheckKspVersions()
@@ -193,6 +206,6 @@ public class VersionChecking : SpaceWarpModule
             ModuleLogger.LogError($"Unable to check KSP version for {guid} due to error {e}");
         }
 
-        info.Unsupported = unsupported;
+        info.Unsupported = info.Unsupported || unsupported;
     }
 }
