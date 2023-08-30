@@ -22,7 +22,7 @@ internal static class AssetHelpers
             SpaceWarpManager.Logger.LogInfo($"Loaded addressables catalog {catalog}");
             var locator = operation.Result;
             SpaceWarpManager.Logger.LogInfo($"{catalog} ----- {locator.LocatorId}");
-            GameManager.Instance.Game.Assets.RegisterResourceLocator(locator);
+            GameManager.Instance.Assets.RegisterResourceLocator(locator);
         }
     }
 

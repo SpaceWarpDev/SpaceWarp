@@ -22,7 +22,7 @@ public class AddressableAction<T> : FlowAction where T : UnityObject
     {
         try
         {
-            GameManager.Instance.Game.Assets.LoadByLabel(Label,Action,delegate(IList<T> assetLocations)
+            GameManager.Instance.Assets.LoadByLabel(Label,Action,delegate(IList<T> assetLocations)
             {
                 if (assetLocations != null)
                 {
