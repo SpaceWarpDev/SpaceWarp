@@ -14,6 +14,7 @@ using UniLinq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using SpaceWarp.Backend.Extensions;
+using Enumerable = System.Linq.Enumerable;
 
 namespace SpaceWarp.UI.ModList;
 
@@ -77,6 +78,7 @@ internal class ModListController : MonoBehaviour
 
     private Dictionary<string, bool> _toggles;
     private Dictionary<string, bool> _initialToggles;
+    private Dictionary<string, Toggle> _toggleButtons = new();
 
     internal Dictionary<string, ModListItemController> BoundItems = new();
 
@@ -328,7 +330,6 @@ internal class ModListController : MonoBehaviour
     private void MakeListItem(VisualElement container, Action<ModListItemController> bindFunc)
     {
         var element = _listEntryTemplate.Instantiate();
-
         var data = new ModListItemController(element);
         bindFunc(data);
         element.AddManipulator(new Clickable(OnModSelected));
@@ -336,9 +337,14 @@ internal class ModListController : MonoBehaviour
 
         if (!NoToggleGuids.Contains(data.Guid))
         {
+            _toggleButtons[data.Guid!] = element.Q<Toggle>();
             element.Q<Toggle>().RegisterCallback<ChangeEvent<bool>>(evt =>
             {
                 _toggles[data.Guid] = evt.newValue;
+                if (!evt.newValue)
+                {
+                    DisableDependents(data);
+                }
                 UpdateDisabledFile();
                 UpdateChangesLabel();
             });
@@ -346,6 +352,18 @@ internal class ModListController : MonoBehaviour
 
         if (data.Guid != null) _modItemElements[data.Guid] = element;
         container.Add(element);
+    }
+
+    private void DisableDependents(ModListItemController data)
+    {
+        var deps = BoundItems[data.Guid].Info.SWInfo.Dependencies;
+        foreach (var dep in Enumerable.Where(deps, dep => dep.ID == data.Guid))
+        {
+            if (_toggleButtons.TryGetValue(dep.ID, out var toggle))
+            {
+                toggle.value = false;
+            }
+        }
     }
 
     private void OnModSelected(EventBase evt)

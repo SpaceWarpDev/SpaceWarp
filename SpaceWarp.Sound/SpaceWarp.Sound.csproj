@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
-        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.3" Publicize="true" />
+        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.4" Publicize="true" />
     </ItemGroup>
     
     <ItemGroup>
