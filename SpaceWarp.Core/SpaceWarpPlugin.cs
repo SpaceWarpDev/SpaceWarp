@@ -15,6 +15,7 @@ using MoonSharp.Interpreter.Interop;
 using SpaceWarp.API.Loading;
 using SpaceWarp.API.Lua;
 using SpaceWarp.API.Mods;
+using SpaceWarp.InternalUtilities;
 using UitkForKsp2;
 using SpaceWarp.Modules;
 using SpaceWarp.Patching.LoadingActions;
@@ -96,6 +97,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     public override void OnPreInitialized()
     {
+        // Persist all game objects so I don't need to stomp on config
+        BepInEx.Bootstrap.Chainloader.ManagerObject.Persist();
         ModuleManager.PreInitializeAllModules();
     }
 
