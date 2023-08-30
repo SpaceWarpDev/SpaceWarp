@@ -18,7 +18,7 @@ internal sealed class LoadAddressablesLocalizationsAction : FlowAction
     {
         try
         {
-            GameManager.Instance.Game.Assets.LoadByLabel("language_source",
+            GameManager.Instance.Assets.LoadByLabel("language_source",
                 OnLanguageSourceAssetLoaded, delegate(IList<LanguageSourceAsset> languageAssetLocations)
                 {
                     if (languageAssetLocations != null)
