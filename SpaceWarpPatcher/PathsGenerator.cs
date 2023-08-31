@@ -20,7 +20,7 @@ internal static class PathsGenerator
         var path = '"' + jsonFile.Directory.FullName.Replace("\"","\\\"").Replace("\\","\\\\") + '"';
         var obj = JObject.Parse(File.ReadAllText(jsonFile.FullName));
         var id = obj["mod_id"].Value<string>();
-        var replaced = id.Replace(".", "_").Replace(" ", "_");
+        var replaced = id.Replace(".", "_").Replace(" ", "_").Replace("-","_");
         return (replaced, path);
     }
     private static bool IsDisabled(FileInfo jsonFile, string[] allDisabled)
