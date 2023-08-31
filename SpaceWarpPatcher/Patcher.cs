@@ -96,7 +96,9 @@ internal static class ChainloaderPatch
         var path = '"' + jsonFile.Directory.FullName.Replace("\"","\\\"").Replace("\\","\\\\") + '"';
         var obj = JObject.Parse(File.ReadAllText(jsonFile.FullName));
         var id = obj["mod_id"].Value<string>();
-        var replaced = id.Replace(".", "_").Replace(" ", "_");
+        var replaced = id.Replace(".", "_")
+            .Replace(" ", "_")
+            .Replace("-", "_");
         return (replaced, path);
     }
 
@@ -134,7 +136,7 @@ internal static class ChainloaderPatch
                 var allSwinfos =
                     new DirectoryInfo(Path.Combine(Paths.BepInExRootPath, "plugins"))
                         .EnumerateFiles("swinfo.json", SearchOption.AllDirectories).Where(x => IsDisabled(x, allDisabled))
-                        .Select(x => GetNameAndPath(x));
+                        .Select(GetNameAndPath);
                 // Now we build the dll
                 var dll = "public static class SpaceWarpPaths {\n";
                 foreach (var swinfo in allSwinfos)
