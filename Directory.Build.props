@@ -29,4 +29,23 @@
             System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute;
         </PolySharpIncludeGeneratedTypes>
     </PropertyGroup>
+
+    <ItemGroup Label="Dependencies for build targets">
+        <PackageReference Include="JsonPeek" Version="1.2.0" PrivateAssets="all"/>
+    </ItemGroup>
+
+    <!-- Define the main target -->
+    <Target Label="Reading properties from swinfo.json" Name="ReadPropertiesFromJson" BeforeTargets="PreBuildEvent">
+        <JsonPeek ContentPath="$(SolutionDir)/SpaceWarpBuildTemplate/swinfo.json" Query="$">
+            <Output TaskParameter="Result" ItemName="Swinfo"/>
+        </JsonPeek>
+        <JsonPeek ContentPath="$(SolutionDir)/SpaceWarpBuildTemplate/swinfo.json" Query="$.dependencies">
+            <Output TaskParameter="Result" ItemName="Dependencies"/>
+        </JsonPeek>
+
+        <!-- Extract properties from the JSON -->
+        <PropertyGroup>
+            <SpaceWarpVersion>@(Swinfo -> '%(version)')</SpaceWarpVersion>
+        </PropertyGroup>
+    </Target>
 </Project>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+
     <PropertyGroup>
         <Version>$(SpaceWarpVersion)</Version>
     </PropertyGroup>
@@ -14,6 +15,7 @@
         <PackageReference Include="BepInEx.Core" Version="5.4.21" />
         <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all" />
         <PackageReference Include="HarmonyX" Version="2.10.1" />
+        <PackageReference Include="JsonPeek" Version="1.2.0" />
         <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.4" Publicize="true" PrivateAssets="all" />
         <PackageReference Include="Ksp2Uitk" Version="0.3.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
@@ -21,6 +23,7 @@
         <PackageReference Include="UitkForKsp2" Version="1.2.0" />
         <PackageReference Include="UnityEngine.Modules" Version="2020.3.33.1" Publicize="true" />
         <PackageReference Include="UnityEngine.UITK" Version="2020.3.33.1" Publicize="true" />
+        <PackageReference Remove="JsonPeek" />
     </ItemGroup>
 
     <ItemGroup>

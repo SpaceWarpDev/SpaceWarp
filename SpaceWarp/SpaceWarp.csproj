@@ -12,6 +12,8 @@
 
     <ItemGroup>
         <PackageReference Remove="PolySharp" />
+        <PackageReference Include="JsonPeek" Version="1.2.0" />
+        <PackageReference Remove="JsonPeek" />
     </ItemGroup>
 
     <ItemGroup>
