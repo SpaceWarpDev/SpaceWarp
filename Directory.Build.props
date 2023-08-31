@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <SpaceWarpVersion>1.4.2</SpaceWarpVersion>
+        <SpaceWarpVersion>1.4.3</SpaceWarpVersion>
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
