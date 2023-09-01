@@ -2,9 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
-        <PackageReference Include="JsonPeek" Version="1.2.0" />
         <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.4" Publicize="true" />
-        <PackageReference Remove="JsonPeek" />
     </ItemGroup>
     
     <ItemGroup>

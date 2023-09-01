@@ -8,9 +8,4 @@
       <ProjectReference Include="..\SpaceWarp.Core\SpaceWarp.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="JsonPeek" Version="1.2.0" />
-      <PackageReference Remove="JsonPeek" />
-    </ItemGroup>
-
 </Project>

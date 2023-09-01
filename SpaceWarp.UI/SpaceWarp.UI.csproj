@@ -14,11 +14,9 @@
 
     <ItemGroup>
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
-        <PackageReference Include="JsonPeek" Version="1.2.0" />
         <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.4" Publicize="true" />
         <PackageReference Include="UitkForKsp2" Version="1.4.0" Publicize="true" />
         <PackageReference Include="UnityEngine.Modules" Version="2020.3.33.1" Publicize="true" />
         <PackageReference Include="UnityEngine.UITK" Version="2020.3.33.1" Publicize="true" />
-        <PackageReference Remove="JsonPeek" />
     </ItemGroup>
 </Project>

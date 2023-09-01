@@ -7,6 +7,5 @@
     <ItemGroup>
       <PackageReference Include="JsonPeek" Version="1.2.0" />
       <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.4" />
-      <PackageReference Remove="JsonPeek" />
     </ItemGroup>
 </Project>
