@@ -91,14 +91,19 @@ internal static class ChainloaderPatch
         return !allDisabled.Contains(obj["mod_id"].Value<string>());
     }
 
+    private static Regex InvalidCharacter = new(@"[^a-zA-Z0-9_]");
+    private static Regex InvalidStartingCharacter = new(@"^[0-9].*$");
+    
     private static (string name, string path) GetNameAndPath(FileInfo jsonFile)
     {
         var path = '"' + jsonFile.Directory.FullName.Replace("\"","\\\"").Replace("\\","\\\\") + '"';
         var obj = JObject.Parse(File.ReadAllText(jsonFile.FullName));
         var id = obj["mod_id"].Value<string>();
-        var replaced = id.Replace(".", "_")
-            .Replace(" ", "_")
-            .Replace("-", "_");
+        var replaced = InvalidCharacter.Replace(id, "_");
+        if (InvalidStartingCharacter.IsMatch(replaced))
+        {
+            replaced = "_" + replaced;
+        }
         return (replaced, path);
     }
 
