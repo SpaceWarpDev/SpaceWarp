@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using BepInEx;
 using BepInEx.Logging;
 using Microsoft.CodeAnalysis;
@@ -12,15 +13,21 @@ namespace SpaceWarpPatcher;
 
 internal static class PathsGenerator
 {
-    
 
 
+    private static Regex InvalidCharacterRegex = new(@"[^a-zA-Z0-9_]");
+    private static Regex InvalidStartRegex = new(@"^[0-9].*$");
     private static (string name, string path) GetNameAndPath(FileInfo jsonFile)
     {
         var path = '"' + jsonFile.Directory.FullName.Replace("\"","\\\"").Replace("\\","\\\\") + '"';
         var obj = JObject.Parse(File.ReadAllText(jsonFile.FullName));
         var id = obj["mod_id"].Value<string>();
-        var replaced = id.Replace(".", "_").Replace(" ", "_").Replace("-","_");
+        // var replaced = id.Replace(".", "_").Replace(" ", "_").Replace("-","_");
+        var replaced = InvalidCharacterRegex.Replace(id, "_");
+        if (InvalidStartRegex.IsMatch(replaced))
+        {
+            replaced = $"_{replaced}";
+        }
         return (replaced, path);
     }
     private static bool IsDisabled(FileInfo jsonFile, string[] allDisabled)
