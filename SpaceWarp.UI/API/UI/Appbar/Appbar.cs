@@ -14,8 +14,9 @@ public static class Appbar
 {
     private static readonly List<(string text, Sprite icon, string ID, Action<bool> action)> ButtonsToBeLoaded = new();
 
-    private static readonly List<(string text, Sprite icon, string ID, Action<bool> action)> OABButtonsToBeLoaded =
-        new();
+    private static readonly List<(string text, Sprite icon, string ID, Action<bool> action)> OABButtonsToBeLoaded = new();
+
+    private static readonly List<(string text, Sprite icon, string ID, Action action)> KSCButtonsToBeLoaded = new();
 
     /// <summary>
     /// Register an appbar menu for the game
@@ -102,6 +103,30 @@ public static class Appbar
     }
 
     /// <summary>
+    /// Register a button on the KSC AppBar
+    /// </summary>
+    /// <param name="text">The text in the appbar menu</param>
+    /// <param name="id">A unique id for the appbar menu eg: "BTN-ExampleKSC"</param>
+    /// <param name="icon">A Sprite for the icon in the appbar</param>
+    /// <param name="func">The function to be called when this button is clicked</param>
+    public static void RegisterKSCAppButton(string text, string id, Sprite icon, Action func)
+    {
+        KSCButtonsToBeLoaded.Add((text, icon, id, func));
+    }
+
+    /// <summary>
+    /// Register a button on the KSC AppBar
+    /// </summary>
+    /// <param name="text">The text in the appbar menu</param>
+    /// <param name="id">A unique id for the appbar menu eg: "BTN-ExampleKSC"</param>
+    /// <param name="icon">A Texture2D for the icon in the appbar</param>
+    /// <param name="func">The function to be called when this button is clicked</param>
+    public static void RegisterKSCAppButton(string text, string id, Texture2D icon, Action func)
+    {
+        RegisterKSCAppButton(text, id, GetAppBarIconFromTexture(icon), func);
+    }
+
+    /// <summary>
     /// Convert a Texture2D to a Sprite
     /// </summary>
     /// <param name="texture">The Texture2D</param>
@@ -147,6 +172,14 @@ public static class Appbar
         foreach (var button in OABButtonsToBeLoaded)
         {
             AppbarBackend.AddOABButton(button.text, button.icon, button.ID, button.action);
+        }
+    }
+
+    internal static void LoadKSCButtons()
+    {
+        foreach (var button in KSCButtonsToBeLoaded)
+        {
+            AppbarBackend.AddKSCButton(button.text, button.icon, button.ID, button.action);
         }
     }
 }

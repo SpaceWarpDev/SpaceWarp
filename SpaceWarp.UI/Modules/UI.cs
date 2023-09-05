@@ -53,6 +53,7 @@ public class UI : SpaceWarpModule
     {
         AppbarBackend.AppBarInFlightSubscriber.AddListener(Appbar.LoadAllButtons);
         AppbarBackend.AppBarOABSubscriber.AddListener(Appbar.LoadOABButtons);
+        AppbarBackend.AppBarKSCSubscriber.AddListener(Appbar.LoadKSCButtons);
         Instance = this;
         ConfigErrorColor = new(ModuleConfiguration.Bind("Debug Console", "Color Error", Color.red,
             "The color for log messages that have the level: Error/Fatal (bolded)"));

@@ -12,6 +12,7 @@ using KSP.Api.CoreTypes;
 using KSP.Game;
 using KSP.OAB;
 using KSP.Sim.impl;
+using KSP.UI;
 using KSP.UI.Binding;
 using KSP.UI.Flight;
 using SpaceWarp.API.Assets;
@@ -299,12 +300,12 @@ internal static class AppbarBackend
     {
         get
         {
-            if (_oabTray == null)
+            if (_kscTray == null)
             {
-                return _oabTray = CreateKSCTray();
+                return _kscTray = CreateKSCTray();
             }
 
-            return _oabTray;
+            return _kscTray;
         }
     }
 
@@ -337,8 +338,17 @@ internal static class AppbarBackend
         image.sprite = Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f));
 
         // Change the text to APPS
-        var text = kscAppTrayButton.GetChild("Header").GetChild("Content").GetChild("Title").GetComponent<TMPro.TextMeshProUGUI>();
-        text.text = "Apps";
+        var title = kscAppTrayButton.GetChild("Header").GetChild("Content").GetChild("Title");
+        {
+            // Suppress renaming of button to Launchpad
+            var localizer = title.GetComponent<Localize>();
+            if (localizer)
+            {
+                UnityObject.Destroy(localizer);
+            }
+            var text = title.GetComponent<TextMeshProUGUI>();
+            text.text = "Apps";
+        }
 
         // Get the tray and rename it
         var kscAppTray = kscAppTrayButton.GetChild("LaunchLocationsFlyoutTarget");
@@ -349,7 +359,8 @@ internal static class AppbarBackend
         {
             var child = kscAppTray.transform.GetChild(i);
 
-            UnityEngine.Object.Destroy(child.gameObject);
+            if (!child.name.ToLowerInvariant().Contains("thingy"))
+                UnityEngine.Object.Destroy(child.gameObject);
         }
 
         Logger.LogInfo("Created KSC app tray.");
@@ -357,63 +368,104 @@ internal static class AppbarBackend
         return kscAppTray;
     }
 
-    public static void AddKSCButton(string buttonText, Sprite buttonIcon, string buttonId, Action<bool> function)
+    public static void AddKSCButton(string buttonText, Sprite buttonIcon, string buttonId, Action function)
     {
-        throw new NotImplementedException();
+        Logger.LogInfo($"Adding KSC appbar button: {buttonId}.");
 
-        // TODO:
+        //var list = GameObject.Find(
+        //    "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Scaled Popup Canvas/Container/ButtonBar/BTN-App-Tray/appbar-others-group");
+        //var resourceManger = list != null ? list.GetChild("BTN-Resource-Manager") : null;
 
-        Logger.LogInfo($"Adding OAB app bar button: {buttonId}.");
+        //if (resourceManger == null)
+        //{
+        //    Logger.LogError("Couldn't find the appbar.");
+        //    return;
+        //}
 
-        // Find the resource manager button.
-        var list = GameObject.Find(
-            "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Scaled Popup Canvas/Container/ButtonBar/BTN-App-Tray/appbar-others-group");
-        var resourceManger = list != null ? list.GetChild("BTN-Resource-Manager") : null;
+        // Find the Launchpad_1 button.
+        var kscLaunchLocationsFlyoutTarget = GameObject.Find(
+            "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Main Canvas/KSCMenu(Clone)/LandingPanel/InteriorWindow/MenuButtons/Content/Menu/LaunchLocationFlyoutHeaderToggle/LaunchLocationsFlyoutTarget");
+        var launchPadButton = kscLaunchLocationsFlyoutTarget != null ? kscLaunchLocationsFlyoutTarget.GetChild("Launchpad_1") : null;
 
-        if (resourceManger == null)
+        if (launchPadButton == null)
         {
-            Logger.LogError("Couldn't find the appbar.");
+            Logger.LogError("Couldn't find the KSC Launchpad_1 button.");
             return;
         }
 
+
         // Clone the resource manager button.
-        var appButton = UnityObject.Instantiate(resourceManger, OABTray.transform);
-        appButton.name = buttonId;
+        //var appButton = UnityObject.Instantiate(resourceManger, KSCTray.transform);
+        //appButton.name = buttonId;
+        
+        var modButton = UnityObject.Instantiate(launchPadButton, KSCTray.transform);
+        modButton.name = buttonId;
+
 
         // Change the text.
-        var text = appButton.GetChild("Content").GetChild("TXT-title").GetComponent<TextMeshProUGUI>();
-        text.text = buttonText;
+        //var text = appButton.GetChild("Content").GetChild("TXT-title").GetComponent<TextMeshProUGUI>();
+        //text.text = buttonText;
 
-        var localizer = text.gameObject.GetComponent<Localize>();
+        var modText = modButton.GetChild("Content").GetChild("Text (TMP)").GetComponent<TextMeshProUGUI>();
+        modText.text = buttonText;
+
+        //var localizer = text.gameObject.GetComponent<Localize>();
+        //if (localizer)
+        //{
+        //    UnityObject.Destroy(localizer);
+        //}
+
+        var localizer = modText.gameObject.GetComponent<Localize>();
         if (localizer)
         {
             UnityObject.Destroy(localizer);
         }
 
         // Change the icon.
-        var icon = appButton.GetChild("Content").GetChild("GRP-icon");
-        var image = icon.GetChild("ICO-asset").GetComponent<Image>();
+        //var icon = appButton.GetChild("Content").GetChild("GRP-icon");
+        //var image = icon.GetChild("ICO-asset").GetComponent<Image>();
+        //image.sprite = buttonIcon;
+
+        var icon = modButton.GetChild("Icon");
+        var image = icon.GetComponent<Image>();
         image.sprite = buttonIcon;
 
         // Add our function call to the toggle.
-        var utoggle = appButton.GetComponent<ToggleExtended>();
-        utoggle.onValueChanged.AddListener(state =>
-        {
-            Logger.LogInfo($"{buttonId}({state})");
-            function(state);
-        });
+        //var utoggle = appButton.GetComponent<ToggleExtended>();
+        //utoggle.onValueChanged.AddListener(state =>
+        //{
+        //    Logger.LogInfo($"{buttonId}({state})");
+        //    function(state);
+        //});
 
         // Set the initial state of the button.
-        var toggle = appButton.GetComponent<UIValue_WriteBool_Toggle>();
-        toggle.BindValue(new Property<bool>(false));
+        //var toggle = appButton.GetComponent<UIValue_WriteBool_Toggle>();
+        //toggle.BindValue(new Property<bool>(false));
 
-        // Bind the action to close the tray after pressing the button.
-        void Action() => SetKSCTrayState(false);
-        appButton.GetComponent<UIAction_Void_Toggle>().BindAction(new DelegateAction((Action)Action));
+        //// Bind the action to close the tray after pressing the button.
+        //void Action() => SetKSCTrayState(false);
+        //appButton.GetComponent<UIAction_Void_Toggle>().BindAction(new DelegateAction((Action)Action));
 
-        Logger.LogInfo($"Added OAB appbar button: {buttonId}");
+        var buttonExtended = modButton.GetComponent<ButtonExtended>();
+        var previousListeners = modButton.GetComponent<UIAction_String_ButtonExtended>();
+        if (previousListeners)
+        {
+            UnityObject.Destroy(previousListeners);
+        }
+        buttonExtended.onClick.AddListener(() =>
+        {
+            Logger.LogInfo($"Mod button {buttonId} clicked.");
+            function();
+
+            // Hide the tray
+            var toggle = KSCTray.GetComponentInParent<ToggleExtended>();
+            toggle.isOn = false;
+        });
+
+        Logger.LogInfo($"Added KSC appbar button: {buttonId}.");
     }
 
+    // TODO: delete?
     private static void SetKSCTrayState(bool state)
     {
         if (_kscTray == null)
@@ -442,7 +494,8 @@ internal class ToolbarBackendObject : KerbalBehavior
         yield return Type switch
         {
             AppbarEvent.Flight => new WaitForSeconds(1),
-            AppbarEvent.OAB => new WaitForFixedUpdate(),
+            AppbarEvent.OAB => new WaitForSeconds(1),
+            AppbarEvent.KSC => new WaitForFixedUpdate(),
             _ => new WaitForSeconds(1)
         };
 
@@ -469,5 +522,15 @@ internal class ToolbarBackendOABSideBarPatcher
     public static void Postfix()
     {
         SubscriberSchedulePing(AppbarEvent.OAB);
+    }
+}
+
+[HarmonyPatch(typeof(KSCMenuManager))]
+[HarmonyPatch("Start")]
+internal class ToolbarBackendKSCPatcher
+{
+    public static void Postfix()
+    {
+        SubscriberSchedulePing(AppbarEvent.KSC);
     }
 }
