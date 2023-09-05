@@ -30,6 +30,7 @@ internal static class AppbarBackend
 
     public static readonly UnityEvent AppBarOABSubscriber = new();
     public static readonly UnityEvent AppBarInFlightSubscriber = new();
+    public static readonly UnityEvent AppBarKSCSubscriber = new();
 
     internal static void SubscriberSchedulePing(AppbarEvent type)
     {
@@ -42,6 +43,7 @@ internal static class AppbarBackend
         {
             AppbarEvent.Flight => AppBarInFlightSubscriber,
             AppbarEvent.OAB => AppBarOABSubscriber,
+            AppbarEvent.KSC => AppBarKSCSubscriber,
             _ => waiterObject.CreationEvent
         };
 
@@ -52,7 +54,8 @@ internal static class AppbarBackend
     internal enum AppbarEvent
     {
         Flight,
-        OAB
+        OAB,
+        KSC
     }
 
     #region Flight App Bar
@@ -284,6 +287,141 @@ internal static class AppbarBackend
         }
 
         _oabState.SetValue(state);
+    }
+
+    #endregion
+
+    #region KSC App Bar
+
+    private static GameObject _kscTray;
+
+    private static GameObject KSCTray
+    {
+        get
+        {
+            if (_oabTray == null)
+            {
+                return _oabTray = CreateKSCTray();
+            }
+
+            return _oabTray;
+        }
+    }
+
+    private static Property<bool> _kscState;
+
+    private static GameObject CreateKSCTray()
+    {
+        Logger.LogInfo("Creating KSC app tray...");
+
+        // Find the KSC launch locations menu item; it will be used for cloning the app tray
+
+        // Get the Launch Pads menu item
+        var kscMenu = GameObject.Find("GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Main Canvas/KSCMenu(Clone)/LandingPanel/InteriorWindow/MenuButtons/Content/Menu");
+        var launchLocationsButton = kscMenu != null ? kscMenu.GetChild("LaunchLocationFlyoutHeaderToggle") : null;
+
+        if (kscMenu == null || launchLocationsButton == null)
+        {
+            Logger.LogError("Couldn't find KSC tray.");
+            return null;
+        }
+
+        // Clone it, add it to the menu and rename it
+        var kscAppTrayButton = UnityEngine.Object.Instantiate(launchLocationsButton, kscMenu.transform);
+        kscAppTrayButton.name = "KSC-AppTrayButton";
+
+        // Set the button icon
+        var image = kscAppTrayButton.GetChild("Header").GetChild("Content").GetChild("Icon Panel").GetChild("icon").GetComponent<Image>();
+        var tex = AssetManager.GetAsset<Texture2D>($"{SpaceWarpPlugin.ModGuid}/images/oabTrayButton.png");
+        tex.filterMode = FilterMode.Point;
+        image.sprite = Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f));
+
+        // Change the text to APPS
+        var text = kscAppTrayButton.GetChild("Header").GetChild("Content").GetChild("Title").GetComponent<TMPro.TextMeshProUGUI>();
+        text.text = "Apps";
+
+        // Get the tray and rename it
+        var kscAppTray = kscAppTrayButton.GetChild("LaunchLocationsFlyoutTarget");
+        kscAppTray.name = "KSC-AppTray";
+
+        // Delete existing buttons in the tray.
+        for (var i = 0; i < kscAppTray.transform.childCount; i++)
+        {
+            var child = kscAppTray.transform.GetChild(i);
+
+            UnityEngine.Object.Destroy(child.gameObject);
+        }
+
+        Logger.LogInfo("Created KSC app tray.");
+
+        return kscAppTray;
+    }
+
+    public static void AddKSCButton(string buttonText, Sprite buttonIcon, string buttonId, Action<bool> function)
+    {
+        throw new NotImplementedException();
+
+        // TODO:
+
+        Logger.LogInfo($"Adding OAB app bar button: {buttonId}.");
+
+        // Find the resource manager button.
+        var list = GameObject.Find(
+            "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Scaled Popup Canvas/Container/ButtonBar/BTN-App-Tray/appbar-others-group");
+        var resourceManger = list != null ? list.GetChild("BTN-Resource-Manager") : null;
+
+        if (resourceManger == null)
+        {
+            Logger.LogError("Couldn't find the appbar.");
+            return;
+        }
+
+        // Clone the resource manager button.
+        var appButton = UnityObject.Instantiate(resourceManger, OABTray.transform);
+        appButton.name = buttonId;
+
+        // Change the text.
+        var text = appButton.GetChild("Content").GetChild("TXT-title").GetComponent<TextMeshProUGUI>();
+        text.text = buttonText;
+
+        var localizer = text.gameObject.GetComponent<Localize>();
+        if (localizer)
+        {
+            UnityObject.Destroy(localizer);
+        }
+
+        // Change the icon.
+        var icon = appButton.GetChild("Content").GetChild("GRP-icon");
+        var image = icon.GetChild("ICO-asset").GetComponent<Image>();
+        image.sprite = buttonIcon;
+
+        // Add our function call to the toggle.
+        var utoggle = appButton.GetComponent<ToggleExtended>();
+        utoggle.onValueChanged.AddListener(state =>
+        {
+            Logger.LogInfo($"{buttonId}({state})");
+            function(state);
+        });
+
+        // Set the initial state of the button.
+        var toggle = appButton.GetComponent<UIValue_WriteBool_Toggle>();
+        toggle.BindValue(new Property<bool>(false));
+
+        // Bind the action to close the tray after pressing the button.
+        void Action() => SetKSCTrayState(false);
+        appButton.GetComponent<UIAction_Void_Toggle>().BindAction(new DelegateAction((Action)Action));
+
+        Logger.LogInfo($"Added OAB appbar button: {buttonId}");
+    }
+
+    private static void SetKSCTrayState(bool state)
+    {
+        if (_kscTray == null)
+        {
+            return;
+        }
+
+        _kscState.SetValue(state);
     }
 
     #endregion
