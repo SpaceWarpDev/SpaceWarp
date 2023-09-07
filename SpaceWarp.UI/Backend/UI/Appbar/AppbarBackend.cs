@@ -338,7 +338,7 @@ internal static class AppbarBackend
         // Change the text to APPS
         var title = kscAppTrayButton.GetChild("Header").GetChild("Content").GetChild("Title");
         {
-            // Suppress renaming of button to Launchpad
+            // Suppress renaming of the button to Launchpad
             var localizer = title.GetComponent<Localize>();
             if (localizer)
             {
@@ -352,11 +352,12 @@ internal static class AppbarBackend
         var kscAppTray = kscAppTrayButton.GetChild("LaunchLocationsFlyoutTarget");
         kscAppTray.name = "KSC-AppTray";
 
-        // Delete existing buttons in the tray
+        // Delete existing buttons and separators in the tray
         for (var i = 0; i < kscAppTray.transform.childCount; i++)
         {
             var child = kscAppTray.transform.GetChild(i);
 
+            // Destroy all objects inside the tray, but keep the arrow ("thingy") that points to the menu button
             if (!child.name.ToLowerInvariant().Contains("thingy"))
                 UnityObject.Destroy(child.gameObject);
         }
@@ -372,16 +373,6 @@ internal static class AppbarBackend
 
         // Grab the Launchpad_1 button, clone it and convert it to a mod launching button
 
-        //var list = GameObject.Find(
-        //    "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Scaled Popup Canvas/Container/ButtonBar/BTN-App-Tray/appbar-others-group");
-        //var resourceManger = list != null ? list.GetChild("BTN-Resource-Manager") : null;
-
-        //if (resourceManger == null)
-        //{
-        //    Logger.LogError("Couldn't find the appbar.");
-        //    return;
-        //}
-
         // Find the Launchpad_1 button.
         var kscLaunchLocationsFlyoutTarget = GameObject.Find(
             "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Main Canvas/KSCMenu(Clone)/LandingPanel/InteriorWindow/MenuButtons/Content/Menu/LaunchLocationFlyoutHeaderToggle/LaunchLocationsFlyoutTarget");
@@ -393,59 +384,28 @@ internal static class AppbarBackend
             return;
         }
 
-
-        // Clone the resource manager button.
-        //var appButton = UnityObject.Instantiate(resourceManger, KSCTray.transform);
-        //appButton.name = buttonId;
-        
+        // Clone the button, add it to the popup tray and rename it
         var modButton = UnityObject.Instantiate(launchPadButton, KSCTray.transform);
         modButton.name = buttonId;
 
 
-        // Change the text.
-        //var text = appButton.GetChild("Content").GetChild("TXT-title").GetComponent<TextMeshProUGUI>();
-        //text.text = buttonText;
-
+        // Change the text
         var modText = modButton.GetChild("Content").GetChild("Text (TMP)").GetComponent<TextMeshProUGUI>();
         modText.text = buttonText;
 
-        //var localizer = text.gameObject.GetComponent<Localize>();
-        //if (localizer)
-        //{
-        //    UnityObject.Destroy(localizer);
-        //}
-
+        // Suppress renaming of the button
         var localizer = modText.gameObject.GetComponent<Localize>();
         if (localizer)
         {
             UnityObject.Destroy(localizer);
         }
 
-        // Change the icon.
-        //var icon = appButton.GetChild("Content").GetChild("GRP-icon");
-        //var image = icon.GetChild("ICO-asset").GetComponent<Image>();
-        //image.sprite = buttonIcon;
-
+        // Change the icon
         var icon = modButton.GetChild("Icon");
         var image = icon.GetComponent<Image>();
         image.sprite = buttonIcon;
 
-        // Add our function call to the toggle.
-        //var utoggle = appButton.GetComponent<ToggleExtended>();
-        //utoggle.onValueChanged.AddListener(state =>
-        //{
-        //    Logger.LogInfo($"{buttonId}({state})");
-        //    function(state);
-        //});
-
-        // Set the initial state of the button.
-        //var toggle = appButton.GetComponent<UIValue_WriteBool_Toggle>();
-        //toggle.BindValue(new Property<bool>(false));
-
-        //// Bind the action to close the tray after pressing the button.
-        //void Action() => SetKSCTrayState(false);
-        //appButton.GetComponent<UIAction_Void_Toggle>().BindAction(new DelegateAction((Action)Action));
-
+        // Remove previous onclick listeners and add the function that mod will use
         var buttonExtended = modButton.GetComponent<ButtonExtended>();
         var previousListeners = modButton.GetComponent<UIAction_String_ButtonExtended>();
         if (previousListeners)
@@ -457,7 +417,7 @@ internal static class AppbarBackend
             Logger.LogInfo($"Mod button {buttonId} clicked.");
             function();
 
-            // Hide the tray
+            // Hide the popup tray after the button is clicked
             var toggle = KSCTray.GetComponentInParent<ToggleExtended>();
             toggle.isOn = false;
         });
