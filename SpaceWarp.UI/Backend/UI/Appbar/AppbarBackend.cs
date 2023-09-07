@@ -12,6 +12,7 @@ using KSP.Api.CoreTypes;
 using KSP.Game;
 using KSP.OAB;
 using KSP.Sim.impl;
+using KSP.UI;
 using KSP.UI.Binding;
 using KSP.UI.Flight;
 using SpaceWarp.API.Assets;
@@ -30,6 +31,7 @@ internal static class AppbarBackend
 
     public static readonly UnityEvent AppBarOABSubscriber = new();
     public static readonly UnityEvent AppBarInFlightSubscriber = new();
+    public static readonly UnityEvent AppBarKSCSubscriber = new();
 
     internal static void SubscriberSchedulePing(AppbarEvent type)
     {
@@ -42,6 +44,7 @@ internal static class AppbarBackend
         {
             AppbarEvent.Flight => AppBarInFlightSubscriber,
             AppbarEvent.OAB => AppBarOABSubscriber,
+            AppbarEvent.KSC => AppBarKSCSubscriber,
             _ => waiterObject.CreationEvent
         };
 
@@ -52,7 +55,8 @@ internal static class AppbarBackend
     internal enum AppbarEvent
     {
         Flight,
-        OAB
+        OAB,
+        KSC
     }
 
     #region Flight App Bar
@@ -287,6 +291,140 @@ internal static class AppbarBackend
     }
 
     #endregion
+
+    #region KSC App Bar
+
+    private static GameObject _kscTray;
+
+    private static GameObject KSCTray
+    {
+        get
+        {
+            if (_kscTray == null)
+            {
+                return _kscTray = CreateKSCTray();
+            }
+
+            return _kscTray;
+        }
+    }
+
+    private static GameObject CreateKSCTray()
+    {
+        Logger.LogInfo("Creating KSC app tray...");
+
+        // Find the KSC launch locations menu item; it will be used for cloning the app tray
+
+        // Get the Launch Pads menu item
+        var kscMenu = GameObject.Find("GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Main Canvas/KSCMenu(Clone)/LandingPanel/InteriorWindow/MenuButtons/Content/Menu");
+        var launchLocationsButton = kscMenu != null ? kscMenu.GetChild("LaunchLocationFlyoutHeaderToggle") : null;
+
+        if (kscMenu == null || launchLocationsButton == null)
+        {
+            Logger.LogError("Couldn't find Launch Pads menu item for cloning the KSC app tray.");
+            return null;
+        }
+
+        // Clone it, add it to the menu and rename it
+        var kscAppTrayButton = UnityObject.Instantiate(launchLocationsButton, kscMenu.transform);
+        kscAppTrayButton.name = "KSC-AppTrayButton";
+
+        // Set the button icon (use OAB app tray icon)
+        var image = kscAppTrayButton.GetChild("Header").GetChild("Content").GetChild("Icon Panel").GetChild("icon").GetComponent<Image>();
+        var tex = AssetManager.GetAsset<Texture2D>($"{SpaceWarpPlugin.ModGuid}/images/oabTrayButton.png");
+        tex.filterMode = FilterMode.Point;
+        image.sprite = Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f));
+
+        // Change the text to APPS
+        var title = kscAppTrayButton.GetChild("Header").GetChild("Content").GetChild("Title");
+        {
+            // Suppress renaming of the button to Launchpad
+            var localizer = title.GetComponent<Localize>();
+            if (localizer)
+            {
+                UnityObject.Destroy(localizer);
+            }
+            var text = title.GetComponent<TextMeshProUGUI>();
+            text.text = "Apps";
+        }
+
+        // Get the popup tray and rename it
+        var kscAppTray = kscAppTrayButton.GetChild("LaunchLocationsFlyoutTarget");
+        kscAppTray.name = "KSC-AppTray";
+
+        // Delete existing buttons and separators in the tray
+        for (var i = 0; i < kscAppTray.transform.childCount; i++)
+        {
+            var child = kscAppTray.transform.GetChild(i);
+
+            // Destroy all objects inside the tray, but keep the arrow ("thingy") that points to the menu button
+            if (!child.name.ToLowerInvariant().Contains("thingy"))
+                UnityObject.Destroy(child.gameObject);
+        }
+
+        Logger.LogInfo("Created KSC app tray.");
+
+        return kscAppTray;
+    }
+
+    public static void AddKSCButton(string buttonText, Sprite buttonIcon, string buttonId, Action function)
+    {
+        Logger.LogInfo($"Adding KSC appbar button: {buttonId}.");
+
+        // Grab the Launchpad_1 button, clone it and convert it to a mod launching button
+
+        // Find the Launchpad_1 button.
+        var kscLaunchLocationsFlyoutTarget = GameObject.Find(
+            "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Main Canvas/KSCMenu(Clone)/LandingPanel/InteriorWindow/MenuButtons/Content/Menu/LaunchLocationFlyoutHeaderToggle/LaunchLocationsFlyoutTarget");
+        var launchPadButton = kscLaunchLocationsFlyoutTarget != null ? kscLaunchLocationsFlyoutTarget.GetChild("Launchpad_1") : null;
+
+        if (launchPadButton == null)
+        {
+            Logger.LogError("Couldn't find the KSC Launchpad_1 button.");
+            return;
+        }
+
+        // Clone the button, add it to the popup tray and rename it
+        var modButton = UnityObject.Instantiate(launchPadButton, KSCTray.transform);
+        modButton.name = buttonId;
+
+        // Change the text
+        var modText = modButton.GetChild("Content").GetChild("Text (TMP)").GetComponent<TextMeshProUGUI>();
+        modText.text = buttonText;
+
+        // Suppress renaming of the button
+        var localizer = modText.gameObject.GetComponent<Localize>();
+        if (localizer)
+        {
+            UnityObject.Destroy(localizer);
+        }
+
+        // Change the icon
+        var icon = modButton.GetChild("Icon");
+        var image = icon.GetComponent<Image>();
+        image.sprite = buttonIcon;
+
+        // Remove previous onclick listeners and add the function that mod will use
+        var buttonExtended = modButton.GetComponent<ButtonExtended>();
+        var previousListeners = modButton.GetComponent<UIAction_String_ButtonExtended>();
+        if (previousListeners)
+        {
+            UnityObject.Destroy(previousListeners);
+        }
+        buttonExtended.onClick.AddListener(() =>
+        {
+            Logger.LogInfo($"Mod button {buttonId} clicked.");
+            function();
+
+            // Hide the popup tray after the button is clicked
+            var toggle = KSCTray.GetComponentInParent<ToggleExtended>();
+            toggle.isOn = false;
+        });
+
+        Logger.LogInfo($"Added KSC appbar button: {buttonId}.");
+    }
+
+    #endregion
 }
 
 internal class ToolbarBackendObject : KerbalBehavior
@@ -305,6 +443,7 @@ internal class ToolbarBackendObject : KerbalBehavior
         {
             AppbarEvent.Flight => new WaitForSeconds(1),
             AppbarEvent.OAB => new WaitForFixedUpdate(),
+            AppbarEvent.KSC => new WaitForFixedUpdate(),
             _ => new WaitForSeconds(1)
         };
 
@@ -331,5 +470,15 @@ internal class ToolbarBackendOABSideBarPatcher
     public static void Postfix()
     {
         SubscriberSchedulePing(AppbarEvent.OAB);
+    }
+}
+
+[HarmonyPatch(typeof(KSCMenuManager))]
+[HarmonyPatch("Start")]
+internal class ToolbarBackendKSCPatcher
+{
+    public static void Postfix()
+    {
+        SubscriberSchedulePing(AppbarEvent.KSC);
     }
 }
