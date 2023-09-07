@@ -388,7 +388,6 @@ internal static class AppbarBackend
         var modButton = UnityObject.Instantiate(launchPadButton, KSCTray.transform);
         modButton.name = buttonId;
 
-
         // Change the text
         var modText = modButton.GetChild("Content").GetChild("Text (TMP)").GetComponent<TextMeshProUGUI>();
         modText.text = buttonText;
