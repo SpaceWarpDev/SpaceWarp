@@ -96,7 +96,7 @@ public static class ModsPropertyDrawers
                 var lab = ddCopy.GetChild("Label");
                 lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
                 lab.GetComponent<TextMeshProUGUI>().text = entry.Definition.Key;
-                var dropdown = ddCopy.GetChild("Setting").GetChild("KSP2DropDown");
+                var dropdown = ddCopy.GetChild("Setting").GetChild("BTN-Dropdown");
                 var extended = dropdown.GetComponent<DropdownExtended>();
                 // Start by clearing the options data
                 extended.options.Clear();
@@ -203,7 +203,7 @@ public static class ModsPropertyDrawers
                 var lab = ddCopy.GetChild("Label");
                 lab.GetComponent<Localize>().SetTerm(name);
                 lab.GetComponent<TextMeshProUGUI>().text = name;
-                var dropdown = ddCopy.GetChild("Setting").GetChild("KSP2DropDown");
+                var dropdown = ddCopy.GetChild("Setting").GetChild("BTN-Dropdown");
                 var extended = dropdown.GetComponent<DropdownExtended>();
                 // Start by clearing the options data
                 extended.options.Clear();
@@ -492,7 +492,7 @@ public static class ModsPropertyDrawers
         var lab = ddCopy.GetChild("Label");
         lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
         lab.GetComponent<TextMeshProUGUI>().text = entry.Definition.Key;
-        var dropdown = ddCopy.GetChild("Setting").GetChild("KSP2DropDown");
+        var dropdown = ddCopy.GetChild("Setting").GetChild("BTN-Dropdown");
         var extended = dropdown.GetComponent<DropdownExtended>();
         // Start by clearing the options data
         extended.options.Clear();
@@ -551,12 +551,15 @@ public static class ModsPropertyDrawers
             TypeCode.Single => x => (T)(object)x,
             _ => x => throw new NotImplementedException(typeof(T).ToString())
         };
-
+        slider.minValue = toFloat(acceptableValues.MinValue);
+        slider.maxValue = toFloat(acceptableValues.MaxValue);
+        slider.SetValueWithoutNotify(toFloat(entry.Value));
         slider.onValueChanged.AddListener(value =>
         {
             // var trueValue = (acceptableValues.MaxValue-acceptableValues.MinValue) * (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFrom(value)
-            var trueValue = (toFloat(acceptableValues.MaxValue) - toFloat(acceptableValues.MinValue)) * value +
-                            toFloat(acceptableValues.MinValue);
+            // var trueValue = (toFloat(acceptableValues.MaxValue) - toFloat(acceptableValues.MinValue)) * value +
+            //                 toFloat(acceptableValues.MinValue);
+            var trueValue = value;
 
             entry.Value = toT(trueValue) ?? entry.Value;
             if (entry.Value != null) text.text = entry.Value.ToString();

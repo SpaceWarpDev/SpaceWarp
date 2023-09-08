@@ -283,15 +283,21 @@ internal static class PluginRegister
         }
     }
 
-    private static SpaceWarpPluginDescriptor GetBepInExDescriptor(BaseUnityPlugin plugin) => new(
-        null,
-        plugin.Info.Metadata.GUID,
-        plugin.Info.Metadata.Name,
-        BepInExToSWInfo(plugin.Info),
-        new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!),
-        false,
-        new BepInExConfigFile(plugin.Config)
-    );
+    private static SpaceWarpPluginDescriptor GetBepInExDescriptor(BaseUnityPlugin plugin)
+    {
+        var pluginAdapter = new BepInExModAdapter(plugin);
+        var descriptor = new SpaceWarpPluginDescriptor(
+            pluginAdapter,
+            plugin.Info.Metadata.GUID,
+            plugin.Info.Metadata.Name,
+            BepInExToSWInfo(plugin.Info),
+            new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!),
+            false,
+            new BepInExConfigFile(plugin.Config)
+        );
+        pluginAdapter.SWMetadata = descriptor;
+        return descriptor;
+    }
 
     private static SpaceWarpPluginDescriptor GetBepInExDescriptor(PluginInfo info) => new(
         null,

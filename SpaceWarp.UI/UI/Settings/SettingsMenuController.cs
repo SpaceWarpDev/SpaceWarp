@@ -76,7 +76,7 @@ internal class SettingsMenuController : KerbalMonoBehaviour
         var ddPrefab = Instantiate(GameObject.Find(DropdownPrefabPath));
         Destroy(ddPrefab.GetComponent<UIValue_ReadBool_SetActive>());
         ddPrefab.Persist();
-        var dropdown = ddPrefab.GetChild("Setting").GetChild("KSP2DropDown");
+        var dropdown = ddPrefab.GetChild("Setting").GetChild("BTN-Dropdown");
         // This will be redone once I add a specific
         Destroy(dropdown.GetComponent<UIValue_ReadDropdownOption_Text>());
         Destroy(dropdown.GetComponent<SettingsElementDescriptionController>());

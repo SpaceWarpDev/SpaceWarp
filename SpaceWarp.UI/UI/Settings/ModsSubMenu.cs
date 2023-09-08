@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BepInEx;
 using BepInEx.Configuration;
 using KSP.UI;
 using SpaceWarp.API.Configuration;
@@ -33,35 +34,6 @@ internal class ModsSubMenu : SettingsSubMenu
             Destroy(child.gameObject);
         }
 
-        foreach (var module in ModuleManager.AllSpaceWarpModules.Where(
-                     mod => mod.ModuleConfiguration.Sections.Count > 0
-                 ))
-        {
-            GenerateTitle(module.Name).transform.SetParent(transform);
-            GenerateDivider().transform.SetParent(transform);
-            Dictionary<string, List<(string name, IConfigEntry entry)>> modConfigCategories = new();
-            foreach (var section in module.ModuleConfiguration!.Sections)
-            {
-                if (module.ModuleConfiguration[section].Count <= 0) continue;
-                var list = modConfigCategories[section] = new List<(string name, IConfigEntry entry)>();
-                list.AddRange(module.ModuleConfiguration[section].Select(
-                    entry => (entry, module.ModuleConfiguration[section, entry])
-                ));
-            }
-
-            foreach (var config in modConfigCategories)
-            {
-                var header = GenerateSectionHeader(config.Key);
-                header.transform.SetParent(transform);
-                foreach (var drawer in config.Value.Select(x => ModsPropertyDrawers.Drawer(x.name, x.entry))
-                             .Where(drawer => drawer != null))
-                {
-                    drawer.transform.SetParent(header.transform);
-                }
-
-                GenerateDivider().transform.SetParent(transform);
-            }
-        }
 
         // Now here is where we go through every single mod
 #pragma warning disable CS0618
@@ -102,7 +74,8 @@ internal class ModsSubMenu : SettingsSubMenu
         foreach (var mod in PluginList.AllEnabledAndActivePlugins.Where(mod =>
                      mod.ConfigFile != null && mod.ConfigFile.Sections.Count > 0 &&
                      mod.ConfigFile.Sections.Any(x =>
-                         mod.ConfigFile[x].Count > 0 && mod.Plugin is not BepInExModAdapter or BaseSpaceWarpPlugin)))
+                         mod.ConfigFile[x].Count > 0) && mod.Plugin is not BepInExModAdapter &&
+                     mod.Plugin is not BaseSpaceWarpPlugin && mod.Plugin != null))
         {
             GenerateTitle(mod.Name).transform.SetParent(transform);
             GenerateDivider().transform.SetParent(transform);
@@ -127,6 +100,37 @@ internal class ModsSubMenu : SettingsSubMenu
                 GenerateDivider().transform.SetParent(transform);
             }
         }
+        
+        foreach (var module in ModuleManager.AllSpaceWarpModules.Where(
+                     mod => mod.ModuleConfiguration.Sections.Count > 0
+                 ))
+        {
+            GenerateTitle(module.Name).transform.SetParent(transform);
+            GenerateDivider().transform.SetParent(transform);
+            Dictionary<string, List<(string name, IConfigEntry entry)>> modConfigCategories = new();
+            foreach (var section in module.ModuleConfiguration!.Sections)
+            {
+                if (module.ModuleConfiguration[section].Count <= 0) continue;
+                var list = modConfigCategories[section] = new List<(string name, IConfigEntry entry)>();
+                list.AddRange(module.ModuleConfiguration[section].Select(
+                    entry => (entry, module.ModuleConfiguration[section, entry])
+                ));
+            }
+
+            foreach (var config in modConfigCategories)
+            {
+                var header = GenerateSectionHeader(config.Key);
+                header.transform.SetParent(transform);
+                foreach (var drawer in config.Value.Select(x => ModsPropertyDrawers.Drawer(x.name, x.entry))
+                             .Where(drawer => drawer != null))
+                {
+                    drawer.transform.SetParent(header.transform);
+                }
+
+                GenerateDivider().transform.SetParent(transform);
+            }
+        }
+        
     }
 
     public override void OnShow()
