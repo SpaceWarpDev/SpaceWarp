@@ -38,6 +38,8 @@ internal class ModListItemController
 
     internal List<string> UnspecifiedDependencies { get; private set; } = new();
 
+    internal List<string> Conflicts { get; private set; } = new();
+
 
     internal void SetInfo(SpaceWarpPluginDescriptor info)
     {
@@ -121,6 +123,12 @@ internal class ModListItemController
     internal void SetIsDependencyUnspecified(string unspecifiedDependency)
     {
         UnspecifiedDependencies.Add(unspecifiedDependency);
+        SetIsErrored();
+    }
+
+    internal void SetIsConflicting(string conflict)
+    {
+        Conflicts.Add(conflict);
         SetIsErrored();
     }
 

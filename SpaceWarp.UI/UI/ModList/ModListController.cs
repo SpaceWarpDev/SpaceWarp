@@ -62,8 +62,10 @@ internal class ModListController : MonoBehaviour
     private VisualElement _badDirectoryWarning;
     private Foldout _detailsFoldout;
     private Foldout _detailsDependenciesFoldout;
+    private Foldout _detailsConflictFoldout;
     private VisualElement _detailsDependenciesList;
-
+    private VisualElement _detailsConflictList;
+    
     private static LocalizedString _missingDependency = "SpaceWarp/ModList/MissingDependency";
     private static LocalizedString _erroredDependency = "SpaceWarp/ModList/ErroredDependency";
     private static LocalizedString _disabledDependency = "SpaceWarp/ModList/DisabledDependency";
@@ -205,6 +207,9 @@ internal class ModListController : MonoBehaviour
         _detailsDependenciesFoldout = _container.Q<Foldout>("details-dependencies-foldout");
         _detailsDependenciesList = _container.Q<VisualElement>("details-dependencies-list");
 
+        _detailsConflictFoldout = _container.Q<Foldout>("details-conflicts-foldout");
+        _detailsConflictList = _container.Q<VisualElement>("details-conflicts-list");
+        
         // Show only categories that have any mods in them
         if (PluginList.AllEnabledAndActivePlugins.Count > 0)
         {
@@ -401,7 +406,9 @@ internal class ModListController : MonoBehaviour
         //TODO: Add the ability to show errors at some point (Munix)
         SetSelected(
             descriptor.Name,
-            data.HasBadID ? descriptor.SWInfo.ModID : data.Guid, // So that I can show a mismatched ID if it is mismatched
+            data.HasBadID
+                ? descriptor.SWInfo.ModID
+                : data.Guid, // So that I can show a mismatched ID if it is mismatched
             descriptor.SWInfo.Author,
             descriptor.SWInfo.Version,
             descriptor.SWInfo.Source,
@@ -422,6 +429,7 @@ internal class ModListController : MonoBehaviour
             data.UnsupportedDependencies,
             data.UnspecifiedDependencies,
             data.DisabledDependencies,
+            data.Conflicts,// data.Conflicts,
             data.StoredDetails,
             data.GetDetails,
             x => data.StoredDetails = x
@@ -451,6 +459,7 @@ internal class ModListController : MonoBehaviour
         List<string> unsupportedDependencies = null,
         List<string> unspecifiedDependencies = null,
         List<string> disabledDependencies = null,
+        List<string> conflicts = null,
         VisualElement details = null,
         Func<VisualElement> detailsGenerator = null,
         Action<VisualElement> setDetails = null,
@@ -529,6 +538,17 @@ internal class ModListController : MonoBehaviour
             isMissingSWInfo,
             isBadDirectory,
             isMismatchedVersion);
+        // Now time to do conflicts
+        _detailsConflictFoldout.style.display = conflicts.Any() ? DisplayStyle.Flex : DisplayStyle.None;
+        _detailsConflictList.Clear();
+        foreach (var conflict in conflicts)
+        {
+            var text = new TextElement
+            {
+                text = conflict
+            };
+            _detailsConflictList.Add(text);
+        }
     }
 
     private void SetDependencies(

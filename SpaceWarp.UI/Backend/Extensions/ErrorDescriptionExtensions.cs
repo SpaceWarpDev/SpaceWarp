@@ -37,5 +37,10 @@ internal static class ErrorDescriptionExtensions
         {
             controller.SetIsDependencyUnspecified(unspecifiedDependency);
         }
+
+        foreach (var conflict in instance.Incompatibilities)
+        {
+            controller.SetIsConflicting(conflict);
+        }
     }
 }
