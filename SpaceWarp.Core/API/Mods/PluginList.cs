@@ -6,6 +6,8 @@ using JetBrains.Annotations;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
 using SpaceWarpPatcher;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Switch.LowLevel;
 
 // Disable obsolete warning for Chainloader.Plugins
 #pragma warning disable CS0618
@@ -307,6 +309,34 @@ public static class PluginList
         }
     }
 
+    private static void CheckCompatibility()
+    {
+        var incompatibilities = _allEnabledAndActivePlugins.Select(x => (Key: x.Guid, Value: new HashSet<string>()))
+            .ToDictionary(x => x.Key, x => x.Value);
+        var versionLookup = _allEnabledAndActivePlugins.Select(x => (Key: x.Guid, Value: x.SWInfo.Version))
+            .ToDictionary(x => x.Key, x => x.Value);
+        var pluginDictionary = _allEnabledAndActivePlugins.ToDictionary(x => x.Guid, x => x);
+        foreach (var mod in _allEnabledAndActivePlugins)
+        {
+            var swinfo = mod.SWInfo;
+            if (swinfo.Spec < SpecVersion.V2_0) continue;
+            foreach (var conflict in swinfo.Conflicts)
+            {
+                if (!versionLookup.TryGetValue(conflict.ID, out var conflictingVersion) ||
+                    !IsSupportedSemver(conflictingVersion, conflict.Version.Min, conflict.Version.Max)) continue;
+                incompatibilities[mod.Guid].Add(conflict.ID);
+                incompatibilities[conflict.ID].Add(mod.Guid);
+            }
+        }
+
+        foreach (var incompatibility in incompatibilities)
+        {
+            if (incompatibility.Value.Count <= 0) continue;
+            var descriptor = GetErrorDescriptor(pluginDictionary[incompatibility.Key]);
+            descriptor.Incompatibilities.AddRange(incompatibility.Value);
+        }
+    }
+
     /// <summary>
     /// This is done after Awake/LoadModule(), so that everything else can use it
     /// </summary>
@@ -314,6 +344,7 @@ public static class PluginList
     {
         GetLoadOrder();
         GetDependencyErrors();
+        CheckCompatibility();
     }
 
     #endregion

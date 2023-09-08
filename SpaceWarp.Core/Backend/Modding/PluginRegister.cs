@@ -33,7 +33,7 @@ internal static class PluginRegister
     {
         var newInfo = new ModInfo
         {
-            Spec = SpecVersion.V1_3,
+            Spec = SpecVersion.V2_0,
             ModID = plugin.Metadata.GUID,
             Name = plugin.Metadata.Name,
             Author = "<unknown>",
@@ -55,7 +55,16 @@ internal static class PluginRegister
                 Max = "*"
             },
             VersionCheck = null,
-            VersionCheckType = VersionCheckType.SwInfo
+            VersionCheckType = VersionCheckType.SwInfo,
+            Conflicts = plugin.Incompatibilities.Select(x => new DependencyInfo
+            {
+                ID = x.IncompatibilityGUID,
+                Version = new SupportedVersionsInfo
+                {
+                    Min = "*",
+                    Max = "*"
+                }
+            }).ToList()
         };
         return newInfo;
     }

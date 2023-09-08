@@ -20,6 +20,7 @@ public class SpaceWarpErrorDescription
     public List<string> MissingDependencies = new();
     public List<string> UnsupportedDependencies = new();
     public List<string> UnspecifiedDependencies = new();
+    public List<string> Incompatibilities = new();
 
     public SpaceWarpErrorDescription(SpaceWarpPluginDescriptor plugin)
     {
