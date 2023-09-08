@@ -100,8 +100,10 @@ internal static class SwinfoTransformer
 
     internal static void TransformModSwinfos()
     {
+        var dir = new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods"));
+        if (!dir.Exists) return;
         var allSwinfos =
-            new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods")).EnumerateFiles("swinfo.json",
+            dir.EnumerateFiles("swinfo.json",
                 SearchOption.AllDirectories);
         foreach (var swinfo in allSwinfos)
         {

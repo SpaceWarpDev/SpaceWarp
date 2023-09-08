@@ -59,9 +59,18 @@ internal static class PathsGenerator
                 var disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
                 var allDisabled = File.ReadAllText(disabledPluginsFilepath)
                     .Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                var allSwinfos =
+                var allSwinfoPaths =
                     new DirectoryInfo(Path.Combine(Paths.BepInExRootPath, "plugins"))
-                        .EnumerateFiles("swinfo.json", SearchOption.AllDirectories).Where(x => IsDisabled(x, allDisabled)).Concat(new DirectoryInfo(Path.Combine(Paths.GameRootPath,"GameData","Mods")).EnumerateFiles("swinfo.json",SearchOption.AllDirectories)).Select(GetNameAndPath);
+                        .EnumerateFiles("swinfo.json", SearchOption.AllDirectories).Where(x => IsDisabled(x, allDisabled));
+                var gameDataMods = new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods"));
+                if (gameDataMods.Exists)
+                {
+                    allSwinfoPaths =
+                        allSwinfoPaths.Concat(
+                            new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods")).EnumerateFiles(
+                                "swinfo.json", SearchOption.AllDirectories));
+                }
+                var allSwinfos = allSwinfoPaths.Select(GetNameAndPath);
                 // Now we build the dll
                 var dll = "public static class SpaceWarpPaths {\n";
                 foreach (var swinfo in allSwinfos)
