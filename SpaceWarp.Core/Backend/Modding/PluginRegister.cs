@@ -237,7 +237,7 @@ internal static class PluginRegister
         var directoryInfo = new FileInfo(modInfoPath).Directory;
         var descriptor = new SpaceWarpPluginDescriptor(
             plugin,
-            plugin.Info.Metadata.GUID,
+            metadata.ModID,
             metadata.Name,
             metadata,
             directoryInfo,
@@ -265,7 +265,7 @@ internal static class PluginRegister
             if (!TryReadModInfo(plugin, modInfoPath, folderPath, out var metadata)) return;
             var descriptor = new SpaceWarpPluginDescriptor(
                 new BepInExModAdapter(plugin),
-                plugin.Info.Metadata.GUID,
+                metadata.ModID,
                 metadata.Name,
                 metadata,
                 directoryInfo,
