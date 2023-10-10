@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
+        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.4" Publicize="true" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\SpaceWarp.Core\SpaceWarp.Core.csproj" />
+    </ItemGroup>
+</Project>

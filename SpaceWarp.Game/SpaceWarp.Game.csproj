@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+      <ProjectReference Include="..\SpaceWarp.Core\SpaceWarp.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="JsonPeek" Version="1.2.0" />
+      <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.4" />
+    </ItemGroup>
+</Project>

@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using HarmonyLib;
+using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Mono.Cecil;
@@ -18,18 +17,53 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Newtonsoft.Json.Linq;
 
-// ReSharper disable UnusedType.Global
-// ReSharper disable UnusedMember.Global
-
-[assembly: InternalsVisibleTo("SpaceWarp")]
+[assembly: InternalsVisibleTo("SpaceWarp.Core")]
 
 namespace SpaceWarpPatcher;
 
+[UsedImplicitly]
 public static class Patcher
 {
-    public static IEnumerable<string> TargetDLLs => new[] { "UnityEngine.CoreModule.dll" };
+    [UsedImplicitly]
+    public static IEnumerable<string> TargetDLLs => new[] { "UnityEngine.CoreModule.dll"};
 
-    public static void Patch(AssemblyDefinition asm)
+    [UsedImplicitly]
+    public static void Patch(ref AssemblyDefinition asm)
+    {
+        switch (asm.Name.Name)
+        {
+            // case "SpaceWarp":
+            //     PatchSpaceWarp(asm);
+            //     break;
+            case "UnityEngine.CoreModule":
+                PatchCoreModule(asm);
+                break;
+        }
+    }
+
+    // private static void PatchSpaceWarp(AssemblyDefinition asm)
+    // {
+    //     var modulePaths = $"{Paths.PluginPath}\\SpaceWarp\\modules";
+    //     var modules = new DirectoryInfo(modulePaths).EnumerateFiles("*.dll").Select(x => x.FullName)
+    //         .Select(AssemblyDefinition.ReadAssembly);
+    //     var types = modules.SelectMany(x => x.Modules).SelectMany(x => x.GetTypes()).Where(x => x.IsPublic);
+    //     var mainModule = asm.MainModule;
+    //     var importedTypes = types.Select(x => mainModule.ImportReference(x));
+    //     var constructor =
+    //         mainModule.ImportReference(typeof(TypeForwardedToAttribute).GetConstructor(new[] { typeof(Type) }));
+    //     var systemType = mainModule.ImportReference(typeof(Type));
+    //
+    //     CustomAttribute GetTypeForwardedToAttribute(TypeReference typeReference)
+    //     {
+    //         var attr = new CustomAttribute(constructor);
+    //         attr.ConstructorArguments.Add(new CustomAttributeArgument(systemType,typeReference.FullName));
+    //         return null;
+    //     }
+    //     mainModule.CustomAttributes.AddRange(importedTypes.Select(GetTypeForwardedToAttribute));
+    //     asm.Write("SpaceWarpPatched.dll");
+    // }
+
+    private static void PatchCoreModule(AssemblyDefinition asm)
     {
         // is this necessary? I (Windows10CE) didn't think so until i had to do it!
         var targetType = asm.MainModule.GetType("UnityEngine.Application");
@@ -49,12 +83,14 @@ public static class Patcher
     }
 }
 
+[UsedImplicitly]
 internal static class Delayer
 {
+    [UsedImplicitly]
     public static void PatchChainloaderStart()
     {
         ChainloaderPatch.LogSource = Logger.CreateLogSource("SW BIE Extensions");
-        string disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
+        var disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
         ChainloaderPatch.DisabledPluginsFilepath = disabledPluginsFilepath;
         if (!File.Exists(disabledPluginsFilepath))
         {
@@ -64,16 +100,16 @@ internal static class Delayer
         }
 
         ChainloaderPatch.DisabledPluginGuids = File.ReadAllLines(disabledPluginsFilepath);
-        ChainloaderPatch.DisabledPlugins = new();
+        ChainloaderPatch.DisabledPlugins = new List<PluginInfo>();
         Harmony.CreateAndPatchAll(typeof(ChainloaderPatch));
     }
 }
 
 [HarmonyPatch]
-internal static class ChainloaderPatch
+public static class ChainloaderPatch
 {
     internal static string[] DisabledPluginGuids;
-    internal static string DisabledPluginsFilepath;
+    public static string DisabledPluginsFilepath;
     internal static ManualLogSource LogSource;
     internal static List<PluginInfo> DisabledPlugins;
     internal static bool ModListChangedSinceLastRun;
@@ -83,108 +119,24 @@ internal static class ChainloaderPatch
             .Select(fileInfo => fileInfo.FullName)
             .ToArray();
 
-    private static bool IsDisabled(FileInfo jsonFile, string[] allDisabled)
-    {
-        var obj = JObject.Parse(File.ReadAllText(jsonFile.FullName));
-        if (!obj.ContainsKey("spec")) return false;
-        if (obj["spec"].Value<string>() is "1.2" or "1.0") return false;
-        return !allDisabled.Contains(obj["mod_id"].Value<string>());
-    }
-
-    private static (string name, string path) GetNameAndPath(FileInfo jsonFile)
-    {
-        var path = '"' + jsonFile.Directory.FullName.Replace("\"","\\\"").Replace("\\","\\\\") + '"';
-        var obj = JObject.Parse(File.ReadAllText(jsonFile.FullName));
-        var id = obj["mod_id"].Value<string>();
-        var replaced = id.Replace(".", "_")
-            .Replace(" ", "_")
-            .Replace("-", "_");
-        return (replaced, path);
-    }
-
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Chainloader), nameof(Chainloader.Start))]
     private static void PreStartActions()
     {
         var trueLogger = Logger.CreateLogSource("Roslyn Compiler");
         var changed = CompileRoslynMods(trueLogger);
-        GenerateSpaceWarpPathsDLL(changed, trueLogger);
-    }
-
-    private static void GenerateSpaceWarpPathsDLL(bool changed, ManualLogSource trueLogger)
-    {
-        var cacheLocation = Path.Combine(Paths.BepInExRootPath, "AssemblyCache");
-
+        PathsGenerator.GenerateSpaceWarpPathsDLL(changed, trueLogger);
         try
         {
-            var addressablePaths = Path.Combine(cacheLocation, "SpaceWarpPaths.dll");
-            if (changed || !File.Exists(addressablePaths))
-            {
-                // Preload newtonsoft.json
-                try
-                {
-                    Assembly.LoadFile(Path.Combine(Paths.ManagedPath, "Newtonsoft.Json.dll"));
-                }
-                catch (Exception e)
-                {
-                    trueLogger.LogError(e);
-                }
-
-                var disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
-                var allDisabled = File.ReadAllText(disabledPluginsFilepath)
-                    .Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                var allSwinfos =
-                    new DirectoryInfo(Path.Combine(Paths.BepInExRootPath, "plugins"))
-                        .EnumerateFiles("swinfo.json", SearchOption.AllDirectories).Where(x => IsDisabled(x, allDisabled))
-                        .Select(GetNameAndPath);
-                // Now we build the dll
-                var dll = "public static class SpaceWarpPaths {\n";
-                foreach (var swinfo in allSwinfos)
-                {
-                    dll += $"public static string {swinfo.name} = {swinfo.path};\n";
-                }
-
-                dll += "}";
-                trueLogger.LogInfo($"Compiling:\n{dll}");
-                var tree = CSharpSyntaxTree.ParseText(dll);
-                var references = AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && x.Location.Length > 0)
-                    .Select(x => MetadataReference.CreateFromFile(x.Location)).ToList();
-                var compilation = CSharpCompilation.Create("SpaceWarpPaths.dll", new[] { tree },references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-                var result = compilation.Emit(addressablePaths);
-                foreach (var diagnostic in result.Diagnostics)
-                {
-                    if (diagnostic.WarningLevel == 0)
-                    {
-                        trueLogger.LogError(diagnostic.Location + ": " + diagnostic);
-                    }
-                    else
-                    {
-                        trueLogger.LogInfo(diagnostic.Location + ": " + diagnostic);
-                    }
-                }
-
-                if (!result.Success)
-                {
-                    try
-                    {
-                        File.Delete(addressablePaths);
-                    }
-                    catch
-                    {
-                        //Ignored
-                    }
-
-                }
-            }
-
-            Assembly.LoadFile(addressablePaths);
+            SwinfoTransformer.TransformModSwinfos();
         }
         catch (Exception e)
         {
-            trueLogger.LogError(e);
-            //ignored
+            trueLogger.LogError(e.ToString());
         }
     }
+
+    
 
     private static bool CompileRoslynMods(ManualLogSource trueLogger)
     {
@@ -215,15 +167,15 @@ internal static class ChainloaderPatch
                 (new DirectoryInfo(Path.Combine(Paths.BepInExRootPath, "plugins")))
                 .EnumerateFiles("swinfo.json", SearchOption.AllDirectories).Select(x => File.ReadAllText(x.FullName)));
             allPluginsSwinfo += File.ReadAllText(disabledPluginsFilepath);
-            var hash = "";
-            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            string hash;
+            using (var md5 = System.Security.Cryptography.MD5.Create())
             {
-                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(allPluginsSwinfo);
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
-                StringBuilder sb = new System.Text.StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
+                var inputBytes = Encoding.ASCII.GetBytes(allPluginsSwinfo);
+                var hashBytes = md5.ComputeHash(inputBytes);
+                var sb = new StringBuilder();
+                foreach (var b in hashBytes)
                 {
-                    sb.Append(hashBytes[i].ToString("X2"));
+                    sb.Append(b.ToString("X2"));
                 }
 
                 hash = sb.ToString();
@@ -295,7 +247,7 @@ internal static class ChainloaderPatch
 
                 var logger = Logger.CreateLogSource(parent.Name + " compilation");
                 var allSource = AllSourceFiles(directory);
-                DateTime latestWriteTime = DateTime.FromBinary(0);
+                var latestWriteTime = DateTime.FromBinary(0);
 
 
                 var resultFileName = "roslyn-" + id;

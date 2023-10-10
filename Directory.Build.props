@@ -1,7 +1,8 @@
 <Project>
     <PropertyGroup>
-        <SpaceWarpVersion>1.4.3</SpaceWarpVersion>
+        <SpaceWarpVersion>1.5.0</SpaceWarpVersion>
         <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SpaceWarp</RootNamespace>
         <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -28,4 +29,23 @@
             System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute;
         </PolySharpIncludeGeneratedTypes>
     </PropertyGroup>
+
+<!--    <ItemGroup Label="Dependencies for build targets">-->
+<!--        <PackageReference Include="JsonPeek" Version="1.2.0" PrivateAssets="all"/>-->
+<!--    </ItemGroup>-->
+
+<!--    &lt;!&ndash; Define the main target &ndash;&gt;-->
+<!--    <Target Label="Reading properties from swinfo.json" Name="ReadPropertiesFromJson" BeforeTargets="PreBuildEvent">-->
+<!--        <JsonPeek ContentPath="$(SolutionDir)/SpaceWarpBuildTemplate/swinfo.json" Query="$">-->
+<!--            <Output TaskParameter="Result" ItemName="Swinfo"/>-->
+<!--        </JsonPeek>-->
+<!--        <JsonPeek ContentPath="$(SolutionDir)/SpaceWarpBuildTemplate/swinfo.json" Query="$.dependencies">-->
+<!--            <Output TaskParameter="Result" ItemName="Dependencies"/>-->
+<!--        </JsonPeek>-->
+
+<!--        &lt;!&ndash; Extract properties from the JSON &ndash;&gt;-->
+<!--        <PropertyGroup>-->
+<!--            <SpaceWarpVersion>@(Swinfo -> '%(version)')</SpaceWarpVersion>-->
+<!--        </PropertyGroup>-->
+<!--    </Target>-->
 </Project>
