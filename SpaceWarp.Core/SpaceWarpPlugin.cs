@@ -41,8 +41,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     public SpaceWarpPlugin()
     {
-        BepInEx.Bootstrap.Chainloader.ManagerObject.Persist();
-        BepInEx.Configuration.ConfigFile.CoreConfig["Chainloader", "HideManagerGameObject"].BoxedValue = true;
         // Load the type forwarders
         Assembly.LoadFile(
             $"{new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName}\\SpaceWarp.dll");
@@ -62,6 +60,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     }
     public void Awake()
     {
+        BepInEx.Bootstrap.Chainloader.ManagerObject.Persist();
         IOProvider.Init();
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
