@@ -111,11 +111,16 @@ public class VersionChecking : SpaceWarpModule
             {
                 ModuleLogger.LogError($"Unable to check version for {guid} due to error {e}");
             }
-
+            
             info.Outdated = isOutdated;
             info.Unsupported = unsupported;
+            if (isOutdated)
+            {
+                ModuleLogger.LogWarning($"{guid} is outdated");
+            }
             if (unsupported)
             {
+                ModuleLogger.LogWarning($"{guid} is unsupported");
                 info.SWInfo.SupportedKsp2Versions = newKSP2Versions;
             }
         }
@@ -204,6 +209,11 @@ public class VersionChecking : SpaceWarpModule
         catch (Exception e)
         {
             ModuleLogger.LogError($"Unable to check KSP version for {guid} due to error {e}");
+        }
+
+        if (unsupported)
+        {
+            ModuleLogger.LogWarning($"{guid} is unsupported");
         }
 
         info.Unsupported = info.Unsupported || unsupported;
