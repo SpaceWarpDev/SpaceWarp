@@ -41,6 +41,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     public SpaceWarpPlugin()
     {
+        // Load the type forwarders
         Assembly.LoadFile(
             $"{new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName}\\SpaceWarp.dll");
         Logger = base.Logger;
@@ -59,6 +60,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     }
     public void Awake()
     {
+        BepInEx.Bootstrap.Chainloader.ManagerObject.Persist();
         IOProvider.Init();
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
@@ -98,7 +100,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public override void OnPreInitialized()
     {
         // Persist all game objects so I don't need to stomp on config
-        BepInEx.Bootstrap.Chainloader.ManagerObject.Persist();
         ModuleManager.PreInitializeAllModules();
     }
 

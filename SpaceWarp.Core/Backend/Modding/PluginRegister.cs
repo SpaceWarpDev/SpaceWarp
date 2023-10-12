@@ -187,9 +187,10 @@ internal static class PluginRegister
     private static string ClearPrerelease(string version)
     {
         var semver = new SemanticVersion(version);
-        return $"{semver.Major}.{semver.Minor}.{semver.Patch}{(semver.VersionNumbers.Count > 3 ? $".{semver.VersionNumbers[3]}" : "")}";
+        return
+            $"{semver.Major}.{semver.Minor}.{semver.Patch}{(semver.VersionNumbers.Count > 3 ? $".{semver.VersionNumbers[3]}" : "")}";
     }
-    
+
     private static bool AssertMatchingVersions(
         SpaceWarpPluginDescriptor descriptor,
         BaseUnityPlugin plugin,
@@ -460,7 +461,10 @@ internal static class PluginRegister
             {
                 info.Location = plugin.Key;
                 if (PluginList.AllPlugins.Any(
-                        x => string.Equals(x.Guid, info.Metadata.GUID, StringComparison.InvariantCultureIgnoreCase)
+                        x => string.Equals(x.Guid, info.Metadata.GUID, StringComparison.InvariantCultureIgnoreCase) ||
+                             (x.Plugin is BaseUnityPlugin baseUnityPlugin && string.Equals(
+                                 baseUnityPlugin.Info.Metadata.GUID, info.Metadata.GUID,
+                                 StringComparison.InvariantCultureIgnoreCase))
                     )) continue;
 
                 var descriptor = new SpaceWarpPluginDescriptor(

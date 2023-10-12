@@ -86,6 +86,7 @@ public sealed record SpecVersion
     public static bool operator <=(SpecVersion a, SpecVersion b) => Compare(a, b) <= 0;
     public static bool operator >=(SpecVersion a, SpecVersion b) => Compare(a, b) >= 0;
 
+    
     private static int Compare(SpecVersion a, SpecVersion b)
     {
         if (a.Major != b.Major)

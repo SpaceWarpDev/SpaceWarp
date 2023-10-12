@@ -167,6 +167,7 @@ public static class PluginList
 
     public static SpaceWarpErrorDescription GetErrorDescriptor(SpaceWarpPluginDescriptor plugin)
     {
+        
         if (_allErroredPlugins.Any(x => x.Plugin == plugin))
         {
             return _allErroredPlugins.First(x => x.Plugin == plugin);
