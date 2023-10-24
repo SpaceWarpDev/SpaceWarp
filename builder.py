@@ -1,6 +1,6 @@
 import argparse
 import os
-import shlex
+import platform
 import shutil
 import subprocess
 import zipfile
@@ -212,17 +212,17 @@ def nuget_pack():
     command_str = subprocess.list2cmdline(nuget_args)
     print(f"=> Executing: {command_str}")
 
-    encoding = get_console_encoding()
+    encoding = get_console_encoding() if platform.system() == 'Windows' else 'utf-8'
 
     output = subprocess.run(args=command_str, capture_output=True)
     print("    |=>| STDOUT")
 
-    for line in str(output.stdout, get_console_encoding()).splitlines():
+    for line in str(output.stdout, encoding).splitlines():
         print(f"        {line}")
 
     print("    |=>| STDERR")
 
-    for line in str(output.stderr, get_console_encoding()).splitlines():
+    for line in str(output.stderr, encoding).splitlines():
         print(f"        {line}")
 
     shutil.rmtree(os.path.join(BUILD_DIR, "nuget_temp"))
