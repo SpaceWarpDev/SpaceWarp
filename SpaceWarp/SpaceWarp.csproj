@@ -26,30 +26,4 @@
             <IncludeAssets>SpaceWarpPatcher.dll</IncludeAssets>
         </ProjectReference>
     </ItemGroup>
-
-    <!-- Nuget packaging configuration -->
-    <PropertyGroup>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Authors>Space Warp contributors</Authors>
-        <Description>A C# modding API for KSP2 built on top of BepInEx</Description>
-        <PackageIcon>icon.png</PackageIcon>
-        <PackageId>SpaceWarp</PackageId>
-        <PackageLicenseUrl>https://raw.githubusercontent.com/SpaceWarpDev/SpaceWarp/main/LICENSE</PackageLicenseUrl>
-        <PackageOutputPath>..\build</PackageOutputPath>
-        <PackageProjectUrl>https://spacewarp.org</PackageProjectUrl>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>SpaceWarp;KSP2;modding</PackageTags>
-        <RepositoryUrl>https://github.com/SpaceWarpDev/SpaceWarp</RepositoryUrl>
-        <Title>Space Warp</Title>
-        <NoWarn>$(NoWarn),NU5118,NU5125</NoWarn>
-    </PropertyGroup>
-
-    <Target Name="IncludeAllFilesInTargetDir" AfterTargets="Build">
-        <ItemGroup>
-            <None Include="..\images\icon.png" Pack="true" PackagePath="\" />
-            <None Include="..\LICENSE" Pack="true" PackagePath="\" />
-            <None Include="..\.github\README.md" Pack="true" PackagePath="\" />
-            <None Include="$(TargetDir)\**" Pack="true" PackagePath="lib\$(TargetFramework)" />
-        </ItemGroup>
-    </Target>
 </Project>

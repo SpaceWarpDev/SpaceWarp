@@ -1,10 +1,9 @@
 import argparse
-from ast import mod
 import os
+import shlex
 import shutil
 import subprocess
 import zipfile
-
 
 TEMPLATE_DIR = os.path.abspath("SpaceWarpBuildTemplate")
 SPACEWARP_DIR = os.path.abspath("SpaceWarp")
@@ -14,8 +13,7 @@ PATCHER_LIB_DIR = os.path.abspath("SpaceWarpPatcherLibraries")
 BUILD_DIR = os.path.abspath("build")
 THIRD_PARTY = os.path.abspath("ThirdParty")
 
-MODULES = ["Game","Sound","UI","VersionChecking","Messaging"]
-
+MODULES = ["Game", "Sound", "UI", "VersionChecking", "Messaging"]
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-r", "--release", help="Build a release version", action="store_true")
@@ -40,14 +38,18 @@ def clean():
 
 
 def build(release=False):
-    dotnet_args = ["dotnet", "build", os.path.join(SPACEWARP_DIR,"SpaceWarp.csproj"),  "-c", "Release" if release else "Debug"]
-    dotnet_core_args = ["dotnet", "build", os.path.join(SPACEWARP_CORE_DIR,"SpaceWarp.Core.csproj"),  "-c", "Release" if release else "Debug"]
+    dotnet_args = ["dotnet", "build", os.path.join(SPACEWARP_DIR, "SpaceWarp.csproj"), "-c",
+                   "Release" if release else "Debug"]
+    dotnet_core_args = ["dotnet", "build", os.path.join(SPACEWARP_CORE_DIR, "SpaceWarp.Core.csproj"), "-c",
+                        "Release" if release else "Debug"]
     build_output_dir = os.path.join(SPACEWARP_DIR, "bin", "Release" if release else "Debug")
     build_output_dir_core = os.path.join(SPACEWARP_CORE_DIR, "bin", "Release" if release else "Debug")
     output_dir = os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "SpaceWarp")
+    nuget_temp_dir = os.path.join(BUILD_DIR, "nuget_temp")
     # copy over the internals of the template
     print("=> Creating build directory...")
     os.makedirs(os.path.join(BUILD_DIR, "SpaceWarp"), True)
+    os.makedirs(nuget_temp_dir, True)
     print("=> Copying BepInEx")
     os.makedirs(os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins"), True)
     os.makedirs(os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "patchers", "SpaceWarp"), True)
@@ -74,7 +76,7 @@ def build(release=False):
 
     for line in str(output.stderr, "utf-8").splitlines():
         print(f"        {line}")
-    
+
     print(f"=> Executing: {' '.join(dotnet_core_args)}")
 
     output = subprocess.run(args=dotnet_core_args, capture_output=True)
@@ -88,14 +90,14 @@ def build(release=False):
     for line in str(output.stderr, "utf-8").splitlines():
         print(f"        {line}")
 
-    print("=> Compiling Modules")    
-    os.makedirs(os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "SpaceWarp","modules"), True)
+    print("=> Compiling Modules")
+    os.makedirs(os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "SpaceWarp", "modules"), True)
     for module in MODULES:
-        path = os.path.abspath("SpaceWarp." +module)
-        csproj = os.path.join(path,"SpaceWarp."+module+".csproj")
+        path = os.path.abspath("SpaceWarp." + module)
+        csproj = os.path.join(path, "SpaceWarp." + module + ".csproj")
         module_args = ["dotnet", "build", csproj, "-c", "Release" if release else "Debug"]
-        module_build_output_dir = os.path.join(path,"bin","Release" if release else "Debug")
-        module_output_dir = os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "SpaceWarp","modules")
+        module_build_output_dir = os.path.join(path, "bin", "Release" if release else "Debug")
+        module_output_dir = os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "plugins", "SpaceWarp", "modules")
 
         print(f"=> Executing: {' '.join(module_args)}")
 
@@ -111,17 +113,24 @@ def build(release=False):
             print(f"        {line}")
 
         print("=> Copying module")
-    
+
         def shutil_copy_module(file):
             shutil.copyfile(os.path.join(module_build_output_dir, file), os.path.join(module_output_dir, file))
-        if not release and os.path.exists(os.path.join(module_build_output_dir,"SpaceWarp."+module+".pdb")):
-            shutil_copy_module("SpaceWarp."+module+".pdb")
-        shutil_copy_module("SpaceWarp."+module+".dll")
-        
+
+        def shutil_copy_nuget_module(file):
+            shutil.copyfile(os.path.join(module_build_output_dir, file), os.path.join(nuget_temp_dir, file))
+
+        if not release and os.path.exists(os.path.join(module_build_output_dir, "SpaceWarp." + module + ".pdb")):
+            shutil_copy_module("SpaceWarp." + module + ".pdb")
+
+        shutil_copy_module("SpaceWarp." + module + ".dll")
+        shutil_copy_nuget_module("SpaceWarp." + module + ".dll")
+        shutil_copy_nuget_module("SpaceWarp." + module + ".xml")
+
     # patcher libraries
     patcher_library_dir = os.path.join(BUILD_DIR, "SpaceWarp", "BepInEx", "patchers", "SpaceWarp", "lib")
     print(f"=> Copying Patcher Libraries")
-    shutil.copytree(PATCHER_LIB_DIR,patcher_library_dir)
+    shutil.copytree(PATCHER_LIB_DIR, patcher_library_dir)
 
     # patcher build
     patcher_dotnet_args = ["dotnet", "build", os.path.join(PATCHER_DIR, "SpaceWarpPatcher.csproj"), "-c",
@@ -146,20 +155,77 @@ def build(release=False):
 
     def shutil_copy(file):
         shutil.copyfile(os.path.join(build_output_dir, file), os.path.join(output_dir, file))
+
     def shutil_copy_core(file):
         shutil.copyfile(os.path.join(build_output_dir_core, file), os.path.join(output_dir, file))
+
     def shutil_copy_patcher(file):
         shutil.copyfile(os.path.join(patcher_build_output_dir, file), os.path.join(patcher_output_dir, file))
 
-    if not release and os.path.exists(os.path.join(build_output_dir_core,"SpaceWarp.Core.pdb")):
+    def shutil_nuget_copy(file):
+        shutil.copyfile(os.path.join(build_output_dir, file), os.path.join(nuget_temp_dir, file))
+
+    def shutil_nuget_copy_core(file):
+        shutil.copyfile(os.path.join(build_output_dir_core, file), os.path.join(nuget_temp_dir, file))
+
+    def shutil_nuget_copy_patcher(file):
+        shutil.copyfile(os.path.join(patcher_build_output_dir, file), os.path.join(nuget_temp_dir, file))
+
+    if not release and os.path.exists(os.path.join(build_output_dir_core, "SpaceWarp.Core.pdb")):
         shutil_copy_core("SpaceWarp.Core.pdb")
     if not release and os.path.exists(os.path.join(build_output_dir, "SpaceWarp.pdb")):
         shutil_copy("SpaceWarp.pdb")
     if not release and os.path.exists(os.path.join(patcher_build_output_dir, "SpaceWarpPatcher.pdb")):
         shutil_copy_patcher("SpaceWarpPatcher.pdb")
+
     shutil_copy("SpaceWarp.dll")
-    shutil_copy_patcher("SpaceWarpPatcher.dll")
+    shutil_nuget_copy("SpaceWarp.dll")
+    shutil_nuget_copy("SpaceWarp.xml")
+
     shutil_copy_core("SpaceWarp.Core.dll")
+    shutil_nuget_copy_core("SpaceWarp.Core.dll")
+    shutil_nuget_copy_core("SpaceWarp.Core.xml")
+
+    shutil_copy_patcher("SpaceWarpPatcher.dll")
+    shutil_nuget_copy_patcher("SpaceWarpPatcher.dll")
+    shutil_nuget_copy_patcher("SpaceWarpPatcher.xml")
+
+
+def get_console_encoding():
+    command = 'powershell -command "[Console]::OutputEncoding.WebName"'
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    if result.returncode == 0:
+        encoding_name = result.stdout.strip()
+        return encoding_name
+    else:
+        raise RuntimeError(f'Failed to get console encoding: {result.stderr}')
+
+
+def nuget_pack():
+    nuget_args = [
+        "nuget",
+        "pack",
+        os.path.abspath("SpaceWarp.nuspec"),
+        "-OutputDirectory",
+        BUILD_DIR
+    ]
+    command_str = subprocess.list2cmdline(nuget_args)
+    print(f"=> Executing: {command_str}")
+
+    encoding = get_console_encoding()
+
+    output = subprocess.run(args=command_str, capture_output=True)
+    print("    |=>| STDOUT")
+
+    for line in str(output.stdout, get_console_encoding()).splitlines():
+        print(f"        {line}")
+
+    print("    |=>| STDERR")
+
+    for line in str(output.stderr, get_console_encoding()).splitlines():
+        print(f"        {line}")
+
+    shutil.rmtree(os.path.join(BUILD_DIR, "nuget_temp"))
 
 
 def create_zip_name(prefix):
@@ -185,7 +251,7 @@ def compress(release=False):
 
 def main():
     args = parser.parse_args()
-    total_steps = 3
+    total_steps = 4
     print(f"====> [1/{total_steps}] Cleaning...")
 
     clean()
@@ -194,7 +260,11 @@ def main():
 
     build(args.release)
 
-    print(f"====> [3/{total_steps}] Compressing...")
+    print(f"====> [3/{total_steps}] Packing NuGet...")
+
+    nuget_pack()
+
+    print(f"====> [4/{total_steps}] Compressing...")
 
     compress(args.release)
 
