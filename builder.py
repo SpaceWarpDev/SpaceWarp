@@ -202,28 +202,29 @@ def get_console_encoding():
 
 
 def nuget_pack():
-    nuget_args = [
-        "nuget",
-        "pack",
-        os.path.abspath("SpaceWarp.nuspec"),
-        "-OutputDirectory",
-        BUILD_DIR
-    ]
-    command_str = subprocess.list2cmdline(nuget_args)
-    print(f"=> Executing: {command_str}")
+    if platform.system() == "Windows":
+        nuget_args = [
+            "nuget",
+            "pack",
+            os.path.abspath("SpaceWarp.nuspec"),
+            "-OutputDirectory",
+            BUILD_DIR
+        ]
+        command_str = subprocess.list2cmdline(nuget_args)
+        print(f"=> Executing: {command_str}")
 
-    encoding = get_console_encoding() if platform.system() == 'Windows' else 'utf-8'
+        encoding = get_console_encoding()
 
-    output = subprocess.run(args=command_str, capture_output=True)
-    print("    |=>| STDOUT")
+        output = subprocess.run(args=command_str, capture_output=True)
+        print("    |=>| STDOUT")
 
-    for line in str(output.stdout, encoding).splitlines():
-        print(f"        {line}")
+        for line in str(output.stdout, encoding).splitlines():
+            print(f"        {line}")
 
-    print("    |=>| STDERR")
+        print("    |=>| STDERR")
 
-    for line in str(output.stderr, encoding).splitlines():
-        print(f"        {line}")
+        for line in str(output.stderr, encoding).splitlines():
+            print(f"        {line}")
 
     shutil.rmtree(os.path.join(BUILD_DIR, "nuget_temp"))
 
