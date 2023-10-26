@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
-        <SpaceWarpVersion>1.5.1</SpaceWarpVersion>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <SpaceWarpVersion>1.5.2</SpaceWarpVersion>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <RootNamespace>SpaceWarp</RootNamespace>
         <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
