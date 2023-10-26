@@ -11,7 +11,7 @@
     {
       "id":  "UitkForKsp2",
       "version": {
-        "min": "1.2.0",
+        "min": "2.0.0",
         "max": "*"
       }
     },
