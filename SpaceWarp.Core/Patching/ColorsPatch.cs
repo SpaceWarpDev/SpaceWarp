@@ -6,6 +6,7 @@ using HarmonyLib;
 using KSP.Game;
 using KSP.Modules;
 using KSP.OAB;
+using KSP.Sim.impl;
 using SpaceWarp.API.Assets;
 using UnityEngine;
 
@@ -29,6 +30,24 @@ internal class ColorsPatch
     public static void Prefix(IObjectAssemblyAvailablePart obj, ref GameObject prefab)
     {
         foreach (var renderer in prefab.GetComponentsInChildren<Renderer>())
+        {
+            var shaderName = renderer.material.shader.name;
+            if (shaderName is not ("Parts Replace" or "KSP2/Parts/Paintable")) continue;
+            Material material;
+            var mat = new Material(Shader.Find(Ksp2OpaquePath))
+            {
+                name = (material = renderer.material).name
+            };
+            mat.CopyPropertiesFromMaterial(material);
+            renderer.material = mat;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(SimulationObjectView), nameof(SimulationObjectView.InitializeView))]
+    public static void UpdateColorsInFlight(GameObject instance)
+    {
+        foreach (var renderer in instance.GetComponentsInChildren<Renderer>())
         {
             var shaderName = renderer.material.shader.name;
             if (shaderName is not ("Parts Replace" or "KSP2/Parts/Paintable")) continue;
