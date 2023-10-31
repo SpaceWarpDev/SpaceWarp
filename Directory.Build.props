@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <SpaceWarpVersion>1.5.2</SpaceWarpVersion>
+        <SpaceWarpVersion>1.5.3</SpaceWarpVersion>
         <TargetFramework>netstandard2.1</TargetFramework>
         <RootNamespace>SpaceWarp</RootNamespace>
         <LangVersion>11</LangVersion>
