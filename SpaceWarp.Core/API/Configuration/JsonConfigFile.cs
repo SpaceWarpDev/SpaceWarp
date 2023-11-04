@@ -4,6 +4,8 @@ using System.IO;
 using System.Text;
 using JetBrains.Annotations;
 using KSP.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
@@ -68,6 +70,22 @@ public class JsonConfigFile : IConfigFile
         return true;
     }
 
+    private static List<JsonConverter> _defaultConverters;
+
+    public static List<JsonConverter> DefaultConverters
+    {
+        get
+        {
+            if (_defaultConverters == null)
+            {
+                _defaultConverters = IOProvider.CreateDefaultConverters();
+                _defaultConverters.Add(new StringEnumConverter());
+            }
+
+            return _defaultConverters;
+        }
+    }
+
     private static bool DumpEntry(StringBuilder result, bool hadPreviousKey, KeyValuePair<string, JsonConfigEntry> entry)
     {
         if (hadPreviousKey)
@@ -85,7 +103,7 @@ public class JsonConfigFile : IConfigFile
             }
         }
 
-        var serialized = IOProvider.ToJson(entry.Value.Value);
+        var serialized = JsonConvert.SerializeObject(entry.Value.Value,Formatting.Indented,DefaultConverters.ToArray());
         var serializedLines = serialized.Split('\n').Select(x => x.TrimEnd()).ToArray();
         if (serializedLines.Length > 1)
         {

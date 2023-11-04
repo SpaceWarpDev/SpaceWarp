@@ -38,8 +38,16 @@ internal static class FunctionalLoadingActions
 
             var path = internalPath + "/" + assetName;
             path = path.ToLower();
-            var asset = assetBundle.LoadAsset(name);
-            assets.Add((path, asset));
+            try
+            {
+                SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Attempting to load asset {name} from bundle at {filename}");
+                var asset = assetBundle.LoadAsset(name);
+                assets.Add((path, asset));
+            }
+            catch (Exception e)
+            {
+                SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Error loading asset {name} from bundle at {filename}: {e}");
+            }
         }
 
         return assets;

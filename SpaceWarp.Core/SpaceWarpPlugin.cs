@@ -61,7 +61,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     public void Awake()
     {
         BepInEx.Bootstrap.Chainloader.ManagerObject.Persist();
-        IOProvider.Init();
+        // IOProvider.Init();
 
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
         ModuleManager.LoadAllModules();
