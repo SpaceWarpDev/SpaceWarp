@@ -16,27 +16,28 @@ public static class ModSaves
     /// <summary>
     /// Registers your mod data for saving and loading events.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="modGuid">Your mod GUID. Or, technically, any kind of string can be passed here, but what is mandatory is that it's unique compared to what other mods will use.</param>
+    /// <typeparam name="T">Any object</typeparam>
+    /// <param name="modGuid">Your mod GUID. Or, technically, any kind of string can be passed here, but what is mandatory is that it's unique compared to what other mods will use.</param>    
+    /// <param name="onSave">Function that will execute when a SAVE event is triggered. 'NULL' is also valid here if you don't need a callback.</param>
+    /// <param name="onLoad">Function that will execute when a LOAD event is triggered. 'NULL' is also valid here if you don't need a callback.</param>
     /// <param name="saveData">Your object that will be saved to a save file during a save event and that will be updated when a load event pulls new data. Ensure that a new instance of this object is NOT created after registration.</param>
-    /// <param name="saveEventCallback">Function that will execute when a SAVE event is triggered. 'NULL' is also valid here if you don't need a callback.</param>
-    /// <param name="loadEventCallback">Function that will execute when a LOAD event is triggered. 'NULL' is also valid here if you don't need a callback.</param>
-    public static void RegisterSaveLoadGameData<T>(string modGuid, T saveData, Action<T> saveEventCallback, Action<T> loadEventCallback)
+    /// <returns>T saveData object you passed as a parameter, or a default instance of object T if you didn't pass anything</returns>
+    public static T RegisterSaveLoadGameData<T>(string modGuid, Action<T> onSave, Action<T> onLoad, T saveData = default)
     {
         // Create adapter functions to convert Action<T> to CallbackFunctionDelegate
         SaveGameCallbackFunctionDelegate saveCallbackAdapter = (object saveData) =>
         {
-            if (saveEventCallback != null && saveData is T data)
+            if (onSave != null && saveData is T data)
             {
-                saveEventCallback(data);
+                onSave(data);
             }
         };
 
         SaveGameCallbackFunctionDelegate loadCallbackAdapter = (object saveData) =>
         {
-            if (loadEventCallback != null && saveData is T data)
+            if (onLoad != null && saveData is T data)
             {
-                loadEventCallback(data);
+                onLoad(data);
             }
         };
 
@@ -47,8 +48,12 @@ public static class ModSaves
         }
         else
         {
-            InternalPluginSaveData.Add(new PluginSaveData { ModGuid = modGuid, SaveData = saveData, SaveEventCallback = saveCallbackAdapter, LoadEventCallback = loadCallbackAdapter });
+            if (saveData == null)
+                saveData = Activator.CreateInstance<T>();
+
+            InternalPluginSaveData.Add(new PluginSaveData { ModGuid = modGuid, SaveEventCallback = saveCallbackAdapter, LoadEventCallback = loadCallbackAdapter, SaveData = saveData });
             _logger.LogInfo($"Registered '{modGuid}' for save/load events.");
+            return saveData;
         }
     }
 
@@ -69,14 +74,15 @@ public static class ModSaves
     /// <summary>
     /// Unregisters then again registers your mod data for saving and loading events
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="modGuid">Your mod GUID. Or, technically, any kind of string can be passed here, but what is mandatory is that it's unique compared to what other mods will use.</param>
+    /// <typeparam name="T"> Any object</typeparam>
+    /// <param name="modGuid">Your mod GUID. Or, technically, any kind of string can be passed here, but what is mandatory is that it's unique compared to what other mods will use.</param>    
+    /// <param name="onSave">Function that will execute when a SAVE event is triggered. 'NULL' is also valid here if you don't need a callback.</param>
+    /// <param name="onLoad">Function that will execute when a LOAD event is triggered. 'NULL' is also valid here if you don't need a callback.</param>
     /// <param name="saveData">Your object that will be saved to a save file during a save event and that will be updated when a load event pulls new data. Ensure that a new instance of this object is NOT created after registration.</param>
-    /// <param name="saveEventCallback">Function that will execute when a SAVE event is triggered. 'NULL' is also valid here if you don't need a callback.</param>
-    /// <param name="loadEventCallback">Function that will execute when a LOAD event is triggered. 'NULL' is also valid here if you don't need a callback.</param>
-    public static void ReregisterSaveLoadGameData<T>(string modGuid, T saveData, Action<T> saveEventCallback, Action<T> loadEventCallback)
+    /// <returns>T saveData object you passed as a parameter, or a default instance of object T if you didn't pass anything</returns>
+    public static T ReregisterSaveLoadGameData<T>(string modGuid, Action<T> onSave, Action<T> onLoad, T saveData = default(T))
     {
         UnRegisterSaveLoadGameData(modGuid);
-        RegisterSaveLoadGameData<T>(modGuid, saveData, saveEventCallback, loadEventCallback);
+        return RegisterSaveLoadGameData<T>(modGuid, onSave, onLoad, saveData);
     }
 }
