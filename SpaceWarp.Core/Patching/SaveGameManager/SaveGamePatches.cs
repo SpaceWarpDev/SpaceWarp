@@ -20,7 +20,7 @@ internal class SaveLoadPatches
     [HarmonyPatch(new Type[] { typeof(string), typeof(LoadGameData) })]
     private static void InjectPluginSaveGameData(string filename, LoadGameData data, SerializeGameDataFlowAction __instance)
     {
-        // Skip plugin data injection if there are not mods that have registered for save/load actions
+        // Skip plugin data injection if there are no mods that have registered for save/load actions
         if (ModSaves.InternalPluginSaveData.Count == 0)
             return;
 
