@@ -15,7 +15,8 @@ public class SpaceWarpPluginDescriptor
         ModInfo swInfo,
         DirectoryInfo folder,
         bool doLoadingActions = true,
-        [CanBeNull] IConfigFile configFile = null
+        [CanBeNull] IConfigFile configFile = null,
+        [CanBeNull] SaveConfigFile saveConfigFile = null
     )
     {
         Plugin = plugin;
@@ -25,6 +26,7 @@ public class SpaceWarpPluginDescriptor
         Folder = folder;
         DoLoadingActions = doLoadingActions;
         ConfigFile = configFile;
+        SaveConfigFile = saveConfigFile;
     }
 
     [CanBeNull] public ISpaceWarpMod Plugin;
@@ -34,6 +36,7 @@ public class SpaceWarpPluginDescriptor
     public readonly DirectoryInfo Folder;
     public bool DoLoadingActions;
     [CanBeNull] public IConfigFile ConfigFile;
+    [CanBeNull] public SaveConfigFile SaveConfigFile;
 
     // Set by the version checking system
     public bool Outdated;

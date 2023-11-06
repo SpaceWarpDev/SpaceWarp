@@ -16,7 +16,7 @@ public class JsonConfigFile : IConfigFile
 {
     [CanBeNull] private JObject _previousConfigObject;
 
-    private Dictionary<string, Dictionary<string, JsonConfigEntry>> _currentEntries = new();
+    internal Dictionary<string, Dictionary<string, JsonConfigEntry>> CurrentEntries = new();
     private readonly string _file;
 
     public JsonConfigFile(string file)
@@ -40,11 +40,11 @@ public class JsonConfigFile : IConfigFile
 
     public void Save()
     {
-        if (!_currentEntries.Any(value => value.Value.Count > 0)) return;
+        if (!CurrentEntries.Any(value => value.Value.Count > 0)) return;
         var result = new StringBuilder();
         result.AppendLine("{");
         var hadPreviousSection = false;
-        foreach (var section in _currentEntries.Where(section => section.Value.Count > 0))
+        foreach (var section in CurrentEntries.Where(section => section.Value.Count > 0))
         {
             hadPreviousSection = DumpSection(hadPreviousSection, result, section);
         }
@@ -128,15 +128,15 @@ public class JsonConfigFile : IConfigFile
         return true;
     }
 
-    public IConfigEntry this[string section, string key] => _currentEntries[section][key];
+    public IConfigEntry this[string section, string key] => CurrentEntries[section][key];
 
     public IConfigEntry Bind<T>(string section, string key, T defaultValue = default, string description = "")
     {
         // So now we have to check if its already bound, and/or if the previous config object has it
-        if (!_currentEntries.TryGetValue(section, out var previousSection))
+        if (!CurrentEntries.TryGetValue(section, out var previousSection))
         {
             previousSection = new Dictionary<string, JsonConfigEntry>();
-            _currentEntries.Add(section,previousSection);
+            CurrentEntries.Add(section,previousSection);
         }
 
         if (previousSection.TryGetValue(key, out var result))
@@ -173,7 +173,51 @@ public class JsonConfigFile : IConfigFile
         return previousSection[key];
     }
 
-    public IReadOnlyList<string> Sections => _currentEntries.Keys.ToList();
+    public IConfigEntry Bind(Type type, string section, string key, object defaultValue = default,
+        string description = "")
+    {
+        // So now we have to check if its already bound, and/or if the previous config object has it
+        if (!CurrentEntries.TryGetValue(section, out var previousSection))
+        {
+            previousSection = new Dictionary<string, JsonConfigEntry>();
+            CurrentEntries.Add(section,previousSection);
+        }
 
-    public IReadOnlyList<string> this[string section] => _currentEntries[section].Keys.ToList();
+        if (previousSection.TryGetValue(key, out var result))
+        {
+            return result;
+        }
+
+        if (_previousConfigObject != null && _previousConfigObject.TryGetValue(section, out var sect))
+        {
+            try
+            {
+                if (sect is JObject obj && obj.TryGetValue(key, out var value))
+                {
+                    var previousValue = value.ToObject(type);
+                    previousSection[key] = new JsonConfigEntry(this, type, description, previousValue);
+                }
+                else
+                {
+                    previousSection[key] = new JsonConfigEntry(this, type, description, defaultValue);
+                }
+            }
+            catch
+            {
+                previousSection[key] = new JsonConfigEntry(this, type, description, defaultValue);
+                // ignored
+            }
+        }
+        else
+        {
+            previousSection[key] = new JsonConfigEntry(this, type, description, defaultValue);
+        }
+
+        Save();
+        return previousSection[key];
+    }
+
+    public IReadOnlyList<string> Sections => CurrentEntries.Keys.ToList();
+
+    public IReadOnlyList<string> this[string section] => CurrentEntries[section].Keys.ToList();
 }

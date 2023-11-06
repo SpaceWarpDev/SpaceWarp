@@ -17,5 +17,7 @@ public interface ISpaceWarpMod
 
     public IConfigFile SWConfiguration { get; }
 
+    public SaveConfigFile CampaignConfiguration { get; }
+
     public SpaceWarpPluginDescriptor SWMetadata { get; set; }
 }

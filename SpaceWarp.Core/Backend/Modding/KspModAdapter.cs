@@ -33,4 +33,7 @@ internal class KspModAdapter : MonoBehaviour, ISpaceWarpMod
     public ILogger SWLogger { get; private set; }
     public IConfigFile SWConfiguration => new EmptyConfigFile();
     public SpaceWarpPluginDescriptor SWMetadata { get; set; }
+    
+    private SaveConfigFile _saveConfig;
+    public SaveConfigFile CampaignConfiguration => _saveConfig ??= new SaveConfigFile();
 }
