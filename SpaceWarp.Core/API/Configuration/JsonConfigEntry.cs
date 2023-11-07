@@ -8,6 +8,7 @@ public class JsonConfigEntry : IConfigEntry
 {
     private readonly JsonConfigFile _configFile;
     private object _value;
+    public event Action<object, object> Callbacks; 
     
 
     public JsonConfigEntry(JsonConfigFile configFile, Type type, string description, object value, IValueConstraint constraint = null)
@@ -25,6 +26,7 @@ public class JsonConfigEntry : IConfigEntry
         get => _value;
         set
         {
+            Callbacks?.Invoke(_value, value);
             _value = value;
             _configFile.Save();
         }
@@ -56,4 +58,8 @@ public class JsonConfigEntry : IConfigEntry
 
     public string Description { get; }
     public IValueConstraint Constraint { get; }
+    public void RegisterCallback(Action<object, object> valueChangedCallback)
+    {
+        Callbacks += valueChangedCallback;
+    }
 }

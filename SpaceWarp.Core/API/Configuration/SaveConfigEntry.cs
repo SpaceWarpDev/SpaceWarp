@@ -9,6 +9,7 @@ public class SaveConfigEntry : IConfigEntry
 
     internal object InMemoryValue;
     internal object DefaultValue;
+    public event Action<object, object> Callbacks;
 
     public SaveConfigEntry(string section, string key, string description, Type valueType, object defaultValue, IValueConstraint constraint)
     {
@@ -31,10 +32,12 @@ public class SaveConfigEntry : IConfigEntry
         {
             if (BoundEntry != null)
             {
+                Callbacks?.Invoke(BoundEntry.Value, value);
                 BoundEntry.Value = value;
             }
             else
             {
+                Callbacks?.Invoke(InMemoryValue, value);
                 InMemoryValue = value;
             }
         }
@@ -71,6 +74,10 @@ public class SaveConfigEntry : IConfigEntry
 
     public string Description { get; }
     public IValueConstraint Constraint { get; }
+    public void RegisterCallback(Action<object, object> valueChangedCallback)
+    {
+        Callbacks += valueChangedCallback;
+    }
 
     // The moment we bind to a new config file, reset the defaults
     internal void Bind(JsonConfigFile newConfigFile)

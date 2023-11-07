@@ -8,7 +8,7 @@ namespace SpaceWarp.API.Configuration;
 public class BepInExConfigEntry :  IConfigEntry
 {
     public readonly ConfigEntryBase EntryBase;
-
+    public event Action<object, object> Callbacks; 
     public BepInExConfigEntry(ConfigEntryBase entryBase, IValueConstraint constraint = null)
     {
         EntryBase = entryBase;
@@ -18,8 +18,13 @@ public class BepInExConfigEntry :  IConfigEntry
     public object Value
     {
         get => EntryBase.BoxedValue;
-        set => EntryBase.BoxedValue = value;
+        set
+        {
+            Callbacks?.Invoke(EntryBase.BoxedValue, value);
+            EntryBase.BoxedValue = value;
+        }
     }
+
     public Type ValueType => EntryBase.SettingType;
 
     public T Get<T>() where T : class
@@ -43,9 +48,14 @@ public class BepInExConfigEntry :  IConfigEntry
         {
             if (!Constraint.IsConstrained(value)) return;
         }
+        Callbacks?.Invoke(EntryBase.BoxedValue, value);
         EntryBase.BoxedValue = Convert.ChangeType(value, ValueType);
     }
 
     public string Description => EntryBase.Description.Description;
     public IValueConstraint Constraint { get; }
+    public void RegisterCallback(Action<object, object> valueChangedCallback)
+    {
+        Callbacks += valueChangedCallback;
+    }
 }

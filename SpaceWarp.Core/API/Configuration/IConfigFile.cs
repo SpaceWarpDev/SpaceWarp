@@ -18,4 +18,5 @@ public interface IConfigFile
     
     public IReadOnlyList<string> Sections { get; }
     public IReadOnlyList<string> this[string section] { get; }
+
 }
