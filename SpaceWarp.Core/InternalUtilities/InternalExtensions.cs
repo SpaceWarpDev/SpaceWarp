@@ -1,3 +1,5 @@
+using System.Reflection;
+using System;
 using UnityEngine;
 
 namespace SpaceWarp.InternalUtilities;
@@ -8,5 +10,26 @@ internal static class InternalExtensions
     {
         UnityObject.DontDestroyOnLoad(obj);
         obj.hideFlags |= HideFlags.HideAndDontSave;
+    }
+
+    internal static void CopyFieldAndPropertyDataFromSourceToTargetObject(object source, object target)
+    {
+        foreach (FieldInfo field in source.GetType().GetFields())
+        {
+            object value = field.GetValue(source);
+
+            try
+            {
+                field.SetValue(target, value);
+            }
+            catch (FieldAccessException)
+            { /* some fields are constants */ }
+        }
+
+        foreach (PropertyInfo property in source.GetType().GetProperties())
+        {
+            object value = property.GetValue(source);
+            property.SetValue(target, value);
+        }
     }
 }
