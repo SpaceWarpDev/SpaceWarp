@@ -42,6 +42,11 @@ public class SaveConfigFile : IConfigFile
 
     public IConfigEntry Bind<T>(string section, string key, T defaultValue = default, string description = "")
     {
+        return Bind(section, key, defaultValue, description, null);
+    }
+
+    public IConfigEntry Bind<T>(string section, string key, T defaultValue, string description, IValueConstraint valueConstraint)
+    {
         if (!CurrentEntries.TryGetValue(section, out var previousSection))
         {
             previousSection = new Dictionary<string, SaveConfigEntry>();
@@ -52,7 +57,7 @@ public class SaveConfigFile : IConfigFile
             return result;
         }
 
-        var entry = new SaveConfigEntry(section, key, description, typeof(T), defaultValue);
+        var entry = new SaveConfigEntry(section, key, description, typeof(T), defaultValue, valueConstraint);
         if (_internalConfigFile != null) entry.Bind(_internalConfigFile);
         previousSection[key] = entry;
         return entry;

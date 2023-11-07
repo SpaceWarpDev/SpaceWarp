@@ -10,13 +10,14 @@ public class SaveConfigEntry : IConfigEntry
     internal object InMemoryValue;
     internal object DefaultValue;
 
-    public SaveConfigEntry(string section, string key, string description, Type valueType, object defaultValue)
+    public SaveConfigEntry(string section, string key, string description, Type valueType, object defaultValue, IValueConstraint constraint)
     {
         Section = section;
         Key = key;
         Description = description;
         ValueType = valueType;
         DefaultValue = defaultValue;
+        Constraint = constraint;
         InMemoryValue = defaultValue;
     }
 
@@ -57,6 +58,10 @@ public class SaveConfigEntry : IConfigEntry
         {
             throw new InvalidCastException($"Cannot cast {ValueType} to {typeof(T)}");
         }
+        if (Constraint != null)
+        {
+            if (!Constraint.IsConstrained(value)) return;
+        }
 
         Value = Convert.ChangeType(value, ValueType);
     }
@@ -65,11 +70,12 @@ public class SaveConfigEntry : IConfigEntry
     public string Key { get; }
 
     public string Description { get; }
+    public IValueConstraint Constraint { get; }
 
     // The moment we bind to a new config file, reset the defaults
     internal void Bind(JsonConfigFile newConfigFile)
     {
-        BoundEntry = newConfigFile.Bind(ValueType, Section, Key, InMemoryValue, Description);
+        BoundEntry = newConfigFile.Bind(ValueType, Section, Key, InMemoryValue, Description, Constraint);
         InMemoryValue = DefaultValue;
     }
 

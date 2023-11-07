@@ -9,9 +9,10 @@ public class BepInExConfigEntry :  IConfigEntry
 {
     public readonly ConfigEntryBase EntryBase;
 
-    public BepInExConfigEntry(ConfigEntryBase entryBase)
+    public BepInExConfigEntry(ConfigEntryBase entryBase, IValueConstraint constraint = null)
     {
         EntryBase = entryBase;
+        Constraint = constraint;
     }
 
     public object Value
@@ -38,8 +39,13 @@ public class BepInExConfigEntry :  IConfigEntry
             throw new InvalidCastException($"Cannot cast {ValueType} to {typeof(T)}");
         }
 
+        if (Constraint != null)
+        {
+            if (!Constraint.IsConstrained(value)) return;
+        }
         EntryBase.BoxedValue = Convert.ChangeType(value, ValueType);
     }
 
     public string Description => EntryBase.Description.Description;
+    public IValueConstraint Constraint { get; }
 }

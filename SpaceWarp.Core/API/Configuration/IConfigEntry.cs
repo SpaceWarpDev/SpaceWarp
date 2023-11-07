@@ -12,4 +12,6 @@ public interface IConfigEntry
     public void Set<T>(T value);
 
     public string Description { get; }
+
+    public IValueConstraint Constraint { get; }
 }
