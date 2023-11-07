@@ -9,7 +9,9 @@ using BepInEx.Logging;
 using HarmonyLib;
 using I2.Loc;
 using JetBrains.Annotations;
+using KSP.Game;
 using KSP.IO;
+using KSP.Messages;
 using KSP.ScriptInterop.impl.moonsharp;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
@@ -40,7 +42,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ScriptEnvironment GlobalLuaState;
 
     internal new static ManualLogSource Logger;
-    
+
+
     public SpaceWarpPlugin()
     {
         // Load the type forwarders
@@ -111,6 +114,20 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     {
         ModuleManager.InitializeAllModules();
         SetupLuaState();
+        Game.Messages.Subscribe(typeof(GameStateEnteredMessage), ResetToDefaults, false, true);
+    }
+
+    private void ResetToDefaults(MessageCenterMessage msg)
+    {
+        var stateChange = msg as GameStateEnteredMessage;
+        if (stateChange!.StateBeingEntered != GameState.MainMenu) return;
+        foreach (var plugin in PluginList.AllEnabledAndActivePlugins)
+        {
+            if (plugin.SaveConfigFile != null && plugin.SaveConfigFile.Sections.Count > 0)
+            {
+                plugin.SaveConfigFile.ResetToDefaults();
+            }
+        }
     }
 
     public override void OnPostInitialized()
