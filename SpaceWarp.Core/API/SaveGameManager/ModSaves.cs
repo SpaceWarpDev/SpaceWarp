@@ -24,23 +24,6 @@ public static class ModSaves
     /// <returns>T saveData object you passed as a parameter, or a default instance of object T if you didn't pass anything</returns>
     public static T RegisterSaveLoadGameData<T>(string modGuid, Action<T> onSave, Action<T> onLoad, T saveData = default)
     {
-        // Create adapter functions to convert Action<T> to CallbackFunctionDelegate
-        void SaveCallbackAdapter(object dataToBeSaved)
-        {
-            if (onSave != null && dataToBeSaved is T data)
-            {
-                onSave(data);
-            }
-        }
-
-        void LoadCallbackAdapter(object dataToBeLoaded)
-        {
-            if (onLoad != null && dataToBeLoaded is T data)
-            {
-                onLoad(data);
-            }
-        }
-
         // Check if this GUID is already registered
         if (InternalPluginSaveData.Find(p => p.ModGuid == modGuid) != null)
         {
@@ -52,6 +35,23 @@ public static class ModSaves
         InternalPluginSaveData.Add(new PluginSaveData { ModGuid = modGuid, SaveEventCallback = SaveCallbackAdapter, LoadEventCallback = LoadCallbackAdapter, SaveData = saveData });
         Logger.LogInfo($"Registered '{modGuid}' for save/load events.");
         return saveData;
+
+        void LoadCallbackAdapter(object dataToBeLoaded)
+        {
+            if (onLoad != null && dataToBeLoaded is T data)
+            {
+                onLoad(data);
+            }
+        }
+
+        // Create adapter functions to convert Action<T> to CallbackFunctionDelegate
+        void SaveCallbackAdapter(object dataToBeSaved)
+        {
+            if (onSave != null && dataToBeSaved is T data)
+            {
+                onSave(data);
+            }
+        }
     }
 
     /// <summary>
