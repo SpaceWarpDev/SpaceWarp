@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 namespace SpaceWarp.Backend.SaveGameManager;
 
@@ -9,5 +10,5 @@ namespace SpaceWarp.Backend.SaveGameManager;
 [Serializable]
 public class SpaceWarpSerializedSavedGame : KSP.Sim.SerializedSavedGame
 {
-    public List<PluginSaveData> SerializedPluginSaveData = new();
+    public List<PluginSaveData> serializedPluginSaveData = new();
 }

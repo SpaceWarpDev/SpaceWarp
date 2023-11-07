@@ -9,7 +9,7 @@ namespace SpaceWarp.API.SaveGameManager;
 [PublicAPI]
 public static class ModSaves
 {
-    private static readonly ILogger _logger = new UnityLogSource("SpaceWarp.ModSaves");
+    private static readonly ILogger Logger = new UnityLogSource("SpaceWarp.ModSaves");
 
     internal static List<PluginSaveData> InternalPluginSaveData = new();
 
@@ -25,36 +25,33 @@ public static class ModSaves
     public static T RegisterSaveLoadGameData<T>(string modGuid, Action<T> onSave, Action<T> onLoad, T saveData = default)
     {
         // Create adapter functions to convert Action<T> to CallbackFunctionDelegate
-        SaveGameCallbackFunctionDelegate saveCallbackAdapter = (object saveData) =>
+        void SaveCallbackAdapter(object dataToBeSaved)
         {
-            if (onSave != null && saveData is T data)
+            if (onSave != null && dataToBeSaved is T data)
             {
                 onSave(data);
             }
-        };
+        }
 
-        SaveGameCallbackFunctionDelegate loadCallbackAdapter = (object saveData) =>
+        void LoadCallbackAdapter(object dataToBeLoaded)
         {
-            if (onLoad != null && saveData is T data)
+            if (onLoad != null && dataToBeLoaded is T data)
             {
                 onLoad(data);
             }
-        };
+        }
 
         // Check if this GUID is already registered
         if (InternalPluginSaveData.Find(p => p.ModGuid == modGuid) != null)
         {
-            throw new ArgumentException($"Mod GUID '{modGuid}' is already registered. Skipping.", "modGuid");
+            throw new ArgumentException($"Mod GUID '{modGuid}' is already registered. Skipping.", nameof(modGuid));
         }
-        else
-        {
-            if (saveData == null)
-                saveData = Activator.CreateInstance<T>();
 
-            InternalPluginSaveData.Add(new PluginSaveData { ModGuid = modGuid, SaveEventCallback = saveCallbackAdapter, LoadEventCallback = loadCallbackAdapter, SaveData = saveData });
-            _logger.LogInfo($"Registered '{modGuid}' for save/load events.");
-            return saveData;
-        }
+        saveData ??= Activator.CreateInstance<T>();
+
+        InternalPluginSaveData.Add(new PluginSaveData { ModGuid = modGuid, SaveEventCallback = SaveCallbackAdapter, LoadEventCallback = LoadCallbackAdapter, SaveData = saveData });
+        Logger.LogInfo($"Registered '{modGuid}' for save/load events.");
+        return saveData;
     }
 
     /// <summary>
@@ -64,11 +61,9 @@ public static class ModSaves
     public static void UnRegisterSaveLoadGameData(string modGuid)
     {
         var toRemove = InternalPluginSaveData.Find(p => p.ModGuid == modGuid);
-        if (toRemove != null)
-        {
-            InternalPluginSaveData.Remove(toRemove);
-            _logger.LogInfo($"Unregistered '{modGuid}' for save/load events.");
-        }
+        if (toRemove == null) return;
+        InternalPluginSaveData.Remove(toRemove);
+        Logger.LogInfo($"Unregistered '{modGuid}' for save/load events.");
     }
 
     /// <summary>
@@ -83,6 +78,6 @@ public static class ModSaves
     public static T ReregisterSaveLoadGameData<T>(string modGuid, Action<T> onSave, Action<T> onLoad, T saveData = default(T))
     {
         UnRegisterSaveLoadGameData(modGuid);
-        return RegisterSaveLoadGameData<T>(modGuid, onSave, onLoad, saveData);
+        return RegisterSaveLoadGameData(modGuid, onSave, onLoad, saveData);
     }
 }

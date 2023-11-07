@@ -27,7 +27,7 @@ internal class SaveLoadPatches
         // Take the game's LoadGameData, extend it with our own class and copy plugin save data to it
         SpaceWarpSerializedSavedGame modSaveData = new();
         InternalExtensions.CopyFieldAndPropertyDataFromSourceToTargetObject(data.SavedGame, modSaveData);
-        modSaveData.SerializedPluginSaveData = ModSaves.InternalPluginSaveData;
+        modSaveData.serializedPluginSaveData = ModSaves.InternalPluginSaveData;
         data.SavedGame = modSaveData;
 
         // Initiate save callback for plugins that specified a callback function
@@ -56,10 +56,10 @@ internal class SaveLoadPatches
             __instance._data.DataLength = IOProvider.GetFileSize(__instance._filename);
 
             // Perform plugin load data if plugin data is found in the save file
-            if (serializedSavedGame.SerializedPluginSaveData.Count > 0)
+            if (serializedSavedGame.serializedPluginSaveData.Count > 0)
             {
                 // Iterate through each plugin
-                foreach (var loadedData in serializedSavedGame.SerializedPluginSaveData)
+                foreach (var loadedData in serializedSavedGame.serializedPluginSaveData)
                 {
                     // Match registered plugin GUID with the GUID found in the save file
                     var existingData = ModSaves.InternalPluginSaveData.Find(p => p.ModGuid == loadedData.ModGuid);
