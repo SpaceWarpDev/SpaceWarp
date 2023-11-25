@@ -1,6 +1,7 @@
 using System.Reflection;
 using System;
 using UnityEngine;
+using System.Collections;
 
 namespace SpaceWarp.InternalUtilities;
 
@@ -14,22 +15,36 @@ internal static class InternalExtensions
 
     internal static void CopyFieldAndPropertyDataFromSourceToTargetObject(object source, object target)
     {
-        foreach (FieldInfo field in source.GetType().GetFields())
+        // check if it's a dictionary
+        if (source is IDictionary sourceDictionary && target is IDictionary targetDictionary)
         {
-            object value = field.GetValue(source);
-
-            try
+            // copy dictionary items
+            foreach (DictionaryEntry entry in sourceDictionary)
             {
-                field.SetValue(target, value);
+                targetDictionary[entry.Key] = entry.Value;
             }
-            catch (FieldAccessException)
-            { /* some fields are constants */ }
         }
-
-        foreach (PropertyInfo property in source.GetType().GetProperties())
+        else
         {
-            object value = property.GetValue(source);
-            property.SetValue(target, value);
+            // copy fields
+            foreach (FieldInfo field in source.GetType().GetFields())
+            {
+                object value = field.GetValue(source);
+
+                try
+                {
+                    field.SetValue(target, value);
+                }
+                catch (FieldAccessException)
+                { /* some fields are constants */ }
+            }
+
+            // copy properties
+            foreach (PropertyInfo property in source.GetType().GetProperties())
+            {
+                object value = property.GetValue(source);
+                property.SetValue(target, value);
+            }
         }
     }
 }
