@@ -4,7 +4,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using BepInEx;
-using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using I2.Loc;
@@ -13,7 +12,6 @@ using KSP.IO;
 using KSP.ScriptInterop.impl.moonsharp;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Loading;
 using SpaceWarp.API.Lua;
 using SpaceWarp.API.Mods;
@@ -40,7 +38,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     internal ScriptEnvironment GlobalLuaState;
 
     internal new static ManualLogSource Logger;
-    
+
     public SpaceWarpPlugin()
     {
         // Load the type forwarders
@@ -103,8 +101,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     {
         // Persist all game objects so I don't need to stomp on config
         ModuleManager.PreInitializeAllModules();
-        // Start loading campaign configuration data
-        SaveLoad.AddFlowActionToCampaignLoadAfter<LoadCampaignConfiguration>("Deserializing Save File Contents");
     }
 
     public override void OnInitialized()

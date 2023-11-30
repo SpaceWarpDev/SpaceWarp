@@ -29,7 +29,4 @@ public class BepInExModAdapter : ISpaceWarpMod
     {
         Plugin = plugin;
     }
-    
-    private SaveConfigFile _saveConfig;
-    public SaveConfigFile CampaignConfiguration => _saveConfig ??= new SaveConfigFile();
 }

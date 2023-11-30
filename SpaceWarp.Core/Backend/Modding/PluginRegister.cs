@@ -83,8 +83,7 @@ internal static class PluginRegister
             BepInExToSWInfo(plugin.Info),
             new DirectoryInfo(folderPath),
             false,
-            new BepInExConfigFile(plugin.Config),
-            plugin.CampaignConfiguration
+            new BepInExConfigFile(plugin.Config)
         );
         PluginList.NoteBadDirectoryError(descriptor);
         return false;
@@ -244,8 +243,7 @@ internal static class PluginRegister
             metadata,
             directoryInfo,
             true,
-            plugin.SWConfiguration,
-            plugin.CampaignConfiguration
+            new BepInExConfigFile(plugin.Config)
         );
         descriptor.Plugin!.SWMetadata = descriptor;
         if (!AssertSpecificationCompliance(descriptor, plugin, metadata, folderPath)) return;
@@ -266,16 +264,14 @@ internal static class PluginRegister
         if (File.Exists(modInfoPath))
         {
             if (!TryReadModInfo(plugin, modInfoPath, folderPath, out var metadata)) return;
-            var adapter = new BepInExModAdapter(plugin);
             var descriptor = new SpaceWarpPluginDescriptor(
-                adapter,
+                new BepInExModAdapter(plugin),
                 metadata.Spec != SpecVersion.V1_2 ? metadata.ModID : plugin.Info.Metadata.GUID,
                 metadata.Name,
                 metadata,
                 directoryInfo,
                 false,
-                adapter.SWConfiguration,
-                adapter.CampaignConfiguration
+                new BepInExConfigFile(plugin.Config)
             );
             descriptor.Plugin!.SWMetadata = descriptor;
             if (!AssertSpecificationCompliance(descriptor, plugin, metadata, folderPath))
@@ -298,8 +294,7 @@ internal static class PluginRegister
             BepInExToSWInfo(plugin.Info),
             new DirectoryInfo(Path.GetDirectoryName(plugin.Info.Location)!),
             false,
-            pluginAdapter.SWConfiguration,
-            pluginAdapter.CampaignConfiguration
+            new BepInExConfigFile(plugin.Config)
         );
         pluginAdapter.SWMetadata = descriptor;
         return descriptor;
@@ -355,15 +350,13 @@ internal static class PluginRegister
                 continue;
             }
 
-            var assetMod = new AssetOnlyMod(swinfoData.Name);
             var descriptor = new SpaceWarpPluginDescriptor(
-                assetMod,
+                new AssetOnlyMod(swinfoData.Name),
                 swinfoData.ModID,
                 swinfoData.Name,
                 swinfoData, swinfo.Directory,
                 true,
-                new BepInExConfigFile(FindOrCreateConfigFile(swinfoData.ModID)),
-                assetMod.CampaignConfiguration
+                new BepInExConfigFile(FindOrCreateConfigFile(swinfoData.ModID))
             );
             descriptor.Plugin!.SWMetadata = descriptor;
 

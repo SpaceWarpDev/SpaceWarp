@@ -103,11 +103,6 @@ public class JsonConfigFile : IConfigFile
             }
         }
 
-        if (entry.Value.Constraint != null)
-        {
-            result.AppendLine($"        // Accepts: {entry.Value.Constraint}");
-        }
-
         var serialized = JsonConvert.SerializeObject(entry.Value.Value,Formatting.Indented,DefaultConverters.ToArray());
         var serializedLines = serialized.Split('\n').Select(x => x.TrimEnd()).ToArray();
         if (serializedLines.Length > 1)
@@ -137,11 +132,6 @@ public class JsonConfigFile : IConfigFile
 
     public IConfigEntry Bind<T>(string section, string key, T defaultValue = default, string description = "")
     {
-        return Bind(section, key, defaultValue, description, null);
-    }
-
-    public IConfigEntry Bind<T>(string section, string key, T defaultValue, string description, IValueConstraint valueConstraint)
-    {
         // So now we have to check if its already bound, and/or if the previous config object has it
         if (!CurrentEntries.TryGetValue(section, out var previousSection))
         {
@@ -161,66 +151,22 @@ public class JsonConfigFile : IConfigFile
                 if (sect is JObject obj && obj.TryGetValue(key, out var value))
                 {
                     var previousValue = value.ToObject(typeof(T));
-                    previousSection[key] = new JsonConfigEntry(this, typeof(T), description, previousValue, valueConstraint);
+                    previousSection[key] = new JsonConfigEntry(this, typeof(T), description, previousValue);
                 }
                 else
                 {
-                    previousSection[key] = new JsonConfigEntry(this, typeof(T), description, defaultValue, valueConstraint);
+                    previousSection[key] = new JsonConfigEntry(this, typeof(T), description, defaultValue);
                 }
             }
             catch
             {
-                previousSection[key] = new JsonConfigEntry(this, typeof(T), description, defaultValue, valueConstraint);
+                previousSection[key] = new JsonConfigEntry(this, typeof(T), description, defaultValue);
                 // ignored
             }
         }
         else
         {
-            previousSection[key] = new JsonConfigEntry(this, typeof(T), description, defaultValue, valueConstraint);
-        }
-
-        Save();
-        return previousSection[key];
-    }
-
-    public IConfigEntry Bind(Type type, string section, string key, object defaultValue = default,
-        string description = "", IValueConstraint constraint = null)
-    {
-        // So now we have to check if its already bound, and/or if the previous config object has it
-        if (!CurrentEntries.TryGetValue(section, out var previousSection))
-        {
-            previousSection = new Dictionary<string, JsonConfigEntry>();
-            CurrentEntries.Add(section,previousSection);
-        }
-
-        if (previousSection.TryGetValue(key, out var result))
-        {
-            return result;
-        }
-
-        if (_previousConfigObject != null && _previousConfigObject.TryGetValue(section, out var sect))
-        {
-            try
-            {
-                if (sect is JObject obj && obj.TryGetValue(key, out var value))
-                {
-                    var previousValue = value.ToObject(type);
-                    previousSection[key] = new JsonConfigEntry(this, type, description, previousValue,constraint);
-                }
-                else
-                {
-                    previousSection[key] = new JsonConfigEntry(this, type, description, defaultValue, constraint);
-                }
-            }
-            catch
-            {
-                previousSection[key] = new JsonConfigEntry(this, type, description, defaultValue, constraint);
-                // ignored
-            }
-        }
-        else
-        {
-            previousSection[key] = new JsonConfigEntry(this, type, description, defaultValue, constraint);
+            previousSection[key] = new JsonConfigEntry(this, typeof(T), description, defaultValue);
         }
 
         Save();

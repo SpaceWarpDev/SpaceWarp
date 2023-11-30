@@ -32,6 +32,4 @@ public abstract class BaseKspLoaderSpaceWarpMod : Mod, ISpaceWarpMod
     }
 
     public SpaceWarpPluginDescriptor SWMetadata { get; set; }
-    private SaveConfigFile _saveConfig;
-    public SaveConfigFile CampaignConfiguration => _saveConfig ??= new SaveConfigFile();
 }

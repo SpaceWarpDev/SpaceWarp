@@ -12,11 +12,7 @@ public interface IConfigFile
     public IConfigEntry this[string section, string key] { get; }
 
     public IConfigEntry Bind<T>(string section, string key, T defaultValue = default, string description = "");
-
-    public IConfigEntry Bind<T>(string section, string key, T defaultValue, string description,
-        IValueConstraint valueConstraint);
     
     public IReadOnlyList<string> Sections { get; }
     public IReadOnlyList<string> this[string section] { get; }
-
 }
