@@ -27,6 +27,12 @@ public class BepInExConfigFile : IConfigFile
         return new BepInExConfigEntry(AdaptedConfigFile.Bind(section, key, defaultValue, description));
     }
 
+    public IConfigEntry Bind<T>(string section, string key, T defaultValue, string description, IValueConstraint valueConstraint)
+    {
+        return new BepInExConfigEntry(AdaptedConfigFile.Bind(new ConfigDefinition(section, key), defaultValue,
+            new ConfigDescription(description, valueConstraint.ToAcceptableValueBase())));
+    }
+
     public IReadOnlyList<string> Sections => AdaptedConfigFile.Keys.Select(x => x.Section).Distinct().ToList();
 
     public IReadOnlyList<string> this[string section] => AdaptedConfigFile.Keys.Where(x => x.Section == section)

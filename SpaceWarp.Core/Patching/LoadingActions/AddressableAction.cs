@@ -21,8 +21,21 @@ public class AddressableAction<T> : FlowAction where T : UnityObject
         Action = action;
     }
 
+    private bool DoesLabelExist(object label)
+    {
+        return GameManager.Instance.Assets._registeredResourceLocators.Any(locator => locator.Keys.Contains(label))
+               || Addressables.ResourceLocators.Any(locator => locator.Keys.Contains(label));
+    }
+
     public override void DoAction(Action resolve, Action<string> reject)
     {
+        if (!DoesLabelExist(Label))
+        {
+            Debug.Log($"[Space Warp] Skipping loading addressables for {Label} which does not exist.");
+            resolve();
+            return;
+        }
+
         try
         {
             GameManager.Instance.Assets.LoadByLabel(Label,Action,delegate(IList<T> assetLocations)

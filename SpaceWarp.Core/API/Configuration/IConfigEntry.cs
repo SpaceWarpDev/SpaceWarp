@@ -12,4 +12,12 @@ public interface IConfigEntry
     public void Set<T>(T value);
 
     public string Description { get; }
+
+    public IValueConstraint Constraint { get; }
+    
+    /// <summary>
+    /// Called when setting the value on a config file
+    /// </summary>
+    /// <param name="valueChangedCallback">An action that takes te old value and the new value and calls a callback</param>
+    public void RegisterCallback(Action<object, object> valueChangedCallback);
 }

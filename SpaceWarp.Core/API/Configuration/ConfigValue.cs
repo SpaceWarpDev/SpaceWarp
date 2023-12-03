@@ -20,6 +20,21 @@ public class ConfigValue<T>
     public T Value
     {
         get => (T)Entry.Value;
-        set => Entry.Value = value;
+        set
+        {
+            Entry.Value = value;
+        }
+    }
+
+    public void RegisterCallback(Action<T, T> callback)
+    {
+        // Callbacks += callback;
+        Entry.RegisterCallback(NewCallback);
+        return;
+
+        void NewCallback(object from, object to)
+        {
+            callback.Invoke((T)from, (T)to);
+        }
     }
 }

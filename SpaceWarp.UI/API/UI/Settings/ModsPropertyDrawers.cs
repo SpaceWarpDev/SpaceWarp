@@ -335,15 +335,30 @@ public static class ModsPropertyDrawers
 
     private static Func<string, IConfigEntry, GameObject> GenerateAbstractGenericDrawerFor(Type entrySettingType)
     {
-        var valueListMethod = typeof(ModsPropertyDrawers).GetMethod(nameof(CreateFromAcceptableValueList),
+        var valueListMethod = typeof(ModsPropertyDrawers).GetMethod(nameof(CreateFromListConstraint),
             BindingFlags.Static | BindingFlags.NonPublic)
             ?.MakeGenericMethod(entrySettingType);
-        var valueRangeMethod = typeof(ModsPropertyDrawers).GetMethod(nameof(CreateFromAcceptableValueRange),
+        var valueRangeMethod = typeof(ModsPropertyDrawers).GetMethod(nameof(CreateFromRangeConstraint),
                 BindingFlags.Static | BindingFlags.NonPublic)
             ?.MakeGenericMethod(entrySettingType);
         return (name, entry) =>
         {
+            var t = entry.Constraint?.GetType();
+            if (t?.GetGenericTypeDefinition() == typeof(ListConstraint<>) &&
+                t.GenericTypeArguments[0] == entrySettingType)
+            {
+                if (valueListMethod != null)
+                    return (GameObject)valueListMethod.Invoke(null, new object[] { name, entry, entry.Constraint });
+            }
 
+            if (t?.GetGenericTypeDefinition() == typeof(RangeConstraint<>) &&
+                t.GenericTypeArguments[0] == entrySettingType)
+            {
+                if (valueRangeMethod != null)
+                {
+                    return (GameObject)valueRangeMethod.Invoke(null, new object[] { name, entry, entry.Constraint });
+                }
+            }
             var inputFieldCopy = UnityObject.Instantiate(InputFieldPrefab);
             var lab = inputFieldCopy.GetChild("Label");
             lab.GetComponent<Localize>().SetTerm(name);
@@ -571,6 +586,93 @@ public static class ModsPropertyDrawers
         sec.isInputSettingElement = false;
         slCopy.SetActive(true);
         slCopy.name = entry.Definition.Key;
+        return slCopy;
+    }
+
+    private static GameObject CreateFromListConstraint<T>(string key, IConfigEntry entry, ListConstraint<T> constraint) where T : IEquatable<T>
+    {
+        var value = new ConfigValue<T>(entry);
+        var ddCopy = UnityObject.Instantiate(DropdownPrefab);
+        var lab = ddCopy.GetChild("Label");
+        lab.GetComponent<Localize>().SetTerm(key);
+        lab.GetComponent<TextMeshProUGUI>().text = key;
+        var dropdown = ddCopy.GetChild("Setting").GetChild("BTN-Dropdown");
+        var extended = dropdown.GetComponent<DropdownExtended>();
+        // Start by clearing the options data
+        extended.options.Clear();
+        foreach (var option in constraint.AcceptableValues)
+        {
+            extended.options.Add(new TMP_Dropdown.OptionData(option as string ?? (option is Color color
+                ? (color.a < 1 ? ColorUtility.ToHtmlStringRGBA(color) : ColorUtility.ToHtmlStringRGB(color))
+                : option.ToString())));
+        }
+        
+        extended.value = constraint.AcceptableValues.IndexOf(value.Value);
+        extended.onValueChanged.AddListener(idx => { value.Value = constraint.AcceptableValues[idx]; });
+        var sec = ddCopy.AddComponent<CustomSettingsElementDescriptionController>();
+        sec.description = entry.Description;
+        sec.isInputSettingElement = false;
+        ddCopy.SetActive(true);
+        ddCopy.name = key;
+        return ddCopy;
+    }
+
+    private static GameObject CreateFromRangeConstraint<T>(string key, IConfigEntry entry,
+        RangeConstraint<T> constraint) where T : IComparable<T>, IComparable
+    {
+        var value = new ConfigValue<T>(entry);
+        // Now we have to have a "slider" prefab
+        var slCopy = UnityObject.Instantiate(SliderPrefab);
+        var lab = slCopy.GetChild("Label");
+        lab.GetComponent<Localize>().SetTerm(key);
+        lab.GetComponent<TextMeshProUGUI>().text = key;
+        var setting = slCopy.GetChild("Setting");
+        var slider = setting.GetChild("KSP2SliderLinear").GetComponent<SliderExtended>();
+        var amount = setting.GetChild("Amount display");
+        var text = amount.GetComponentInChildren<TextMeshProUGUI>();
+        text.text = entry.Value.ToString();
+        Func<T, float> toFloat = x => Convert.ToSingle(x);
+        // if (!typeof(T).IsIntegral())
+        // {
+        //     var convT = TypeDescriptor.GetConverter(typeof(T)) ??
+        //                 throw new ArgumentNullException("TypeDescriptor.GetConverter(typeof(T))");
+        //     toT = x => (T)convT.ConvertFrom(x);
+        // }
+        Func<float, T> toT = Type.GetTypeCode(typeof(T)) switch
+        {
+            TypeCode.Byte => x => (T)(object)Convert.ToByte(x),
+            TypeCode.SByte => x => (T)(object)Convert.ToSByte(x),
+            TypeCode.UInt16 => x => (T)(object)Convert.ToUInt16(x),
+            TypeCode.UInt32 => x => (T)(object)Convert.ToUInt32(x),
+            TypeCode.UInt64 => x => (T)(object)Convert.ToUInt64(x),
+            TypeCode.Int16 => x => (T)(object)Convert.ToInt16(x),
+            TypeCode.Int32 => x => (T)(object)Convert.ToInt32(x),
+            TypeCode.Int64 => x => (T)(object)Convert.ToInt64(x),
+            TypeCode.Decimal => x => (T)(object)Convert.ToDecimal(x),
+            TypeCode.Double => x => (T)(object)Convert.ToDouble(x),
+            TypeCode.Single => x => (T)(object)x,
+            _ => x => throw new NotImplementedException(typeof(T).ToString())
+        };
+        slider.minValue = toFloat(constraint.Minimum);
+        slider.maxValue = toFloat(constraint.Maximum);
+        slider.SetValueWithoutNotify(toFloat(value.Value));
+        slider.onValueChanged.AddListener(val =>
+        {
+            // var trueValue = (acceptableValues.MaxValue-acceptableValues.MinValue) * (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFrom(value)
+            // var trueValue = (toFloat(acceptableValues.MaxValue) - toFloat(acceptableValues.MinValue)) * value +
+            //                 toFloat(acceptableValues.MinValue);
+            var trueValue = val;
+
+            value.Value = toT(trueValue) ?? value.Value;
+            if (entry.Value != null) text.text = entry.Value.ToString();
+            slider.SetWithoutCallback(toFloat(value.Value));
+        });
+
+        var sec = slCopy.AddComponent<CustomSettingsElementDescriptionController>();
+        sec.description = entry.Description;
+        sec.isInputSettingElement = false;
+        slCopy.SetActive(true);
+        slCopy.name = key;
         return slCopy;
     }
 

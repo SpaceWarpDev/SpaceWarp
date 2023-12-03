@@ -17,6 +17,11 @@ public class EmptyConfigFile : IConfigFile
         throw new System.NotImplementedException();
     }
 
+    public IConfigEntry Bind<T>(string section, string key, T defaultValue, string description, IValueConstraint valueConstraint)
+    {
+        throw new System.NotImplementedException();
+    }
+
     public IReadOnlyList<string> Sections => new List<string>();
 
     public IReadOnlyList<string> this[string section] => throw new KeyNotFoundException($"{section}");
