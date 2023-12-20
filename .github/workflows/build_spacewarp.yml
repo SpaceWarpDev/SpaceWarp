@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build the solution
-        run: dotnet build "SpaceWarp.sln" -c ${{ matrix.run_args }}
+        run: dotnet build "SpaceWarp.sln" -c Debug
 
   build-release:
     runs-on: ubuntu-latest
@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v3
       
       - name: Build the solution
-        run: dotnet build "SpaceWarp.sln" -c ${{ matrix.run_args }}
+        run: dotnet build "SpaceWarp.sln" -c Release
         
       - name: Find Zip
         id: find-zip
