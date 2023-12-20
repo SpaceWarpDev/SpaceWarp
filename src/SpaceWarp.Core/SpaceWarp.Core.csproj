@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>SpaceWarp</RootNamespace>
+    </PropertyGroup>
+    <!-- References -->
+    <ItemGroup Label="NuGet package references">
+        <PackageReference Include="BepInEx.Analyzers" Version="1.0.8">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all"/>
+        <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" Publicize="true"/>
+        <PackageReference Include="BepInEx.Core" Version="5.4.21"/>
+        <PackageReference Include="HarmonyX" Version="2.10.1"/>
+        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.5" Publicize="true" PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="SpaceWarp.PluginInfoProps" Version="1.*" PrivateAssets="all"/>
+        <PackageReference Include="UitkForKsp2" Version="2.4.0"/>
+        <PackageReference Include="UnityEngine.Modules" Version="2022.3.5" Publicize="true"/>
+    </ItemGroup>
+    <ItemGroup Label="Project references">
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarpPatcher/SpaceWarpPatcher.csproj" Private="false" PrivateAssets="all"/>
+    </ItemGroup>
+</Project>

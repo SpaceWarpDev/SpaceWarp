@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <!-- References -->
+    <ItemGroup Label="NuGet package references">
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all"/>
+        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.5" Publicize="true"/>
+    </ItemGroup>
+    <ItemGroup Label="Project references">
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Core/SpaceWarp.Core.csproj" Private="false"/>
+    </ItemGroup>
+</Project>

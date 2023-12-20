@@ -1,8 +1,0 @@
-<Project>
-    <PropertyGroup>
-        <AssemblySearchPaths>
-            $(MSBuildThisFileDirectory)external_dlls;
-            $(AssemblySearchPaths)
-        </AssemblySearchPaths>
-    </PropertyGroup>
-</Project>

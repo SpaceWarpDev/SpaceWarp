@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <!-- References -->
+    <ItemGroup Label="DLL references">
+        <Reference Include="$(SolutionDir)/plugin_template/BepInEx/plugins/ConfigurationManager/ConfigurationManager.dll" Private="false" Publicize="true"/>
+    </ItemGroup>
+    <ItemGroup Label="NuGet package references">
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all"/>
+        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.5" Publicize="true"/>
+        <PackageReference Include="UitkForKsp2" Version="2.4.0" Publicize="true"/>
+        <PackageReference Include="UnityEngine.Modules" Version="2022.3.5" Publicize="true"/>
+    </ItemGroup>
+    <ItemGroup Label="Project references">
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Core/SpaceWarp.Core.csproj" Private="false"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.VersionChecking/SpaceWarp.VersionChecking.csproj" Private="false"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarpPatcher/SpaceWarpPatcher.csproj" Private="false"/>
+    </ItemGroup>
+</Project>
