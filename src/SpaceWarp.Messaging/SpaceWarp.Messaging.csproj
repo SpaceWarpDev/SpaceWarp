@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!-- References -->
+    <ItemGroup Label="Project references">
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Core/SpaceWarp.Core.csproj" Private="false"/>
+    </ItemGroup>
+</Project>

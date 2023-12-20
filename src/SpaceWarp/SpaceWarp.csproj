@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <!-- References -->
+    <ItemGroup Label="DLL file references">
+        <Reference Include="$(SolutionDir)/plugin_template/BepInEx/plugins/ConfigurationManager/ConfigurationManager.dll" Private="false" Publicize="true"/>
+    </ItemGroup>
+    <ItemGroup Label="NuGet package references">
+        <PackageReference Remove="PolySharp"/>
+    </ItemGroup>
+    <ItemGroup Label="Project references">
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Core/SpaceWarp.Core.csproj" Private="false"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Game/SpaceWarp.Game.csproj" Private="false"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Messaging/SpaceWarp.Messaging.csproj" Private="false"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Sound/SpaceWarp.Sound.csproj" Private="false"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.UI/SpaceWarp.UI.csproj" Private="false"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.VersionChecking/SpaceWarp.VersionChecking.csproj" Private="false"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarpPatcher/SpaceWarpPatcher.csproj" Private="false"/>
+    </ItemGroup>
+</Project>

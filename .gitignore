@@ -350,8 +350,10 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-# Build script folder
-build/
+# Build folders
+/build
+/dist
+/nuget
 
 # Idea folder
 .idea
