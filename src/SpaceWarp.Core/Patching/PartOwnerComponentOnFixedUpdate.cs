@@ -13,21 +13,20 @@ internal class PartOwnerComponentOnFixedUpdate
         PartOwnerComponent __instance)
     {
         var isModulePresent = false;
+        var hasPartModuleMethod = __instance.GetType().GetMethod("HasPartModule");
 
-        // Go through each registered module and check if it's present in PartOwnerComponent modules
-        foreach (var moduleType in PartComponentModuleOverride.RegisteredPartComponentOverrides)
+        if (hasPartModuleMethod != null)
         {
-            var hasPartModuleMethod = __instance.GetType().GetMethod("HasPartModule");
-
-            if (hasPartModuleMethod != null)
+            // Go through each registered module and check if it's present in PartOwnerComponent modules
+            foreach (var moduleType in PartComponentModuleOverride.RegisteredPartComponentOverrides)
             {
-                var genericMethod = hasPartModuleMethod.MakeGenericMethod(moduleType);
+                    var genericMethod = hasPartModuleMethod.MakeGenericMethod(moduleType);
 
-                if ((bool)genericMethod.Invoke(__instance, null))
-                {
-                    isModulePresent = true;
-                    break;
-                }
+                    if ((bool)genericMethod.Invoke(__instance, null))
+                    {
+                        isModulePresent = true;
+                        break;
+                    }
             }
         }
 
