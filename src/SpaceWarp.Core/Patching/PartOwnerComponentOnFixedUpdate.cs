@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System.Runtime.CompilerServices;
+using HarmonyLib;
 using KSP.Sim.impl;
 using SpaceWarp.API.Parts;
 
@@ -7,7 +8,15 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch]
 internal class PartOwnerComponentOnFixedUpdate
 {
-    private static Dictionary<PartOwnerComponent, bool> AlreadyCachedOwners = new();
+    private class ReferenceBoolean
+    {
+        internal static ReferenceBoolean TRUE = new();
+        internal static ReferenceBoolean FALSE = new();
+        public static implicit operator ReferenceBoolean(bool b) => b ? TRUE : FALSE;
+        public static implicit operator bool(ReferenceBoolean b) => b == TRUE;
+    }
+    
+    private static ConditionalWeakTable<PartOwnerComponent, ReferenceBoolean> AlreadyCachedOwners = new();
     [HarmonyPatch(typeof(PartOwnerComponent), "OnFixedUpdate"), HarmonyPrefix]
     private static bool PerformBackgroundCalculationsForRegisteredModules(double universalTime,
         double deltaUniversalTime,
