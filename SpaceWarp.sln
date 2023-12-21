@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarpPatcher", "src/Spa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarpTest", "src/SpaceWarpTest/SpaceWarpTest.csproj", "{8DB42693-9177-40B9-AC6A-B6D7A4823FAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarp.ResourceFix", "src\SpaceWarp.ResourceFix\SpaceWarp.ResourceFix.csproj", "{0C3A5074-3F79-4B81-8390-F98B3D876F0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,14 @@ Global
 		{8DB42693-9177-40B9-AC6A-B6D7A4823FAD}.Deploy|Any CPU.Build.0 = Deploy|Any CPU
 		{8DB42693-9177-40B9-AC6A-B6D7A4823FAD}.DeployAndRun|Any CPU.ActiveCfg = DeployAndRun|Any CPU
 		{8DB42693-9177-40B9-AC6A-B6D7A4823FAD}.DeployAndRun|Any CPU.Build.0 = DeployAndRun|Any CPU
+		{0C3A5074-3F79-4B81-8390-F98B3D876F0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C3A5074-3F79-4B81-8390-F98B3D876F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C3A5074-3F79-4B81-8390-F98B3D876F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C3A5074-3F79-4B81-8390-F98B3D876F0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C3A5074-3F79-4B81-8390-F98B3D876F0D}.Deploy|Any CPU.ActiveCfg = Deploy|Any CPU
+		{0C3A5074-3F79-4B81-8390-F98B3D876F0D}.Deploy|Any CPU.Build.0 = Deploy|Any CPU
+		{0C3A5074-3F79-4B81-8390-F98B3D876F0D}.DeployAndRun|Any CPU.ActiveCfg = DeployAndRun|Any CPU
+		{0C3A5074-3F79-4B81-8390-F98B3D876F0D}.DeployAndRun|Any CPU.Build.0 = DeployAndRun|Any CPU
 	EndGlobalSection
 EndGlobal
 

@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using HarmonyLib;
+using JetBrains.Annotations;
 using KSP.Game;
 using KSP.Messages;
 using SpaceWarp.API.Game.Messages;
@@ -11,6 +12,7 @@ public class Game : SpaceWarpModule
     public override string Name => "SpaceWarp.Game";
 
     public override void LoadModule()
+
     {
     }
 

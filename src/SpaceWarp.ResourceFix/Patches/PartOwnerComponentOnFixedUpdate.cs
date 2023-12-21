@@ -2,6 +2,7 @@
 using HarmonyLib;
 using KSP.Sim.impl;
 using SpaceWarp.API.Parts;
+using SpaceWarp.ResourceFix.API;
 
 namespace SpaceWarp.Patching;
 
@@ -13,6 +14,7 @@ internal class PartOwnerComponentOnFixedUpdate
         double deltaUniversalTime,
         PartOwnerComponent __instance)
     {
+        
         var isModulePresent = false;
         var hasPartModuleMethod = __instance.GetType().GetMethod("HasPartModule");
 
