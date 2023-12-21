@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using KSP.Sim.impl;
 using SpaceWarp.API.Logging;
+using SpaceWarp.ResourceFix.Patches;
 
 namespace SpaceWarp.ResourceFix.API;
 
@@ -27,7 +28,7 @@ public static class PartComponentModuleOverride
         }
         if (RegisteredPartComponentOverrides.Count == 0)
         {
-            Harmony.CreateAndPatchAll(typeof(Modules.ResourceFix).Assembly,"ResourceFix");
+            Harmony.CreateAndPatchAll(typeof(PartOwnerComponent),"ResourceFix");
         }
         RegisteredPartComponentOverrides.Add(typeof(T));
         _LOGGER.LogInfo($"Registered '{moduleName}' for background resources processing.");
