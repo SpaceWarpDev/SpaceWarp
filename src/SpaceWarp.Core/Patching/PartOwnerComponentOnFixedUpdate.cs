@@ -7,32 +7,27 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch]
 internal class PartOwnerComponentOnFixedUpdate
 {
-    private static Dictionary<PartOwnerComponent, bool> AlreadyCachedOwners = new();
     [HarmonyPatch(typeof(PartOwnerComponent), "OnFixedUpdate"), HarmonyPrefix]
     private static bool PerformBackgroundCalculationsForRegisteredModules(double universalTime,
         double deltaUniversalTime,
         PartOwnerComponent __instance)
     {
-        if (!AlreadyCachedOwners.TryGetValue(__instance, out var isModulePresent))
-        {
-            isModulePresent = false;
-            var hasPartModuleMethod = __instance.GetType().GetMethod("HasPartModule");
+        var isModulePresent = false;
+        var hasPartModuleMethod = __instance.GetType().GetMethod("HasPartModule");
 
-            if (hasPartModuleMethod != null)
+        if (hasPartModuleMethod != null)
+        {
+            // Go through each registered module and check if it's present in PartOwnerComponent modules
+            foreach (var moduleType in PartComponentModuleOverride.RegisteredPartComponentOverrides)
             {
-                // Go through each registered module and check if it's present in PartOwnerComponent modules
-                foreach (var moduleType in PartComponentModuleOverride.RegisteredPartComponentOverrides)
-                {
                     var genericMethod = hasPartModuleMethod.MakeGenericMethod(moduleType);
+
                     if ((bool)genericMethod.Invoke(__instance, null))
                     {
                         isModulePresent = true;
                         break;
                     }
-                }
             }
-
-            AlreadyCachedOwners.Add(__instance, isModulePresent);
         }
 
         // If registered module is present, run the original 0.1.5 method that runs background resource checks
