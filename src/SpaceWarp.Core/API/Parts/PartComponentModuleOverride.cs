@@ -1,9 +1,8 @@
-﻿using HarmonyLib;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using KSP.Sim.impl;
 using SpaceWarp.API.Logging;
 
-namespace SpaceWarp.ResourceFix.API;
+namespace SpaceWarp.API.Parts;
 
 [PublicAPI]
 public static class PartComponentModuleOverride
@@ -28,10 +27,6 @@ public static class PartComponentModuleOverride
 
         RegisteredPartComponentOverrides.Add(typeof(T));
         _LOGGER.LogInfo($"Registered '{moduleName}' for background resources processing.");
-        if (RegisteredPartComponentOverrides.Count > 0)
-        {
-            Harmony.CreateAndPatchAll(typeof(Modules.ResourceFix).Assembly,"ResourceFix");
-        }
     }
 
     /// <summary>
@@ -44,9 +39,5 @@ public static class PartComponentModuleOverride
 
         RegisteredPartComponentOverrides.Remove(typeof(T));
         _LOGGER.LogInfo($"Unregistered '{typeof(T).Name}' from background resources processing.");
-        if (RegisteredPartComponentOverrides.Count == 0)
-        {
-            Harmony.UnpatchID("ResourceFix");
-        }
     }
 }

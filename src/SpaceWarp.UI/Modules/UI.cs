@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using BepInEx.Bootstrap;
-using HarmonyLib;
 using JetBrains.Annotations;
 using KSP.Assets;
 using KSP.Game;
@@ -52,7 +51,6 @@ public class UI : SpaceWarpModule
 
     public override void LoadModule()
     {
-        Harmony.CreateAndPatchAll(GetType().Assembly);
         AppbarBackend.AppBarInFlightSubscriber.AddListener(Appbar.LoadAllButtons);
         AppbarBackend.AppBarOABSubscriber.AddListener(Appbar.LoadOABButtons);
         AppbarBackend.AppBarKSCSubscriber.AddListener(Appbar.LoadKSCButtons);
