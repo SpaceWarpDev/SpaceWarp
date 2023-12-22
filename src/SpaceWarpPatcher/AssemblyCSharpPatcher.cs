@@ -112,6 +112,5 @@ public class AssemblyCSharpPatcher
         
         insts.Clear();
         insts.AddRange(newInstructions);
-        assemblyDefinition.Write("TestOutput.dll");
     }
 }
