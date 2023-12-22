@@ -28,12 +28,15 @@ jobs:
         run: |
           version=$(jq -r '.version' plugin_template/BepInEx/plugins/SpaceWarp/swinfo.json)
           echo "Version is $version"
-          echo "::set-output name=version::$version"
+          echo "version=$version" >> $GITHUB_ENV
+          echo "artifact_name=spacewarp-release-$version.zip" >> $GITHUB_ENV
+          echo "zip=$(ls -1 dist/SpaceWarp-*.zip | head -n 1)" >> $GITHUB_ENV
+          echo "upload_url=$(wget -qO- https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq '.[0].upload_url' | tr -d \")" >> $GITHUB_ENV
 
       - name: Check if version exists
         id: check-version
         run: |
-          version=${{ steps.get-version.outputs.version }}
+          version=${{ env.version }}
           response=$(curl -s "https://nuget.spacewarp.org/v3/search?q=SpaceWarp")
           exists=$(echo "$response" | jq -r --arg id "SpaceWarp" --arg version "$version" '.data[] | select(.id == $id) | .versions[] | select(.version == $version) | .version')
           if [ "$exists" == "$version" ]; then
@@ -41,11 +44,22 @@ jobs:
             exit 1
           else
             echo "Version $version does not exist in the NuGet repository"
-            echo "::set-output name=should_publish::true"
+            echo "should_publish=true" >> $GITHUB_ENV
           fi
 
       - name: Publish NuGet package
-        if: steps.check-version.outputs.should_publish == 'true'
+        if: env.should_publish == 'true'
         run: |
           nupkg_path=$(ls -1 nuget/SpaceWarp.*.nupkg | head -n 1)
           dotnet nuget push "$nupkg_path" -s https://nuget.spacewarp.org/v3/index.json -k ${{ secrets.NUGET_SERVER_KEY }}
+
+      - name: Upload Zip
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.upload_url }}
+          asset_path: ${{ env.zip }}
+          asset_name: ${{ env.artifact_name }}
+          asset_content_type: application/zip  
+        
