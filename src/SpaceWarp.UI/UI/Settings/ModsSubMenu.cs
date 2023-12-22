@@ -35,7 +35,6 @@ internal class ModsSubMenu : SettingsSubMenu
             Destroy(child.gameObject);
         }
 
-
         // Now here is where we go through every single mod
 #pragma warning disable CS0618
         foreach (var mod in BepInEx.Bootstrap.Chainloader.Plugins.Where(mod =>
