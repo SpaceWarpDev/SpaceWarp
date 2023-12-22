@@ -121,6 +121,11 @@ public static class ModsPropertyDrawers
                 lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
                 lab.GetComponent<TextMeshProUGUI>().text = entry.Definition.Key;
                 var setting = radioCopy.GetChild("Setting");
+                foreach (Transform child in setting.transform)
+                {
+                    if (child.gameObject.GetComponent<ToggleExtended>())
+                        UnityObject.Destroy(child.gameObject);
+                }
                 var idx = optionValues.IndexOf((int)entry.BoxedValue);
                 List<ToggleExtended> allToggles = new();
                 for (var i = 0; i < optionNames.Count; i++)
@@ -228,6 +233,11 @@ public static class ModsPropertyDrawers
                 lab.GetComponent<Localize>().SetTerm(name);
                 lab.GetComponent<TextMeshProUGUI>().text = name;
                 var setting = radioCopy.GetChild("Setting");
+                foreach (Transform child in setting.transform)
+                {
+                    if (child.gameObject.GetComponent<ToggleExtended>())
+                        UnityObject.Destroy(child.gameObject);
+                }
                 var idx = optionValues.IndexOf((int)entry.Value);
                 List<ToggleExtended> allToggles = new();
                 for (var i = 0; i < optionNames.Count; i++)
@@ -391,6 +401,11 @@ public static class ModsPropertyDrawers
         lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
         lab.GetComponent<TextMeshProUGUI>().text = entry.Definition.Key;
         var setting = radioCopy.GetChild("Setting");
+        foreach (Transform child in setting.transform)
+        {
+            if (child.gameObject.GetComponent<ToggleExtended>())
+                UnityObject.Destroy(child.gameObject);
+        }
         var idx = entry.Value ? 0 : 1;
         List<ToggleExtended> allToggles = new();
         for (var i = 0; i < 2; i++)
@@ -449,6 +464,11 @@ public static class ModsPropertyDrawers
         lab.GetComponent<Localize>().SetTerm(name);
         lab.GetComponent<TextMeshProUGUI>().text = name;
         var setting = radioCopy.GetChild("Setting");
+        foreach (Transform child in setting.transform)
+        {
+            if (child.gameObject.GetComponent<ToggleExtended>())
+                UnityObject.Destroy(child.gameObject);
+        }
         var idx = (bool)entry.Value ? 0 : 1;
         List<ToggleExtended> allToggles = new();
         for (var i = 0; i < 2; i++)

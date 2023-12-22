@@ -27,13 +27,13 @@ internal class ModsSubMenu : SettingsSubMenu
 
     public void Start()
     {
+        SettingsMenuController.Instance.UpdatePrefabs();
         // Lets make sure we clear out the list
         foreach (Transform child in transform)
         {
             SpaceWarpPlugin.Logger.LogDebug($"Destroying ---- {child.gameObject.name}");
             Destroy(child.gameObject);
         }
-
 
         // Now here is where we go through every single mod
 #pragma warning disable CS0618
