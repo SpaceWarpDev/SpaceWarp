@@ -13,6 +13,13 @@ public static class PartOwnerComponentConstructor
     private static FieldInfo AddedField =
         typeof(PartOwnerComponent).GetField("HasRegisteredPartComponentsForFixedUpdate");
 
+    [HarmonyPatch(MethodType.Constructor)]
+    public static void SetFalse(PartOwnerComponent __instance)
+    {
+
+        AddedField.SetValue(__instance, false);
+    }
+
     [HarmonyPatch(nameof(PartOwnerComponent.Add)), HarmonyPrefix, UsedImplicitly]
     public static void CheckForModule(PartOwnerComponent __instance, PartComponent part)
     {
