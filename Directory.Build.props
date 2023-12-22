@@ -1,51 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project>
-    <PropertyGroup>
-        <SpaceWarpVersion>1.6.0</SpaceWarpVersion>
+    <PropertyGroup Label="Framework and language configuration">
         <TargetFramework>netstandard2.1</TargetFramework>
-        <RootNamespace>SpaceWarp</RootNamespace>
-        <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-        <!-- Disabled warning for publicizer attribute until the NuGet exists for KSP2,
-             and for missing documentation comments for public types and members -->
-        <NoWarn>$(NoWarn),CS0436,CS1591</NoWarn>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>true</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
-    <!--
-    Allows use of some newer C# language features that have compiler gates normally.
-    Do not modify the included types without checking that they don't require runtime support that doesn't exist.
-    -->
-
-    <ItemGroup>
-        <PackageReference Include="PolySharp" Version="1.12.1" PrivateAssets="all"/>
-    </ItemGroup>
-    <PropertyGroup>
-        <PolySharpIncludeGeneratedTypes>
-            System.Index;
-            System.Range;
-            System.Diagnostics.CodeAnalysis.NotNullWhenAttribute;
-            System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute;
-        </PolySharpIncludeGeneratedTypes>
+    <PropertyGroup Label="Game folder configuration">
+        <!-- Set this to the path to your KSP 2 folder if you don't have the KSP2DIR environmental variable set -->
+        <KSP2DIR Condition="'$(KSP2DIR)' == ''">C:/Program Files (x86)/Steam/steamapps/common/Kerbal Space Program 2</KSP2DIR>
     </PropertyGroup>
 
-<!--    <ItemGroup Label="Dependencies for build targets">-->
-<!--        <PackageReference Include="JsonPeek" Version="1.2.0" PrivateAssets="all"/>-->
-<!--    </ItemGroup>-->
+    <PropertyGroup Label="Build and namespace configuration">
+        <SolutionDir Condition="'$(SolutionDir)'==''">$(MSBuildThisFileDirectory)</SolutionDir>
+        <PluginBinPath>$(SolutionDir)build/bin/plugin/$(Configuration)</PluginBinPath>
+        <PluginObjPath>$(SolutionDir)build/obj/plugin/$(Configuration)</PluginObjPath>
+        <ModulesBinPath>$(SolutionDir)build/bin/modules/$(Configuration)</ModulesBinPath>
+        <ModulesObjPath>$(SolutionDir)build/obj/modules/$(Configuration)</ModulesObjPath>
+        <PatcherBinPath>$(SolutionDir)build/bin/patcher/$(Configuration)</PatcherBinPath>
+        <PatcherObjPath>$(SolutionDir)build/obj/patcher/$(Configuration)</PatcherObjPath>
+        <BaseOutputPath>$(ModulesBinPath)/$(MSBuildProjectName)</BaseOutputPath>
+        <BaseIntermediateOutputPath>$(ModulesObjPath)/$(MSBuildProjectName)</BaseIntermediateOutputPath>
+        <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+        <RootNamespace>$(AssemblyName)</RootNamespace>
+        <Configurations>Debug;Release;Deploy;DeployAndRun</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <NoWarn>$(NoWarn);CS0436</NoWarn>
+    </PropertyGroup>
 
-<!--    &lt;!&ndash; Define the main target &ndash;&gt;-->
-<!--    <Target Label="Reading properties from swinfo.json" Name="ReadPropertiesFromJson" BeforeTargets="PreBuildEvent">-->
-<!--        <JsonPeek ContentPath="$(SolutionDir)/SpaceWarpBuildTemplate/swinfo.json" Query="$">-->
-<!--            <Output TaskParameter="Result" ItemName="Swinfo"/>-->
-<!--        </JsonPeek>-->
-<!--        <JsonPeek ContentPath="$(SolutionDir)/SpaceWarpBuildTemplate/swinfo.json" Query="$.dependencies">-->
-<!--            <Output TaskParameter="Result" ItemName="Dependencies"/>-->
-<!--        </JsonPeek>-->
+    <PropertyGroup Label="Package source configuration">
+        <RestoreAdditionalProjectSources>
+            https://nuget.spacewarp.org/v3/index.json
+        </RestoreAdditionalProjectSources>
+    </PropertyGroup>
 
-<!--        &lt;!&ndash; Extract properties from the JSON &ndash;&gt;-->
-<!--        <PropertyGroup>-->
-<!--            <SpaceWarpVersion>@(Swinfo -> '%(version)')</SpaceWarpVersion>-->
-<!--        </PropertyGroup>-->
-<!--    </Target>-->
+    <ItemGroup Label="Dependencies for build targets">
+        <PackageReference Include="JsonPeek" Version="1.2.0" PrivateAssets="all"/>
+    </ItemGroup>
+
+    <!-- Define the main target -->
+    <Target Label="Reading properties from swinfo.json" Name="ReadPropertiesFromJson" BeforeTargets="PreBuildEvent;AddGeneratedFile">
+        <JsonPeek ContentPath="$(SolutionDir)/plugin_template/BepInEx/plugins/SpaceWarp/swinfo.json" Query="$">
+            <Output TaskParameter="Result" ItemName="Swinfo"/>
+        </JsonPeek>
+
+        <!-- Extract properties from the JSON -->
+        <PropertyGroup>
+            <ModId>@(Swinfo -> '%(mod_id)')</ModId>
+            <Version>@(Swinfo -> '%(version)')</Version>
+            <Version Condition="$(Version.Contains('-'))">$(Version.Substring(0, $(Version.IndexOf('-'))))</Version>
+            <Product>@(Swinfo -> '%(name)')</Product>
+            <Authors>@(Swinfo -> '%(author)')</Authors>
+            <Description>@(Swinfo -> '%(description)')</Description>
+            <RepositoryType>git</RepositoryType>
+            <RepositoryUrl>@(Swinfo -> '%(source)')</RepositoryUrl>
+            <BepInExPluginGuid>$(ModId)</BepInExPluginGuid>
+            <BepInExPluginName>$(Product)</BepInExPluginName>
+            <BepInExPluginVersion>$(Version)</BepInExPluginVersion>
+        </PropertyGroup>
+    </Target>
 </Project>

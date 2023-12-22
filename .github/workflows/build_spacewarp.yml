@@ -9,38 +9,39 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        run_args: ["" , "-r"]
-    
+
     steps:
-      - name: Check Out Repository
+      - name: Check out repository
         uses: actions/checkout@v3
-      
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: 3.9
-          
-      - name: Run Python Script
-        run: sudo python builder.py ${{ matrix.run_args }} 
-        # I'm sure running it in sudo will cause NO issues what so ever.
-        
-      - name: Find Zip
+
+      - name: Download NuGet
+        id: download-nuget
+        run: |
+          sudo curl -o /usr/local/bin/nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+
+      - name: Build the solution
+        run: dotnet build "SpaceWarp.sln" -c Release
+
+      - name: Find zip
         id: find-zip
         run: |
-          if [ "${{ matrix.run_args }}" == "-r" ]; then
-            echo "zip=$(ls -1 build/SpaceWarp-Release*.zip | head -n 1)" >> $GITHUB_ENV
-            echo "artifact_name=SpaceWarpRelease" >> $GITHUB_ENV
-          else
-            echo "zip=$(ls -1 build/SpaceWarp-Debug*.zip | head -n 1)" >> $GITHUB_ENV
-            echo "artifact_name=SpaceWarpDebug" >> $GITHUB_ENV
-          fi
-        # Least cursed Sinon code.
+          echo "zip=$(ls -1 dist/SpaceWarp-*.zip | head -n 1)" >> $GITHUB_ENV
+          echo "artifact_name=SpaceWarpRelease" >> $GITHUB_ENV
 
-      - name: Upload Artifact
+      - name: Upload release zip
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.artifact_name }}
           path: ${{ env.zip }}
+
+      - name: Find NuGet package
+        id: find-nupkg
+        run: |
+          echo "nupkg=$(ls -1 nuget/SpaceWarp.*.nupkg | head -n 1)" >> $GITHUB_ENV
+          echo "artifact_name=SpaceWarpNuGet" >> $GITHUB_ENV
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.artifact_name }}
+          path: ${{ env.nupkg }}
