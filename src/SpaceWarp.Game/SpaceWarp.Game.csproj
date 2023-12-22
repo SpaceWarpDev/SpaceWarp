@@ -2,7 +2,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <!-- References -->
     <ItemGroup Label="NuGet package references">
-        <PackageReference Include="JsonPeek" Version="1.2.0"/>
         <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.5"/>
     </ItemGroup>
     <ItemGroup Label="Project references">

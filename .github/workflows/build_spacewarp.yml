@@ -7,34 +7,41 @@ on:
     branches: [ "main", "dev" ]
 
 jobs:
-  build-debug:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Out Repository
+      - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Build the solution
-        run: dotnet build "SpaceWarp.sln" -c Debug
+      - name: Download NuGet
+        id: download-nuget
+        run: |
+          sudo curl -o /usr/local/bin/nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 
-  build-release:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check Out Repository
-        uses: actions/checkout@v3
-      
       - name: Build the solution
         run: dotnet build "SpaceWarp.sln" -c Release
-        
-      - name: Find Zip
+
+      - name: Find zip
         id: find-zip
         run: |
           echo "zip=$(ls -1 dist/SpaceWarp-*.zip | head -n 1)" >> $GITHUB_ENV
           echo "artifact_name=SpaceWarpRelease" >> $GITHUB_ENV
 
-      - name: Upload Artifact
+      - name: Upload release zip
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.artifact_name }}
           path: ${{ env.zip }}
+
+      - name: Find NuGet package
+        id: find-nupkg
+        run: |
+          echo "nupkg=$(ls -1 nuget/SpaceWarp.*.nupkg | head -n 1)" >> $GITHUB_ENV
+          echo "artifact_name=SpaceWarpNuGet" >> $GITHUB_ENV
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.artifact_name }}
+          path: ${{ env.nupkg }}

@@ -11,9 +11,9 @@
 
 [Documentation](https://docs.spacewarp.org)
 
-Space Warp is a mod loader for Kerbal Space Program 2.
+Space Warp is a modding API for Kerbal Space Program 2 with support for BepInEx and the official mod loader.*
 
-Note: Use at your own risk, as this is an early version that is expected to undergo many changes.
+*\*Note: The official mod loader is unfinished, so BepInEx is currently still required to enable it.*
 
 ## Installation
 
@@ -41,11 +41,19 @@ That should be it, you can now launch the game and enjoy!
 
 To compile this project, you will need to follow these steps:
 
-1. Install NuGet
+1. Install .NET 7+ SDK
 2. Run `dotnet restore` inside the top directory to install the packages.
-3. Run one of the build scripts (see below for more info) and copy the contents from the correct build output directory into the KSP2 root director
+3. Run `dotnet build -c <Configuration>` to build the project, where `<Configuration>` is one of the following:
+   - `Debug` - Builds the project in debug mode
+   - `Deploy` - Builds the project in debug mode and copies the output to the KSP2 directory
+   - `DeployAndRun` - Builds the project in debug mode, copies the output to the KSP2 directory, and runs the game
+   - `Release` - Builds the project in release mode, zips the output, and builds a NuGet package
 
-Mods are currently implemented as monobehaviours with two fields: a `Logger` for logging and a `Manager` that points to Spacewarp. A mod template generator exists as a Python script.
+or you can use Visual Studio 2022 or JetBrains Rider to build the project.
+
+There are also scripts in the `scripts` folder that can be used to build the project in each of the configurations, they simply run the `dotnet build` command with the correct arguments.
+
+The outputs can be found in `dist/<Configuration>`. The Release zip will be in the `dist` folder, and the NuGet package will be in the `nuget` folder.
 
 ## Mod Structure
 
@@ -63,6 +71,8 @@ KSP2_Root_Folder/
 │   │   │   │   │   ├── *.bundle
 │   │   │   │   ├── images/
 │   │   │   │   │   ├── *
+│   │   │   │   ├── soundbanks/
+│   │   │   │   │   ├── *.bnk
 │   │   │   ├── localizations/
 │   │   │   │   ├── *.csv
 │   │   │   ├── addressables/
@@ -70,16 +80,3 @@ KSP2_Root_Folder/
 │   │   │   │   ├── *
 │   │   │   ├── *.dll 
 ```
-
-## Build Scripts
-
-Each build scripts is essentially just a wrapper around `python3 builder.py $@`. The actual builder code is in `builder.py`.
-Before running, open a terminal and `cd` into the repo, then run `pip install -r requirements.txt` to install the required dependencies (its just `argparse`).
-
-The build scripts are:
-`build.bat` for Windows, `build.ps1` for Windows (Powershell), and `build.sh` for Linux
-
-The available arguments are:
-- `-r` or `--release` to build in release mode
-
-When building, the build output will be in `build/SpaceWarp`, and the compressed version will be `build/SpaceWarp-[Debug|Release]-[commit].zip`.
