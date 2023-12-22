@@ -84,7 +84,7 @@
         <Message Text="Compressing built plugin folder" Condition="$(ConfigurationName) == Release"/>
         <Delete Condition="$(ConfigurationName) == Release"
                 Files="$(SolutionDir)/dist/$(SolutionName)-$(Version).zip"/>
-        <Exec Condition="$(ConfigurationName) == 'Release' and '$(OS)' == 'Windows_NT'"
+        <Exec Condition="$(ConfigurationName) == 'Release'"
               Command="$(PowerShellExecutable) -Command &quot;&amp; {Push-Location '$(SolutionDir)/dist/$(ConfigurationName)'; Compress-Archive -Path './*' -DestinationPath '$(SolutionDir)/dist/$(SolutionName)-$(Version).zip'; Pop-Location}&quot;"/>
 
         <!-- Packing NuGet package -->
