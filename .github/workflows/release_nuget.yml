@@ -1,0 +1,46 @@
+name: Publish NuGet Package
+
+on:
+  release:
+    types: [ "published" ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v2.1.0
+
+      - name: Build the solution
+        run: dotnet build "SpaceWarp.sln" -c Release
+
+      - name: Extract current version
+        id: get-version
+        run: |
+          version=$(jq -r '.version' plugin_template/BepInEx/plugins/SpaceWarp/swinfo.json)
+          echo "Version is $version"
+          echo "::set-output name=version::$version"
+
+      - name: Check if version exists
+        id: check-version
+        run: |
+          version=${{ steps.get-version.outputs.version }}
+          response=$(curl -s "https://nuget.spacewarp.org/v3/search?q=SpaceWarp")
+          exists=$(echo "$response" | jq -r --arg id "SpaceWarp" --arg version "$version" '.data[] | select(.id == $id) | .versions[] | select(.version == $version) | .version')
+          if [ "$exists" == "$version" ]; then
+            echo "Version $version already exists in the NuGet repository"
+            exit 1
+          else
+            echo "Version $version does not exist in the NuGet repository"
+            echo "::set-output name=should_publish::true"
+          fi
+
+      - name: Publish NuGet package
+        if: steps.check-version.outputs.should_publish == 'true'
+        run: |
+          nupkg_path=$(ls -1 nuget/SpaceWarp.*.nupkg | head -n 1)
+          dotnet nuget push "$nupkg_path" -s https://nuget.spacewarp.org/v3/index.json -k ${{ secrets.NUGET_SERVER_KEY }}
