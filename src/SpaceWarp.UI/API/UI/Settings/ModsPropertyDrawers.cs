@@ -117,6 +117,10 @@ public static class ModsPropertyDrawers
             else
             {
                 var radioCopy = UnityObject.Instantiate(RadioPrefab);
+                foreach (Transform child in radioCopy.transform)
+                {
+                    UnityObject.Destroy(child.gameObject);
+                }
                 var lab = radioCopy.GetChild("Label");
                 lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
                 lab.GetComponent<TextMeshProUGUI>().text = entry.Definition.Key;
@@ -224,6 +228,10 @@ public static class ModsPropertyDrawers
             else
             {
                 var radioCopy = UnityObject.Instantiate(RadioPrefab);
+                foreach (Transform child in radioCopy.transform)
+                {
+                    UnityObject.Destroy(child.gameObject);
+                }
                 var lab = radioCopy.GetChild("Label");
                 lab.GetComponent<Localize>().SetTerm(name);
                 lab.GetComponent<TextMeshProUGUI>().text = name;
@@ -387,6 +395,10 @@ public static class ModsPropertyDrawers
     {
         var entry = (ConfigEntry<bool>)baseEntry;
         var radioCopy = UnityObject.Instantiate(RadioPrefab);
+        foreach (Transform child in radioCopy.transform)
+        {
+            UnityObject.Destroy(child.gameObject);
+        }
         var lab = radioCopy.GetChild("Label");
         lab.GetComponent<Localize>().SetTerm(entry.Definition.Key);
         lab.GetComponent<TextMeshProUGUI>().text = entry.Definition.Key;
@@ -445,6 +457,10 @@ public static class ModsPropertyDrawers
     private static GameObject CreateBoolConfigAbstracted(string name, IConfigEntry entry)
     {
         var radioCopy = UnityObject.Instantiate(RadioPrefab);
+        foreach (Transform child in radioCopy.transform)
+        {
+            UnityObject.Destroy(child.gameObject);
+        }
         var lab = radioCopy.GetChild("Label");
         lab.GetComponent<Localize>().SetTerm(name);
         lab.GetComponent<TextMeshProUGUI>().text = name;

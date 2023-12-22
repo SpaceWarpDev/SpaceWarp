@@ -42,20 +42,16 @@ internal class SettingsMenuController : KerbalMonoBehaviour
     private GameObject _headerPrefab;
     private GameObject _dividerPrefab;
     private GameObject _sectionPrefab;
+    internal static SettingsMenuController Instance;
     private bool _alreadySetup = false;
     private void Start()
     {
         MainMenuPatcher.MainMenuLoaded += Setup;
+        Instance = this;
     }
 
-    private void Setup()
+    public void UpdatePrefabs()
     {
-        if (_alreadySetup) return;
-        _alreadySetup = true;
-        var categories = GameObject.Find(CategoriesPath);
-        var graphics = GameObject.Find(GraphicsPath);
-        var modsButton =Instantiate(graphics, categories.transform);
-        var content = GameObject.Find(ContentPath);
         var graphicsSettings = GameObject.Find(ContentGraphicsPath);
         _headerPrefab = Instantiate(graphicsSettings.transform.Find("SettingsMenuHeader").gameObject);
         _headerPrefab.Persist();
@@ -66,7 +62,7 @@ internal class SettingsMenuController : KerbalMonoBehaviour
         _sectionPrefab = Instantiate(graphicsSettings.transform.Find("Video").gameObject);
         foreach (Transform child in _sectionPrefab.transform)
         {
-            if (child.gameObject.name != "Title")
+            if (!child.gameObject.GetComponent<TMPro.TextMeshProUGUI>())
             {
                 Destroy(child.gameObject);
             }
@@ -100,7 +96,6 @@ internal class SettingsMenuController : KerbalMonoBehaviour
             if (alpha != null) Destroy(alpha);
             var beta = radioSettingPrefab.GetComponent<UIAction_Void_Toggle>();
             if (beta != null) Destroy(beta);
-
         }
         radioPrefab.SetActive(false);
         radioSettingPrefab.SetActive(false);
@@ -134,8 +129,20 @@ internal class SettingsMenuController : KerbalMonoBehaviour
         Destroy(amount.GetComponentInChildren<UIValue_ReadString_Text>());
         sliderPrefab.SetActive(false);
         ModsPropertyDrawers.SliderPrefab = sliderPrefab;
+    }
+    
+    private void Setup()
+    {
+        if (_alreadySetup) return;
+        _alreadySetup = true;
+        var categories = GameObject.Find(CategoriesPath);
+        var graphics = GameObject.Find(GraphicsPath);
+        var content = GameObject.Find(ContentPath);
+        var graphicsSettings = GameObject.Find(ContentGraphicsPath);
+        
 
 
+        var modsButton = Instantiate(graphics, categories.transform);
         modsButton.GetComponentInChildren<Localize>().Term = "";
         var text = modsButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
         text.text = "Mods";
@@ -187,6 +194,13 @@ internal class SettingsMenuController : KerbalMonoBehaviour
     private GameObject GenerateSection(string section)
     {
         var copy = Instantiate(_sectionPrefab);
+        foreach (Transform child in copy.transform)
+        {
+            if (!child.gameObject.GetComponent<TMPro.TextMeshProUGUI>())
+            {
+                Destroy(child.gameObject);
+            }
+        }
         var text = copy.GetComponentInChildren<TMPro.TextMeshProUGUI>();
         var localize = copy.GetComponentInChildren<Localize>();
         if (localize != null)

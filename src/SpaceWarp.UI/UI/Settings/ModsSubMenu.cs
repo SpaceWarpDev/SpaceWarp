@@ -27,6 +27,7 @@ internal class ModsSubMenu : SettingsSubMenu
 
     public void Start()
     {
+        SettingsMenuController.Instance.UpdatePrefabs();
         // Lets make sure we clear out the list
         foreach (Transform child in transform)
         {
