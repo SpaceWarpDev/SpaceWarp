@@ -1,8 +1,10 @@
-﻿using HarmonyLib;
+﻿using System.Runtime.CompilerServices;
+using HarmonyLib;
 using KSP.Sim.impl;
+using SpaceWarp.API.Parts;
 using SpaceWarp.ResourceFix.API;
 
-namespace SpaceWarp.ResourceFix.Patches;
+namespace SpaceWarp.Patching;
 
 [HarmonyPatch]
 internal class PartOwnerComponentOnFixedUpdate

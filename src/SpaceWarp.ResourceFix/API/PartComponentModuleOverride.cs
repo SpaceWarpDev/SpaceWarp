@@ -25,12 +25,13 @@ public static class PartComponentModuleOverride
         {
             throw new ArgumentException($"Module '{moduleName}' is already registered. Skipping.", nameof(T));
         }
-        if (RegisteredPartComponentOverrides.Count == 0)
+
+        RegisteredPartComponentOverrides.Add(typeof(T));
+        _LOGGER.LogInfo($"Registered '{moduleName}' for background resources processing.");
+        if (RegisteredPartComponentOverrides.Count > 0)
         {
             Harmony.CreateAndPatchAll(typeof(Modules.ResourceFix).Assembly,"ResourceFix");
         }
-        RegisteredPartComponentOverrides.Add(typeof(T));
-        _LOGGER.LogInfo($"Registered '{moduleName}' for background resources processing.");
     }
 
     /// <summary>
