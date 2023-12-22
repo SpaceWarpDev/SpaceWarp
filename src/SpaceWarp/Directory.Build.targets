@@ -78,8 +78,12 @@
         <Message Text="Compressing built plugin folder" Condition="$(ConfigurationName) == Release"/>
         <Delete Condition="$(ConfigurationName) == Release"
                 Files="$(SolutionDir)/dist/$(SolutionName)-$(Version).zip"/>
-        <Exec Condition="$(ConfigurationName) == Release"
+        <!-- Windows command is "powershell" -->
+        <Exec Condition="$(ConfigurationName) == 'Release' and '$(OS)' == 'Windows_NT'"
               Command="powershell -Command &quot;&amp; {Push-Location '$(SolutionDir)/dist/$(ConfigurationName)'; Compress-Archive -Path './*' -DestinationPath '$(SolutionDir)/dist/$(SolutionName)-$(Version).zip'; Pop-Location}&quot;"/>
+        <!-- Linux command is "pwsh" -->
+        <Exec Condition="$(ConfigurationName) == 'Release' and '$(OS)' != 'Windows_NT'"
+              Command="pwsh -Command &quot;&amp; {Push-Location '$(SolutionDir)/dist/$(ConfigurationName)'; Compress-Archive -Path './*' -DestinationPath '$(SolutionDir)/dist/$(SolutionName)-$(Version).zip'; Pop-Location}&quot;"/>
 
         <!-- Packing NuGet package -->
         <Message Text="Copying plugin DLLs and XMLs to temporary folder for NuGet packing" Condition="$(ConfigurationName) == Release"/>
