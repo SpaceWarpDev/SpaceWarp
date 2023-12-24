@@ -42,5 +42,5 @@ SpaceWarp/Console/AutoScroll,Text,,Auto Scroll,Scroll automatico,Défilement aut
 SpaceWarp/Console/On,Text,,On,On,On
 SpaceWarp/Console/Off,Text,,Off,Off,Off
 SpaceWarp/AvcDialog/Title,Text,,spacewarp.avc,spacewarp.avc,spacewarp.avc
-SpaceWarp/AvcDialog/MainText,Text,,Allow SpaceWarp to automatically check for mod updates online?,Allow SpaceWarp to automatically check for mod updates online?,Autoriser SpaceWarp à vérifier automatiquement les mises à jour de mods en ligne ?
-SpaceWarp/AvcDialog/MinorText,Text,,*You can change this later in the settings menu.,*You can change this later in the settings menu.,*Vous pouvez modifier plus tard dans le menu des réglages.
+SpaceWarp/AvcDialog/MainText,Text,,Allow SpaceWarp to automatically check for mod updates online?,Permitir que o SpaceWarp verifique automaticamente se há atualizações de mods online?,Autoriser SpaceWarp à vérifier automatiquement les mises à jour de mods en ligne ?
+SpaceWarp/AvcDialog/MinorText,Text,,*You can change this later in the settings menu.,*Pode alterá-lo mais tarde no menu de definições.,*Vous pouvez modifier plus tard dans le menu des réglages.
