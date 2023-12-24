@@ -3,7 +3,7 @@ SpaceWarp/ModList/EnableAll,Text,,Enable All,Ativar todos,Activer tous
 SpaceWarp/ModList/DisableAll,Text,,Disable All,Desativar todos,Désactiver tous
 SpaceWarp/ModList/RevertChanges,Text,,Revert Changes,Reverter alterações,Rétablir les changements
 SpaceWarp/ModList/multipleChangesDetected,Text,,"{0} changes detected, please restart to apply them","{0} alterações detetadas, porfavor reinicie o jogo","{0} changements détectés, veuillez redémarrer pour les appliquer"
-SpaceWarp/ModList/singleChangeDetected,Text,,"1 change detected, please restart to apply it","1 alteração detectada, reinicie para aplicá-la","{0} changement détecté, veuillez redémarrer pour l'appliquer"
+SpaceWarp/ModList/singleChangeDetected,Text,,"1 change detected, please restart to apply it","1 alteração detectada, reinicie para aplicá-la","1 changement détecté, veuillez redémarrer pour l'appliquer"
 SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist,spacewarp.modlist
 SpaceWarp/ModList/EnabledMods,Text,,Enabled Mods,Mods ativos,Mods activés
 SpaceWarp/ModList/ErroredMods,Text,,Errored Mods,Mods com erros,Mods avec des erreurs
