@@ -56,9 +56,9 @@
             <Description>@(Swinfo -> '%(description)')</Description>
             <RepositoryType>git</RepositoryType>
             <RepositoryUrl>@(Swinfo -> '%(source)')</RepositoryUrl>
-            <BepInExPluginGuid>$(ModId)</BepInExPluginGuid>
-            <BepInExPluginName>$(Product)</BepInExPluginName>
-            <BepInExPluginVersion>$(Version)</BepInExPluginVersion>
+            <SpaceWarpPluginGuid>$(ModId)</SpaceWarpPluginGuid>
+            <SpaceWarpPluginName>$(Product)</SpaceWarpPluginName>
+            <SpaceWarpPluginVersion>$(Version)</SpaceWarpPluginVersion>
         </PropertyGroup>
     </Target>
 </Project>
