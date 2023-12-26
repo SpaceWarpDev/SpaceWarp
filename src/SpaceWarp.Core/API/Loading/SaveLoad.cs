@@ -1,17 +1,19 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using KSP.Game.Flow;
 using SpaceWarp.Patching;
 
 namespace SpaceWarp.API.Loading;
 
+/// <summary>
+/// An API to register flow actions to be run during loading and saving.
+/// </summary>
 [PublicAPI]
 public static class SaveLoad
 {
     /// <summary>
     ///     <para>Construct and add a <cref>FlowAction</cref> to the Game's load sequence.</para>
     ///
-    ///     <para>FlowActionType must have a public constructor that takes either no arguments,
+    ///     <para>TFlowActionType must have a public constructor that takes either no arguments,
     ///     or a single GameManager.</para>
     ///
     ///     <para>The action will be run after the first FlowAction with a name equal to referenceAction.
@@ -34,12 +36,12 @@ public static class SaveLoad
     ///         </list>
     ///     </para>
     /// </summary>
-    /// <typeparam name="FlowActionType">The type of FlowAction to insert</typeparam>
-    /// <param name="referenceAction">The name of the action to insert a FlowActionType after. Use <c>null</c> to insert it at the start.</param>
-    /// <exception cref="InvalidOperationException">Thrown if <c>FlowActionType</c> does not have a valid Constructor</exception>
-    public static void AddFlowActionToGameLoadAfter<FlowActionType>(string referenceAction) where FlowActionType : FlowAction
+    /// <typeparam name="TFlowActionType">The type of FlowAction to insert</typeparam>
+    /// <param name="referenceAction">The name of the action to insert a TFlowActionType after. Use <c>null</c> to insert it at the start.</param>
+    /// <exception cref="InvalidOperationException">Thrown if <c>TFlowActionType</c> does not have a valid Constructor</exception>
+    public static void AddFlowActionToGameLoadAfter<TFlowActionType>(string referenceAction) where TFlowActionType : FlowAction
     {
-        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(FlowActionType), SequentialFlowLoadersPatcher.FlowMethodStartgame);
+        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(TFlowActionType), SequentialFlowLoadersPatcher.FlowMethodStartgame);
     }
 
     /// <summary>
@@ -66,17 +68,17 @@ public static class SaveLoad
     ///     </para>
     /// </summary>
     /// <param name="flowAction">The FlowAction to insert</param>
-    /// <param name="referenceAction">The name of the action to insert a FlowActionType after. Use <c>null</c> to insert it at the start.</param>
+    /// <param name="referenceAction">The name of the action to insert a TFlowActionType after. Use <c>null</c> to insert it at the start.</param>
     public static void AddFlowActionToGameLoadAfter(FlowAction flowAction, string referenceAction)
     {
         SequentialFlowLoadersPatcher.AddFlowAction(referenceAction, flowAction, SequentialFlowLoadersPatcher.FlowMethodStartgame);
     }
 
     /// <summary>
-    ///     <para>Add a <cref>FlowAction</cref> to the save file loading sequence. A new <c>FlowActionType</c> is constructed every load.</para>
+    ///     <para>Add a <cref>FlowAction</cref> to the save file loading sequence. A new <c>TFlowActionType</c> is constructed every load.</para>
     ///
     ///     <para>
-    ///         FlowActionType must have a public constructor that at most one of each of the following types:
+    ///         TFlowActionType must have a public constructor that at most one of each of the following types:
     ///         <list type="bullet">
     ///             <item><cref>SaveLoadManager</cref></item>
     ///             <item><cref>LoadOrSaveCampaignTicket</cref></item>
@@ -145,12 +147,12 @@ public static class SaveLoad
     ///         </list>
     ///     </para>
     /// </summary>
-    /// <typeparam name="FlowActionType">The type of FlowAction to insert</typeparam>
-    /// <param name="referenceAction">The name of the action to insert a FlowActionType after. Use <c>null</c> to insert it at the start.</param>
-    /// <exception cref="InvalidOperationException">Thrown if <c>FlowActionType</c> does not have a valid Constructor</exception>
-    public static void AddFlowActionToCampaignLoadAfter<FlowActionType>(string referenceAction) where FlowActionType : FlowAction
+    /// <typeparam name="TFlowActionType">The type of FlowAction to insert</typeparam>
+    /// <param name="referenceAction">The name of the action to insert a TFlowActionType after. Use <c>null</c> to insert it at the start.</param>
+    /// <exception cref="InvalidOperationException">Thrown if <c>TFlowActionType</c> does not have a valid Constructor</exception>
+    public static void AddFlowActionToCampaignLoadAfter<TFlowActionType>(string referenceAction) where TFlowActionType : FlowAction
     {
-        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(FlowActionType), SequentialFlowLoadersPatcher.FlowMethodPrivateloadcommon);
+        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(TFlowActionType), SequentialFlowLoadersPatcher.FlowMethodPrivateloadcommon);
     }
 
     /// <summary>
@@ -225,10 +227,10 @@ public static class SaveLoad
     }
 
     /// <summary>
-    ///     <para>Add a <cref>FlowAction</cref> to the save file writing sequence. A new <c>FlowActionType</c> is constructed every load.</para>
+    ///     <para>Add a <cref>FlowAction</cref> to the save file writing sequence. A new <c>TFlowActionType</c> is constructed every load.</para>
     ///
     ///     <para>
-    ///         FlowActionType must have a public constructor that at most one of each of the following types:
+    ///         TFlowActionType must have a public constructor that at most one of each of the following types:
     ///         <list type="bullet">
     ///             <item><cref>SaveLoadManager</cref></item>
     ///             <item><cref>LoadOrSaveCampaignTicket</cref></item>
@@ -258,12 +260,12 @@ public static class SaveLoad
     ///         </list>
     ///     </para>
     /// </summary>
-    /// <typeparam name="FlowActionType">The type of FlowAction to insert</typeparam>
-    /// <param name="referenceAction">The name of the action to insert a FlowActionType after. Use <c>null</c> to insert it at the start.</param>
-    /// <exception cref="InvalidOperationException">Thrown if <c>FlowActionType</c> does not have a valid Constructor</exception>
-    public static void AddFlowActionToCampaignSaveAfter<FlowActionType>(string referenceAction) where FlowActionType : FlowAction
+    /// <typeparam name="TFlowActionType">The type of FlowAction to insert</typeparam>
+    /// <param name="referenceAction">The name of the action to insert a TFlowActionType after. Use <c>null</c> to insert it at the start.</param>
+    /// <exception cref="InvalidOperationException">Thrown if <c>TFlowActionType</c> does not have a valid Constructor</exception>
+    public static void AddFlowActionToCampaignSaveAfter<TFlowActionType>(string referenceAction) where TFlowActionType : FlowAction
     {
-        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(FlowActionType), SequentialFlowLoadersPatcher.FlowMethodPrivatesavecommon);
+        SequentialFlowLoadersPatcher.AddConstructor(referenceAction, typeof(TFlowActionType), SequentialFlowLoadersPatcher.FlowMethodPrivatesavecommon);
     }
 
     /// <summary>

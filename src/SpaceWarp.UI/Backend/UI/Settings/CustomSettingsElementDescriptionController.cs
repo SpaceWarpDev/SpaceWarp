@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using KSP.Game;
+﻿using KSP.Game;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 

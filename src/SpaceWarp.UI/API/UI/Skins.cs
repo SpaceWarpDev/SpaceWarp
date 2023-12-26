@@ -1,5 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using SpaceWarp.API.Assets;
 using UnityEngine;
 

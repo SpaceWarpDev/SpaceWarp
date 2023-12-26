@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using JetBrains.Annotations;
 using KSP.IO;
 using Newtonsoft.Json;
@@ -11,6 +8,9 @@ using UnityEngine;
 
 namespace SpaceWarp.API.Configuration;
 
+/// <summary>
+/// A config file that uses JSON to store its data.
+/// </summary>
 [PublicAPI]
 public class JsonConfigFile : IConfigFile
 {
@@ -19,6 +19,10 @@ public class JsonConfigFile : IConfigFile
     internal Dictionary<string, Dictionary<string, JsonConfigEntry>> CurrentEntries = new();
     private readonly string _file;
 
+    /// <summary>
+    /// Creates a new JSON config file object.
+    /// </summary>
+    /// <param name="file">The file path to use.</param>
     public JsonConfigFile(string file)
     {
         // Use .cfg as this is going to have comments and that will be an issue
@@ -38,6 +42,7 @@ public class JsonConfigFile : IConfigFile
         _file = file;
     }
 
+    /// <inheritdoc />
     public void Save()
     {
         if (!CurrentEntries.Any(value => value.Value.Count > 0)) return;
@@ -72,6 +77,9 @@ public class JsonConfigFile : IConfigFile
 
     private static List<JsonConverter> _defaultConverters;
 
+    /// <summary>
+    /// The default converters to use when serializing/deserializing JSON.
+    /// </summary>
     public static List<JsonConverter> DefaultConverters
     {
         get
@@ -86,7 +94,11 @@ public class JsonConfigFile : IConfigFile
         }
     }
 
-    private static bool DumpEntry(StringBuilder result, bool hadPreviousKey, KeyValuePair<string, JsonConfigEntry> entry)
+    private static bool DumpEntry(
+        StringBuilder result,
+        bool hadPreviousKey,
+        KeyValuePair<string, JsonConfigEntry> entry
+    )
     {
         if (hadPreviousKey)
         {
@@ -128,8 +140,10 @@ public class JsonConfigFile : IConfigFile
         return true;
     }
 
+    /// <inheritdoc />
     public IConfigEntry this[string section, string key] => CurrentEntries[section][key];
 
+    /// <inheritdoc />
     public IConfigEntry Bind<T>(string section, string key, T defaultValue = default, string description = "")
     {
         // So now we have to check if its already bound, and/or if the previous config object has it
@@ -173,7 +187,9 @@ public class JsonConfigFile : IConfigFile
         return previousSection[key];
     }
 
+    /// <inheritdoc />
     public IReadOnlyList<string> Sections => CurrentEntries.Keys.ToList();
 
+    /// <inheritdoc />
     public IReadOnlyList<string> this[string section] => CurrentEntries[section].Keys.ToList();
 }

@@ -5,7 +5,6 @@ using SpaceWarp.API.Logging;
 using SpaceWarp.API.SaveGameManager;
 using SpaceWarp.Backend.SaveGameManager;
 using SpaceWarp.InternalUtilities;
-using System;
 
 namespace SpaceWarp.Patching.SaveGameManager;
 

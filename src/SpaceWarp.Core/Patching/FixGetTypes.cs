@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using BepInEx.Logging;
 using HarmonyLib;

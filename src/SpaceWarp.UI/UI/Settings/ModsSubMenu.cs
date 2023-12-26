@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using BepInEx;
-using BepInEx.Configuration;
+﻿using BepInEx.Configuration;
 using KSP.UI;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Mods;

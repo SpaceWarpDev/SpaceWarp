@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using SpaceWarp.API.Lua;
 using UnityEngine;
 using Logger = BepInEx.Logging.Logger;
 
 namespace SpaceWarp.API.Assets;
 
+/// <summary>
+/// Manages all mod assets loaded by SpaceWarp
+/// </summary>
 [SpaceWarpLuaAPI("Assets")]
 [PublicAPI]
 public static class AssetManager

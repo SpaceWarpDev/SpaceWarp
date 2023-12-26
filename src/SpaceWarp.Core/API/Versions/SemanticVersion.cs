@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 
 // Disable warnings for missing Equals and GetHashCode implementations
 #pragma warning disable CS0660, CS0661

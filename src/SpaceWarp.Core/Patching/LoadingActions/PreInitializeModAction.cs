@@ -1,4 +1,3 @@
-using System;
 using KSP.Game.Flow;
 using SpaceWarp.API.Mods;
 

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SpaceWarp.Backend.SaveGameManager;
+﻿namespace SpaceWarp.Backend.SaveGameManager;
 
 internal delegate void SaveGameCallbackFunctionDelegate(object data);
 

@@ -1,5 +1,4 @@
-﻿using System;
-using BepInEx.Logging;
+﻿using BepInEx.Logging;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static SpaceWarp.UI.Console.SpaceWarpConsoleLogListener;

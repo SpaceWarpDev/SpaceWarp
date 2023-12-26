@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using SpaceWarp.API.Configuration;
+﻿using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Logging;
 
 namespace SpaceWarp.Modules;

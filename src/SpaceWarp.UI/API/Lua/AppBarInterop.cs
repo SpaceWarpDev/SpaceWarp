@@ -1,5 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using MoonSharp.Interpreter;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.UI.Appbar;

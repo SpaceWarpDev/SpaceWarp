@@ -1,7 +1,5 @@
 ﻿global using UnityObject = UnityEngine.Object;
 global using System.Linq;
-using System;
-using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace SpaceWarp.InternalUtilities;
+﻿namespace SpaceWarp.InternalUtilities;
 
 internal static class PathHelpers
 {

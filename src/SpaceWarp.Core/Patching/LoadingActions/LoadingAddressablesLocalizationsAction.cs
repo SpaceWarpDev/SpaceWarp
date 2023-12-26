@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using I2.Loc;
+﻿using I2.Loc;
 using KSP.Game;
 using KSP.Game.Flow;
 using UnityEngine;

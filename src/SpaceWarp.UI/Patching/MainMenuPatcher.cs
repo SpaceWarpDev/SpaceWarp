@@ -1,5 +1,4 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using I2.Loc;
 using KSP.Api.CoreTypes;
 using KSP.Game.StartupFlow;

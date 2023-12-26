@@ -1,7 +1,6 @@
 // Attribution Notice To Lawrence/HatBat of https://github.com/Halbann/LazyOrbit
 // This file is licensed under https://creativecommons.org/licenses/by-sa/4.0/
 
-using System;
 using System.Collections;
 using System.Reflection;
 using BepInEx.Logging;

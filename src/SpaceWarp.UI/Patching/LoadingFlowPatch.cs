@@ -1,9 +1,7 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using KSP.Game;
 using KSP.Game.Flow;
 using KSP.Startup;
-using UnityEngine;
 
 namespace SpaceWarp.Patching;
 

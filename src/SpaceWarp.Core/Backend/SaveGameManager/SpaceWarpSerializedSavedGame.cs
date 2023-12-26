@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine.Serialization;
-
-namespace SpaceWarp.Backend.SaveGameManager;
+﻿namespace SpaceWarp.Backend.SaveGameManager;
 
 /// <summary>
 /// Extension of game's save/load data class

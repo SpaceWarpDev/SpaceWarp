@@ -1,15 +1,20 @@
-﻿using System;
-using BepInEx.Logging;
+﻿using BepInEx.Logging;
 using JetBrains.Annotations;
 using KSP.Game;
 using MoonSharp.Interpreter;
 
 namespace SpaceWarp.API.Lua;
 
+/// <summary>
+/// A Lua mod, this is the base class for all mods that are written in Lua.
+/// </summary>
 [MoonSharpUserData]
 [PublicAPI]
 public class LuaMod : KerbalMonoBehaviour
 {
+    /// <summary>
+    /// The table that contains the mod's functions.
+    /// </summary>
     public Table ModTable;
     // TODO: Add more than just this to the behaviour but for now
 
@@ -33,9 +38,15 @@ public class LuaMod : KerbalMonoBehaviour
     private Closure _reset;
     #endregion
 
+    /// <summary>
+    /// The logger for this mod.
+    /// </summary>
     public ManualLogSource Logger;
 
-    // First a pass through to the wrapped table
+    /// <summary>
+    /// A pass through to the wrapped table
+    /// </summary>
+    /// <param name="idx">The index of the name.</param>
     public DynValue this[DynValue idx]
     {
         get => ModTable.Get(idx);
@@ -55,17 +66,17 @@ public class LuaMod : KerbalMonoBehaviour
     }
     #region Message Handlers
 
-    private void TryRegister(string name, out Closure method)
+    private void TryRegister(string methodName, out Closure method)
     {
-        if (ModTable.Get(name) != null && ModTable.Get(name).Type == DataType.Function)
+        if (ModTable.Get(methodName) != null && ModTable.Get(methodName).Type == DataType.Function)
         {
-            method = ModTable.Get(name).Function;
+            method = ModTable.Get(methodName).Function;
             return;
         }
         method = null;
     }
 
-    public void Awake()
+    private void Awake()
     {
         if (ModTable.Get("Awake") != null && ModTable.Get("Awake").Type == DataType.Function)
         {
@@ -92,7 +103,7 @@ public class LuaMod : KerbalMonoBehaviour
     }
 
     // Start
-    public void Start()
+    private void Start()
     {
         if (_start != null)
         {
@@ -102,7 +113,7 @@ public class LuaMod : KerbalMonoBehaviour
 
     // Update Functions
 
-    public void Update()
+    private void Update()
     {
         if (_update != null)
         {
@@ -110,7 +121,7 @@ public class LuaMod : KerbalMonoBehaviour
         }
     }
 
-    public void FixedUpdate()
+    private void FixedUpdate()
     {
         if (_fixedUpdate != null)
         {
@@ -118,7 +129,7 @@ public class LuaMod : KerbalMonoBehaviour
         }
     }
 
-    public void LateUpdate()
+    private void LateUpdate()
     {
         if (_lateUpdate != null)
         {
@@ -128,7 +139,7 @@ public class LuaMod : KerbalMonoBehaviour
 
     // Enable/Disable
 
-    public void OnEnable()
+    private void OnEnable()
     {
         if (_onEnable != null)
         {
@@ -136,7 +147,7 @@ public class LuaMod : KerbalMonoBehaviour
         }
     }
 
-    public void OnDisable()
+    private void OnDisable()
     {
         if (_onDisable != null)
         {
@@ -146,7 +157,7 @@ public class LuaMod : KerbalMonoBehaviour
 
     // Destruction
 
-    public void OnDestroy()
+    private void OnDestroy()
     {
         if (_onDestroy != null)
         {
@@ -155,7 +166,7 @@ public class LuaMod : KerbalMonoBehaviour
     }
 
     // Reset
-    public void Reset()
+    private void Reset()
     {
         if (_reset != null)
         {

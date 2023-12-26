@@ -1,6 +1,4 @@
-﻿using BepInEx;
-using BepInEx.Logging;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;

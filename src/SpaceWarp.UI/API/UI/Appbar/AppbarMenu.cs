@@ -1,4 +1,3 @@
-using System;
 using JetBrains.Annotations;
 using KSP.Game;
 using KSP.Sim.impl;

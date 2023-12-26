@@ -1,5 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using KSP.Game.Flow;
 using SpaceWarp.API.Mods;
 

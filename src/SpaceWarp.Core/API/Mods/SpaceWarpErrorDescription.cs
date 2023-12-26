@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using BepInEx;
+﻿using BepInEx;
 using JetBrains.Annotations;
 using SpaceWarp.Patching;
-using UnityEngine;
 
 namespace SpaceWarp.API.Mods;
 

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Bootstrap;
 using JetBrains.Annotations;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
 using SpaceWarpPatcher;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Switch.LowLevel;
 
 // Disable obsolete warning for Chainloader.Plugins
 #pragma warning disable CS0618

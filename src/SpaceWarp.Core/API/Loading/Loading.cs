@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using KSP.Game.Flow;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
@@ -10,6 +7,9 @@ using SpaceWarp.Patching.LoadingActions;
 
 namespace SpaceWarp.API.Loading;
 
+/// <summary>
+/// API for mods to register their actions for the loading of assets.
+/// </summary>
 [PublicAPI]
 public static class Loading
 {
@@ -20,7 +20,7 @@ public static class Loading
     internal static List<Func<FlowAction>> GeneralLoadingActions = new();
 
     /// <summary>
-    /// Registers an asset loading function for space warp, will load assets from the subfolder. Should be added either on Awake() or Start().
+    /// Registers an asset loading function for SpaceWarp, will load assets from the subfolder. Should be added either on Awake() or Start().
     /// </summary>
     /// <param name="subfolder">The subfolder under "assets" that this loader matches</param>
     /// <param name="name">The name to be displayed for this loader, it gets displayed like the following "Mod Name: [name]"</param>

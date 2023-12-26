@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using BepInEx;
@@ -15,7 +11,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using Newtonsoft.Json.Linq;
 
 [assembly: InternalsVisibleTo("SpaceWarp.Core")]
 
