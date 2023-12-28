@@ -142,7 +142,7 @@ internal class ModsSubMenu : SettingsSubMenu
                 }
                 else
                 {
-                    modConfigCategories[section] = new List<ConfigEntryBase> { conf };
+                    modConfigCategories[section] = [conf];
                 }
             }
 

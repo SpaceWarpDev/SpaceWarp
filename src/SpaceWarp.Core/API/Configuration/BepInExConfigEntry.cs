@@ -69,7 +69,6 @@ public class BepInExConfigEntry :  IConfigEntry
         {
             if (!Constraint.IsConstrained(value)) return;
         }
-        Callbacks?.Invoke(EntryBase.BoxedValue, value);
         EntryBase.BoxedValue = Convert.ChangeType(value, ValueType);
     }
 
