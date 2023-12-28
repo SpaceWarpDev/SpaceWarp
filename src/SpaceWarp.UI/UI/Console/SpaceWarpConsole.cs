@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using BepInEx.Logging;
 using KSP.Game;
 using UitkForKsp2.API;
@@ -39,7 +40,7 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
             CreateNewLogEntry(logMessage);
         }
         // Binds the OnNewMessageReceived function to the OnNewMessage event
-        OnNewLog += CreateNewLogEntry;
+        OnNewLog += AddToQueue;
     }
 
 
@@ -97,6 +98,13 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
         if (_isWindowVisible && Input.GetKey(KeyCode.Escape))
         {
             HideWindow();
+        }
+
+        if (!_isWindowVisible) return;
+        
+        while (Queue.TryDequeue(out var info))
+        {
+            CreateNewLogEntry(info);
         }
     }
 
@@ -298,4 +306,16 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
         UnbindFunctions();
     }
 
+    private ConcurrentQueue<LogInfo> Queue = new(); 
+
+
+    private void AddToQueue(LogInfo info)
+    {
+        Queue.Enqueue(info);
+        while (Queue.Count >
+               Modules.UI.Instance.ConfigDebugMessageLimit.Value && Queue.TryDequeue(out _))
+        {
+            // Do nothing
+        }
+    }
 }
