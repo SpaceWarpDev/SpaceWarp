@@ -47,7 +47,7 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
     private void OnDestroy()
     {
         // Unbinds the OnNewMessageReceived function to the OnNewMessage event when destroyed
-        OnNewLog -= CreateNewLogEntry;
+        OnNewLog -= AddToQueue;
     
     }
 
