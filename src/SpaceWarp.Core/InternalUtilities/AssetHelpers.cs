@@ -36,14 +36,14 @@ internal static class AssetHelpers
         }
 
         var info = new DirectoryInfo(folder);
-        foreach (var csvFile in info.GetFiles("*.csv"))
+        foreach (var csvFile in info.GetFiles("*.csv", SearchOption.AllDirectories))
         {
             languageSourceData ??= new LanguageSourceData();
             var csvData = File.ReadAllText(csvFile.FullName).Replace("\r\n", "\n");
             languageSourceData.Import_CSV("", csvData, eSpreadsheetUpdateMode.AddNewTerms);
         }
 
-        foreach (var i2CsvFile in info.GetFiles("*.i2csv"))
+        foreach (var i2CsvFile in info.GetFiles("*.i2csv", SearchOption.AllDirectories))
         {
             languageSourceData ??= new LanguageSourceData();
             var i2CsvData = File.ReadAllText(i2CsvFile.FullName).Replace("\r\n", "\n");
