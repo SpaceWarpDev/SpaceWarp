@@ -54,11 +54,33 @@ internal static class AssetHelpers
         {
             languageSourceData.OnMissingTranslation = LanguageSourceData.MissingTranslationAction.Fallback;
             SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Loaded localizations from {folder}");
-            LocalizationManager.AddSource(languageSourceData);
+
+            AddSource(languageSourceData);
         }
         else
         {
             SpaceWarpPlugin.Instance.SWLogger.LogInfo($"No localizations found in {folder}");
         }
+    }
+
+    private static void AddSource(LanguageSourceData source)
+    {
+        if (LocalizationManager.Sources.Contains(source))
+        {
+            return;
+        }
+
+        LocalizationManager.Sources.Insert(0, source);
+        foreach (var language in source.mLanguages)
+        {
+            language.SetLoaded(true);
+        }
+
+        if (source.mDictionary.Count != 0)
+        {
+            return;
+        }
+
+        source.UpdateDictionary(true);
     }
 }
