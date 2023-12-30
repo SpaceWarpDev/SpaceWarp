@@ -96,6 +96,11 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
     }
 
+    private void UpdateLanguagesDropdown()
+    {
+        Game.SettingsMenuManager._generalSettings.InitializeLanguageDropdown();
+    }
+
     public override void OnPreInitialized()
     {
         // Persist all game objects so I don't need to stomp on config
@@ -106,6 +111,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
     {
         ModuleManager.InitializeAllModules();
         SetupLuaState();
+        UpdateLanguagesDropdown();
     }
 
     public override void OnPostInitialized()

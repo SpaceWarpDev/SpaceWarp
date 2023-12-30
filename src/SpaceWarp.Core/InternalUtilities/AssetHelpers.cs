@@ -36,14 +36,14 @@ internal static class AssetHelpers
         }
 
         var info = new DirectoryInfo(folder);
-        foreach (var csvFile in info.GetFiles("*.csv"))
+        foreach (var csvFile in info.GetFiles("*.csv", SearchOption.AllDirectories))
         {
             languageSourceData ??= new LanguageSourceData();
             var csvData = File.ReadAllText(csvFile.FullName).Replace("\r\n", "\n");
             languageSourceData.Import_CSV("", csvData, eSpreadsheetUpdateMode.AddNewTerms);
         }
 
-        foreach (var i2CsvFile in info.GetFiles("*.i2csv"))
+        foreach (var i2CsvFile in info.GetFiles("*.i2csv", SearchOption.AllDirectories))
         {
             languageSourceData ??= new LanguageSourceData();
             var i2CsvData = File.ReadAllText(i2CsvFile.FullName).Replace("\r\n", "\n");
@@ -54,11 +54,33 @@ internal static class AssetHelpers
         {
             languageSourceData.OnMissingTranslation = LanguageSourceData.MissingTranslationAction.Fallback;
             SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Loaded localizations from {folder}");
-            LocalizationManager.AddSource(languageSourceData);
+
+            AddSource(languageSourceData);
         }
         else
         {
             SpaceWarpPlugin.Instance.SWLogger.LogInfo($"No localizations found in {folder}");
         }
+    }
+
+    private static void AddSource(LanguageSourceData source)
+    {
+        if (LocalizationManager.Sources.Contains(source))
+        {
+            return;
+        }
+
+        LocalizationManager.Sources.Insert(0, source);
+        foreach (var language in source.mLanguages)
+        {
+            language.SetLoaded(true);
+        }
+
+        if (source.mDictionary.Count != 0)
+        {
+            return;
+        }
+
+        source.UpdateDictionary(true);
     }
 }
