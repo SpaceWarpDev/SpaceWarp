@@ -20,7 +20,7 @@ public static class ModSaves
     /// <param name="onLoad">Function that will execute when a LOAD event is triggered. Defaults to null or no callback.</param>
     /// <param name="saveData">Your object that will be saved to a save file during a save event and that will be updated when a load event pulls new data. Ensure that a new instance of this object is NOT created after registration.</param>
     /// <returns>T saveData object you passed as a parameter, or a default instance of object T if you didn't pass anything</returns>
-    public static T RegisterSaveLoadGameData<T>(string modGuid, Action<T> onSave = null, Action<T> onLoad = null, T saveData = default)
+    public static T RegisterSaveLoadGameData<T>(string modGuid, Action<T> onSave = null, Action<T> onLoad = null, T saveData = default) where T : class
     {
         // Check if this GUID is already registered
         if (InternalPluginSaveData.Find(p => p.ModGuid == modGuid) != null)
@@ -73,7 +73,7 @@ public static class ModSaves
     /// <param name="onLoad">Function that will execute when a LOAD event is triggered. Defaults to null or no callback.</param>
     /// <param name="saveData">Your object that will be saved to a save file during a save event and that will be updated when a load event pulls new data. Ensure that a new instance of this object is NOT created after registration.</param>
     /// <returns>T saveData object you passed as a parameter, or a default instance of object T if you didn't pass anything</returns>
-    public static T ReregisterSaveLoadGameData<T>(string modGuid, Action<T> onSave = null, Action<T> onLoad = null, T saveData = default(T))
+    public static T ReregisterSaveLoadGameData<T>(string modGuid, Action<T> onSave = null, Action<T> onLoad = null, T saveData = default(T)) where T : class
     {
         UnRegisterSaveLoadGameData(modGuid);
         return RegisterSaveLoadGameData(modGuid, onSave, onLoad, saveData);
