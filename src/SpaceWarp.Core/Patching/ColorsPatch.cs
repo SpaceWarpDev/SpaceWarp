@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using BepInEx.Logging;
-using Castle.Core.Internal;
 using HarmonyLib;
 using KSP.Game;
 using KSP.Modules;
@@ -321,7 +320,7 @@ internal class ColorsPatch
     internal static void Postfix(Module_Color __instance)
     {
         var partName = __instance.OABPart is not null ? __instance.OABPart.PartName : __instance.part.Name;
-        if (partName.IsNullOrEmpty()) return;
+        if (string.IsNullOrEmpty(partName)) return;
         var trimmedPartName = TrimPartName(partName);
         if (DeclaredParts.Count <= 0 || !_allParts.Contains(trimmedPartName)) return;
 

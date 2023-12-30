@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using KSP.ScriptInterop.impl.moonsharp;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Loading;
 using SpaceWarp.API.Lua;
 using SpaceWarp.API.Mods;
@@ -38,8 +37,6 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 
     public SpaceWarpPlugin()
     {
-        
-        
         // Load the type forwarders
         Assembly.LoadFile(
             $"{new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName}\\SpaceWarp.dll");
