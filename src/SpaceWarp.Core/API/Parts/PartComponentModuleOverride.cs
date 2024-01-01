@@ -1,14 +1,14 @@
 ﻿using JetBrains.Annotations;
 using KSP.Sim.impl;
-using SpaceWarp.API.Logging;
 
 namespace SpaceWarp.API.Parts;
 
+/// <summary>
+/// This class allows you to register your custom PartComponentModule for background resource processing.
+/// </summary>
 [PublicAPI]
 public static class PartComponentModuleOverride
 {
-    private static readonly ILogger _LOGGER = new UnityLogSource("SpaceWarp.PartComponentModuleOverride");
-
     internal static List<Type> RegisteredPartComponentOverrides = new();
 
     /// <summary>
@@ -22,11 +22,14 @@ public static class PartComponentModuleOverride
         // Check if this Module is already registered
         if (RegisteredPartComponentOverrides.Contains(typeof(T)))
         {
-            throw new ArgumentException($"Module '{moduleName}' is already registered. Skipping.", nameof(T));
+            throw new ArgumentException(
+                $"Background resource processing for module '{moduleName}' is already registered. Skipping.",
+                nameof(T)
+            );
         }
 
         RegisteredPartComponentOverrides.Add(typeof(T));
-        _LOGGER.LogInfo($"Registered '{moduleName}' for background resources processing.");
+        SpaceWarpPlugin.Logger.LogInfo($"Registered '{moduleName}' for background resources processing.");
     }
 
     /// <summary>
@@ -35,9 +38,12 @@ public static class PartComponentModuleOverride
     /// <typeparam name="T">Your Custom Module class that inherits from PartComponentModule</typeparam>
     public static void UnRegisterModuleForBackgroundResourceProcessing<T>() where T : PartComponentModule
     {
-        if (!RegisteredPartComponentOverrides.Contains(typeof(T))) return;
+        if (!RegisteredPartComponentOverrides.Contains(typeof(T)))
+        {
+            return;
+        }
 
         RegisteredPartComponentOverrides.Remove(typeof(T));
-        _LOGGER.LogInfo($"Unregistered '{typeof(T).Name}' from background resources processing.");
+        SpaceWarpPlugin.Logger.LogInfo($"Unregistered '{typeof(T).Name}' from background resources processing.");
     }
 }
