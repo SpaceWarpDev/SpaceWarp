@@ -3,6 +3,9 @@ using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Versions;
 
+/// <summary>
+/// Utility class for comparing semantic versions
+/// </summary>
 [PublicAPI]
 public static class VersionUtility
 {
@@ -28,6 +31,13 @@ public static class VersionUtility
         return CompareSemanticVersionStrings(version1, version2) < 0;
     }
 
+    /// <summary>
+    /// Checks if a semantic version is supported by a range of versions
+    /// </summary>
+    /// <param name="version">The version to check</param>
+    /// <param name="min">The minimum version</param>
+    /// <param name="max">The maximum version</param>
+    /// <returns></returns>
     public static bool IsSupported(string version, string min, string max)
     {
         return !IsOlderThan(version, min) && !IsNewerThan(version, max);
@@ -119,7 +129,7 @@ public static class VersionUtility
             alphaVersionNumber1 = int.Parse(number.Value);
             alphaVersionName1 = name.Value;
         }
-        
+
         if (_prereleaseVersion.IsMatch(alphaVersion2))
         {
             var match = _prereleaseVersion.Match(alphaVersion2);
@@ -130,20 +140,21 @@ public static class VersionUtility
         }
 
         var comparison = string.CompareOrdinal(alphaVersionName1, alphaVersionName2);
-        if (comparison == 0)
+        if (comparison != 0)
         {
-            if (alphaVersionNumber1 > alphaVersionNumber2)
-            {
-                return 1;
-            } else if (alphaVersionNumber1 == alphaVersionNumber2)
-            {
-                return 0;
-            }
-            else
-            {
-                return -1;
-            }
+            return comparison;
         }
-        return comparison;
+
+        if (alphaVersionNumber1 > alphaVersionNumber2)
+        {
+            return 1;
+        }
+
+        if (alphaVersionNumber1 == alphaVersionNumber2)
+        {
+            return 0;
+        }
+
+        return -1;
     }
 }
