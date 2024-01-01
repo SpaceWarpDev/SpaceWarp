@@ -10,15 +10,13 @@ namespace SpaceWarpPatcher;
 
 internal static class PathsGenerator
 {
-
-
-    private static Regex InvalidCharacterRegex = new(@"[^a-zA-Z0-9_]");
-    private static Regex InvalidStartRegex = new(@"^[0-9].*$");
+    private static readonly Regex InvalidCharacterRegex = new(@"[^a-zA-Z0-9_]");
+    private static readonly Regex InvalidStartRegex = new(@"^[0-9].*$");
     private static (string name, string path) GetNameAndPath(FileInfo jsonFile)
     {
-        var path = '"' + jsonFile.Directory.FullName.Replace("\"","\\\"").Replace("\\","\\\\") + '"';
+        var path = '"' + jsonFile.Directory!.FullName.Replace("\"","\\\"").Replace("\\","\\\\") + '"';
         var obj = JObject.Parse(File.ReadAllText(jsonFile.FullName));
-        var id = obj["mod_id"].Value<string>();
+        var id = obj["mod_id"]!.Value<string>();
         // var replaced = id.Replace(".", "_").Replace(" ", "_").Replace("-","_");
         var replaced = InvalidCharacterRegex.Replace(id, "_");
         if (InvalidStartRegex.IsMatch(replaced))
@@ -31,8 +29,8 @@ internal static class PathsGenerator
     {
         var obj = JObject.Parse(File.ReadAllText(jsonFile.FullName));
         if (!obj.ContainsKey("spec")) return false;
-        if (obj["spec"].Value<string>() is "1.2" or "1.0") return false;
-        return !allDisabled.Contains(obj["mod_id"].Value<string>());
+        if (obj["spec"]!.Value<string>() is "1.2" or "1.0") return false;
+        return !allDisabled.Contains(obj["mod_id"]!.Value<string>());
     }
     internal static void GenerateSpaceWarpPathsDLL(bool changed, ManualLogSource trueLogger)
     {
