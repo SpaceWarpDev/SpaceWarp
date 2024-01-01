@@ -2,14 +2,14 @@ using System.Reflection;
 using BepInEx.Logging;
 using HarmonyLib;
 
-namespace SpaceWarp.Patching;
+namespace SpaceWarp.Patching.System;
 
 [HarmonyPatch]
 internal static class FixGetTypes
 {
-    [HarmonyFinalizer]
     [HarmonyPatch(typeof(Assembly), nameof(Assembly.GetTypes), new Type[0])]
     [HarmonyPatch(typeof(Assembly), nameof(Assembly.GetExportedTypes))]
+    [HarmonyFinalizer]
     private static Exception GetTypesFix(Exception __exception, Assembly __instance, ref Type[] __result)
     {
         if (__exception is not ReflectionTypeLoadException reflectionTypeLoadException)
@@ -30,6 +30,5 @@ internal static class FixGetTypes
 
         __result = reflectionTypeLoadException.Types.Where(type => type != null).ToArray();
         return null;
-
     }
 }

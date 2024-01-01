@@ -18,7 +18,10 @@ internal sealed class PostInitializeModAction : FlowAction
         try
         {
             if (_plugin.DoLoadingActions)
-                _plugin.Plugin.OnPostInitialized();
+            {
+                _plugin.Plugin!.OnPostInitialized();
+            }
+
             resolve();
         }
         catch (Exception e)

@@ -4,13 +4,14 @@ using SpaceWarp.API.Mods;
 
 namespace SpaceWarp.Patching.LoadingActions;
 
+// TODO: Move this to SpaceWarp.API.Loading in 2.0.0
+
 [Obsolete("This will be moved to SpaceWarp.API.Loading in 2.0.0")]
 [PublicAPI]
 public class ModLoadingAction : FlowAction
 {
-    private Action<BaseSpaceWarpPlugin> Action;
-    private BaseSpaceWarpPlugin Plugin;
-
+    private Action<BaseSpaceWarpPlugin> _action;
+    private BaseSpaceWarpPlugin _plugin;
 
     public ModLoadingAction(
         string actionName,
@@ -18,20 +19,20 @@ public class ModLoadingAction : FlowAction
         BaseSpaceWarpPlugin plugin
     ) : base($"{plugin.SpaceWarpMetadata.Name}:{actionName}")
     {
-        Action = action;
-        Plugin = plugin;
+        _action = action;
+        _plugin = plugin;
     }
 
     public override void DoAction(Action resolve, Action<string> reject)
     {
         try
         {
-            Action(Plugin);
+            _action(_plugin);
             resolve();
         }
         catch (Exception e)
         {
-            Plugin.SWLogger.LogError(e.ToString());
+            _plugin.SWLogger.LogError(e.ToString());
             reject(null);
         }
     }

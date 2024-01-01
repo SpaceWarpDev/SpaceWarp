@@ -2,7 +2,7 @@
 using I2.Loc;
 using UnityEngine;
 
-namespace SpaceWarp.Patching;
+namespace SpaceWarp.Patching.Localization;
 
 /// <summary>
 /// Patches the localization system to properly find fallback translations.

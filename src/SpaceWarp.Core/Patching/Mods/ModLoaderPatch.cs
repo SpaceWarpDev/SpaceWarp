@@ -12,12 +12,12 @@ using SpaceWarpPatcher;
 using UnityEngine;
 using File = System.IO.File;
 
-namespace SpaceWarp.Patching;
+namespace SpaceWarp.Patching.Mods;
 
 [HarmonyPatch(typeof(KSP2Mod))]
-public static class ModLoaderPatch
+internal static class ModLoaderPatch
 {
-    private static ModInfo KSPToSwinfo(KSP2Mod mod)
+    private static ModInfo KspToSwinfo(KSP2Mod mod)
     {
         var newInfo = new ModInfo
         {
@@ -34,8 +34,7 @@ public static class ModLoaderPatch
                 Min = "*",
                 Max = "*"
             },
-            VersionCheck = null,
-            VersionCheckType = VersionCheckType.SwInfo
+            VersionCheck = null
         };
         return newInfo;
     }
@@ -48,7 +47,7 @@ public static class ModLoaderPatch
         var path = __instance.ModRootPath;
         var info = File.Exists(Path.Combine(path, "swinfo.json"))
             ? JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path))
-            : KSPToSwinfo(__instance);
+            : KspToSwinfo(__instance);
         var disabled = ChainloaderPatch.DisabledPluginGuids.Contains(info.ModID);
         __state = disabled;
         return !disabled;
@@ -63,7 +62,7 @@ public static class ModLoaderPatch
         var path = __instance.ModRootPath;
         var info = File.Exists(Path.Combine(path, "swinfo.json"))
             ? JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path))
-            : KSPToSwinfo(__instance);
+            : KspToSwinfo(__instance);
         var descriptor =
             PluginList.AllPlugins.FirstOrDefault(x =>
                 string.Equals(x.Guid, info.ModID, StringComparison.InvariantCultureIgnoreCase));
@@ -74,7 +73,10 @@ public static class ModLoaderPatch
         if (__instance.EntryPoint != null)
         {
             if (LoadCodeBasedMod(__instance, ref __result, go, ref descriptor.Plugin, ref addAdapter,
-                    ref descriptor.ConfigFile, ref descriptor.DoLoadingActions)) return;
+                    ref descriptor.ConfigFile, ref descriptor.DoLoadingActions))
+            {
+                return;
+            }
         }
         else
         {
@@ -112,11 +114,17 @@ public static class ModLoaderPatch
             if (__instance.EntryPoint.EndsWith(".dll"))
             {
                 if (LoadModWithDLLEntryPoint(__instance, ref __result, go, ref swMod, ref addAdapter, ref configFile,
-                        ref isSWMod)) return true;
+                        ref isSWMod))
+                {
+                    return true;
+                }
             }
             else if (__instance.EntryPoint.EndsWith(".lua"))
             {
-                if (LoadModWithLuaEntryPoint(__instance, ref __result)) return true;
+                if (LoadModWithLuaEntryPoint(__instance, ref __result))
+                {
+                    return true;
+                }
             }
         }
         else
@@ -169,9 +177,16 @@ public static class ModLoaderPatch
             __instance.modType = KSP2ModType.CSharp;
             foreach (var type in asm.GetTypes())
             {
-                if (!typeof(Mod).IsAssignableFrom(type) || type.IsAbstract) continue;
+                if (!typeof(Mod).IsAssignableFrom(type) || type.IsAbstract)
+                {
+                    continue;
+                }
+
                 var comp = go.AddComponent(type);
-                if (comp is not BaseKspLoaderSpaceWarpMod baseKspLoaderSpaceWarpMod) continue;
+                if (comp is not BaseKspLoaderSpaceWarpMod baseKspLoaderSpaceWarpMod)
+                {
+                    continue;
+                }
 
                 SpaceWarpPlugin.Logger.LogInfo($"Loading mod: {comp}");
                 isSWMod = true;

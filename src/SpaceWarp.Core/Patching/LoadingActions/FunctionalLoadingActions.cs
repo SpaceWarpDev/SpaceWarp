@@ -12,8 +12,7 @@ internal static class FunctionalLoadingActions
         var assetBundle = AssetBundle.LoadFromFile(filename);
         if (assetBundle == null)
         {
-            throw new Exception(
-                $"Failed to load AssetBundle {internalPath} ({filename})");
+            throw new Exception($"Failed to load AssetBundle {internalPath} ({filename})");
         }
 
         internalPath = internalPath.Replace(".bundle", "");

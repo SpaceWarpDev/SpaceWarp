@@ -3,13 +3,14 @@ using BepInEx.Bootstrap;
 using ConfigurationManager.Utilities;
 using HarmonyLib;
 
-namespace SpaceWarp.Patching;
+namespace SpaceWarp.Patching.Settings;
 
-[HarmonyPatch(typeof(Utils))]
-[HarmonyPatch(nameof(Utils.FindPlugins))]
-public class ConfigurationPatch
+[HarmonyPatch]
+internal class ConfigurationManagerPatch
 {
-    private static void Postfix(ref BaseUnityPlugin[] __result)
+    [HarmonyPatch(typeof(Utils), nameof(Utils.FindPlugins))]
+    [HarmonyPostfix]
+    private static void FindPluginsPatch(ref BaseUnityPlugin[] __result)
     {
         //Disable because I know what I am doing.
         #pragma warning disable CS0618

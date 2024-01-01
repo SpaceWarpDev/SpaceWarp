@@ -1,6 +1,6 @@
 ﻿using BepInEx;
 using JetBrains.Annotations;
-using SpaceWarp.Patching;
+using SpaceWarp.Patching.Flow;
 
 namespace SpaceWarp.API.Mods;
 

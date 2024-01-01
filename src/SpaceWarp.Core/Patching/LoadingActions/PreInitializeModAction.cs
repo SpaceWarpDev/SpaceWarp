@@ -27,6 +27,7 @@ internal sealed class PreInitializeModAction : FlowAction
             {
                 SpaceWarpPlugin.Logger.LogInfo("NO!!");
             }
+
             resolve();
         }
         catch (Exception e)

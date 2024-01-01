@@ -6,10 +6,9 @@ using SpaceWarp.API.UI;
 using TMPro;
 using UnityObject = UnityEngine.Object;
 
-namespace SpaceWarp.Patching;
+namespace SpaceWarp.Patching.Settings;
 
-[HarmonyPatch(typeof(LandingHUD))]
-[HarmonyPatch("Start")]
+[HarmonyPatch(typeof(LandingHUD), nameof(LandingHUD.Start))]
 internal class MainMenuPatcher
 {
     internal static event Action MainMenuLoaded;

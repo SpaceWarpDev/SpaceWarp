@@ -4,6 +4,8 @@ using SpaceWarp.API.Mods;
 
 namespace SpaceWarp.Patching.LoadingActions;
 
+// TODO: Move this to SpaceWarp.API.Loading in 2.0.0
+
 [Obsolete("This will be moved to SpaceWarp.API.Loading in 2.0.0")]
 [PublicAPI]
 public class DescriptorLoadingAction : FlowAction

@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 using SpaceWarp.API.Lua;
-using SpaceWarp.Patching;
+using SpaceWarp.Patching.Parts;
 using UnityEngine;
 
 namespace SpaceWarp.API.Parts;
