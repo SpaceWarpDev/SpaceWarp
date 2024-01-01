@@ -6,7 +6,6 @@ namespace SpaceWarp.API.Logging;
 public abstract class BaseLogger : ILogger
 {
     public abstract void Log(LogLevel level, object x);
-    public void LogNone(object x) => Log(LogLevel.None, x);
 
     public void LogFatal(object x) => Log(LogLevel.Fatal, x);
 
@@ -19,6 +18,4 @@ public abstract class BaseLogger : ILogger
     public void LogInfo(object x) => Log(LogLevel.Info, x);
 
     public void LogDebug(object x) => Log(LogLevel.Debug, x);
-
-    public void LogAll(object x) => Log(LogLevel.All, x);
 }
