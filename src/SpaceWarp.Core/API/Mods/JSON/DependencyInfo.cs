@@ -11,7 +11,13 @@ namespace SpaceWarp.API.Mods.JSON;
 [PublicAPI]
 public sealed class DependencyInfo
 {
+    /// <summary>
+    /// The ID of the dependency.
+    /// </summary>
     [JsonProperty("id")] public string ID { get; internal set; }
 
+    /// <summary>
+    /// The version of the dependency.
+    /// </summary>
     [JsonProperty("version")] public SupportedVersionsInfo Version { get; internal set; }
 }
