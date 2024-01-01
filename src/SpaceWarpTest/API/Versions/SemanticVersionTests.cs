@@ -39,6 +39,7 @@ public class SemanticVersionTests
     {
         try
         {
+            // ReSharper disable once UnusedVariable
             var semanticVersion = new SemanticVersion(version);
             return true;
         }
