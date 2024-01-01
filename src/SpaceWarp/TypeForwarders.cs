@@ -18,6 +18,7 @@ using SpaceWarp.API.UI.Settings;
 using SpaceWarp.API.Versions;
 using SpaceWarp.Modules;
 using SpaceWarp.Patching.LoadingActions;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 [assembly: TypeForwardedTo(typeof(AssetManager))]
 [assembly: TypeForwardedTo(typeof(BepInExConfigEntry))]
