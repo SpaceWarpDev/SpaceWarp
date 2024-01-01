@@ -5,19 +5,16 @@ using SpaceWarp.API.Game.Messages;
 
 namespace SpaceWarp.Modules;
 
+/// <summary>
+/// The module for game-related APIs.
+/// </summary>
 [UsedImplicitly]
 public class Game : SpaceWarpModule
 {
+    /// <inheritdoc />
     public override string Name => "SpaceWarp.Game";
 
-    public override void LoadModule()
-    {
-    }
-
-    public override void PreInitializeModule()
-    {
-    }
-
+    /// <inheritdoc />
     public override void InitializeModule()
     {
         var game = GameManager.Instance.Game;
@@ -27,9 +24,5 @@ public class Game : SpaceWarpModule
         game.Messages.Subscribe(typeof(TrackingStationLoadedMessage), StateLoadings.TrackingStationLoadedHandler, false, true);
         game.Messages.Subscribe(typeof(TrackingStationUnloadedMessage), StateLoadings.TrackingStationUnloadedHandler, false, true);
         game.Messages.Subscribe(typeof(TrainingCenterLoadedMessage), StateLoadings.TrainingCenterLoadedHandler, false, true);
-    }
-
-    public override void PostInitializeModule()
-    {
     }
 }
