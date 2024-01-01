@@ -47,16 +47,19 @@ public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin, ISpaceWarpMod
     /// <summary>
     /// The mod info for this mod.
     /// </summary>
+    [Obsolete("This will be removed in 2.0.0. Use SWMetadata instead.")]
     public ModInfo SpaceWarpMetadata { get; internal set; }
 
     /// <summary>
     /// The path to the folder containing the plugin.
     /// </summary>
+    [Obsolete("This will be removed in 2.0.0. Use SWMetadata.Folder instead.")]
     public string PluginFolderPath { get; internal set; }
 
     /// <summary>
     /// The correct ID of the mod based on its spec version.
     /// </summary>
+    [Obsolete("This will be removed in 2.0.0. Use SWMetadata.Guid instead.")]
     public string IdBySpec => GetGuidBySpec(Info, SpaceWarpMetadata);
 
     /// <inheritdoc />
@@ -83,6 +86,7 @@ public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin, ISpaceWarpMod
     {
     }
 
+    [Obsolete("To be removed in 2.0.0.")]
     internal static string GetGuidBySpec(PluginInfo pluginInfo, ModInfo modInfo)
     {
         return modInfo.Spec >= SpecVersion.V1_2
