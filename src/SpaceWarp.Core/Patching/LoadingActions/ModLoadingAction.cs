@@ -31,7 +31,7 @@ public class ModLoadingAction : FlowAction
         }
         catch (Exception e)
         {
-            Plugin.ModLogger.LogError(e.ToString());
+            Plugin.SWLogger.LogError(e.ToString());
             reject(null);
         }
     }

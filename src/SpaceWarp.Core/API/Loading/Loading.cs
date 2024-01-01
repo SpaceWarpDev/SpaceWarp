@@ -100,7 +100,7 @@ public static class Loading
                     }
                     catch (Exception e)
                     {
-                        plugin.ModLogger.LogError(e.ToString());
+                        plugin.SWLogger.LogError(e.ToString());
                     }
                 }
             }
@@ -197,7 +197,7 @@ public static class Loading
                 }
                 catch (Exception e)
                 {
-                    plugin.ModLogger.LogError(e.ToString());
+                    plugin.SWLogger.LogError(e.ToString());
                 }
             }
         };
