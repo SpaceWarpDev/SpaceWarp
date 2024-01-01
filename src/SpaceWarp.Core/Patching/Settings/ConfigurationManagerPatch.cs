@@ -10,6 +10,7 @@ internal class ConfigurationManagerPatch
 {
     [HarmonyPatch(typeof(Utils), nameof(Utils.FindPlugins))]
     [HarmonyPostfix]
+    // ReSharper disable once InconsistentNaming
     private static void FindPluginsPatch(ref BaseUnityPlugin[] __result)
     {
         //Disable because I know what I am doing.

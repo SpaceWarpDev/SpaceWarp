@@ -101,6 +101,7 @@ internal static class SequentialFlowLoadersPatcher
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.StartGame))]
     [HarmonyPrefix]
+    // ReSharper disable once InconsistentNaming
     public static void PrefixGameManagerStartGame(GameManager __instance)
     {
         SequentialFlowAdditionMethods[FlowMethodStartgame].ApplyTo(
@@ -166,7 +167,7 @@ internal static class SequentialFlowLoadersPatcher
                 })
                 .FirstOrDefault() ?? throw new InvalidOperationException(
                     $"Flow action type {flowAction.Name} does not have a public constructor that has " +
-                    $"parameters compatible with {Method.DeclaringType.Name}.{Method.Name}"
+                    $"parameters compatible with {Method.DeclaringType!.Name}.{Method.Name}"
                 );
 
             _insertAfter.Add(new KeyValuePair<string, object>(after, constructor));

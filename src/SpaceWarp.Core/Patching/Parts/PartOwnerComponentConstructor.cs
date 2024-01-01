@@ -12,6 +12,7 @@ internal static class PartOwnerComponentConstructor
         typeof(PartOwnerComponent).GetField("HasRegisteredPartComponentsForFixedUpdate");
 
     [HarmonyPatch(MethodType.Constructor)]
+    // ReSharper disable once InconsistentNaming
     private static void SetFalse(PartOwnerComponent __instance)
     {
         AddedField.SetValue(__instance, false);
@@ -19,6 +20,7 @@ internal static class PartOwnerComponentConstructor
 
     [HarmonyPatch(nameof(PartOwnerComponent.Add))]
     [HarmonyPrefix]
+    // ReSharper disable once InconsistentNaming
     private static void CheckForModule(PartOwnerComponent __instance, PartComponent part)
     {
         var currentValue = (bool)AddedField.GetValue(__instance);

@@ -39,10 +39,13 @@ internal static class ModLoaderPatch
         return newInfo;
     }
 
-    [HarmonyPrefix]
+
     [HarmonyPatch(nameof(KSP2Mod.Load))]
+    [HarmonyPrefix]
+    // ReSharper disable InconsistentNaming
     private static bool LoadPre(KSP2Mod __instance, ref bool __result, out bool __state)
     {
+        // ReSharper restore InconsistentNaming
         SpaceWarpPlugin.Logger.LogInfo($"KSP2Mod.Load (Pre): {__instance.ModName}");
         var path = __instance.ModRootPath;
         var info = File.Exists(Path.Combine(path, "swinfo.json"))
@@ -53,10 +56,12 @@ internal static class ModLoaderPatch
         return !disabled;
     }
 
-    [HarmonyPostfix]
     [HarmonyPatch(nameof(KSP2Mod.Load))]
+    [HarmonyPostfix]
+    // ReSharper disable InconsistentNaming
     private static void LoadPost(KSP2Mod __instance, ref bool __result, ref bool __state)
     {
+        // ReSharper restore InconsistentNaming
         SpaceWarpPlugin.Logger.LogInfo($"KSP2Mod.Load (Post): {__instance.ModName}");
         if (__state) return;
         var path = __instance.ModRootPath;
@@ -99,8 +104,8 @@ internal static class ModLoaderPatch
     }
 
     private static bool LoadCodeBasedMod(
-        KSP2Mod __instance,
-        ref bool __result,
+        KSP2Mod instance,
+        ref bool result,
         GameObject go,
         ref ISpaceWarpMod swMod,
         ref bool addAdapter,
@@ -109,19 +114,26 @@ internal static class ModLoaderPatch
     )
     {
         // Lets take a simple guess at what needs to be done.
-        if (File.Exists(Path.Combine(__instance.ModRootPath, __instance.EntryPoint)))
+        if (File.Exists(Path.Combine(instance.ModRootPath, instance.EntryPoint)))
         {
-            if (__instance.EntryPoint.EndsWith(".dll"))
+            if (instance.EntryPoint.EndsWith(".dll"))
             {
-                if (LoadModWithDLLEntryPoint(__instance, ref __result, go, ref swMod, ref addAdapter, ref configFile,
-                        ref isSWMod))
+                if (LoadModWithDLLEntryPoint(
+                        instance,
+                        ref result,
+                        go,
+                        ref swMod,
+                        ref addAdapter,
+                        ref configFile,
+                        ref isSWMod
+                    ))
                 {
                     return true;
                 }
             }
-            else if (__instance.EntryPoint.EndsWith(".lua"))
+            else if (instance.EntryPoint.EndsWith(".lua"))
             {
-                if (LoadModWithLuaEntryPoint(__instance, ref __result))
+                if (LoadModWithLuaEntryPoint(instance, ref result))
                 {
                     return true;
                 }
@@ -129,32 +141,32 @@ internal static class ModLoaderPatch
         }
         else
         {
-            __instance.modType = KSP2ModType.Error;
-            __result = false;
+            instance.modType = KSP2ModType.Error;
+            result = false;
             return true;
         }
 
         return false;
     }
 
-    private static bool LoadModWithLuaEntryPoint(KSP2Mod __instance, ref bool __result)
+    private static bool LoadModWithLuaEntryPoint(KSP2Mod instance, ref bool result)
     {
         try
         {
-            __instance.modCore = new KSP2LuaModCore(
-                __instance.APIVersion,
-                __instance.ModName,
-                __instance.EntryPoint,
-                __instance.ModRootPath
+            instance.modCore = new KSP2LuaModCore(
+                instance.APIVersion,
+                instance.ModName,
+                instance.EntryPoint,
+                instance.ModRootPath
             );
-            __instance.modType = KSP2ModType.Lua;
-            __instance.currentState = KSP2ModState.Active;
+            instance.modType = KSP2ModType.Lua;
+            instance.currentState = KSP2ModState.Active;
         }
         catch (Exception e)
         {
             SpaceWarpPlugin.Logger.LogError(e);
-            __instance.modType = KSP2ModType.Error;
-            __result = false;
+            instance.modType = KSP2ModType.Error;
+            result = false;
             return true;
         }
 
@@ -162,8 +174,8 @@ internal static class ModLoaderPatch
     }
 
     private static bool LoadModWithDLLEntryPoint(
-        KSP2Mod __instance,
-        ref bool __result,
+        KSP2Mod instance,
+        ref bool result,
         GameObject go,
         ref ISpaceWarpMod swMod,
         ref bool addAdapter,
@@ -173,8 +185,8 @@ internal static class ModLoaderPatch
     {
         try
         {
-            var asm = Assembly.LoadFile(Path.Combine(__instance.ModRootPath, __instance.EntryPoint));
-            __instance.modType = KSP2ModType.CSharp;
+            var asm = Assembly.LoadFile(Path.Combine(instance.ModRootPath, instance.EntryPoint));
+            instance.modType = KSP2ModType.CSharp;
             foreach (var type in asm.GetTypes())
             {
                 if (!typeof(Mod).IsAssignableFrom(type) || type.IsAbstract)
@@ -190,22 +202,22 @@ internal static class ModLoaderPatch
 
                 SpaceWarpPlugin.Logger.LogInfo($"Loading mod: {comp}");
                 isSWMod = true;
-                baseKspLoaderSpaceWarpMod.SWLogger = new UnityLogSource(__instance.ModName);
+                baseKspLoaderSpaceWarpMod.SWLogger = new UnityLogSource(instance.ModName);
                 // baseKspLoaderSpaceWarpMod.modFolder = __instance.ModRootPath;
                 configFile = baseKspLoaderSpaceWarpMod.SWConfiguration = new JsonConfigFile(
-                    Path.Combine(__instance.ModRootPath, "config.cfg")
+                    Path.Combine(instance.ModRootPath, "config.cfg")
                 );
                 swMod = baseKspLoaderSpaceWarpMod;
                 addAdapter = false;
             }
 
-            __instance.currentState = KSP2ModState.Active;
+            instance.currentState = KSP2ModState.Active;
         }
         catch (Exception e)
         {
             SpaceWarpPlugin.Logger.LogError(e);
-            __instance.modType = KSP2ModType.Error;
-            __result = false;
+            instance.modType = KSP2ModType.Error;
+            result = false;
             return true;
         }
 
