@@ -5,6 +5,8 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.InternalUtilities;
 using SpaceWarp.Patching.LoadingActions;
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 namespace SpaceWarp.API.Loading;
 
 /// <summary>
