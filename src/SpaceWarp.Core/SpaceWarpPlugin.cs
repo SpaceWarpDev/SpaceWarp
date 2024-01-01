@@ -73,7 +73,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
 
         asset.mSource.owner = asset;
-        LocalizationManager.AddSource(asset.mSource);
+        LocalizationHelpers.AddSource(asset.mSource);
     }
 
     private void Awake()

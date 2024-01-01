@@ -43,7 +43,7 @@ internal static class AssetHelpers
             var csvData = File.ReadAllText(csvFile.FullName).Replace("\r\n", "\n");
             csvSource.Import_CSV("", csvData, eSpreadsheetUpdateMode.AddNewTerms);
             loadedCount++;
-            AddSource(csvSource);
+            LocalizationHelpers.AddSource(csvSource);
         }
 
         foreach (var i2CsvFile in info.GetFiles("*.i2csv", SearchOption.AllDirectories))
@@ -52,34 +52,11 @@ internal static class AssetHelpers
             var i2CsvData = File.ReadAllText(i2CsvFile.FullName).Replace("\r\n", "\n");
             i2CsvSource.Import_I2CSV("", i2CsvData, eSpreadsheetUpdateMode.AddNewTerms);
             loadedCount++;
-            AddSource(i2CsvSource);
+            LocalizationHelpers.AddSource(i2CsvSource);
         }
 
         SpaceWarpPlugin.Instance.SWLogger.LogInfo(
             loadedCount > 0 ? $"Loaded localizations from {folder}" : $"No localizations found in {folder}"
         );
-    }
-
-    private static void AddSource(LanguageSourceData source)
-    {
-        if (LocalizationManager.Sources.Contains(source))
-        {
-            return;
-        }
-
-        source.OnMissingTranslation = LanguageSourceData.MissingTranslationAction.Fallback;
-
-        LocalizationManager.Sources.Insert(0, source);
-        foreach (var language in source.mLanguages)
-        {
-            language.SetLoaded(true);
-        }
-
-        if (source.mDictionary.Count != 0)
-        {
-            return;
-        }
-
-        source.UpdateDictionary(true);
     }
 }
