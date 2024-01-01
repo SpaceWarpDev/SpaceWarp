@@ -3,9 +3,16 @@ using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Sound;
 
+/// <summary>
+/// Represents a Soundbank.
+/// </summary>
 [PublicAPI]
 public class Soundbank
 {
+    /// <summary>
+    /// Creates a Soundbank object from bytes.
+    /// </summary>
+    /// <param name="bankData">The bytes of the Soundbank.</param>
     public Soundbank(byte[] bankData)
     {
         BankData = bankData;
@@ -42,6 +49,10 @@ public class Soundbank
     /// </summary>
     public uint WwiseID;
 
+    /// <summary>
+    /// Loads the Soundbank.
+    /// </summary>
+    /// <returns>The result of the operation.</returns>
     public AKRESULT Load()
     {
         // Pins BankData array in memory
