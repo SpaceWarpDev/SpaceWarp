@@ -19,27 +19,48 @@ using SpaceWarp.Patching.LoadingActions;
 
 namespace SpaceWarp;
 
+/// <summary>
+/// The main SpaceWarp plugin class.
+/// </summary>
 [BepInDependency("com.bepis.bepinex.configurationmanager", "17.1")]
 [BepInDependency(UitkForKsp2Plugin.ModGuid, UitkForKsp2Plugin.ModVer)]
 [BepInIncompatibility("com.shadow.quantum")]
 [BepInPlugin(ModGuid, ModName, ModVer)]
 public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 {
+    /// <summary>
+    /// SpaceWarp plugin instance.
+    /// </summary>
     public static SpaceWarpPlugin Instance;
 
+    /// <summary>
+    /// The GUID of the SpaceWarp plugin.
+    /// </summary>
     [PublicAPI] public const string ModGuid = MyPluginInfo.PLUGIN_GUID;
+
+    /// <summary>
+    /// The name of the SpaceWarp plugin.
+    /// </summary>
     [PublicAPI] public const string ModName = MyPluginInfo.PLUGIN_NAME;
+
+    /// <summary>
+    /// The version of the SpaceWarp plugin.
+    /// </summary>
     [PublicAPI] public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
 
     internal ScriptEnvironment GlobalLuaState;
 
     internal new static ManualLogSource Logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SpaceWarpPlugin"/> class.
+    /// </summary>
     public SpaceWarpPlugin()
     {
         // Load the type forwarders
         Assembly.LoadFile(
-            $"{new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName}\\SpaceWarp.dll");
+            $"{new FileInfo(Assembly.GetExecutingAssembly().Location).Directory!.FullName}\\SpaceWarp.dll"
+        );
         Logger = base.Logger;
         Instance = this;
     }
@@ -54,7 +75,8 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         asset.mSource.owner = asset;
         LocalizationManager.AddSource(asset.mSource);
     }
-    public void Awake()
+
+    private void Awake()
     {
         BepInEx.Bootstrap.Chainloader.ManagerObject.Persist();
         // IOProvider.Init();
@@ -62,9 +84,22 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
         ModuleManager.LoadAllModules();
 
-        Loading.AddAssetLoadingAction("bundles", "loading asset bundles", FunctionalLoadingActions.AssetBundleLoadingAction, "bundle");
-        Loading.AddAssetLoadingAction("images", "loading images", FunctionalLoadingActions.ImageLoadingAction);
-        Loading.AddAddressablesLoadingAction<LanguageSourceAsset>("localization","language_source",OnLanguageSourceAssetLoaded);
+        Loading.AddAssetLoadingAction(
+            "bundles",
+            "loading asset bundles",
+            FunctionalLoadingActions.AssetBundleLoadingAction,
+            "bundle"
+        );
+        Loading.AddAssetLoadingAction(
+            "images",
+            "loading images",
+            FunctionalLoadingActions.ImageLoadingAction
+        );
+        Loading.AddAddressablesLoadingAction<LanguageSourceAsset>(
+            "localization",
+            "language_source",
+            OnLanguageSourceAssetLoaded
+        );
     }
 
     private void SetupLuaState()
@@ -98,12 +133,14 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         Game.SettingsMenuManager._generalSettings.InitializeLanguageDropdown();
     }
 
+    /// <inheritdoc/>
     public override void OnPreInitialized()
     {
         // Persist all game objects so I don't need to stomp on config
         ModuleManager.PreInitializeAllModules();
     }
 
+    /// <inheritdoc/>
     public override void OnInitialized()
     {
         ModuleManager.InitializeAllModules();
@@ -111,6 +148,7 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         UpdateLanguagesDropdown();
     }
 
+    /// <inheritdoc/>
     public override void OnPostInitialized()
     {
         ModuleManager.PostInitializeAllModules();
