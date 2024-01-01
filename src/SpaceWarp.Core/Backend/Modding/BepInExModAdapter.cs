@@ -5,14 +5,16 @@ using SpaceWarp.API.Mods;
 
 namespace SpaceWarp.Backend.Modding;
 
-public class BepInExModAdapter : ISpaceWarpMod
+internal class BepInExModAdapter : ISpaceWarpMod
 {
     public readonly BaseUnityPlugin Plugin;
 
+    /// <inheritdoc />
     public void OnPreInitialized()
     {
     }
 
+    /// <inheritdoc />
     public void OnInitialized()
     {
     }
