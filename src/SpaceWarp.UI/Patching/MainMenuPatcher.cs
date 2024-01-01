@@ -37,6 +37,8 @@ internal class MainMenuPatcher
             var tmp = newButton.GetComponentInChildren<TextMeshProUGUI>();
 
             tmp.SetText(menuButtonToBeAdded.name);
+
+            LocalizationManager.OnLocalizeEvent += () => tmp.SetText(menuButtonToBeAdded.name);
         }
 
         foreach (var localizedMenuButtonToBeAddded in MainMenu.LocalizedMenuButtonsToBeAdded)
