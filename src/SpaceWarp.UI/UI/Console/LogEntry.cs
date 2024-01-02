@@ -190,9 +190,9 @@ internal class LogEntry : BindableElement
         Expanded = !startCollapsed;
     }
 
-    [Obsolete]
-    public override void HandleEvent(EventBase evt)
+    public override void ExecuteDefaultAction(EventBase evt)
     {
+        base.ExecuteDefaultAction(evt);
         if(evt is ClickEvent)
         {
             Expanded = !Expanded;
