@@ -3,8 +3,6 @@ using KSP.UI;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.UI.Settings;
-using SpaceWarp.Backend.Modding;
-using SpaceWarp.Backend.UI.Settings;
 using SpaceWarp.Modules;
 using SpaceWarp.UI.API.UI.Settings;
 using UnityEngine;
@@ -100,9 +98,13 @@ internal class ModsSubMenu : SettingsSubMenu
             GenerateTitle(section).transform.SetParent(transform);
             GenerateDivider().transform.SetParent(transform);
             Dictionary<string, List<(string name, IConfigEntry entry)>> modConfigCategories = new();
-            foreach (var sect in entries.Sections)
+            foreach (var _ in entries.Sections)
             {
-                if (entries[section].Count <= 0) continue;
+                if (entries[section].Count <= 0)
+                {
+                    continue;
+                }
+
                 var list = modConfigCategories[section] = new List<(string name, IConfigEntry entry)>();
                 list.AddRange(entries[section].Select(
                     entry => (entry, entries[section, entry])

@@ -10,6 +10,7 @@ internal static class CurtainPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(nameof(Curtain.Awake))]
+    // ReSharper disable once InconsistentNaming
     public static void LoadScreensEarly(Curtain __instance)
     {
         LoadingScreenManager = new LoadingScreenManager();

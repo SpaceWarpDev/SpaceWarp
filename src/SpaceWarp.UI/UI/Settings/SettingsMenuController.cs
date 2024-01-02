@@ -43,7 +43,7 @@ internal class SettingsMenuController : KerbalMonoBehaviour
     private GameObject _dividerPrefab;
     private GameObject _sectionPrefab;
     internal static SettingsMenuController Instance;
-    private bool _alreadySetup = false;
+    private bool _alreadySetup;
     private void Start()
     {
         MainMenuPatcher.MainMenuLoaded += Setup;

@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using I2.Loc;
+using JetBrains.Annotations;
 using KSP.Api.CoreTypes;
 using KSP.Game.StartupFlow;
 using SpaceWarp.API.UI;
@@ -12,6 +13,9 @@ namespace SpaceWarp.Patching.Settings;
 internal class MainMenuPatcher
 {
     internal static event Action MainMenuLoaded;
+
+    [UsedImplicitly]
+    // ReSharper disable once InconsistentNaming
     public static void Postfix(LandingHUD __instance)
     {
         var menuItemsGroupTransform = __instance.transform.FindChildEx("MenuItemsGroup");

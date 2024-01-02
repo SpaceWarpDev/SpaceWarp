@@ -12,6 +12,7 @@ internal static class LoadingFlowPatch
 
     [HarmonyPostfix]
     [HarmonyPatch(nameof(SequentialFlow.NextFlowAction))]
+    // ReSharper disable once InconsistentNaming
     internal static void SelectRandomLoadingScreen(SequentialFlow __instance)
     {
         if (__instance.FlowState != FlowState.Finished)

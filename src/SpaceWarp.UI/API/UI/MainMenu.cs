@@ -2,6 +2,9 @@
 
 namespace SpaceWarp.API.UI;
 
+/// <summary>
+/// Used to register buttons in the game's main menu.
+/// </summary>
 [PublicAPI]
 public static class MainMenu
 {
