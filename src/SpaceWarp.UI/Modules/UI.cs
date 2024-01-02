@@ -28,7 +28,6 @@ public class UI : SpaceWarpModule
     internal static UI Instance;
 
     internal ConfigValue<Color> ConfigAllColor;
-    internal ConfigValue<bool> ConfigCheckVersions;
     internal ConfigValue<bool> ConfigShowMainMenuWarningForOutdatedMods;
     internal ConfigValue<bool> ConfigShowMainMenuWarningForErroredMods;
     internal ConfigValue<Color> ConfigDebugColor;
