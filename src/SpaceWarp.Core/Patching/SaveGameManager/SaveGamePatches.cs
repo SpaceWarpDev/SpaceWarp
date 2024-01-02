@@ -79,7 +79,7 @@ internal class SaveLoadPatches
                     );
                     if (existingData == null)
                     {
-                        SpaceWarpPlugin.Logger.LogWarning(
+                        SpaceWarpPlugin.Instance.SWLogger.LogWarning(
                             $"Saved data for plugin '{loadedData.ModGuid}' found during a load event, however " +
                             $"that plugin isn't registered for save/load events. Skipping load for this plugin."
                         );

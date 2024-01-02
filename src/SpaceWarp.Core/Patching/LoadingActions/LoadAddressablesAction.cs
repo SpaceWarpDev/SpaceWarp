@@ -1,5 +1,5 @@
-﻿using BepInEx.Logging;
-using KSP.Game.Flow;
+﻿using KSP.Game.Flow;
+using SpaceWarp.API.Logging;
 using SpaceWarp.API.Mods;
 using SpaceWarp.InternalUtilities;
 
@@ -7,7 +7,7 @@ namespace SpaceWarp.Patching.LoadingActions;
 
 internal sealed class LoadAddressablesAction : FlowAction
 {
-    private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("Addressables Loader");
+    private static readonly ILogger Logger = BaseLogger.CreateDefault("Addressables Loader");
     private readonly SpaceWarpPluginDescriptor _plugin;
 
     public LoadAddressablesAction(SpaceWarpPluginDescriptor plugin) : base(
@@ -43,7 +43,7 @@ internal sealed class LoadAddressablesAction : FlowAction
             }
             else
             {
-                SpaceWarpPlugin.Logger.LogError(_plugin.SWInfo.Name + ": " + e);
+                SpaceWarpPlugin.Instance.SWLogger.LogError(_plugin.SWInfo.Name + ": " + e);
             }
 
             reject(null);

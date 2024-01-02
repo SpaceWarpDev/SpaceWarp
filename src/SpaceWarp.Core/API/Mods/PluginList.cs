@@ -146,10 +146,10 @@ public static class PluginList
     {
         if (AllPlugins.Any(x => x.Guid == plugin.Guid))
         {
-            SpaceWarpPlugin.Logger.LogError($"Attempting to register a mod with a duplicate GUID: {plugin.Guid}");
+            SpaceWarpPlugin.Instance.SWLogger.LogError($"Attempting to register a mod with a duplicate GUID: {plugin.Guid}");
         }
 
-        SpaceWarpPlugin.Logger.LogInfo($"Registered plugin: {plugin.Guid}");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Registered plugin: {plugin.Guid}");
         _allEnabledAndActivePlugins.Add(plugin);
     }
 
@@ -277,7 +277,7 @@ public static class PluginList
         for (var i = _allEnabledAndActivePlugins.Count - 1; i >= 0; i--)
         {
             var info = _allEnabledAndActivePlugins[i];
-            SpaceWarpPlugin.Logger.LogError($"Missing dependency for mod: {info.Name}, this mod will not be loaded");
+            SpaceWarpPlugin.Instance.SWLogger.LogError($"Missing dependency for mod: {info.Name}, this mod will not be loaded");
             var error = GetErrorDescriptor(info);
             error.MissingDependencies = info.SWInfo
                 .Dependencies

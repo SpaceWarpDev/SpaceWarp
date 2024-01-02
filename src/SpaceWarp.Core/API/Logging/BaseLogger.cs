@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using BepInEx.Logging;
+using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Logging;
 
@@ -28,4 +29,11 @@ public abstract class BaseLogger : ILogger
 
     /// <inheritdoc />
     public void LogDebug(object x) => Log(LogLevel.Debug, x);
+
+    /// <summary>
+    /// Creates a logger of default type with the specified name.
+    /// </summary>
+    /// <param name="name">The name of the logger.</param>
+    /// <returns>The created logger.</returns>
+    public static BaseLogger CreateDefault(string name) => new BepInExLogger(new ManualLogSource(name));
 }

@@ -129,7 +129,7 @@ public static class Loading
                         if (plugin.Plugin != null)
                             plugin.Plugin.SWLogger.LogError(e.ToString());
                         else
-                            SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
+                            SpaceWarpPlugin.Instance.SWLogger.LogError(plugin.SWInfo.Name + ": " + e);
                     }
                 }
             }
@@ -223,7 +223,7 @@ public static class Loading
                     if (plugin.Plugin != null)
                         plugin.Plugin.SWLogger.LogError(e.ToString());
                     else
-                        SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
+                        SpaceWarpPlugin.Instance.SWLogger.LogError(plugin.SWInfo.Name + ": " + e);
                 }
             }
         };

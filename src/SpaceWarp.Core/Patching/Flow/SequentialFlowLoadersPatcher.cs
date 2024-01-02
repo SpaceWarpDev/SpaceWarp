@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
 using System.Reflection.Emit;
-using BepInEx.Logging;
 using HarmonyLib;
 using KSP.Game;
 using KSP.Game.Flow;
+using SpaceWarp.API.Logging;
 
 namespace SpaceWarp.Patching.Flow;
 
@@ -276,7 +276,7 @@ internal static class SequentialFlowLoadersPatcher
                 if (_insertAfter[i].Value is ConstructorInfo constructor)
                 {
                     var actionType = constructor.DeclaringType;
-                    var logger = Logger.CreateLogSource($"{actionType!.Assembly.GetName().Name}/{actionType.Name}");
+                    var logger = BaseLogger.CreateDefault($"{actionType!.Assembly.GetName().Name}/{actionType.Name}");
                     logger.LogWarning(
                         $"Flow action {actionType.Name} was set to be inserted after \"{_insertAfter[i].Key}\" " +
                         $"in {Method.Name}, however that action does not exist in that flow"
@@ -284,7 +284,7 @@ internal static class SequentialFlowLoadersPatcher
                 }
                 else if (_insertAfter[i].Value is FlowAction action)
                 {
-                    var logger = Logger.CreateLogSource("SequentialFlow");
+                    var logger = BaseLogger.CreateDefault("SequentialFlow");
                     logger.LogWarning(
                         $"Flow action \"{action.Name}\" was set to be inserted after \"{_insertAfter[i].Key}\" " +
                         $"in {Method.Name}, however that action does not exist in that flow"

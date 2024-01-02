@@ -3,7 +3,6 @@
 
 using System.Collections;
 using System.Reflection;
-using BepInEx.Logging;
 using HarmonyLib;
 using I2.Loc;
 using JetBrains.Annotations;
@@ -21,13 +20,14 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using static SpaceWarp.Backend.UI.Appbar.AppbarBackend;
+using ILogger = SpaceWarp.API.Logging.ILogger;
 using UnityObject = UnityEngine.Object;
 
 namespace SpaceWarp.Backend.UI.Appbar;
 
 internal static class AppbarBackend
 {
-    private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("ToolbarBackend");
+    private static ILogger Logger => Modules.UI.Instance.ModuleLogger;
 
     // ReSharper disable InconsistentNaming
     public static readonly UnityEvent AppBarOABSubscriber = new();

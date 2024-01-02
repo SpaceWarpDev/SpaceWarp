@@ -54,7 +54,7 @@ public static class ModSaves
             LoadEventCallback = LoadCallbackAdapter,
             SaveData = saveData
         });
-        SpaceWarpPlugin.Logger.LogInfo($"Registered '{modGuid}' for save/load events.");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Registered '{modGuid}' for save/load events.");
         return saveData;
 
         // Create adapter functions to convert Action<T> to CallbackFunctionDelegate
@@ -86,7 +86,7 @@ public static class ModSaves
         var toRemove = InternalPluginSaveData.Find(p => p.ModGuid == modGuid);
         if (toRemove == null) return;
         InternalPluginSaveData.Remove(toRemove);
-        SpaceWarpPlugin.Logger.LogInfo($"Unregistered '{modGuid}' for save/load events.");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Unregistered '{modGuid}' for save/load events.");
     }
 
     /// <summary>

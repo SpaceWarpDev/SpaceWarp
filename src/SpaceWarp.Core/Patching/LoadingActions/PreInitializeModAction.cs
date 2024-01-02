@@ -15,17 +15,17 @@ internal sealed class PreInitializeModAction : FlowAction
 
     public override void DoAction(Action resolve, Action<string> reject)
     {
-        SpaceWarpPlugin.Logger.LogInfo($"Pre-initializing: {_plugin.Name}?");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Pre-initializing: {_plugin.Name}?");
         try
         {
             if (_plugin.DoLoadingActions)
             {
-                SpaceWarpPlugin.Logger.LogInfo($"YES! {_plugin.Plugin}");
+                SpaceWarpPlugin.Instance.SWLogger.LogInfo($"YES! {_plugin.Plugin}");
                 _plugin.Plugin.OnPreInitialized();
             }
             else
             {
-                SpaceWarpPlugin.Logger.LogInfo("NO!!");
+                SpaceWarpPlugin.Instance.SWLogger.LogInfo("NO!!");
             }
 
             resolve();

@@ -1,12 +1,13 @@
 ﻿using System.Reflection;
-using BepInEx.Logging;
 using HarmonyLib;
 using KSP.Game;
 using KSP.Modules;
 using KSP.OAB;
 using KSP.Sim.impl;
 using SpaceWarp.API.Assets;
+using SpaceWarp.API.Logging;
 using UnityEngine;
+using ILogger = SpaceWarp.API.Logging.ILogger;
 
 namespace SpaceWarp.Patching.Parts;
 
@@ -116,7 +117,7 @@ internal class ColorsPatch
     private static Shader _ksp2Opaque;
     private static Shader _ksp2Transparent;
     private static Shader _unityStandard;
-    internal static ManualLogSource Logger;
+    internal static ILogger Logger = BaseLogger.CreateDefault(DisplayName);
 
     public static Dictionary<string, string[]> DeclaredParts { get; } = new();
 
@@ -142,8 +143,6 @@ internal class ColorsPatch
         _ksp2Opaque = Shader.Find(Ksp2OpaquePath);
         _ksp2Transparent = Shader.Find(Ksp2TransparentPath);
         _unityStandard = Shader.Find(UnityStandard);
-
-        Logger = BepInEx.Logging.Logger.CreateLogSource(DisplayName);
 
         return true;
     }

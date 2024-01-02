@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using SpaceWarp.API.Logging;
 using SpaceWarp.API.Lua;
 using UnityEngine;
 using Logger = BepInEx.Logging.Logger;
@@ -17,7 +18,7 @@ public static class AssetManager
     internal static async Task RegisterAssetBundle(string modId, string assetBundleName, AssetBundle assetBundle)
     {
         assetBundleName = assetBundleName.Replace(".bundle", "");
-        var logger = Logger.CreateLogSource($"{modId}/{assetBundleName}");
+        var logger = BaseLogger.CreateDefault($"{modId}/{assetBundleName}");
 
         var names = assetBundle.GetAllAssetNames();
 

@@ -29,7 +29,7 @@ public static class PartComponentModuleOverride
         }
 
         RegisteredPartComponentOverrides.Add(typeof(T));
-        SpaceWarpPlugin.Logger.LogInfo($"Registered '{moduleName}' for background resources processing.");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Registered '{moduleName}' for background resources processing.");
     }
 
     /// <summary>
@@ -44,6 +44,6 @@ public static class PartComponentModuleOverride
         }
 
         RegisteredPartComponentOverrides.Remove(typeof(T));
-        SpaceWarpPlugin.Logger.LogInfo($"Unregistered '{typeof(T).Name}' from background resources processing.");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Unregistered '{typeof(T).Name}' from background resources processing.");
     }
 }

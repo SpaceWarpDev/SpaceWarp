@@ -1,7 +1,7 @@
-﻿using BepInEx.Logging;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using KSP.Game;
 using MoonSharp.Interpreter;
+using SpaceWarp.API.Logging;
 
 namespace SpaceWarp.API.Lua;
 
@@ -41,7 +41,7 @@ public class LuaMod : KerbalMonoBehaviour
     /// <summary>
     /// The logger for this mod.
     /// </summary>
-    public ManualLogSource Logger;
+    public ILogger Logger;
 
     /// <summary>
     /// A pass through to the wrapped table

@@ -46,7 +46,7 @@ internal static class ModLoaderPatch
     private static bool LoadPre(KSP2Mod __instance, ref bool __result, out bool __state)
     {
         // ReSharper restore InconsistentNaming
-        SpaceWarpPlugin.Logger.LogInfo($"KSP2Mod.Load (Pre): {__instance.ModName}");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"KSP2Mod.Load (Pre): {__instance.ModName}");
         var path = __instance.ModRootPath;
         var info = File.Exists(Path.Combine(path, "swinfo.json"))
             ? JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path))
@@ -62,7 +62,7 @@ internal static class ModLoaderPatch
     private static void LoadPost(KSP2Mod __instance, ref bool __result, ref bool __state)
     {
         // ReSharper restore InconsistentNaming
-        SpaceWarpPlugin.Logger.LogInfo($"KSP2Mod.Load (Post): {__instance.ModName}");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"KSP2Mod.Load (Post): {__instance.ModName}");
         if (__state) return;
         var path = __instance.ModRootPath;
         var info = File.Exists(Path.Combine(path, "swinfo.json"))
@@ -88,7 +88,7 @@ internal static class ModLoaderPatch
             __instance.modType = KSP2ModType.ContentOnly;
         }
 
-        SpaceWarpPlugin.Logger.LogInfo($"KSP2Mod.Load (Loaded stuff): {__instance.ModName}");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"KSP2Mod.Load (Loaded stuff): {__instance.ModName}");
 
         if (addAdapter)
         {
@@ -164,7 +164,7 @@ internal static class ModLoaderPatch
         }
         catch (Exception e)
         {
-            SpaceWarpPlugin.Logger.LogError(e);
+            SpaceWarpPlugin.Instance.SWLogger.LogError(e);
             instance.modType = KSP2ModType.Error;
             result = false;
             return true;
@@ -200,7 +200,7 @@ internal static class ModLoaderPatch
                     continue;
                 }
 
-                SpaceWarpPlugin.Logger.LogInfo($"Loading mod: {comp}");
+                SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Loading mod: {comp}");
                 isSWMod = true;
                 baseKspLoaderSpaceWarpMod.SWLogger = new UnityLogSource(instance.ModName);
                 // baseKspLoaderSpaceWarpMod.modFolder = __instance.ModRootPath;
@@ -215,7 +215,7 @@ internal static class ModLoaderPatch
         }
         catch (Exception e)
         {
-            SpaceWarpPlugin.Logger.LogError(e);
+            SpaceWarpPlugin.Instance.SWLogger.LogError(e);
             instance.modType = KSP2ModType.Error;
             result = false;
             return true;

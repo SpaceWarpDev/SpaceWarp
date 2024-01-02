@@ -23,7 +23,7 @@ internal static class PluginRegister
         DisableMods();
     }
 
-    private static readonly ILogger Logger = (BepInExLogger)SpaceWarpPlugin.Logger;
+    private static readonly ILogger Logger = SpaceWarpPlugin.Instance.SWLogger;
 
     private static ModInfo BepInExToSWInfo(PluginInfo plugin)
     {

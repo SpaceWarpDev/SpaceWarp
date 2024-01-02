@@ -1,6 +1,6 @@
 using System.Reflection;
-using BepInEx.Logging;
 using HarmonyLib;
+using SpaceWarp.API.Logging;
 
 namespace SpaceWarp.Patching.System;
 
@@ -19,7 +19,7 @@ internal static class FixGetTypes
             return __exception;
         }
 
-        var logger = new ManualLogSource("FixGetTypes");
+        var logger = BaseLogger.CreateDefault("FixGetTypes");
 
         logger.LogWarning(
             $"Types failed to load from assembly {__instance.FullName} due to the reasons below, continuing anyway."

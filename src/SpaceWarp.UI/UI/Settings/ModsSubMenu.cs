@@ -27,7 +27,7 @@ internal class ModsSubMenu : SettingsSubMenu
         // Lets make sure we clear out the list
         foreach (Transform child in transform)
         {
-            SpaceWarpPlugin.Logger.LogDebug($"Destroying ---- {child.gameObject.name}");
+            Modules.UI.Instance.ModuleLogger.LogDebug($"Destroying ---- {child.gameObject.name}");
             Destroy(child.gameObject);
         }
 

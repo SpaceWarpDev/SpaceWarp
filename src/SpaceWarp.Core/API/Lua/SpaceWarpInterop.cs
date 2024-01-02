@@ -1,6 +1,7 @@
 ﻿using BepInEx.Bootstrap;
 using JetBrains.Annotations;
 using MoonSharp.Interpreter;
+using SpaceWarp.API.Logging;
 using SpaceWarp.InternalUtilities;
 using UnityEngine;
 using Logger = BepInEx.Logging.Logger;
@@ -27,7 +28,7 @@ public static class SpaceWarpInterop
         go.transform.SetParent(Chainloader.ManagerObject.transform);
         go.SetActive(false);
         var mod = go.AddComponent<LuaMod>();
-        mod.Logger = Logger.CreateLogSource(name);
+        mod.Logger = new BepInExLogger(Logger.CreateLogSource(name));
         mod.ModTable = modTable;
         go.SetActive(true);
         return mod;
