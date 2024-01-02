@@ -86,7 +86,7 @@ jobs:
       
       - name: Update mod on spacedock
         run: |
-          result=$(curl -b ./cookies -F "version=${{ env.version }}" -F "changelog=${{ env.changelog }}" -F "game-version=${{ env.LATEST_GAME_VERSION}}" -F "notify-followers=yes" -F "zipball=@${{ env.zip }}" "https://spacedock.info/api/mod/${{ env.MOD_ID }}/update")
+          result=$(curl -b ./cookies -F "version=${{ env.version }}" -F "changelog=${{ env.changelog }}" -F "game-version=${{ env.LATEST_GAME_VERSION }}" -F "notify-followers=yes" -F "zipball=@${{ env.zip }}" "https://spacedock.info/api/mod/${{ env.MOD_ID }}/update")
           errored=$(echo $result | jq .error)
           if [ "$errored" == "true" ]; then
             echo "Upload to space dock errored: $(echo $result | jq .reason)"
