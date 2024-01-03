@@ -36,6 +36,7 @@ jobs:
           echo "zip=$(ls -1 dist/SpaceWarp-*.zip | head -n 1)" >> $GITHUB_ENV
           echo "upload_url=$(wget -qO- https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq '.[0].upload_url' | tr -d \")" >> $GITHUB_ENV
           echo "changelog=$(wget -qO- https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq '.[0].body' | tr -d \" | jq -Rr @uri)" >> $GITHUB_ENV
+          echo "${{ env.changelog }}" > ./changelog.md
 
       - name: Check if version exists
         id: check-version
@@ -86,7 +87,7 @@ jobs:
       
       - name: Update mod on spacedock
         run: |
-          result=$(curl -b ./cookies -F "version=${{ env.version }}" -F "changelog=${{ env.changelog }}" -F "game-version=${{ env.LATEST_GAME_VERSION }}" -F "notify-followers=yes" -F "zipball=@${{ env.zip }}" "https://spacedock.info/api/mod/${{ env.MOD_ID }}/update")
+          result=$(curl -b ./cookies -F "version=${{ env.version }}" -F "changelog=@./changelog.md" -F "game-version=${{ env.LATEST_GAME_VERSION }}" -F "notify-followers=yes" -F "zipball=@${{ env.zip }}" "https://spacedock.info/api/mod/${{ env.MOD_ID }}/update")
           errored=$(echo $result | jq .error)
           if [ "$errored" == "true" ]; then
             echo "Upload to space dock errored: $(echo $result | jq .reason)"
