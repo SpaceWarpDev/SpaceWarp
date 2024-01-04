@@ -83,9 +83,15 @@
         <!-- Copying compiled preloader to build directory -->
         <Message Text="Copying preloader DLLs to build directory"/>
         <ItemGroup Label="Preloader DLLs to be copied">
-            <PreloaderDLLs Include="$(PreloaderBinPath)/**/*.dll" Exclude="$(PreloaderBinPath)/**/*.pdb"/>
+            <PreloaderDLLs Include="$(PreloaderBinPath)/**/*.dll"/>
         </ItemGroup>
         <Copy SourceFiles="@(PreloaderDLLs)"
+              DestinationFolder="$(SolutionDir)/dist/$(ConfigurationName)/BepInEx/core"/>
+
+        <ItemGroup Label="Preloader PDBs to be copied">
+            <PreloaderPDBs Include="$(PreloaderBinPath)/**/*.pdb"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(PreloaderPDBs)"
               DestinationFolder="$(SolutionDir)/dist/$(ConfigurationName)/BepInEx/core"/>
 
         <!-- Copying compiled restarter to build directory -->
@@ -139,9 +145,9 @@
                    Directories="$(KSP2DIR)/BepInEx/plugins/$(ProjectName)"/>
         <RemoveDir Condition="$(ConfigurationName) == Deploy Or $(ConfigurationName) == DeployAndRun"
                    Directories="$(KSP2DIR)/BepInEx/patchers/$(ProjectName)"/>
-        <Delete Files="$(KSP2DIR)/SpaceWarp.Preloader.dll"
+        <Delete Files="$(KSP2DIR)/BepInEx/core/SpaceWarp.Preloader.dll"
                 Condition="$(ConfigurationName) == Deploy Or $(ConfigurationName) == DeployAndRun"/>
-        <Delete Files="$(KSP2DIR)/SpaceWarp.Preloader.pdb"
+        <Delete Files="$(KSP2DIR)/BepInEx/core/SpaceWarp.Preloader.pdb"
                 Condition="$(ConfigurationName) == Deploy Or $(ConfigurationName) == DeployAndRun"/>
 
         <ItemGroup Label="Dist folder to be copied">
