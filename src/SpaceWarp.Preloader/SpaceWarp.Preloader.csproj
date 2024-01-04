@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <!-- References -->
+    <ItemGroup Label="NuGet package references">
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" Private="false"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" PrivateAssets="all" Private="false"/>
+    </ItemGroup>
+    <ItemGroup>
+      <Reference Include="BepInEx.Preloader" Publicize="true" PrivateAssets="all" Private="false">
+        <HintPath>..\..\plugin_template\BepInEx\core\BepInEx.Preloader.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+</Project>

@@ -21,6 +21,10 @@
         <ModulesObjPath>$(SolutionDir)build/obj/modules/$(Configuration)</ModulesObjPath>
         <PatcherBinPath>$(SolutionDir)build/bin/patcher/$(Configuration)</PatcherBinPath>
         <PatcherObjPath>$(SolutionDir)build/obj/patcher/$(Configuration)</PatcherObjPath>
+        <RestarterBinPath>$(SolutionDir)build/bin/restarter/$(Configuration)</RestarterBinPath>
+        <RestarterObjPath>$(SolutionDir)build/obj/restarter/$(Configuration)</RestarterObjPath>
+        <PreloaderBinPath>$(SolutionDir)build/bin/preloader/$(Configuration)</PreloaderBinPath>
+        <PreloaderObjPath>$(SolutionDir)build/obj/preloader/$(Configuration)</PreloaderObjPath>
         <BaseOutputPath>$(ModulesBinPath)/$(MSBuildProjectName)</BaseOutputPath>
         <BaseIntermediateOutputPath>$(ModulesObjPath)/$(MSBuildProjectName)</BaseIntermediateOutputPath>
         <AssemblyName>$(MSBuildProjectName)</AssemblyName>
