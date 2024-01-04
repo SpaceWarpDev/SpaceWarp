@@ -16,12 +16,22 @@ using MonoMod.Cil;
 
 namespace SpaceWarpPatcher;
 
+/// <summary>
+/// Patcher for the UnityEngine.CoreModule assembly.
+/// </summary>
 [UsedImplicitly]
 public static class Patcher
 {
+    /// <summary>
+    /// The target DLLs to patch.
+    /// </summary>
     [UsedImplicitly]
     public static IEnumerable<string> TargetDLLs => new[] { "UnityEngine.CoreModule.dll"};
 
+    /// <summary>
+    /// Patch the target assembly.
+    /// </summary>
+    /// <param name="asm">The target assembly.</param>
     [UsedImplicitly]
     public static void Patch(ref AssemblyDefinition asm)
     {
@@ -100,19 +110,26 @@ internal static class Delayer
     }
 }
 
+/// <summary>
+/// Patches the Chainloader.Start method to disable plugins.
+/// </summary>
 [HarmonyPatch]
 public static class ChainloaderPatch
 {
-    internal static string[] DisabledPluginGuids;
+    /// <summary>
+    /// The filepath to the disabled plugins file.
+    /// </summary>
     public static string DisabledPluginsFilepath;
+
+    internal static string[] DisabledPluginGuids;
     internal static ManualLogSource LogSource;
     internal static List<PluginInfo> DisabledPlugins;
     internal static bool ModListChangedSinceLastRun;
 
-    private static string[] AllSourceFiles(DirectoryInfo directoryInfo) =>
-        directoryInfo.EnumerateFiles("*.cs", SearchOption.AllDirectories)
-            .Select(fileInfo => fileInfo.FullName)
-            .ToArray();
+    private static string[] AllSourceFiles(DirectoryInfo directoryInfo) => directoryInfo
+        .EnumerateFiles("*.cs", SearchOption.AllDirectories)
+        .Select(fileInfo => fileInfo.FullName)
+        .ToArray();
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Chainloader), nameof(Chainloader.Start))]
@@ -131,8 +148,6 @@ public static class ChainloaderPatch
         }
     }
 
-    
-
     private static bool CompileRoslynMods(ManualLogSource trueLogger)
     {
         try
@@ -148,7 +163,7 @@ public static class ChainloaderPatch
                 "System.Runtime.CompilerServices.Unsafe",
                 "System.Numerics.Vectors"
             };
-            var loc = new DirectoryInfo(Assembly.GetExecutingAssembly().Location).Parent.FullName;
+            var loc = new DirectoryInfo(Assembly.GetExecutingAssembly().Location).Parent!.FullName;
             foreach (var file in toLoad)
             {
                 trueLogger.LogInfo($"Loading: {file}");

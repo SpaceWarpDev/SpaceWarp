@@ -7,14 +7,22 @@ using MonoMod.Utils;
 
 namespace SpaceWarpPatcher;
 
-
+/// <summary>
+/// Patcher for the game's main DLL
+/// </summary>
 [UsedImplicitly]
 public class AssemblyCSharpPatcher
 {
+    /// <summary>
+    /// The target DLLs to patch
+    /// </summary>
     [UsedImplicitly]
     public static IEnumerable<string> TargetDLLs => new[] { "Assembly-CSharp.dll"};
 
-
+    /// <summary>
+    /// Patches the target DLL
+    /// </summary>
+    /// <param name="assemblyDefinition">The assembly definition to patch</param>
     [UsedImplicitly]
     public static void Patch(ref AssemblyDefinition assemblyDefinition)
     {
@@ -36,7 +44,7 @@ public class AssemblyCSharpPatcher
         firstTargetType.Fields.Add(new FieldDefinition("HasRegisteredPartComponentsForFixedUpdate",FieldAttributes.Public,boolType));
         var field = firstTargetType.Fields.First(x => x.Name == "HasRegisteredPartComponentsForFixedUpdate");
         // Now later we harmony patch the initializer for partownercomponent
-        
+
         var targetMethod = firstTargetType.Methods.First(method => method.Name == "OnFixedUpdate");
         var methodCallA = assemblyDefinition.MainModule.Types.First(t => t.Name == "ResourceFlowRequestManager").Methods
             .First(m => m.Name == "UpdateFlowRequests");
@@ -59,7 +67,7 @@ public class AssemblyCSharpPatcher
             {
                 done = currentInstruction;
                 nextIsTarget = false;
-            } 
+            }
             newInstructions.Add(currentInstruction);
             if (!currentInstruction.MatchCallOrCallvirt(methodCallA)) continue;
             nextIsTarget = true;
@@ -67,9 +75,9 @@ public class AssemblyCSharpPatcher
             newInstructions.Add(Instruction.Create(OpCodes.Ldarg_0));
             @else = newInstructions.Last();
             newInstructions.Add(Instruction.Create(OpCodes.Ldfld,field));
-            newInstructions.Add(Instruction.Create(OpCodes.Ldarg_3)); 
+            newInstructions.Add(Instruction.Create(OpCodes.Ldarg_3));
             newInstructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-            newInstructions.Add(Instruction.Create(OpCodes.Call, methodCallB));   
+            newInstructions.Add(Instruction.Create(OpCodes.Call, methodCallB));
             newInstructions.Add(Instruction.Create(OpCodes.Ldarg_1));
             newInstructions.Add(Instruction.Create(OpCodes.Ldarg_2));
             newInstructions.Add(Instruction.Create(OpCodes.Callvirt, methodCallA));
@@ -95,19 +103,19 @@ public class AssemblyCSharpPatcher
             {
                 newInstructions[i] = Instruction.Create(OpCodes.Bne_Un_S, @else);
             }
-        
+
             if (currentInstruction.OpCode == OpCodes.Nop)
             {
                 newInstructions[i] = Instruction.Create(OpCodes.Br_S, done);
             }
-        
+
             if (currentInstruction.OpCode == OpCodes.Ldarg_3)
             {
                 newInstructions[i] = Instruction.Create(OpCodes.Brfalse_S, done);
             }
         }
-        
-        
+
+
         insts.Clear();
         insts.AddRange(newInstructions);
     }

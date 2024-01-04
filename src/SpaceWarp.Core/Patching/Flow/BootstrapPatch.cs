@@ -7,7 +7,7 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.Backend.Modding;
 using SpaceWarp.Patching.LoadingActions;
 
-namespace SpaceWarp.Patching;
+namespace SpaceWarp.Patching.Flow;
 
 [HarmonyPatch]
 internal static class BootstrapPatch
@@ -23,8 +23,8 @@ internal static class BootstrapPatch
         PluginList.ResolveDependenciesAndLoadOrder();
     }
 
-    [HarmonyILManipulator]
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.StartBootstrap))]
+    [HarmonyILManipulator]
     private static void PatchInitializationsIL(ILContext ilContext, ILLabel endLabel)
     {
         ILCursor ilCursor = new(ilContext);
@@ -108,9 +108,9 @@ internal static class BootstrapPatch
         IList<SpaceWarpPluginDescriptor> allPlugins;
         if (ForceSpaceWarpLoadDueToError)
         {
-            var l = new List<SpaceWarpPluginDescriptor> { ErroredSWPluginDescriptor };
-            l.AddRange(PluginList.AllEnabledAndActivePlugins);
-            allPlugins = l;
+            var list = new List<SpaceWarpPluginDescriptor> { ErroredSWPluginDescriptor };
+            list.AddRange(PluginList.AllEnabledAndActivePlugins);
+            allPlugins = list;
         }
         else
         {
@@ -130,7 +130,9 @@ internal static class BootstrapPatch
         foreach (var plugin in PluginList.AllEnabledAndActivePlugins)
         {
             if (plugin.Plugin != null && !plugin.LatePreInitialize)
+            {
                 GameManager.Instance.LoadingFlow.AddAction(new PreInitializeModAction(plugin));
+            }
         }
     }
 }

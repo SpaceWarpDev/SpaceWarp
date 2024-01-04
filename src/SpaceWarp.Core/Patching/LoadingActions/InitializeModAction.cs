@@ -7,8 +7,7 @@ internal sealed class InitializeModAction : FlowAction
 {
     private readonly SpaceWarpPluginDescriptor _plugin;
 
-    public InitializeModAction(SpaceWarpPluginDescriptor plugin) : base(
-        $"Initialization for plugin {plugin.Name}")
+    public InitializeModAction(SpaceWarpPluginDescriptor plugin) : base($"Initialization for plugin {plugin.Name}")
     {
         _plugin = plugin;
     }
@@ -18,7 +17,10 @@ internal sealed class InitializeModAction : FlowAction
         try
         {
             if (_plugin.DoLoadingActions)
+            {
                 _plugin.Plugin.OnInitialized();
+            }
+
             resolve();
         }
         catch (Exception e)

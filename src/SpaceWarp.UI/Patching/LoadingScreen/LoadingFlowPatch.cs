@@ -3,23 +3,24 @@ using KSP.Game;
 using KSP.Game.Flow;
 using KSP.Startup;
 
-namespace SpaceWarp.Patching;
+namespace SpaceWarp.Patching.LoadingScreen;
 
 [HarmonyPatch(typeof(SequentialFlow))]
 internal static class LoadingFlowPatch
 {
-    internal static long LoadingScreenTimer;
+    private static long _loadingScreenTimer;
 
     [HarmonyPostfix]
     [HarmonyPatch(nameof(SequentialFlow.NextFlowAction))]
+    // ReSharper disable once InconsistentNaming
     internal static void SelectRandomLoadingScreen(SequentialFlow __instance)
     {
         if (__instance.FlowState != FlowState.Finished)
         {
             var time = ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();
-            if (time - LoadingScreenTimer >= 7)
+            if (time - _loadingScreenTimer >= 7)
             {
-                LoadingScreenTimer = time;
+                _loadingScreenTimer = time;
                 // Switch loading screen
                 if (GameManager.Instance == null || GameManager.Instance.Game == null ||
                     GameManager.Instance.Game.UI == null) return;
@@ -34,5 +35,4 @@ internal static class LoadingFlowPatch
             }
         }
     }
-
 }

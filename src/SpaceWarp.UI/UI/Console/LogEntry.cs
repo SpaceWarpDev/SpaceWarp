@@ -89,14 +89,7 @@ internal class LogEntry : BindableElement
         set
         {
             _expanded = value;
-            if (value)
-            {
-                _logMessageLabel.style.display = DisplayStyle.Flex;
-            }
-            else
-            {
-                _logMessageLabel.style.display = DisplayStyle.None;
-            }
+            _logMessageLabel.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
             _logMessageHeaderLabel.text = LogMessageHeader;
         }
     }
@@ -197,8 +190,9 @@ internal class LogEntry : BindableElement
         Expanded = !startCollapsed;
     }
 
-    public override void HandleEvent(EventBase evt)
+    public override void ExecuteDefaultAction(EventBase evt)
     {
+        base.ExecuteDefaultAction(evt);
         if(evt is ClickEvent)
         {
             Expanded = !Expanded;

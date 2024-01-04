@@ -5,6 +5,8 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.InternalUtilities;
 using SpaceWarp.Patching.LoadingActions;
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 namespace SpaceWarp.API.Loading;
 
 /// <summary>
@@ -98,7 +100,7 @@ public static class Loading
                     }
                     catch (Exception e)
                     {
-                        plugin.ModLogger.LogError(e.ToString());
+                        plugin.SWLogger.LogError(e.ToString());
                     }
                 }
             }
@@ -127,7 +129,7 @@ public static class Loading
                         if (plugin.Plugin != null)
                             plugin.Plugin.SWLogger.LogError(e.ToString());
                         else
-                            SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
+                            SpaceWarpPlugin.Instance.SWLogger.LogError(plugin.SWInfo.Name + ": " + e);
                     }
                 }
             }
@@ -195,7 +197,7 @@ public static class Loading
                 }
                 catch (Exception e)
                 {
-                    plugin.ModLogger.LogError(e.ToString());
+                    plugin.SWLogger.LogError(e.ToString());
                 }
             }
         };
@@ -221,7 +223,7 @@ public static class Loading
                     if (plugin.Plugin != null)
                         plugin.Plugin.SWLogger.LogError(e.ToString());
                     else
-                        SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
+                        SpaceWarpPlugin.Instance.SWLogger.LogError(plugin.SWInfo.Name + ": " + e);
                 }
             }
         };

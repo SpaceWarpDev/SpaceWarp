@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 using KSP.Game.Flow;
-using SpaceWarp.Patching;
+using SpaceWarp.Patching.Flow;
 
 namespace SpaceWarp.API.Loading;
 

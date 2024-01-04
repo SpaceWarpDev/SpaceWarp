@@ -6,11 +6,20 @@ using ILogger = SpaceWarp.API.Logging.ILogger;
 
 namespace SpaceWarp.Modules;
 
+/// <summary>
+/// Manager of SpaceWarp modules.
+/// </summary>
 public static class ModuleManager
 {
     internal static List<SpaceWarpModule> AllSpaceWarpModules = new();
     private static readonly ILogger ModuleManagerLogSource = new UnityLogSource("SpaceWarp.ModuleManager");
 
+    /// <summary>
+    /// Gets a SpaceWarp module instance by name.
+    /// </summary>
+    /// <param name="name">Name of the module.</param>
+    /// <param name="module">The module instance.</param>
+    /// <returns>True if the module was found, false otherwise.</returns>
     public static bool TryGetModule(string name, out SpaceWarpModule module)
     {
         module = AllSpaceWarpModules.FirstOrDefault(x => x.Name == name);

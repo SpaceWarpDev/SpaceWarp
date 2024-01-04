@@ -61,7 +61,7 @@ internal class ModListController : MonoBehaviour
     private Foldout _detailsConflictFoldout;
     private VisualElement _detailsDependenciesList;
     private VisualElement _detailsConflictList;
-    
+
     private static LocalizedString _missingDependency = "SpaceWarp/ModList/MissingDependency";
     private static LocalizedString _erroredDependency = "SpaceWarp/ModList/ErroredDependency";
     private static LocalizedString _disabledDependency = "SpaceWarp/ModList/DisabledDependency";
@@ -80,7 +80,7 @@ internal class ModListController : MonoBehaviour
 
     internal Dictionary<string, ModListItemController> BoundItems = new();
 
-    private EventCallback<ChangeEvent<bool>> _lastDetailsFoldoutCallback = null;
+    private EventCallback<ChangeEvent<bool>> _lastDetailsFoldoutCallback;
 
     private static readonly IReadOnlyList<string> NoToggleGuids = new List<string>
     {
@@ -205,7 +205,7 @@ internal class ModListController : MonoBehaviour
 
         _detailsConflictFoldout = _container.Q<Foldout>("details-conflicts-foldout");
         _detailsConflictList = _container.Q<VisualElement>("details-conflicts-list");
-        
+
         // Show only categories that have any mods in them
         if (PluginList.AllEnabledAndActivePlugins.Count > 0)
         {
@@ -432,8 +432,8 @@ internal class ModListController : MonoBehaviour
         );
     }
 
-    
-    
+
+
     private void SetSelected(
         string modName = "",
         string id = "",
@@ -498,7 +498,7 @@ internal class ModListController : MonoBehaviour
             }
             else
             {
-                
+
                 void GenerateFoldoutCallback(ChangeEvent<bool> evt)
                 {
                     if (!evt.newValue) return;
@@ -520,7 +520,7 @@ internal class ModListController : MonoBehaviour
                 _lastDetailsFoldoutCallback = GenerateFoldoutCallback;
             }
         }
-        
+
         SetDependencies(dependencies,
             missingDependencies,
             erroredDependencies,

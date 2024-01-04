@@ -1,15 +1,15 @@
 ﻿using System.Reflection;
-using BepInEx.Logging;
-using Castle.Core.Internal;
 using HarmonyLib;
 using KSP.Game;
 using KSP.Modules;
 using KSP.OAB;
 using KSP.Sim.impl;
 using SpaceWarp.API.Assets;
+using SpaceWarp.API.Logging;
 using UnityEngine;
+using ILogger = SpaceWarp.API.Logging.ILogger;
 
-namespace SpaceWarp.Patching;
+namespace SpaceWarp.Patching.Parts;
 
 /// <summary>
 /// This patch is meant to give modders a way to use the new colors system on KSP2.
@@ -21,9 +21,9 @@ namespace SpaceWarp.Patching;
 [HarmonyPatch]
 internal class ColorsPatch
 {
+    #region Colors patch
+
     private const string Ksp2OpaquePath = "KSP2/Scenery/Standard (Opaque)";
-    private const string Ksp2TransparentPath = "KSP2/Scenery/Standard (Transparent)";
-    private const string UnityStandard = "Standard";
 
     [HarmonyPatch(typeof(ObjectAssemblyPartTracker), nameof(ObjectAssemblyPartTracker.OnPartPrefabLoaded))]
     public static void Prefix(IObjectAssemblyAvailablePart obj, ref GameObject prefab)
@@ -31,7 +31,11 @@ internal class ColorsPatch
         foreach (var renderer in prefab.GetComponentsInChildren<Renderer>())
         {
             var shaderName = renderer.material.shader.name;
-            if (shaderName is not ("Parts Replace" or "KSP2/Parts/Paintable")) continue;
+            if (shaderName is not ("Parts Replace" or "KSP2/Parts/Paintable"))
+            {
+                continue;
+            }
+
             Material material;
             var mat = new Material(Shader.Find(Ksp2OpaquePath))
             {
@@ -49,7 +53,11 @@ internal class ColorsPatch
         foreach (var renderer in instance.GetComponentsInChildren<Renderer>())
         {
             var shaderName = renderer.material.shader.name;
-            if (shaderName is not ("Parts Replace" or "KSP2/Parts/Paintable")) continue;
+            if (shaderName is not ("Parts Replace" or "KSP2/Parts/Paintable"))
+            {
+                continue;
+            }
+
             Material material;
             var mat = new Material(Shader.Find(Ksp2OpaquePath))
             {
@@ -60,7 +68,17 @@ internal class ColorsPatch
         }
     }
 
-    //Everything below this point will be removed in the next patch
+    #endregion
+
+    // TODO: Remove everything below this comment in 2.0.
+
+    #region To be removed
+
+    // ReSharper disable all
+
+    private const string Ksp2TransparentPath = "KSP2/Scenery/Standard (Transparent)";
+    private const string UnityStandard = "Standard";
+
     private const int Diffuse = 0;
     private const int Metallic = 1;
     private const int Bump = 2;
@@ -99,9 +117,8 @@ internal class ColorsPatch
     private static Shader _ksp2Opaque;
     private static Shader _ksp2Transparent;
     private static Shader _unityStandard;
-    internal static ManualLogSource Logger;
+    internal static ILogger Logger = BaseLogger.CreateDefault(DisplayName);
 
-    ///TODO: Implement false behaviour
     public static Dictionary<string, string[]> DeclaredParts { get; } = new();
 
     [HarmonyPrepare]
@@ -127,9 +144,7 @@ internal class ColorsPatch
         _ksp2Transparent = Shader.Find(Ksp2TransparentPath);
         _unityStandard = Shader.Find(UnityStandard);
 
-        Logger = BepInEx.Logging.Logger.CreateLogSource(DisplayName);
-
-        return true; // TODO: add config to enable/disable this patch, if disabled return false.
+        return true;
     }
 
     /// <summary>
@@ -313,7 +328,7 @@ internal class ColorsPatch
         nameof(GameManager.OnLoadingFinished))]
     internal static void Prefix()
     {
-        LoadDeclaredParts(); // TODO: Move this to a more apropriate call, like the one loading parts or something like that.
+        LoadDeclaredParts();
     }
 
     [HarmonyPatch(typeof(Module_Color),
@@ -321,7 +336,7 @@ internal class ColorsPatch
     internal static void Postfix(Module_Color __instance)
     {
         var partName = __instance.OABPart is not null ? __instance.OABPart.PartName : __instance.part.Name;
-        if (partName.IsNullOrEmpty()) return;
+        if (string.IsNullOrEmpty(partName)) return;
         var trimmedPartName = TrimPartName(partName);
         if (DeclaredParts.Count <= 0 || !_allParts.Contains(trimmedPartName)) return;
 
@@ -364,4 +379,6 @@ internal class ColorsPatch
     {
         Logger.LogError($"{data}");
     }
+
+    #endregion
 }

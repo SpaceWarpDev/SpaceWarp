@@ -1,18 +1,21 @@
 ﻿using HarmonyLib;
 using I2.Loc;
+using JetBrains.Annotations;
 using KSP.Api.CoreTypes;
 using KSP.Game.StartupFlow;
 using SpaceWarp.API.UI;
 using TMPro;
 using UnityObject = UnityEngine.Object;
 
-namespace SpaceWarp.Patching;
+namespace SpaceWarp.Patching.Settings;
 
-[HarmonyPatch(typeof(LandingHUD))]
-[HarmonyPatch("Start")]
+[HarmonyPatch(typeof(LandingHUD), nameof(LandingHUD.Start))]
 internal class MainMenuPatcher
 {
     internal static event Action MainMenuLoaded;
+
+    [UsedImplicitly]
+    // ReSharper disable once InconsistentNaming
     public static void Postfix(LandingHUD __instance)
     {
         var menuItemsGroupTransform = __instance.transform.FindChildEx("MenuItemsGroup");
@@ -37,6 +40,8 @@ internal class MainMenuPatcher
             var tmp = newButton.GetComponentInChildren<TextMeshProUGUI>();
 
             tmp.SetText(menuButtonToBeAdded.name);
+
+            LocalizationManager.OnLocalizeEvent += () => tmp.SetText(menuButtonToBeAdded.name);
         }
 
         foreach (var localizedMenuButtonToBeAddded in MainMenu.LocalizedMenuButtonsToBeAdded)

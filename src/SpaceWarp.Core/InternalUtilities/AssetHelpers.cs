@@ -28,59 +28,35 @@ internal static class AssetHelpers
     internal static void LoadLocalizationFromFolder(string folder)
     {
         SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Attempting to load localizations from {folder}");
-        LanguageSourceData languageSourceData = null;
         if (!Directory.Exists(folder))
         {
             SpaceWarpPlugin.Instance.SWLogger.LogInfo($"{folder} does not exist, not loading localizations.");
             return;
         }
 
+        int loadedCount = 0;
+
         var info = new DirectoryInfo(folder);
         foreach (var csvFile in info.GetFiles("*.csv", SearchOption.AllDirectories))
         {
-            languageSourceData ??= new LanguageSourceData();
+            var csvSource = new LanguageSourceData();
             var csvData = File.ReadAllText(csvFile.FullName).Replace("\r\n", "\n");
-            languageSourceData.Import_CSV("", csvData, eSpreadsheetUpdateMode.AddNewTerms);
+            csvSource.Import_CSV("", csvData, eSpreadsheetUpdateMode.AddNewTerms);
+            loadedCount++;
+            LocalizationHelpers.AddSource(csvSource);
         }
 
         foreach (var i2CsvFile in info.GetFiles("*.i2csv", SearchOption.AllDirectories))
         {
-            languageSourceData ??= new LanguageSourceData();
+            var i2CsvSource = new LanguageSourceData();
             var i2CsvData = File.ReadAllText(i2CsvFile.FullName).Replace("\r\n", "\n");
-            languageSourceData.Import_I2CSV("", i2CsvData, eSpreadsheetUpdateMode.AddNewTerms);
+            i2CsvSource.Import_I2CSV("", i2CsvData, eSpreadsheetUpdateMode.AddNewTerms);
+            loadedCount++;
+            LocalizationHelpers.AddSource(i2CsvSource);
         }
 
-        if (languageSourceData != null)
-        {
-            languageSourceData.OnMissingTranslation = LanguageSourceData.MissingTranslationAction.Fallback;
-            SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Loaded localizations from {folder}");
-
-            AddSource(languageSourceData);
-        }
-        else
-        {
-            SpaceWarpPlugin.Instance.SWLogger.LogInfo($"No localizations found in {folder}");
-        }
-    }
-
-    private static void AddSource(LanguageSourceData source)
-    {
-        if (LocalizationManager.Sources.Contains(source))
-        {
-            return;
-        }
-
-        LocalizationManager.Sources.Insert(0, source);
-        foreach (var language in source.mLanguages)
-        {
-            language.SetLoaded(true);
-        }
-
-        if (source.mDictionary.Count != 0)
-        {
-            return;
-        }
-
-        source.UpdateDictionary(true);
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo(
+            loadedCount > 0 ? $"Loaded localizations from {folder}" : $"No localizations found in {folder}"
+        );
     }
 }

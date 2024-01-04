@@ -1,5 +1,4 @@
 ﻿using BepInEx;
-using BepInEx.Logging;
 using JetBrains.Annotations;
 using KSP.Game;
 using KSP.Messages;
@@ -11,61 +10,83 @@ using SpaceWarp.API.Logging;
 namespace SpaceWarp.API.Mods;
 
 /// <summary>
-/// Represents a KSP2 Mod, you should inherit from this and do your manager processing.
+/// Represents a SpaceWarp mod based on BepInEx.
 /// </summary>
 [PublicAPI]
 public abstract class BaseSpaceWarpPlugin : BaseUnityPlugin, ISpaceWarpMod
 {
-    #region KspBehaviour things
+    #region KerbalMonoBehaviour properties
 
+    /// <summary>
+    /// The current game instance, this is null if the game is not yet initialized or shutting down.
+    /// </summary>
     protected static GameInstance Game => GameManager.Instance == null ? null : GameManager.Instance.Game;
 
+    /// <summary>
+    /// The message center for the current game instance.
+    /// </summary>
     protected MessageCenter Messages => Game.Messages;
 
-    // ReSharper disable Unity.NoNullPropagation
-    // fine because its null checked by Game properly
+    /// <summary>
+    /// The current game instance, this is null if the game is not yet initialized or shutting down.
+    /// </summary>
+    // ReSharper disable Unity.NoNullPropagation - fine because it's null checked by Game properly
+    // ReSharper disable once InconsistentNaming
     protected ContextualFxSystem CFXSystem => Game?.GraphicsManager?.ContextualFxSystem;
 
+    /// <summary>
+    /// Whether the game is shutting down.
+    /// </summary>
     protected bool IsGameShuttingDown => Game == null;
 
     #endregion
 
-    public ModInfo SpaceWarpMetadata { get; internal set; }
-    internal ManualLogSource ModLogger => Logger;
-    public string PluginFolderPath { get; internal set; }
-
-    public string IdBySpec => GetGuidBySpec(Info, SpaceWarpMetadata);
+    private BepInExLogger _logger;
+    private BepInExConfigFile _configFile;
 
     /// <summary>
-    ///     1st stage initialization
-    ///     This is called before any of the game is actually loaded, it is called as early as possible in the games bootstrap
-    ///     process.
+    /// The mod info for this mod.
     /// </summary>
+    [Obsolete("This will be removed in 2.0.0. Use SWMetadata instead.")]
+    public ModInfo SpaceWarpMetadata { get; internal set; }
+
+    /// <summary>
+    /// The path to the folder containing the plugin.
+    /// </summary>
+    [Obsolete("This will be removed in 2.0.0. Use SWMetadata.Folder instead.")]
+    public string PluginFolderPath { get; internal set; }
+
+    /// <summary>
+    /// The correct ID of the mod based on its spec version.
+    /// </summary>
+    [Obsolete("This will be removed in 2.0.0. Use SWMetadata.Guid instead.")]
+    public string IdBySpec => GetGuidBySpec(Info, SpaceWarpMetadata);
+
+    /// <inheritdoc />
+    public ILogger SWLogger => _logger ??= new BepInExLogger(Logger);
+
+    /// <inheritdoc />
+    public IConfigFile SWConfiguration => _configFile ??= new BepInExConfigFile(Config);
+
+    /// <inheritdoc />
+    public SpaceWarpPluginDescriptor SWMetadata { get; set; }
+
+    /// <inheritdoc />
     public virtual void OnPreInitialized()
     {
     }
 
-    /// <summary>
-    ///     2nd stage initialization
-    ///     This is called after the game is loaded, and after your mods assets are loaded.
-    /// </summary>
+    /// <inheritdoc />
     public virtual void OnInitialized()
     {
     }
 
-    /// <summary>
-    ///     3rd stage initialization
-    ///     This is called after all mods have done first stage initialization
-    /// </summary>
+    /// <inheritdoc />
     public virtual void OnPostInitialized()
     {
     }
-    private BepInExLogger _logger;
-    public ILogger SWLogger => _logger ??= new BepInExLogger(Logger);
-    private BepInExConfigFile _configFile;
-    public IConfigFile SWConfiguration => _configFile ??= new BepInExConfigFile(Config);
-    public SpaceWarpPluginDescriptor SWMetadata { get; set; }
 
+    [Obsolete("To be removed in 2.0.0.")]
     internal static string GetGuidBySpec(PluginInfo pluginInfo, ModInfo modInfo)
     {
         return modInfo.Spec >= SpecVersion.V1_2

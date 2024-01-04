@@ -2,14 +2,14 @@
 using KSP.Game;
 using KSP.Game.StartupFlow;
 
-namespace SpaceWarp.Patching;
+namespace SpaceWarp.Patching.LoadingScreen;
 
 [HarmonyPatch(typeof(DeserializeLoadingScreens))]
-public static class LoadingScreenDeserializationPatch
+internal static class LoadingScreenDeserializationPatch
 {
     [HarmonyPatch(nameof(DeserializeLoadingScreens.DoAction))]
     [HarmonyPostfix]
-    public static void AddToAllFlows()
+    private static void AddToAllFlows()
     {
         var curtain = GameManager.Instance.Game.UI.Curtain;
         foreach (var flow in curtain.LoadingScreens.Values.Distinct())

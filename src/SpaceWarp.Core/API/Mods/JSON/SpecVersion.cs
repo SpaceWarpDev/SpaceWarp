@@ -14,7 +14,14 @@ public sealed record SpecVersion
     private const int DefaultMajor = 1;
     private const int DefaultMinor = 0;
 
+    /// <summary>
+    /// Major version number.
+    /// </summary>
     public int Major { get; } = DefaultMajor;
+
+    /// <summary>
+    /// Minor version number.
+    /// </summary>
     public int Minor { get; } = DefaultMinor;
 
     // ReSharper disable InconsistentNaming
@@ -78,14 +85,44 @@ public sealed record SpecVersion
         Minor = minor;
     }
 
+    /// <summary>
+    /// Returns the string representation of the version in the format "major.minor".
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => $"{Major}.{Minor}";
 
+    /// <summary>
+    /// Returns true if the first version is less than the second version.
+    /// </summary>
+    /// <param name="a">First version</param>
+    /// <param name="b">Second version</param>
+    /// <returns>True if the first version is less than the second version</returns>
     public static bool operator <(SpecVersion a, SpecVersion b) => Compare(a, b) < 0;
+
+    /// <summary>
+    /// Returns true if the first version is greater than the second version.
+    /// </summary>
+    /// <param name="a">First version</param>
+    /// <param name="b">Second version</param>
+    /// <returns>True if the first version is greater than the second version</returns>
     public static bool operator >(SpecVersion a, SpecVersion b) => Compare(a, b) > 0;
+
+    /// <summary>
+    /// Returns true if the first version is less than or equal to the second version.
+    /// </summary>
+    /// <param name="a">First version</param>
+    /// <param name="b">Second version</param>
+    /// <returns>True if the first version is less than or equal to the second version</returns>
     public static bool operator <=(SpecVersion a, SpecVersion b) => Compare(a, b) <= 0;
+
+    /// <summary>
+    /// Returns true if the first version is greater than or equal to the second version.
+    /// </summary>
+    /// <param name="a">First version</param>
+    /// <param name="b">Second version</param>
+    /// <returns>True if the first version is greater than or equal to the second version</returns>
     public static bool operator >=(SpecVersion a, SpecVersion b) => Compare(a, b) >= 0;
 
-    
     private static int Compare(SpecVersion a, SpecVersion b)
     {
         if (a.Major != b.Major)
@@ -103,6 +140,10 @@ public sealed record SpecVersion
 [PublicAPI]
 public sealed class InvalidSpecVersionException : Exception
 {
+    /// <summary>
+    /// Creates a new InvalidSpecVersionException.
+    /// </summary>
+    /// <param name="version">Invalid version string</param>
     public InvalidSpecVersionException(string version) :
         base($"Invalid spec version: {version}. The correct format is \"major.minor\".")
     {
@@ -115,8 +156,15 @@ public sealed class InvalidSpecVersionException : Exception
 [PublicAPI]
 public sealed class DeprecatedSwinfoPropertyException : Exception
 {
+    /// <summary>
+    /// Creates a new DeprecatedSwinfoPropertyException.
+    /// </summary>
+    /// <param name="property">Deprecated property name</param>
+    /// <param name="deprecationVersion">Specification version in which the property was deprecated</param>
     public DeprecatedSwinfoPropertyException(string property, SpecVersion deprecationVersion) :
-        base($"The swinfo.json property \"{property}\" is deprecated in the spec version {deprecationVersion} and will be removed completely in the future.")
+        base(
+            $"The swinfo.json property \"{property}\" is deprecated in the spec version {deprecationVersion} and will be removed completely in the future."
+        )
     {
     }
 }

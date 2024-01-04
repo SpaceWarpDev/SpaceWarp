@@ -3,6 +3,9 @@ using SpaceWarp.API.Configuration;
 
 namespace SpaceWarp.UI.API.UI.Settings;
 
+/// <summary>
+/// API for the mod settings menu
+/// </summary>
 [PublicAPI]
 public static class SettingsMenu
 {

@@ -3,9 +3,9 @@
 
 using System.Collections;
 using System.Reflection;
-using BepInEx.Logging;
 using HarmonyLib;
 using I2.Loc;
+using JetBrains.Annotations;
 using KSP;
 using KSP.Api.CoreTypes;
 using KSP.Game;
@@ -20,17 +20,20 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using static SpaceWarp.Backend.UI.Appbar.AppbarBackend;
+using ILogger = SpaceWarp.API.Logging.ILogger;
 using UnityObject = UnityEngine.Object;
 
 namespace SpaceWarp.Backend.UI.Appbar;
 
 internal static class AppbarBackend
 {
-    private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("ToolbarBackend");
+    private static ILogger Logger => Modules.UI.Instance.ModuleLogger;
 
+    // ReSharper disable InconsistentNaming
     public static readonly UnityEvent AppBarOABSubscriber = new();
     public static readonly UnityEvent AppBarInFlightSubscriber = new();
     public static readonly UnityEvent AppBarKSCSubscriber = new();
+    // ReSharper restore InconsistentNaming
 
     internal static void SubscriberSchedulePing(AppbarEvent type)
     {
@@ -51,12 +54,14 @@ internal static class AppbarBackend
         gameObject.SetActive(true);
     }
 
+    // ReSharper disable InconsistentNaming
     internal enum AppbarEvent
     {
         Flight,
         OAB,
         KSC
     }
+    // ReSharper restore InconsistentNaming
 
     #region Flight App Bar
 
@@ -128,6 +133,7 @@ internal static class AppbarBackend
 
     private static GameObject _oabTray;
 
+    // ReSharper disable once InconsistentNaming
     private static GameObject OABTray
     {
         get
@@ -143,6 +149,7 @@ internal static class AppbarBackend
 
     private static Property<bool> _oabState;
 
+    // ReSharper disable once InconsistentNaming
     private static GameObject CreateOABTray()
     {
         Logger.LogInfo("Creating OAB app button tray...");
@@ -226,6 +233,7 @@ internal static class AppbarBackend
         return oabTray;
     }
 
+    // ReSharper disable once InconsistentNaming
     public static void AddOABButton(string buttonText, Sprite buttonIcon, string buttonId, Action<bool> function)
     {
         Logger.LogInfo($"Adding OAB app bar button: {buttonId}.");
@@ -279,6 +287,7 @@ internal static class AppbarBackend
         Logger.LogInfo($"Added OAB appbar button: {buttonId}");
     }
 
+    // ReSharper disable once InconsistentNaming
     private static void SetOABTrayState(bool state)
     {
         if (_oabTray == null)
@@ -295,6 +304,7 @@ internal static class AppbarBackend
 
     private static GameObject _kscTray;
 
+    // ReSharper disable once InconsistentNaming
     private static GameObject KSCTray
     {
         get
@@ -308,6 +318,7 @@ internal static class AppbarBackend
         }
     }
 
+    // ReSharper disable once InconsistentNaming
     private static GameObject CreateKSCTray()
     {
         Logger.LogInfo("Creating KSC app tray...");
@@ -366,6 +377,7 @@ internal static class AppbarBackend
         return kscAppTray;
     }
 
+    // ReSharper disable once InconsistentNaming
     public static void AddKSCButton(string buttonText, Sprite buttonIcon, string buttonId, Action function)
     {
         Logger.LogInfo($"Adding KSC appbar button: {buttonId}.");
@@ -456,6 +468,7 @@ internal class ToolbarBackendObject : KerbalBehavior
 [HarmonyPatch("Start")]
 internal class ToolbarBackendAppBarPatcher
 {
+    [UsedImplicitly]
     public static void Postfix()
     {
         SubscriberSchedulePing(AppbarEvent.Flight);
@@ -464,8 +477,10 @@ internal class ToolbarBackendAppBarPatcher
 
 [HarmonyPatch(typeof(OABSideBar))]
 [HarmonyPatch("Start")]
+// ReSharper disable once InconsistentNaming
 internal class ToolbarBackendOABSideBarPatcher
 {
+    [UsedImplicitly]
     public static void Postfix()
     {
         SubscriberSchedulePing(AppbarEvent.OAB);
@@ -474,8 +489,10 @@ internal class ToolbarBackendOABSideBarPatcher
 
 [HarmonyPatch(typeof(KSCMenuManager))]
 [HarmonyPatch("Start")]
+// ReSharper disable once InconsistentNaming
 internal class ToolbarBackendKSCPatcher
 {
+    [UsedImplicitly]
     public static void Postfix()
     {
         SubscriberSchedulePing(AppbarEvent.KSC);
