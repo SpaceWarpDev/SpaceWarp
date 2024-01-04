@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarp.Messaging", "src/
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarp.Preloader", "src/SpaceWarp.Preloader/SpaceWarp.Preloader.csproj", "{0957B5C2-B882-45A4-981E-F9EEE0B551C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarp.Restarter", "src/SpaceWarp.Restarter/SpaceWarp.Restarter.csproj", "{4B509D31-4C02-4D6E-8508-8417F0745776}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarpRestarter", "src\SpaceWarpRestarter\SpaceWarpRestarter.csproj", "{4B509D31-4C02-4D6E-8508-8417F0745776}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarp.Sound", "src/SpaceWarp.Sound/SpaceWarp.Sound.csproj", "{BA439A24-7EA3-4E79-A44C-1FA303B9331C}"
 EndProject
