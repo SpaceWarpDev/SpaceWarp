@@ -29,8 +29,12 @@ public class BepInExConfigFile : IConfigFile
         AdaptedConfigFile.Save();
     }
 
+    private Dictionary<(string section, string key), IConfigEntry> _storedEntries = new();
+
     /// <inheritdoc />
-    public IConfigEntry this[string section, string key] => new BepInExConfigEntry(AdaptedConfigFile[section, key]);
+    public IConfigEntry this[string section, string key] => _storedEntries[(section, key)] ??=
+        new BepInExConfigEntry(AdaptedConfigFile[section, key],
+            IValueConstraint.FromAcceptableValueBase(AdaptedConfigFile[section, key].Description.AcceptableValues));
 
     /// <inheritdoc />
     public IConfigEntry Bind<T>(string section, string key, T defaultValue = default, string description = "")
