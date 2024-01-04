@@ -61,8 +61,8 @@ public class BepInExConfigFile : IConfigFile
         IValueConstraint valueConstraint
     )
     {
-        return new BepInExConfigEntry(AdaptedConfigFile.Bind(new ConfigDefinition(section, key), defaultValue,
-            new ConfigDescription(description, valueConstraint.ToAcceptableValueBase())));
+        return _storedEntries[(section, key)] = new BepInExConfigEntry(AdaptedConfigFile.Bind(new ConfigDefinition(section, key), defaultValue,
+            new ConfigDescription(description, valueConstraint.ToAcceptableValueBase())),valueConstraint);
     }
 
     /// <inheritdoc />

@@ -36,7 +36,7 @@ public interface IValueConstraint
                 .GetProperty("AcceptableValues", BindingFlags.Instance | BindingFlags.Public)
                 ?.GetMethod;
             var values = valuesMethod?.Invoke(acceptableValueBase,[]);
-            return Activator.CreateInstance(typeof(ListConstraint<>).MakeGenericType(type), [values]) as IValueConstraint;
+            return (IValueConstraint)Activator.CreateInstance(typeof(ListConstraint<>).MakeGenericType(type), [values]);
         }
 
         if (acceptableValueBase.GetType().GetGenericTypeDefinition() == typeof(AcceptableValueRange<>))
@@ -48,7 +48,7 @@ public interface IValueConstraint
                 .GetProperty("MaxValue", BindingFlags.Instance | BindingFlags.Public)?.GetMethod;
             var min = minMethod?.Invoke(acceptableValueBase, []);
             var max = maxMethod?.Invoke(acceptableValueBase, []);
-            return Activator.CreateInstance(typeof(RangeConstraint<>).MakeGenericType(type),[min,max]) as IValueConstraint;
+            return (IValueConstraint)Activator.CreateInstance(typeof(RangeConstraint<>).MakeGenericType(type),[min,max]);
         }
 
         return null;

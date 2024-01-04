@@ -383,7 +383,7 @@ public static class ModsPropertyDrawers
                 t.GenericTypeArguments[0] == entrySettingType)
             {
                 if (valueListMethod != null)
-                    return (GameObject)valueListMethod.Invoke(null, new object[] { name, entry, entry.Constraint });
+                    return (GameObject)valueListMethod.Invoke(null, [name, entry, entry.Constraint]);
             }
 
             if (t?.GetGenericTypeDefinition() == typeof(RangeConstraint<>) &&
@@ -391,7 +391,7 @@ public static class ModsPropertyDrawers
             {
                 if (valueRangeMethod != null)
                 {
-                    return (GameObject)valueRangeMethod.Invoke(null, new object[] { name, entry, entry.Constraint });
+                    return (GameObject)valueRangeMethod.Invoke(null, [name, entry, entry.Constraint]);
                 }
             }
             var inputFieldCopy = UnityObject.Instantiate(InputFieldPrefab);
@@ -753,6 +753,10 @@ public static class ModsPropertyDrawers
 
     private static GameObject CreateStringConfigAbstracted(string name, IConfigEntry entry)
     {
+        if (entry.Constraint is ListConstraint<string> constraint)
+        {
+            return CreateFromListConstraint(name, entry, constraint);
+        }
         var inputFieldCopy = UnityObject.Instantiate(InputFieldPrefab);
         var lab = inputFieldCopy.GetChild("Label");
         lab.GetComponent<Localize>().SetTerm(name);
