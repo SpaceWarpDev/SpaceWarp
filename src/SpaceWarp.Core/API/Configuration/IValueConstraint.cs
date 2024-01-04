@@ -1,4 +1,5 @@
-﻿using BepInEx.Configuration;
+﻿using System.Reflection;
+using BepInEx.Configuration;
 
 namespace SpaceWarp.API.Configuration;
 
@@ -19,4 +20,37 @@ public interface IValueConstraint
     /// </summary>
     /// <returns>An <see cref="AcceptableValueBase"/> representing this constraint.</returns>
     public AcceptableValueBase ToAcceptableValueBase();
+
+    /// <summary>
+    /// Converts an acceptable value base into an IValueConstraint
+    /// </summary>
+    /// <param name="acceptableValueBase">The acceptable value base</param>
+    /// <returns>The IValueConstraint</returns>
+    public static IValueConstraint FromAcceptableValueBase(AcceptableValueBase acceptableValueBase)
+    {
+        if (acceptableValueBase is null) return null;
+        if (acceptableValueBase.GetType().GetGenericTypeDefinition() == typeof(AcceptableValueList<>))
+        {
+            var type = acceptableValueBase.GetType().GetGenericArguments()[0];
+            var valuesMethod = acceptableValueBase.GetType()
+                .GetProperty("AcceptableValues", BindingFlags.Instance | BindingFlags.Public)
+                ?.GetMethod;
+            var values = valuesMethod?.Invoke(acceptableValueBase,[]);
+            return (IValueConstraint)Activator.CreateInstance(typeof(ListConstraint<>).MakeGenericType(type), [values]);
+        }
+
+        if (acceptableValueBase.GetType().GetGenericTypeDefinition() == typeof(AcceptableValueRange<>))
+        {
+            var type = acceptableValueBase.GetType().GetGenericArguments()[0];
+            var minMethod = acceptableValueBase.GetType()
+                .GetProperty("MinValue", BindingFlags.Instance | BindingFlags.Public)?.GetMethod;
+            var maxMethod = acceptableValueBase.GetType()
+                .GetProperty("MaxValue", BindingFlags.Instance | BindingFlags.Public)?.GetMethod;
+            var min = minMethod?.Invoke(acceptableValueBase, []);
+            var max = maxMethod?.Invoke(acceptableValueBase, []);
+            return (IValueConstraint)Activator.CreateInstance(typeof(RangeConstraint<>).MakeGenericType(type),[min,max]);
+        }
+
+        return null;
+    }
 }

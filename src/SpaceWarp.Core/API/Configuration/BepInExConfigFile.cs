@@ -29,8 +29,13 @@ public class BepInExConfigFile : IConfigFile
         AdaptedConfigFile.Save();
     }
 
+    private Dictionary<(string section, string key), IConfigEntry> _storedEntries = new();
+
     /// <inheritdoc />
-    public IConfigEntry this[string section, string key] => new BepInExConfigEntry(AdaptedConfigFile[section, key]);
+    public IConfigEntry this[string section, string key] => _storedEntries.TryGetValue((section, key), out var result)
+        ? result
+        : _storedEntries[(section, key)] = new BepInExConfigEntry(AdaptedConfigFile[section, key],
+            IValueConstraint.FromAcceptableValueBase(AdaptedConfigFile[section, key].Description.AcceptableValues));
 
     /// <inheritdoc />
     public IConfigEntry Bind<T>(string section, string key, T defaultValue = default, string description = "")
@@ -56,8 +61,8 @@ public class BepInExConfigFile : IConfigFile
         IValueConstraint valueConstraint
     )
     {
-        return new BepInExConfigEntry(AdaptedConfigFile.Bind(new ConfigDefinition(section, key), defaultValue,
-            new ConfigDescription(description, valueConstraint.ToAcceptableValueBase())));
+        return _storedEntries[(section, key)] = new BepInExConfigEntry(AdaptedConfigFile.Bind(new ConfigDefinition(section, key), defaultValue,
+            new ConfigDescription(description, valueConstraint.ToAcceptableValueBase())),valueConstraint);
     }
 
     /// <inheritdoc />
