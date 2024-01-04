@@ -45,10 +45,17 @@ public sealed record SpecVersion
     public static SpecVersion V1_3 { get; } = new(1, 3);
 
     /// <summary>
-    /// Specification version 2.0 (SpaceWarp 1.5.x and 2.0.x) - removes support for version checking from .csproj files,
-    ///
+    /// Specification version 2.0 (SpaceWarp 1.5 - 1.7.x) - removes support for version checking from .csproj files,
+    /// adds support for specifying mod conflicts. Switched to semantic versioning.
     /// </summary>
     public static SpecVersion V2_0 { get; } = new(2, 0);
+
+    /// <summary>
+    /// Specification version 2.1 (SpaceWarp 1.8.x) - requires that mods specify their preload patchers in the
+    /// swinfo.json file.
+    /// </summary>
+    public static SpecVersion V2_1 { get; } = new(2, 1);
+
 
     // ReSharper restore InconsistentNaming
 

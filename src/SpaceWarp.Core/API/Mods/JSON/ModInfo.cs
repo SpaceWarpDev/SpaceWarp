@@ -108,4 +108,10 @@ public sealed class ModInfo
     /// </summary>
     [JsonProperty("conflicts", Required = Required.DisallowNull)]
     public List<DependencyInfo> Conflicts { get; internal set; } = new();
+
+    /// <summary>
+    /// The filenames of patcher assemblies of the mod.
+    /// </summary>
+    [JsonProperty("patchers", Required = Required.DisallowNull)]
+    public List<string> Patchers { get; internal set; } = new();
 }
