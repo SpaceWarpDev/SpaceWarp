@@ -174,4 +174,14 @@ public class SemanticVersionTests
 
         return semanticVersion1 >= semanticVersion2;
     }
+    
+    [TestCase("1.2.3", ExpectedResult = "1.2.3")]
+    [TestCase("1.2.3-alpha", ExpectedResult = "1.2.3-alpha")]
+    [TestCase("1.2.3-alpha+build1", ExpectedResult = "1.2.3-alpha+build1")]
+    public string SemanticVersion_ToString_ReturnsVersionString(string version)
+    {
+        var semanticVersion = new SemanticVersion(version);
+        return semanticVersion.ToString();
+    }
+    
 }
