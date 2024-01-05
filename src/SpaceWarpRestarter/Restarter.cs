@@ -12,7 +12,7 @@ if (args.Length < 1)
 
 var processPath = args[0];
 var processName = Path.GetFileNameWithoutExtension(processPath);
-var processArgs = args.Length > 1 ? args[1..] : Array.Empty<string>();
+var processArgs = string.Join(" ", args.Length > 1 ? args[1..] : Array.Empty<string>());
 
 Console.WriteLine($"Waiting for {processName} to exit...");
 
@@ -23,7 +23,7 @@ while (true)
         try
         {
             Console.WriteLine($"{processName}.exe is not running. Attempting to start the process...");
-            Process.Start(processPath, processArgs);
+            Process.Start("cmd.exe", $"/C \"{processPath}\" {processArgs}");
             Console.WriteLine($"{processName}.exe started successfully.");
             break;
         }

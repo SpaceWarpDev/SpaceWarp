@@ -2,9 +2,11 @@ Key,Type,Description,English,Portuguese BR,French
 SpaceWarp/ModList/EnableAll,Text,,Enable All,Ativar todos,Activer tous
 SpaceWarp/ModList/DisableAll,Text,,Disable All,Desativar todos,Désactiver tous
 SpaceWarp/ModList/RevertChanges,Text,,Revert Changes,Reverter alterações,Rétablir les changements
+SpaceWarp/ModList/ApplyChanges,Text,,Apply and restart,Aplicar e reiniciar,Appliquer et redémarrer
 SpaceWarp/ModList/multipleChangesDetected,Text,,"{0} changes detected, please restart to apply them","{0} alterações detetadas, porfavor reinicie o jogo","{0} changements détectés, veuillez redémarrer pour les appliquer"
 SpaceWarp/ModList/singleChangeDetected,Text,,"1 change detected, please restart to apply it","1 alteração detectada, reinicie para aplicá-la","1 changement détecté, veuillez redémarrer pour l'appliquer"
 SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist,spacewarp.modlist
+SpaceWarp/ModList/CoreMods,Text,,Core Mods,Mods do jogo,Mods du jeu
 SpaceWarp/ModList/EnabledMods,Text,,Enabled Mods,Mods ativos,Mods activés
 SpaceWarp/ModList/ErroredMods,Text,,Errored Mods,Mods com erros,Mods avec des erreurs
 SpaceWarp/ModList/DisabledMods,Text,,Disabled Mods,Mods desativados,Mods désactivés
@@ -14,14 +16,14 @@ SpaceWarp/ModList/Source,Text,,Source,Fonte,Source
 SpaceWarp/ModList/Description,Text,,Description,Descrição,Description
 SpaceWarp/ModList/KSP2Version,Text,,KSP2 Version,Versão do jogo,Version de KSP2
 SpaceWarp/ModList/Dependencies,Text,,Dependencies,Dependências,Dépendances
-SpaceWarp/ModList/outdated,Text,,outdated,desatualizado,obsolète
-SpaceWarp/ModList/unsupported,Text,,unsupported,não suportado,non pris en charge
-SpaceWarp/ModList/disabled,Text,,disabled,desativado,désactivé
-SpaceWarp/ModList/OpenConfigurationManager,Text,,Open Configuration Manager,Abrir gestor de configurações,Ouvrir le gestionnaire de configuration
+SpaceWarp/ModList/outdated,Text,,(outdated),(desatualizado),(obsolète)
+SpaceWarp/ModList/unsupported,Text,,(unsupported),(não suportado),(non pris en charge)
+SpaceWarp/ModList/disabled,Text,,(disabled),(desativado),(désactivé)
+SpaceWarp/ModList/mismatched,Text,,(mismatched),(não corresponde com o swinfo),(non concordant)
+SpaceWarp/ModList/baddirectory,Text,,(bad directory),(problemas no diretorio),(mauvais dossier)
+SpaceWarp/ModList/missingswinfo,Text,,(missing SW Info),(não possui um swinfo),(SW Info manquant)
+SpaceWarp/ModList/OpenModSettings,Text,,Mod Settings,Configurações dos mods,Paramètres des mods
 SpaceWarp/ModList/OpenModsFolder,Text,,Open Mods Folder,Abrir pasta de mods,Ouvrir le dossier des mods
-SpaceWarp/ModList/mismatched,Text,,Mismatched,Não corresponde com o swinfo,Non concordant
-SpaceWarp/ModList/baddirectory,Text,,Bad Directory,Problemas no diretorio,Mauvais dossier
-SpaceWarp/ModList/missingswinfo,Text,,Missing SW Info,Não possui um swinfo,SW Info manquant
 SpaceWarp/ModList/MissingDependency,Text,,Dependency is missing,Esta dependência não está presente,Cette dépendance est manquante
 SpaceWarp/ModList/ErroredDependency,Text,,Dependency had an error while loading,Esta dependência teve um erro durante o loading,Une erreur s'est produite lors du chargement de cette dépendance
 SpaceWarp/ModList/DisabledDependency,Text,,Dependency is disabled,Esta dependência esta desativada,Cette dépendance est manquante

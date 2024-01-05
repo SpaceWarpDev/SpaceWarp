@@ -1,5 +1,4 @@
-@import url('../SpaceWarpUI.uss');
-
+@import url('project://database/Assets/UI/SpaceWarpUI.uss?fileID=7433441132597879392&guid=492f9c9847101cf4bab4ad09d8d46f3f&type=3#SpaceWarpUI');
 .root {
     min-width: 1200px;
     min-height: 720px;
@@ -15,26 +14,40 @@
 }
 
 .unity-scroll-view {
-    background-color: #1c222a;
+    background-color: rgb(28, 34, 42);
 }
 
-.unity-label.disabled, .disabled > .unity-label {
-    color: #808080;
+.unity-label.disabled {
+    color: rgb(128, 128, 128);
 }
 
-.unity-label.outdated, .outdated > .unity-label {
-    color: #FFEB04;
+.disabled > .unity-label {
+    color: rgb(128, 128, 128);
 }
 
-.unity-label.unsupported, .unsupported > .unity-label {
-    color: #800000;
+.unity-label.outdated {
+    color: rgb(255, 235, 4);
 }
 
-.unity-label.errored, .errored > .unity-label {
-    color: #ff0000;
+.outdated > .unity-label {
+    color: rgb(255, 235, 4);
 }
 
-/* region Mod list */
+.unity-label.unsupported {
+    color: rgb(128, 0, 0);
+}
+
+.unsupported > .unity-label {
+    color: rgb(128, 0, 0);
+}
+
+.unity-label.errored {
+    color: rgb(255, 0, 0);
+}
+
+.errored > .unity-label {
+    color: rgb(255, 0, 0);
+}
 
 #modlist-scrollview {
     flex-grow: 0;
@@ -51,17 +64,13 @@
     margin-bottom: 8px;
 }
 
-#enable-all-button {
-    margin-right: 8px;
-    flex-grow: 1;
+#toggle-buttons-row > .right-button {
+    margin-left: 8px;
 }
 
-#disable-all-button {
+#toggle-buttons-row > .unity-button {
     flex-grow: 1;
-}
-
-#revert-changes-button {
-    margin-bottom: 8px;
+    flex-shrink: 1;
 }
 
 #changes-label {
@@ -72,10 +81,6 @@
 .mods-foldout {
     margin-bottom: 8px;
 }
-
-/* endregion */
-
-/* region Details */
 
 .details-item {
     flex-direction: row;
@@ -111,7 +116,6 @@
 
 #details-name {
     font-size: 22px;
-    /*noinspection CssUnknownProperty,CssUnknownTarget*/
     -unity-font-definition: var(--font-regular);
     margin-bottom: 16px;
     color: rgb(208, 213, 243);
@@ -125,8 +129,6 @@
     color: rgb(185, 0, 0);
     margin-top: 8px;
 }
-
-/* endregion */
 
 #footer {
     flex-direction: row;

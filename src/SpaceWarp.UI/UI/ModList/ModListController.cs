@@ -25,19 +25,29 @@ internal class ModListController : MonoBehaviour
     private Button _enableAllButton;
     private Button _disableAllButton;
     private Button _revertChangesButton;
+    private Button _applyChangesButton;
     private Label _changesLabel;
     private readonly LocalizedString _multipleChangesLabelText = "SpaceWarp/ModList/multipleChangesDetected";
     private readonly LocalizedString _singleChangeLabelText = "SpaceWarp/ModList/singleChangeDetected";
 
+    private List<(string, VisualElement)> _coreModList = [];
+    private Foldout _coreModFoldout;
+    private VisualElement _coreModContainer;
+
+    private List<(string, VisualElement)> _enabledModList = [];
     private Foldout _enabledModFoldout;
-    private VisualElement _enabledModList;
+    private VisualElement _enabledModContainer;
+
+    private List<(string, VisualElement)> _erroredModList = [];
     private Foldout _erroredModFoldout;
-    private VisualElement _erroredModList;
+    private VisualElement _erroredModContainer;
+
+    private List<(string, VisualElement)> _disabledModList = [];
     private Foldout _disabledModFoldout;
-    private VisualElement _disabledModList;
+    private VisualElement _disabledModContainer;
 
     private Button _openModsFolderButton;
-    private Button _openConfigManagerButton;
+    private Button _openModSettingsButton;
 
     // Details UI element references
     private VisualElement _detailsContainer;
@@ -100,12 +110,18 @@ internal class ModListController : MonoBehaviour
 
         if (Modules.UI.Instance.ConfigShowMainMenuWarningForErroredMods.Value &&
             PluginList.AllErroredPlugins.Count > 0)
+        {
             term = "SpaceWarp/Mods/Errored";
+        }
         else if (Modules.UI.Instance.ConfigShowMainMenuWarningForOutdatedMods.Value &&
                  PluginList.AllPlugins.Any(x => x.Outdated))
+        {
             term = "SpaceWarp/Mods/Outdated";
+        }
         else
+        {
             term = "SpaceWarp/Mods";
+        }
 
         MainMenu.RegisterLocalizedMenuButton(term, ToggleWindow);
     }
@@ -164,20 +180,23 @@ internal class ModListController : MonoBehaviour
         _enableAllButton = _container.Q<Button>("enable-all-button");
         _disableAllButton = _container.Q<Button>("disable-all-button");
         _revertChangesButton = _container.Q<Button>("revert-changes-button");
+        _applyChangesButton = _container.Q<Button>("apply-changes-button");
         _changesLabel = _container.Q<Label>("changes-label");
 
-        _enabledModFoldout = _container.Q<Foldout>("spacewarp-mod-foldout");
-        _enabledModList = _container.Q<VisualElement>("spacewarp-mod-list");
+        _coreModFoldout = _container.Q<Foldout>("core-mod-foldout");
+        _coreModContainer = _container.Q<VisualElement>("core-mod-list");
 
+        _enabledModFoldout = _container.Q<Foldout>("enabled-mod-foldout");
+        _enabledModContainer = _container.Q<VisualElement>("enabled-mod-list");
 
         _disabledModFoldout = _container.Q<Foldout>("disabled-mod-foldout");
-        _disabledModList = _container.Q<VisualElement>("disabled-mod-list");
+        _disabledModContainer = _container.Q<VisualElement>("disabled-mod-list");
 
         _erroredModFoldout = _container.Q<Foldout>("errored-mod-foldout");
-        _erroredModList = _container.Q<VisualElement>("errored-mod-list");
+        _erroredModContainer = _container.Q<VisualElement>("errored-mod-list");
 
         _openModsFolderButton = _container.Q<Button>("open-mods-folder-button");
-        _openConfigManagerButton = _container.Q<Button>("open-config-manager-button");
+        _openModSettingsButton = _container.Q<Button>("open-mod-settings-button");
 
         // Store references to the selected mod details UI element references
         _detailsContainer = _container.Q<VisualElement>("details-container");
@@ -226,6 +245,21 @@ internal class ModListController : MonoBehaviour
     {
         foreach (var plugin in PluginList.AllEnabledAndActivePlugins)
         {
+            if (NoToggleGuids.Contains(plugin.Guid))
+            {
+                MakeListItem(_coreModList, data =>
+                {
+                    data.Guid = plugin.Guid;
+                    data.SetInfo(plugin);
+
+                    if (plugin.Unsupported)
+                    {
+                        data.SetIsUnsupported();
+                    }
+                });
+                continue;
+            }
+
             MakeListItem(_enabledModList, data =>
             {
                 data.Guid = plugin.Guid;
@@ -254,6 +288,19 @@ internal class ModListController : MonoBehaviour
                 data.Guid = erroredPlugin.Plugin.Guid;
                 erroredPlugin.Apply(data);
             });
+        }
+
+        ProcessModList(_coreModList, _coreModContainer);
+        ProcessModList(_enabledModList, _enabledModContainer);
+        ProcessModList(_disabledModList, _disabledModContainer);
+        ProcessModList(_erroredModList, _erroredModContainer);
+    }
+
+    private static void ProcessModList(IEnumerable<(string name, VisualElement)> modList, VisualElement modContainer)
+    {
+        foreach (var (_, element) in modList.OrderBy(x => x.name))
+        {
+            modContainer.Add(element);
         }
     }
 
@@ -301,6 +348,26 @@ internal class ModListController : MonoBehaviour
             UpdateDisabledFile();
         });
 
+        _applyChangesButton.style.display = DisplayStyle.None;
+        _applyChangesButton.RegisterCallback<ClickEvent>(_ =>
+        {
+            var restarterPath = Path.Combine(
+                SpaceWarpPlugin.Instance.SWMetadata.Folder.FullName,
+                "restarter",
+                "SpaceWarpRestarter.exe"
+            );
+            Modules.UI.Instance.ModuleLogger.LogDebug($"Restarter path: {restarterPath}");
+
+            var restarter = new Process();
+            restarter.StartInfo = new ProcessStartInfo(restarterPath)
+            {
+                Arguments = Environment.CommandLine
+            };
+            restarter.Start();
+
+            Application.Quit();
+        });
+
         _detailsSourceLink.RegisterCallback<ClickEvent>(_ =>
         {
             var url = _detailsSourceLink.text?.Trim();
@@ -319,15 +386,23 @@ internal class ModListController : MonoBehaviour
             };
             explorer.Start();
         });
+
+        _openModSettingsButton.RegisterCallback<ClickEvent>(_ =>
+        {
+            // TODO: Open Settings -> Mods
+        });
     }
 
-    private void MakeListItem(VisualElement container, Action<ModListItemController> bindFunc)
+    private void MakeListItem(ICollection<(string, VisualElement)> list, Action<ModListItemController> bindFunc)
     {
         var element = _listEntryTemplate.Instantiate();
         var data = new ModListItemController(element);
         bindFunc(data);
         element.AddManipulator(new Clickable(OnModSelected));
-        if (data.Guid != null) BoundItems[data.Guid] = data;
+        if (data.Guid != null)
+        {
+            BoundItems[data.Guid] = data;
+        }
 
         if (!NoToggleGuids.Contains(data.Guid))
         {
@@ -344,8 +419,12 @@ internal class ModListController : MonoBehaviour
             });
         }
 
-        if (data.Guid != null) _modItemElements[data.Guid] = element;
-        container.Add(element);
+        if (data.Guid != null)
+        {
+            _modItemElements[data.Guid] = element;
+        }
+
+        list.Add((data.Info.Name, element));
     }
 
     private void DisableDependents(ModListItemController data)
@@ -391,8 +470,6 @@ internal class ModListController : MonoBehaviour
 
     private void SetSelectedModInfo(ModListItemController data, SpaceWarpPluginDescriptor descriptor)
     {
-
-        //TODO: Add the ability to show errors at some point (Munix)
         SetSelected(
             descriptor.Name,
             data.HasBadID
@@ -424,8 +501,6 @@ internal class ModListController : MonoBehaviour
             x => data.StoredDetails = x
         );
     }
-
-
 
     private void SetSelected(
         string modName = "",
@@ -639,15 +714,19 @@ internal class ModListController : MonoBehaviour
             _initialToggles.ContainsKey(entry.Key) && _initialToggles[entry.Key] != entry.Value
         );
 
-        if (numChanges == 1)
+        if (numChanges >= 1)
         {
+            if (numChanges == 1)
+            {
+                _changesLabel.text = _singleChangeLabelText;
+            }
+            else
+            {
+                _changesLabel.text = string.Format(_multipleChangesLabelText, numChanges);
+            }
+
             _changesLabel.style.display = DisplayStyle.Flex;
-            _changesLabel.text = _singleChangeLabelText;
-        }
-        else if (numChanges > 1)
-        {
-            _changesLabel.style.display = DisplayStyle.Flex;
-            _changesLabel.text = string.Format(_multipleChangesLabelText, numChanges);
+            _applyChangesButton.style.display = DisplayStyle.Flex;
         }
         else
         {

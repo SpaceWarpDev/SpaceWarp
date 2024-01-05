@@ -1,11 +1,11 @@
 {
-  "spec": "2.0",
+  "spec": "2.1",
   "mod_id": "com.github.x606.spacewarp",
   "author": "Space Warp Team",
   "name": "Space Warp",
   "description": "Space Warp is an API for KSP 2 mod developers.",
   "source": "https://github.com/SpaceWarpDev/SpaceWarp",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "version_check": "https://raw.githubusercontent.com/SpaceWarpDev/SpaceWarp/main/plugin_template/BepInEx/plugins/SpaceWarp/swinfo.json",
   "ksp2_version": {
     "min": "0.2.0",
@@ -19,5 +19,8 @@
         "max": "*"
       }
     }
+  ],
+  "patchers": [
+    "SpaceWarpPatcher.dll"
   ]
 }

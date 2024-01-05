@@ -10,13 +10,19 @@
                 <ui:VisualElement name="toggle-buttons-container">
                     <ui:VisualElement name="toggle-buttons-row">
                         <ui:Button name="enable-all-button" text="#SpaceWarp/ModList/EnableAll" />
-                        <ui:Button name="disable-all-button" text="#SpaceWarp/ModList/DisableAll" />
+                        <ui:Button name="disable-all-button" text="#SpaceWarp/ModList/DisableAll" class="right-button" />
                     </ui:VisualElement>
-                    <ui:Button name="revert-changes-button" text="#SpaceWarp/ModList/RevertChanges" />
+                    <ui:VisualElement name="toggle-buttons-row">
+                        <ui:Button name="revert-changes-button" text="#SpaceWarp/ModList/RevertChanges" />
+                        <ui:Button name="apply-changes-button" text="#SpaceWarp/ModList/ApplyChanges" class="right-button" style="display: flex;" />
+                    </ui:VisualElement>
                     <ui:Label name="changes-label" style="display: none;" />
                 </ui:VisualElement>
-                <ui:Foldout name="spacewarp-mod-foldout" text="#SpaceWarp/ModList/EnabledMods" class="mods-foldout" style="display: none;">
-                    <ui:VisualElement name="spacewarp-mod-list" />
+                <ui:Foldout name="core-mod-foldout" text="#SpaceWarp/ModList/CoreMods" class="mods-foldout" style="display: flex;">
+                    <ui:VisualElement name="core-mod-list" />
+                </ui:Foldout>
+                <ui:Foldout name="enabled-mod-foldout" text="#SpaceWarp/ModList/EnabledMods" class="mods-foldout" style="display: none;">
+                    <ui:VisualElement name="enabled-mod-list" />
                 </ui:Foldout>
                 <ui:Foldout name="disabled-mod-foldout" text="#SpaceWarp/ModList/DisabledMods" class="mods-foldout" style="display: none;">
                     <ui:VisualElement name="disabled-mod-list" />
@@ -33,24 +39,16 @@
                         <ui:Label text=":" class="details-label" />
                         <ui:Label name="details-id" class="details-label details-value-label" />
                         <ui:VisualElement name="details-disabled-warning" class="details-warning disabled" style="display: none;">
-                            <ui:Label text="(" class="details-label" />
                             <ui:Label text="#SpaceWarp/ModList/disabled" class="details-label" />
-                            <ui:Label text=")" class="details-label" />
                         </ui:VisualElement>
                         <ui:VisualElement name="details-mismatched-id-error" class="details-warning disabled" style="display: none;">
-                            <ui:Label text="(" class="details-label" style="color: rgb(255, 0, 0);" />
                             <ui:Label text="#SpaceWarp/ModList/mismatched" class="details-label" style="color: rgb(255, 0, 0);" />
-                            <ui:Label text=")" class="details-label" style="color: rgb(255, 0, 0);" />
                         </ui:VisualElement>
                         <ui:VisualElement name="details-bad-directory-error" class="details-warning disabled" style="display: none;">
-                            <ui:Label text="(" class="details-label" style="color: rgb(255, 0, 0);" />
                             <ui:Label text="#SpaceWarp/ModList/baddirectory" class="details-label" style="color: rgb(255, 0, 0);" />
-                            <ui:Label text=")" class="details-label" style="color: rgb(255, 0, 0);" />
                         </ui:VisualElement>
                         <ui:VisualElement name="details-missing-info-error" class="details-warning disabled" style="display: none;">
-                            <ui:Label text="(" class="details-label" style="color: rgb(255, 0, 0);" />
                             <ui:Label text="#SpaceWarp/ModList/missingswinfo" class="details-label" style="color: rgb(255, 0, 0);" />
-                            <ui:Label text=")" class="details-label" style="color: rgb(255, 0, 0);" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement class="details-item">
@@ -63,14 +61,10 @@
                         <ui:Label text=":" class="details-label" />
                         <ui:Label name="details-version" class="details-label details-value-label" />
                         <ui:VisualElement name="details-outdated-warning" class="details-warning outdated" style="display: none;">
-                            <ui:Label text="(" class="details-label" style="display: flex;" />
                             <ui:Label text="#SpaceWarp/ModList/outdated" class="details-label" />
-                            <ui:Label text=")" class="details-label" />
                         </ui:VisualElement>
                         <ui:VisualElement name="details-mismatched-error" class="details-warning outdated" style="display: none;">
-                            <ui:Label text="(" class="details-label" style="display: flex; color: rgb(255, 0, 0);" />
                             <ui:Label text="#SpaceWarp/ModList/mismatched" class="details-label" style="color: rgb(255, 0, 0);" />
-                            <ui:Label text=")" class="details-label" style="color: rgb(255, 0, 0);" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement class="details-item">
@@ -105,7 +99,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="footer">
             <ui:Button name="open-mods-folder-button" text="#SpaceWarp/ModList/OpenModsFolder" />
-            <ui:Button name="open-config-manager-button" text="#SpaceWarp/ModList/OpenConfigurationManager" />
+            <ui:Button name="open-mod-settings-button" text="#SpaceWarp/ModList/OpenModSettings" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
