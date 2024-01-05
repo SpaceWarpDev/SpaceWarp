@@ -12,7 +12,6 @@ using SpaceWarp.UI.Settings;
 using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
-using ConfigManager = ConfigurationManager.ConfigurationManager;
 
 namespace SpaceWarp.Modules;
 
@@ -39,7 +38,6 @@ public class UI : SpaceWarpModule
     internal ConfigValue<bool> ConfigShowTimeStamps;
     internal ConfigValue<string> ConfigTimeStampFormat;
     internal ConfigValue<Color> ConfigWarningColor;
-    internal ConfigManager ConfigurationManager;
     internal ModListController ModListController;
     internal SpaceWarpConsole SpaceWarpConsole;
 
@@ -125,10 +123,6 @@ public class UI : SpaceWarpModule
 
     private void InitializeUI()
     {
-        ConfigurationManager = (ConfigManager)Chainloader
-            .PluginInfos[ConfigManager.GUID]
-            .Instance;
-
         var ui = new GameObject("Space Warp UI");
         ui.Persist();
         ui.SetActive(true);

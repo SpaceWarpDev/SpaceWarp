@@ -22,7 +22,6 @@ namespace SpaceWarp;
 /// <summary>
 /// The main SpaceWarp plugin class.
 /// </summary>
-[BepInDependency("com.bepis.bepinex.configurationmanager", "17.1")]
 [BepInDependency(UitkForKsp2Plugin.ModGuid, UitkForKsp2Plugin.ModVer)]
 [BepInIncompatibility("com.shadow.quantum")]
 [BepInPlugin(ModGuid, ModName, ModVer)]

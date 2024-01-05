@@ -85,8 +85,7 @@ internal class ModListController : MonoBehaviour
     private static readonly IReadOnlyList<string> NoToggleGuids = new List<string>
     {
         SpaceWarpPlugin.ModGuid,
-        UitkForKsp2Plugin.ModGuid,
-        ConfigurationManager.ConfigurationManager.GUID
+        UitkForKsp2Plugin.ModGuid
     };
 
     private void Awake()
@@ -319,12 +318,6 @@ internal class ModListController : MonoBehaviour
                 Arguments = $"\"{Paths.PluginPath}\""
             };
             explorer.Start();
-        });
-
-        var configManager = Modules.UI.Instance.ConfigurationManager;
-        _openConfigManagerButton.RegisterCallback<ClickEvent>(_ =>
-        {
-            configManager.DisplayingWindow = !configManager.DisplayingWindow;
         });
     }
 

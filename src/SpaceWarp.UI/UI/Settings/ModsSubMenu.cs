@@ -125,10 +125,16 @@ internal class ModsSubMenu : SettingsSubMenu
             }
         }
 #pragma warning disable CS0618
-        foreach (var mod in BepInEx.Bootstrap.Chainloader.Plugins.Where(mod =>
-                     (mod is not BaseSpaceWarpPlugin || (mod is BaseSpaceWarpPlugin baseSpaceWarpPlugin &&
-                                                         baseSpaceWarpPlugin.SWConfiguration.Sections.Count == 0)) &&
-                     mod.Config.Count > 0 && mod is not ConfigurationManager.ConfigurationManager))
+
+        var mods = BepInEx.Bootstrap.Chainloader.Plugins.Where(
+            mod => mod.Config.Count > 0
+                   && (mod is not BaseSpaceWarpPlugin || (
+                           mod is BaseSpaceWarpPlugin baseSpaceWarpPlugin
+                           && baseSpaceWarpPlugin.SWConfiguration.Sections.Count == 0)
+                   )
+        );
+
+        foreach (var mod in mods)
         {
             // This is where do a "Add Name" function
             GenerateTitle(mod.Info.Metadata.Name).transform.SetParent(transform);

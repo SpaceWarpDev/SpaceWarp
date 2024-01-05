@@ -18,13 +18,6 @@
         "min": "2.4.0",
         "max": "*"
       }
-    },
-    {
-      "id": "com.bepis.bepinex.configurationmanager",
-      "version": {
-        "min": "*",
-        "max": "*"
-      }
     }
   ]
 }

@@ -4,9 +4,6 @@
         <RootNamespace>SpaceWarp</RootNamespace>
     </PropertyGroup>
     <!-- References -->
-    <ItemGroup Label="DLL references">
-        <Reference Include="$(SolutionDir)/plugin_template/BepInEx/plugins/ConfigurationManager/ConfigurationManager.dll" Private="false" Publicize="true"/>
-    </ItemGroup>
     <ItemGroup Label="NuGet package references">
         <PackageReference Include="BepInEx.Analyzers" Version="1.0.8">
             <PrivateAssets>all</PrivateAssets>

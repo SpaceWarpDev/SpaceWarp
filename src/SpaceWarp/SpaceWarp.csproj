@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <!-- References -->
-    <ItemGroup Label="DLL file references">
-        <Reference Include="$(SolutionDir)/plugin_template/BepInEx/plugins/ConfigurationManager/ConfigurationManager.dll" Private="false" Publicize="true"/>
-    </ItemGroup>
     <ItemGroup Label="NuGet package references">
         <PackageReference Remove="PolySharp"/>
     </ItemGroup>
