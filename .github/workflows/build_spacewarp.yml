@@ -22,6 +22,9 @@ jobs:
       - name: Build the solution
         run: dotnet build "SpaceWarp.sln" -c Release
 
+      - name: Run automated tests
+        run: dotnet test "SpaceWarp.sln"
+
       - name: Find zip
         id: find-zip
         run: |
