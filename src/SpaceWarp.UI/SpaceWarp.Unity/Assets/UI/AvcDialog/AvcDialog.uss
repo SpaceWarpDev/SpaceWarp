@@ -1,0 +1,49 @@
+@import url('../SpaceWarpUI.uss');
+
+#avc-dialog {
+    height: 160px;
+    width: 600px;
+}
+
+#avc-text-container {
+    padding: 2px;
+    -unity-text-align: upper-center;
+    background-color: rgb(30, 33, 42);
+    border-width: 1px;
+    border-radius: 6px;
+    border-color: rgb(30, 33, 42);
+    margin-bottom: 4px;
+    flex-grow: 1;
+    flex-shrink: 0;
+    align-items: stretch;
+}
+
+#avc-text-main {
+    white-space: normal;
+    font-size: 12px;
+    -unity-text-align: upper-left;
+}
+
+#avc-text-minor {
+    -unity-text-align: upper-right;
+    font-size: 10px;
+    -unity-font-style: italic;
+    white-space: normal;
+    color: rgb(172, 179, 191);
+}
+
+#avc-buttons-container {
+    flex-direction: row;
+}
+
+#yes-button {
+    width: 50%;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+#no-button {
+    width: 50%;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}

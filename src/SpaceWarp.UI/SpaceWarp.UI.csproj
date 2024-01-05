@@ -12,4 +12,9 @@
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.VersionChecking/SpaceWarp.VersionChecking.csproj" Private="false"/>
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarpPatcher/SpaceWarpPatcher.csproj" Private="false"/>
     </ItemGroup>
+    <!-- Files to compile -->
+    <ItemGroup>
+        <Compile Remove="SpaceWarp.Unity/**"/>
+        <Compile Include="SpaceWarp.Unity/Assets/Runtime/**/*.cs"/>
+    </ItemGroup>
 </Project>

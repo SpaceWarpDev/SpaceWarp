@@ -1,0 +1,43 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Console/Console.uss?fileID=7433441132597879392&amp;guid=a3501e36e3199cc4aadc08344a94b6cf&amp;type=3#Console" />
+    <ui:VisualElement name="root" class="root" style="height: 650px; flex-shrink: 0; width: 1000px; align-items: flex-start;">
+        <ui:VisualElement name="title-bar" style="justify-content: space-between; flex-shrink: 0; width: 100%;">
+            <ui:Label text="spacewarp.console" display-tooltip-when-elided="true" />
+            <ui:Button text="×" display-tooltip-when-elided="true" name="exit-button" class="exit-button" style="border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(102, 126, 196); border-right-color: rgb(102, 126, 196); border-top-color: rgb(102, 126, 196); border-bottom-color: rgb(102, 126, 196); color: rgb(248, 75, 85); margin-right: 0; border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-top-right-radius: 6px; border-bottom-right-radius: 6px; font-size: 45px; -unity-text-align: middle-center; align-items: center; flex-direction: row; justify-content: space-around;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="func" style="height: 50px; width: 100%; flex-direction: row; margin-bottom: 10px; flex-shrink: 0;">
+            <ui:VisualElement name="toggles" style="width: 350px; height: 50px; border-left-color: rgb(97, 96, 216); border-right-color: rgb(97, 96, 216); border-top-color: rgb(97, 96, 216); border-bottom-color: rgb(97, 96, 216); border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-top-right-radius: 6px; border-bottom-right-radius: 6px; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; margin-bottom: 10px; margin-right: 10px; min-height: 50px; min-width: 300px; padding-left: 5px; padding-right: 5px; padding-top: 5px; flex-direction: row;">
+                <ui:VisualElement name="buttonsRect" style="height: 30px; width: 100%; flex-direction: row;">
+                    <ui:Toggle name="toggle-debug" value="true" class="log-level-toggle debug" style="height: 100%; width: 45px; visibility: hidden;">
+                        <ui:Label text="DEBUG" display-tooltip-when-elided="true" name="label-debug" class="left-section" style="visibility: visible;" />
+                    </ui:Toggle>
+                    <ui:Toggle name="toggle-message" class="log-level-toggle message" style="height: 100%; width: 45px;">
+                        <ui:Label text="MSG" display-tooltip-when-elided="true" name="label-message" class="middle-section" />
+                    </ui:Toggle>
+                    <ui:Toggle name="toggle-info" class="log-level-toggle info" style="height: 100%; width: 45px;">
+                        <ui:Label text="INFO" display-tooltip-when-elided="true" name="label-Info" class="middle-section" />
+                    </ui:Toggle>
+                    <ui:Toggle name="toggle-warning" value="false" class="log-level-toggle warning" style="height: 100%; width: 45px;">
+                        <ui:Label text="WARN" display-tooltip-when-elided="true" name="Info" focusable="false" class="middle-section" />
+                    </ui:Toggle>
+                    <ui:Toggle name="toggle-error" value="false" class="log-level-toggle error" style="height: 100%; width: 45px;">
+                        <ui:Label text="ERROR" display-tooltip-when-elided="true" name="Info" class="right-section" />
+                    </ui:Toggle>
+                    <ui:Toggle name="toggle-autoscroll" value="false" class="log-level-toggle auto-scroll" style="height: 100%; width: 100px; margin-right: 0; margin-left: 5px; overflow: visible; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-top: 0; margin-bottom: 0; min-height: 100%;">
+                        <ui:Label text="AUTOSCROLL" display-tooltip-when-elided="true" name="Info" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 100%; height: 100%;" />
+                    </ui:Toggle>
+                </ui:VisualElement>
+                <ui:Label text="CONSOLE.VIEW" display-tooltip-when-elided="true" style="position: absolute; color: rgb(97, 96, 216); background-color: rgb(46, 53, 64); font-size: 12px; top: 93%; right: 37%; -unity-text-align: middle-center; padding-left: 4px; padding-right: 4px; height: 12px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="search-content" class="search-bar" style="height: 100%; flex-grow: 1; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(128, 137, 152); border-right-color: rgb(128, 137, 152); border-top-color: rgb(128, 137, 152); border-bottom-color: rgb(128, 137, 152); border-top-left-radius: 4px; border-bottom-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; background-color: rgb(40, 47, 57); padding-left: 3px; padding-right: 3px; padding-top: 3px; padding-bottom: 3px; flex-direction: row; align-items: center;">
+                <ui:VisualElement style="height: 35px; width: 35px; background-image: url(&apos;project://database/Assets/UI/Console/console_search.png?fileID=21300000&amp;guid=744910fa524f3644eab581cd9535cc4c&amp;type=3#console_search&apos;); -unity-background-scale-mode: scale-to-fit; flex-shrink: 0;" />
+                <ui:TextField picking-mode="Ignore" value="search" is-delayed="true" name="search-text-field" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); font-size: 16px; flex-shrink: 1;" />
+            </ui:VisualElement>
+            <ui:Button text="&#10;" display-tooltip-when-elided="true" name="clear-button" style="height: 100%; width: 110px; overflow: visible; -unity-text-align: middle-center; white-space: normal; flex-direction: row; padding-top: 3px; padding-bottom: 3px; padding-left: 3px; padding-right: 3px; border-left-color: rgb(102, 126, 196); border-right-color: rgb(102, 126, 196); border-top-color: rgb(102, 126, 196); border-bottom-color: rgb(102, 126, 196); margin-left: 10px; justify-content: space-around; align-items: center;">
+                <ui:VisualElement style="width: 35px; height: 35px; background-image: url(&apos;project://database/Assets/UI/Console/console_bin.png?fileID=21300000&amp;guid=10a2edaf89235df4b9f53514aedb8318&amp;type=3#console_bin&apos;); -unity-background-scale-mode: scale-to-fit;" />
+                <ui:Label text="CLEAR LOG" display-tooltip-when-elided="true" style="white-space: normal; font-size: 12px; width: 55%; -unity-text-align: middle-left; -unity-font-style: bold;" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:ScrollView name="log-entry-content" horizontal-scroller-visibility="Hidden" show-vertical-scroller="true" focusable="true" vertical-scroller-visibility="AlwaysVisible" style="flex-grow: 0; flex-shrink: 1; height: 100%; border-left-color: rgb(49, 51, 89); border-right-color: rgb(49, 51, 89); border-top-color: rgb(49, 51, 89); border-bottom-color: rgb(49, 51, 89); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; width: 100%; padding-right: 12px;" />
+    </ui:VisualElement>
+</ui:UXML>
