@@ -21,7 +21,7 @@ internal static class AssetHelpers
             SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Loaded addressables catalog {catalog}");
             var locator = operation.Result;
             SpaceWarpPlugin.Instance.SWLogger.LogInfo($"{catalog} ----- {locator.LocatorId}");
-            GameManager.Instance.Assets.RegisterResourceLocator(locator);
+            // GameManager.Instance.Assets.RegisterResourceLocator(locator);
         }
     }
 

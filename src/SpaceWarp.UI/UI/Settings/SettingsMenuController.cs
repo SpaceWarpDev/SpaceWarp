@@ -37,6 +37,7 @@ internal class SettingsMenuController : KerbalMonoBehaviour
 
     private const string InputFieldPrefabPath = "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Main Canvas/MainMenu(Clone)/CampaignMenu/CreateCampaignMenu/Menu/CampaignOptions/CampaignName/CampaignNameInputField";
 
+    private GameObject _inputFieldPrefab;
 
     private ModsSubMenu _modsSubMenu;
     private GameObject _headerPrefab;
@@ -111,7 +112,7 @@ internal class SettingsMenuController : KerbalMonoBehaviour
         }
 
 
-        var inputFieldPrefab = Instantiate(GameObject.Find(InputFieldPrefabPath), setting.transform);
+        var inputFieldPrefab = Instantiate(_inputFieldPrefab, setting.transform);
         Destroy(inputFieldPrefab.GetChild("Icons"));
         var extended = inputFieldPrefab.GetComponentInChildren<InputFieldExtended>();
         var textArea = extended.gameObject;
@@ -139,8 +140,9 @@ internal class SettingsMenuController : KerbalMonoBehaviour
         var graphics = GameObject.Find(GraphicsPath);
         var content = GameObject.Find(ContentPath);
         var graphicsSettings = GameObject.Find(ContentGraphicsPath);
-
-
+        _inputFieldPrefab = Instantiate(GameObject.Find(InputFieldPrefabPath),SpaceWarpPlugin.Instance.transform);
+        _inputFieldPrefab.Persist();
+        _inputFieldPrefab.transform.SetParent(SpaceWarpPlugin.Instance.transform);
 
         var modsButton = Instantiate(graphics, categories.transform);
         modsButton.GetComponentInChildren<Localize>().Term = "";
