@@ -1,40 +1,77 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
+using System.Management;
+
+// Can only run on Windows
+if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+{
+    Console.WriteLine("This can only run on Windows.");
+    Environment.Exit(1);
+}
 
 if (args.Length < 1)
 {
     Console.WriteLine(
-        $"Usage: {Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location)} <path to KSP2_x64.exe> " +
-        $"[optional arguments]"
+        $"Usage: {Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location)}.exe " +
+        $"<target process id> " +
+        $"[optional arguments that will be passed to KSP2_x64.exe]"
     );
     Environment.Exit(1);
 }
 
-var processPath = args[0];
-var processName = Path.GetFileNameWithoutExtension(processPath);
+var targetPid = args[0];
 var processArgs = string.Join(" ", args.Length > 1 ? args[1..] : Array.Empty<string>());
 
-Console.WriteLine($"Waiting for {processName} to exit...");
-
-while (true)
+// Get the path to the KSP2_x64.exe
+var processModule = Process.GetProcessById(int.Parse(targetPid)).MainModule;
+if (processModule != null)
 {
-    if (Process.GetProcessesByName(processName).Length == 0)
+    var processPath = processModule.FileName;
+
+    KillProc(int.Parse(targetPid));
+
+    // Launch the process
+    var ksp2Process = new Process
     {
-        try
+        StartInfo = new ProcessStartInfo
         {
-            Console.WriteLine($"{processName}.exe is not running. Attempting to start the process...");
-            Process.Start("cmd.exe", $"/C \"{processPath}\" {processArgs}");
-            Console.WriteLine($"{processName}.exe started successfully.");
-            break;
+            FileName = processPath,
+            Arguments = processArgs,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"An error occurred while starting {processName}.exe: {ex.Message}");
-            Environment.Exit(1);
-        }
-    }
-    else
+    };
+
+    // Start the ksp2_process and detach from it
+    ksp2Process.Start();
+    ksp2Process.Dispose();
+} else {
+    Console.WriteLine("Could not find the process.");
+    Environment.Exit(1);
+}
+
+Environment.Exit(0);
+
+// Will recursively kill all child processes of the given process and the process itself
+void KillProc(int pid)
+{
+    var process = Process.GetProcessById(pid);
+    
+    // We already guaranteed that this will only run on Windows
+#pragma warning disable CA1416
+    var searcher = new ManagementObjectSearcher(
+        $"SELECT * " +
+        $"FROM Win32_Process " +
+        $"WHERE ParentProcessId={pid}"
+    );
+    
+    foreach (var child in searcher.Get())
     {
-        Thread.Sleep(500);
+        KillProc(int.Parse(child["ProcessId"].ToString() ?? throw new InvalidOperationException()));
     }
+    
+    process.Kill();
+#pragma warning restore CA1416
 }

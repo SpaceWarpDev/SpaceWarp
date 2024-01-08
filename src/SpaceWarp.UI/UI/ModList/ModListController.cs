@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using BepInEx;
 using I2.Loc;
 using SpaceWarp.API.Assets;
@@ -351,21 +351,30 @@ internal class ModListController : MonoBehaviour
         _applyChangesButton.style.display = DisplayStyle.None;
         _applyChangesButton.RegisterCallback<ClickEvent>(_ =>
         {
+            int currentPid = Process.GetCurrentProcess().Id;
+
+            // We call on restarter to kill the current process 
+            // and it will call the restarter to restarter.
             var restarterPath = Path.Combine(
                 SpaceWarpPlugin.Instance.SWMetadata.Folder.FullName,
                 "restarter",
                 "SpaceWarpRestarter.exe"
             );
-            Modules.UI.Instance.ModuleLogger.LogDebug($"Restarter path: {restarterPath}");
 
             var restarter = new Process();
+
+            // We give the restarter the current_pid so that it can kill it.
             restarter.StartInfo = new ProcessStartInfo(restarterPath)
             {
-                Arguments = Environment.CommandLine
+                Arguments = $"\"{Environment.CommandLine}\" {currentPid}"
             };
             restarter.Start();
 
-            Application.Quit();
+            // Hang the current process so that the restarter can kill it.
+            while (true)
+            {
+                Thread.Sleep(1000);
+            }
         });
 
         _detailsSourceLink.RegisterCallback<ClickEvent>(_ =>
