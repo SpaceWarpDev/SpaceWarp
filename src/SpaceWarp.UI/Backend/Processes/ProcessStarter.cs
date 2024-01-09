@@ -5,7 +5,7 @@ namespace SpaceWarp.Backend.Processes;
 
 internal static class ProcessStarter
 {
-    private const uint DetachedProcess = 0x00000008;
+    private const uint CreateNewConsole = 0x00000010;
 
     [StructLayout(LayoutKind.Sequential)]
     private struct ProcessInformation
@@ -53,6 +53,10 @@ internal static class ProcessStarter
         out ProcessInformation lpProcessInformation
     );
 
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool CloseHandle(IntPtr hObject);
+
     public static bool StartDetachedProcess(string applicationName, string commandLine)
     {
         var si = new StartupInfo();
@@ -64,13 +68,22 @@ internal static class ProcessStarter
             IntPtr.Zero,
             IntPtr.Zero,
             false,
-            DetachedProcess,
+            CreateNewConsole,
             IntPtr.Zero,
             null,
             ref si,
-            out _
+            out var pi
         );
 
-        return success;
+        if (!success)
+        {
+            return false;
+        }
+
+        // Close the handles to the process and thread
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+
+        return true;
     }
 }

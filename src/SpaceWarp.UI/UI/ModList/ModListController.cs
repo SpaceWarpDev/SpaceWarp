@@ -352,29 +352,22 @@ internal class ModListController : MonoBehaviour
         _applyChangesButton.style.display = DisplayStyle.None;
         _applyChangesButton.RegisterCallback<ClickEvent>(_ =>
         {
-            int currentPid = Process.GetCurrentProcess().Id;
+            var currentPid = Process.GetCurrentProcess().Id;
 
             // We call on restarter to kill the current process 
             // and it will call the restarter to restarter.
             var restarterPath = Path.Combine(
                 SpaceWarpPlugin.Instance.SWMetadata.Folder.FullName,
                 "restarter",
-                "SpaceWarpRestarter.exe"
+                "invoke_restarter.bat"
             );
 
-            // var restarter = new Process();
-            //
-            // // We give the restarter the current_pid so that it can kill it.
-            // restarter.StartInfo = new ProcessStartInfo(restarterPath)
-            // {
-            //     Arguments = $"{currentPid} \"{string.Join(" ", Environment.GetCommandLineArgs()[1..])}\"",
-            //     UseShellExecute = true
-            // };
-            // restarter.Start();
-            // restarter.Dispose();
+            var cmd = $"cmd.exe /C \"" +
+                      $"\"{restarterPath}\" " +
+                      $"{currentPid} " +
+                      $"\"{string.Join(" ", Environment.GetCommandLineArgs()[1..])}\"" +
+                      $"\"";
 
-
-            var cmd = $"\"{restarterPath}\" {currentPid} \"{string.Join(" ", Environment.GetCommandLineArgs()[1..])}\"";
             Modules.UI.Instance.ModuleLogger.LogDebug($"Starting restarter: {cmd}");
             var result = ProcessStarter.StartDetachedProcess(
                 null,
@@ -384,6 +377,7 @@ internal class ModListController : MonoBehaviour
             Modules.UI.Instance.ModuleLogger.LogDebug($"Restarter result: {result}");
 
             // Hang the current process so that the restarter can kill it.
+            // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
             while (result)
             {
                 Thread.Sleep(1000);
