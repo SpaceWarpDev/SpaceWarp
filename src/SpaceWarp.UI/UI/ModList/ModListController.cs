@@ -10,6 +10,7 @@ using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
 using SpaceWarp.Backend.Extensions;
+using SpaceWarp.Backend.Processes;
 using Enumerable = System.Linq.Enumerable;
 
 namespace SpaceWarp.UI.ModList;
@@ -361,17 +362,29 @@ internal class ModListController : MonoBehaviour
                 "SpaceWarpRestarter.exe"
             );
 
-            var restarter = new Process();
+            // var restarter = new Process();
+            //
+            // // We give the restarter the current_pid so that it can kill it.
+            // restarter.StartInfo = new ProcessStartInfo(restarterPath)
+            // {
+            //     Arguments = $"{currentPid} \"{string.Join(" ", Environment.GetCommandLineArgs()[1..])}\"",
+            //     UseShellExecute = true
+            // };
+            // restarter.Start();
+            // restarter.Dispose();
 
-            // We give the restarter the current_pid so that it can kill it.
-            restarter.StartInfo = new ProcessStartInfo(restarterPath)
-            {
-                Arguments = $"\"{Environment.CommandLine}\" {currentPid}"
-            };
-            restarter.Start();
+
+            var cmd = $"\"{restarterPath}\" {currentPid} \"{string.Join(" ", Environment.GetCommandLineArgs()[1..])}\"";
+            Modules.UI.Instance.ModuleLogger.LogDebug($"Starting restarter: {cmd}");
+            var result = ProcessStarter.StartDetachedProcess(
+                null,
+                cmd
+            );
+
+            Modules.UI.Instance.ModuleLogger.LogDebug($"Restarter result: {result}");
 
             // Hang the current process so that the restarter can kill it.
-            while (true)
+            while (result)
             {
                 Thread.Sleep(1000);
             }

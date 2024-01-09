@@ -96,10 +96,16 @@
 
         <!-- Copying compiled restarter to build directory -->
         <Message Text="Copying restarter to build directory"/>
-        <ItemGroup Label="Restarter files to be copied">
-            <RestarterFiles Include="$(RestarterBinPath)/**/*" Exclude="$(RestarterBinPath)/**/*.pdb"/>
+        <ItemGroup Label="Restarter EXE to be copied">
+            <RestarterEXE Include="$(RestarterBinPath)/**/*.exe"/>
         </ItemGroup>
-        <Copy SourceFiles="@(RestarterFiles)"
+        <Copy SourceFiles="@(RestarterEXE)"
+              DestinationFolder="$(SolutionDir)/dist/$(ConfigurationName)/BepInEx/plugins/$(ProjectName)/restarter"/>
+
+        <ItemGroup Label="Restarter PDBs to be copied">
+            <RestarterPDBs Include="$(RestarterBinPath)/**/*.pdb"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(RestarterPDBs)"
               DestinationFolder="$(SolutionDir)/dist/$(ConfigurationName)/BepInEx/plugins/$(ProjectName)/restarter"/>
 
         <!-- Compressing build directory for release -->
