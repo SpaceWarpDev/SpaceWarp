@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using BepInEx;
 using I2.Loc;
+using KSP.Game;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.UI;
@@ -10,7 +11,11 @@ using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
 using SpaceWarp.Backend.Extensions;
+using SpaceWarp.UI.Settings;
+using UnityEngine.UI;
+using Button = UnityEngine.UIElements.Button;
 using Enumerable = System.Linq.Enumerable;
+using Toggle = UnityEngine.UIElements.Toggle;
 
 namespace SpaceWarp.UI.ModList;
 
@@ -396,7 +401,15 @@ internal class ModListController : MonoBehaviour
 
         _openModSettingsButton.RegisterCallback<ClickEvent>(_ =>
         {
-            // TODO: Open Settings -> Mods
+            var isMainMenu = GameManager.Instance.Game.GlobalGameState.GetState() == GameState.MainMenu;
+            GameManager.Instance.Game.SettingsMenuManager.SetVisible(isVisible: true, isMainMenu);
+            var modsButton = GameObject.Find(
+                "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Popup Canvas/SettingsMenu(Clone)/Frame/" +
+                "Body/Categories/Graphics(Clone)"
+            );
+            modsButton.GetComponent<UIAction_Void_Toggle>().OnToggleClicked();
+            modsButton.GetComponent<ToggleExtended>().isOn = true;
+            HideWindow();
         });
     }
 
@@ -502,7 +515,7 @@ internal class ModListController : MonoBehaviour
             data.UnsupportedDependencies,
             data.UnspecifiedDependencies,
             data.DisabledDependencies,
-            data.Conflicts,// data.Conflicts,
+            data.Conflicts,
             data.StoredDetails,
             data.GetDetails,
             x => data.StoredDetails = x
