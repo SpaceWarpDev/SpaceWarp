@@ -7,9 +7,11 @@ using KSP.UI.Binding;
 using KSP.UI.Binding.Core;
 using SpaceWarp.API.UI.Settings;
 using SpaceWarp.InternalUtilities;
+using SpaceWarp.Patching.MainMenu;
 using SpaceWarp.Patching.Settings;
 using UnityEngine;
 using UnityEngine.UI;
+
 namespace SpaceWarp.UI.Settings;
 
 internal class SettingsMenuController : KerbalMonoBehaviour
