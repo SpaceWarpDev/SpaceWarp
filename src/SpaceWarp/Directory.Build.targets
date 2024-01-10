@@ -94,19 +94,10 @@
         <Copy SourceFiles="@(PreloaderPDBs)"
               DestinationFolder="$(SolutionDir)/dist/$(ConfigurationName)/BepInEx/core"/>
 
-        <!-- Copying compiled restarter to build directory -->
-        <Message Text="Copying restarter to build directory"/>
-        <ItemGroup Label="Restarter EXE to be copied">
-            <RestarterEXE Include="$(RestarterBinPath)/**/*.exe"/>
-        </ItemGroup>
-        <Copy SourceFiles="@(RestarterEXE)"
-              DestinationFolder="$(SolutionDir)/dist/$(ConfigurationName)/BepInEx/plugins/$(ProjectName)/restarter"/>
-
-        <ItemGroup Label="Restarter PDBs to be copied">
-            <RestarterPDBs Include="$(RestarterBinPath)/**/*.pdb"/>
-        </ItemGroup>
-        <Copy SourceFiles="@(RestarterPDBs)"
-              DestinationFolder="$(SolutionDir)/dist/$(ConfigurationName)/BepInEx/plugins/$(ProjectName)/restarter"/>
+        <!-- Publishing restarter to build directory -->
+        <Message Text="Publishing restarter to build directory"/>
+        <Exec Command="cd"/>
+        <Exec Command="dotnet publish &quot;$(SolutionDir)src\SpaceWarpRestarter\SpaceWarpRestarter.csproj&quot; -c $(ConfigurationName) -r win-x64 -o &quot;$(SolutionDir)dist\$(ConfigurationName)\BepInEx\plugins\$(ProjectName)\restarter&quot; /p:SolutionDir=&quot;$(SolutionDir)&quot;"/>
 
         <!-- Compressing build directory for release -->
         <Message Text="Compressing built plugin folder" Condition="$(ConfigurationName) == Release"/>
@@ -179,4 +170,3 @@
                    Condition="Exists('$(SolutionDir)/temp_nuget')"/>
     </Target>
 </Project>
-

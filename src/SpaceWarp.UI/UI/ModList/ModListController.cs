@@ -10,7 +10,6 @@ using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
 using SpaceWarp.Backend.Extensions;
-using SpaceWarp.Backend.Processes;
 using Enumerable = System.Linq.Enumerable;
 
 namespace SpaceWarp.UI.ModList;
@@ -352,36 +351,28 @@ internal class ModListController : MonoBehaviour
         _applyChangesButton.style.display = DisplayStyle.None;
         _applyChangesButton.RegisterCallback<ClickEvent>(_ =>
         {
-            var currentPid = Process.GetCurrentProcess().Id;
-
-            // We call on restarter to kill the current process 
-            // and it will call the restarter to restarter.
             var restarterPath = Path.Combine(
                 SpaceWarpPlugin.Instance.SWMetadata.Folder.FullName,
                 "restarter",
-                "invoke_restarter.bat"
+                "SpaceWarpRestarter.exe"
             );
+            Modules.UI.Instance.ModuleLogger.LogDebug($"Restarter path: {restarterPath}");
 
-            var cmd = $"cmd.exe /C \"" +
-                      $"\"{restarterPath}\" " +
-                      $"{currentPid} " +
-                      $"\"{string.Join(" ", Environment.GetCommandLineArgs()[1..])}\"" +
-                      $"\"";
-
-            Modules.UI.Instance.ModuleLogger.LogDebug($"Starting restarter: {cmd}");
-            var result = ProcessStarter.StartDetachedProcess(
-                null,
-                cmd
-            );
-
-            Modules.UI.Instance.ModuleLogger.LogDebug($"Restarter result: {result}");
-
-            // Hang the current process so that the restarter can kill it.
-            // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
-            while (result)
+            new Process
             {
-                Thread.Sleep(1000);
-            }
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = restarterPath,
+                    Arguments = Environment.CommandLine,
+                    CreateNoWindow = true,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false
+                }
+            }.Start();
+
+            Application.Quit();
         });
 
         _detailsSourceLink.RegisterCallback<ClickEvent>(_ =>
