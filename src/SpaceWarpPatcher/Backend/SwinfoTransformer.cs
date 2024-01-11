@@ -3,12 +3,51 @@ using System.Text;
 using BepInEx;
 using Newtonsoft.Json.Linq;
 
-namespace SpaceWarpPatcher;
+namespace SpaceWarpPatcher.Backend;
 
 internal static class SwinfoTransformer
 {
-    
-    internal static JObject TransformSwinfo(JObject swinfo, string hash, DirectoryInfo directoryInfo)
+    public static void TransformModSwinfos()
+    {
+        var dir = new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods"));
+        if (!dir.Exists)
+        {
+            return;
+        }
+
+        var allSwinfos = dir.EnumerateFiles("swinfo.json", SearchOption.AllDirectories);
+        foreach (var swinfo in allSwinfos)
+        {
+            var directory = swinfo.Directory!;
+            var target = Path.Combine(directory.FullName, "modinfo.json");
+            var swinfoText = File.ReadAllText(swinfo.FullName);
+            var swinfoData = JObject.Parse(swinfoText);
+            var hash = GetHashString(swinfoText);
+            var toCompareHash = "";
+
+            if (File.Exists(target))
+            {
+                var targetModInfo = JObject.Parse(File.ReadAllText(target));
+                if (targetModInfo.ContainsKey("Hash"))
+                {
+                    toCompareHash = (string)(targetModInfo.GetValue("Hash") as JValue)?.Value;
+                }
+                else
+                {
+                    toCompareHash = hash;
+                }
+            }
+
+            if (hash == toCompareHash)
+            {
+                continue;
+            }
+
+            File.WriteAllText(target,TransformSwinfo(swinfoData,hash, directory).ToString());
+        }
+    }
+
+    private static JObject TransformSwinfo(JObject swinfo, string hash, DirectoryInfo directoryInfo)
     {
         var addressables = Path.Combine(directoryInfo.FullName, "addressables");
         string catalog = null;
@@ -21,16 +60,18 @@ internal static class SwinfoTransformer
             }
         }
 
-        string entryPoint = swinfo.TryGetValue("EntryPoint", out var value) ? value.Value<string>() : null;
+        var entryPoint = swinfo.TryGetValue("EntryPoint", out var value) ? value.Value<string>() : null;
         if (entryPoint != null) {
-            var dll = directoryInfo.EnumerateFiles("*.dll", SearchOption.TopDirectoryOnly).FirstOrDefault();
+            var dll = directoryInfo.EnumerateFiles("*.dll", SearchOption.TopDirectoryOnly)
+                .FirstOrDefault();
+
             if (dll != null)
             {
                 entryPoint = dll.FullName;
             }
         }
 
-        JObject target = new JObject();
+        var target = new JObject();
         if (catalog == null)
         {
             if (entryPoint == null)
@@ -80,51 +121,21 @@ internal static class SwinfoTransformer
 
         return target;
     }
-    
+
     private static byte[] GetHash(string inputString)
     {
-        using (HashAlgorithm algorithm = SHA256.Create())
-            return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+        using HashAlgorithm algorithm = SHA256.Create();
+        return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
     }
 
     private static string GetHashString(string inputString)
     {
-        StringBuilder sb = new StringBuilder();
-        foreach (byte b in GetHash(inputString))
+        var sb = new StringBuilder();
+        foreach (var b in GetHash(inputString))
+        {
             sb.Append(b.ToString("X2"));
+        }
 
         return sb.ToString();
-    }
-
-    internal static void TransformModSwinfos()
-    {
-        var dir = new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods"));
-        if (!dir.Exists) return;
-        var allSwinfos =
-            dir.EnumerateFiles("swinfo.json",
-                SearchOption.AllDirectories);
-        foreach (var swinfo in allSwinfos)
-        {
-            var directory = swinfo.Directory!;
-            var target = Path.Combine(directory.FullName, "modinfo.json");
-            var swinfoText = File.ReadAllText(swinfo.FullName);
-            var swinfoData = JObject.Parse(swinfoText);
-            var hash = GetHashString(swinfoText);
-            var toCompareHash = "";
-            if (File.Exists(target))
-            {
-                var targetModInfo = JObject.Parse(File.ReadAllText(target));
-                if (targetModInfo.ContainsKey("Hash"))
-                {
-                    toCompareHash = (string)(targetModInfo.GetValue("Hash") as JValue)?.Value;
-                }
-                else
-                {
-                    toCompareHash = hash;
-                }
-            }
-            if (hash == toCompareHash) continue;
-            File.WriteAllText(target,TransformSwinfo(swinfoData,hash, directory).ToString());
-        }
     }
 }

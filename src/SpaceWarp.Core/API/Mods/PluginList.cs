@@ -3,7 +3,7 @@ using BepInEx.Bootstrap;
 using JetBrains.Annotations;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
-using SpaceWarpPatcher;
+using SpaceWarpPatcher.API;
 
 // Disable obsolete warning for Chainloader.Plugins
 #pragma warning disable CS0618
@@ -22,7 +22,7 @@ public static class PluginList
     /// Set if the plugin list is different in any way since last run (version differences, new mods, mods removed,
     /// mods disabled, description differences, any different in any swinfo file and the disabled mod list).
     /// </summary>
-    public static bool ModListChangedSinceLastRun => ChainloaderPatch.ModListChangedSinceLastRun;
+    public static bool ModListChangedSinceLastRun => ModList.ChangedSinceLastRun;
 
     /// <summary>
     /// Contains information about all currently loaded plugins. The key is the BepInEx GUID of the plugin.
@@ -32,9 +32,8 @@ public static class PluginList
     /// <summary>
     /// Contains information about all currently disabled plugins. The key is the BepInEx GUID of the plugin.
     /// </summary>
-    public static Dictionary<string, PluginInfo> DisabledPluginInfos { get; } = ChainloaderPatch
-        .DisabledPluginGuids
-        .Zip(ChainloaderPatch.DisabledPlugins, (guid, info) => new { guid, info })
+    public static Dictionary<string, PluginInfo> DisabledPluginInfos { get; } = ModList.DisabledPluginGuids
+        .Zip(ModList.DisabledPlugins, (guid, info) => new { guid, info })
         .ToDictionary(item => item.guid, item => item.info);
 
     /// <summary>

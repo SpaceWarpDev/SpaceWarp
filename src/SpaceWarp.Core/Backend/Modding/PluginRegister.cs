@@ -8,6 +8,8 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
 using SpaceWarpPatcher;
+using SpaceWarpPatcher.API;
+using SpaceWarpPatcher.Patches;
 
 namespace SpaceWarp.Backend.Modding;
 
@@ -544,7 +546,7 @@ internal static class PluginRegister
 
     private static void GetDisabledPlugins()
     {
-        foreach (var plugin in ChainloaderPatch.DisabledPlugins)
+        foreach (var plugin in ModList.DisabledPlugins)
         {
             GetSingleDisabledPlugin(plugin);
         }
@@ -586,7 +588,7 @@ internal static class PluginRegister
 
     private static void DisableMods()
     {
-        foreach (var mod in ChainloaderPatch.DisabledPluginGuids)
+        foreach (var mod in ModList.DisabledPluginGuids)
         {
             PluginList.Disable(mod);
         }

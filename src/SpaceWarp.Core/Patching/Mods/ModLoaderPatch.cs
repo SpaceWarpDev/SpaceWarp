@@ -9,6 +9,7 @@ using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.Backend.Modding;
 using SpaceWarp.InternalUtilities;
 using SpaceWarpPatcher;
+using SpaceWarpPatcher.API;
 using UnityEngine;
 using File = System.IO.File;
 
@@ -51,7 +52,7 @@ internal static class ModLoaderPatch
         var info = File.Exists(Path.Combine(path, "swinfo.json"))
             ? JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path))
             : KspToSwinfo(__instance);
-        var disabled = ChainloaderPatch.DisabledPluginGuids.Contains(info.ModID);
+        var disabled = ModList.DisabledPluginGuids.Contains(info.ModID);
         __state = disabled;
         return !disabled;
     }

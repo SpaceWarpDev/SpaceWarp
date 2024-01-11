@@ -757,7 +757,7 @@ internal class ModListController : MonoBehaviour
     private void UpdateDisabledFile()
     {
         File.WriteAllLines(
-            ChainloaderPatch.DisabledPluginsFilepath,
+            SpaceWarpPatcher.API.ModList.DisabledPluginsFilepath,
             _toggles.Where(item => !item.Value).Select(item => item.Key)
         );
     }
