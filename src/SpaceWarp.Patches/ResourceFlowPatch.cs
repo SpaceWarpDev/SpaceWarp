@@ -4,27 +4,28 @@ using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
 using MonoMod.Cil;
 using MonoMod.Utils;
+using SpaceWarp.Preload.API;
 
-namespace SpaceWarp.Patcher.Patches;
+namespace SpaceWarp.Patches;
 
 /// <summary>
-/// Patcher for the game's main DLL
+/// Patches the game so that parts can register their own resource flow requests.
 /// </summary>
 [UsedImplicitly]
-public class ResourceFlowPatch
+internal class ResourceFlowPatch : BasePatcher
 {
     /// <summary>
     /// The target DLLs to patch
     /// </summary>
     [UsedImplicitly]
-    public static IEnumerable<string> TargetDLLs => new[] { "Assembly-CSharp.dll" };
+    public override IEnumerable<string> DLLsToPatch => ["Assembly-CSharp.dll"];
 
     /// <summary>
     /// Patches the target DLL
     /// </summary>
     /// <param name="assemblyDefinition">The assembly definition to patch</param>
     [UsedImplicitly]
-    public static void Patch(ref AssemblyDefinition assemblyDefinition)
+    public override void ApplyPatch(ref AssemblyDefinition assemblyDefinition)
     {
         var firstTargetType = assemblyDefinition.MainModule.Types.First(t => t.Name == "PartOwnerComponent");
         var boolType = firstTargetType.Fields

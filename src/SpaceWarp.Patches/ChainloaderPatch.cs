@@ -4,27 +4,35 @@ using BepInEx.Logging;
 using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using SpaceWarp.Patcher.API;
-using SpaceWarp.Patcher.Backend;
+using SpaceWarp.Patches.Backend;
+using SpaceWarp.Preload;
+using SpaceWarp.Preload.API;
 
-namespace SpaceWarp.Patcher.Patches;
+namespace SpaceWarp.Patches;
 
 /// <summary>
-/// Patches the Chainloader.Start method to disable plugins.
+/// Patches BepInEx's Chainloader.Start method to disable plugins, generate the mod paths DLL, compile Roslyn mods
+/// and transform swinfo files to modinfo files.
 /// </summary>
 [HarmonyPatch]
-public static class ChainloaderPatch
+internal static class ChainloaderPatch
 {
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Chainloader), nameof(Chainloader.Start))]
     private static void PreStartActions()
     {
         var trueLogger = Logger.CreateLogSource("Roslyn Compiler");
+
+        // Compile Roslyn mods
         var changed = RoslynCompiler.CompileMods(trueLogger);
+
+        // Generate the mod paths DLL
         PathsGenerator.GenerateSpaceWarpPathsDLL(changed, trueLogger);
+
         try
         {
-            SwinfoTransformer.TransformModSwinfos();
+            // Transform swinfo files in the internal mod loader folder to modinfo files
+            ModInfoGenerator.TransformSwinfosToModInfos();
         }
         catch (Exception e)
         {
@@ -41,7 +49,8 @@ public static class ChainloaderPatch
         ILLabel continueLabel = default;
         c.GotoNext(
             MoveType.After,
-            x => x.MatchBrfalse(out continueLabel), // this is from a continue, we use this to start the next iteration
+            // this is from a continue, we use this to start the next iteration:
+            x => x.MatchBrfalse(out continueLabel),
             x => x.MatchLdcI4(0), // false
             x => x.MatchStloc(24) // someBool = false
         );
@@ -58,7 +67,7 @@ public static class ChainloaderPatch
 
             deniedSet.Add(plugin.Metadata.GUID);
             ModList.DisabledPlugins.Add(plugin);
-            Patcher.LogSource.LogInfo($"{plugin.Metadata.GUID} was disabled, skipping loading...");
+            Entrypoint.LogSource.LogInfo($"{plugin.Metadata.GUID} was disabled, skipping loading...");
             return false;
 
         });

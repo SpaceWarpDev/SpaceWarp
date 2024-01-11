@@ -3,7 +3,7 @@ using BepInEx.Bootstrap;
 using JetBrains.Annotations;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
-using SpaceWarp.Patcher.API;
+using SpaceWarp.Preload.API;
 
 // Disable obsolete warning for Chainloader.Plugins
 #pragma warning disable CS0618

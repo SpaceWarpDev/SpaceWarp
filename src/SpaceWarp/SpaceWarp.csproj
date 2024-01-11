@@ -11,8 +11,7 @@
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Sound/SpaceWarp.Sound.csproj" Private="false"/>
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.UI/SpaceWarp.UI.csproj" Private="false"/>
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.VersionChecking/SpaceWarp.VersionChecking.csproj" Private="false"/>
-        <ProjectReference Include="..\SpaceWarp.Patcher\SpaceWarp.Patcher.csproj">
-          <Private>false</Private>
-        </ProjectReference>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Patches/SpaceWarp.Patches.csproj" Private="false"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Preload/SpaceWarp.Preload.csproj" Private="false"/>
     </ItemGroup>
 </Project>

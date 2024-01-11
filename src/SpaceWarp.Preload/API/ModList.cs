@@ -1,14 +1,12 @@
 using BepInEx;
 
-namespace SpaceWarp.Patcher.API;
+namespace SpaceWarp.Preload.API;
 
 /// <summary>
 /// Contains methods related to the mod list.
 /// </summary>
 internal static class ModList
 {
-    internal static string DisabledPluginsFilepath => Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
-
     /// <summary>
     /// The list of all disabled plugin GUIDs.
     /// </summary>
@@ -26,14 +24,14 @@ internal static class ModList
 
     internal static void Initialize()
     {
-        if (!File.Exists(DisabledPluginsFilepath))
+        if (!File.Exists(CommonPaths.DisabledPluginsFilepath))
         {
-            File.Create(DisabledPluginsFilepath).Dispose();
-            Patcher.LogSource.LogWarning(
-                $"Disabled plugins file did not exist, created empty file at: {DisabledPluginsFilepath}"
+            File.Create(CommonPaths.DisabledPluginsFilepath).Dispose();
+            Entrypoint.LogSource.LogWarning(
+                $"Disabled plugins file did not exist, created empty file at: {CommonPaths.DisabledPluginsFilepath}"
             );
         }
 
-        DisabledPluginGuids = File.ReadAllLines(DisabledPluginsFilepath);
+        DisabledPluginGuids = File.ReadAllLines(CommonPaths.DisabledPluginsFilepath);
     }
 }

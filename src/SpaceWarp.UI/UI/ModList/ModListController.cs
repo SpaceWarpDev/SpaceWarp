@@ -5,13 +5,11 @@ using KSP.Game;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.UI;
-using SpaceWarp.Patcher;
 using UitkForKsp2;
 using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
 using SpaceWarp.Backend.Extensions;
-using SpaceWarp.UI.Settings;
 using UnityEngine.UI;
 using Button = UnityEngine.UIElements.Button;
 using Enumerable = System.Linq.Enumerable;
@@ -757,7 +755,7 @@ internal class ModListController : MonoBehaviour
     private void UpdateDisabledFile()
     {
         File.WriteAllLines(
-            Patcher.API.ModList.DisabledPluginsFilepath,
+            Preload.API.CommonPaths.DisabledPluginsFilepath,
             _toggles.Where(item => !item.Value).Select(item => item.Key)
         );
     }

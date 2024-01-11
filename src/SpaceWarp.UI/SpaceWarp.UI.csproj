@@ -10,7 +10,7 @@
     <ItemGroup Label="Project references">
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Core/SpaceWarp.Core.csproj" Private="false"/>
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.VersionChecking/SpaceWarp.VersionChecking.csproj" Private="false"/>
-        <ProjectReference Include="..\SpaceWarp.Patcher\SpaceWarp.Patcher.csproj">
+        <ProjectReference Include="..\SpaceWarp.Preload\SpaceWarp.Preload.csproj">
           <Private>false</Private>
         </ProjectReference>
     </ItemGroup>

@@ -1,15 +1,15 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using BepInEx;
 using Newtonsoft.Json.Linq;
+using SpaceWarp.Preload.API;
 
-namespace SpaceWarp.Patcher.Backend;
+namespace SpaceWarp.Patches.Backend;
 
-internal static class SwinfoTransformer
+internal static class ModInfoGenerator
 {
-    public static void TransformModSwinfos()
+    public static void TransformSwinfosToModInfos()
     {
-        var dir = new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods"));
+        var dir = new DirectoryInfo(Path.Combine(CommonPaths.GameRootPath, "GameData", "Mods"));
         if (!dir.Exists)
         {
             return;
@@ -43,11 +43,11 @@ internal static class SwinfoTransformer
                 continue;
             }
 
-            File.WriteAllText(target,TransformSwinfo(swinfoData,hash, directory).ToString());
+            File.WriteAllText(target,TransformSwinfoToModInfo(swinfoData,hash, directory).ToString());
         }
     }
 
-    private static JObject TransformSwinfo(JObject swinfo, string hash, DirectoryInfo directoryInfo)
+    private static JObject TransformSwinfoToModInfo(JObject swinfo, string hash, DirectoryInfo directoryInfo)
     {
         var addressables = Path.Combine(directoryInfo.FullName, "addressables");
         string catalog = null;

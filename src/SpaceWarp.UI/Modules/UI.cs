@@ -1,5 +1,4 @@
-﻿using BepInEx.Bootstrap;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.UI.Appbar;

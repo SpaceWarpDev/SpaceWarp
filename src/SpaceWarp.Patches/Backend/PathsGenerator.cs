@@ -5,8 +5,9 @@ using BepInEx.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json.Linq;
+using SpaceWarp.Preload.API;
 
-namespace SpaceWarp.Patcher.Backend;
+namespace SpaceWarp.Patches.Backend;
 
 internal static class PathsGenerator
 {
@@ -46,7 +47,7 @@ internal static class PathsGenerator
 
     internal static void GenerateSpaceWarpPathsDLL(bool changed, ManualLogSource trueLogger)
     {
-        var cacheLocation = Path.Combine(Paths.BepInExRootPath, "AssemblyCache");
+        var cacheLocation = Path.Combine(CommonPaths.BepInExRootPath, "AssemblyCache");
 
         try
         {
@@ -56,7 +57,7 @@ internal static class PathsGenerator
                 // Preload newtonsoft.json
                 try
                 {
-                    Assembly.LoadFile(Path.Combine(Paths.ManagedPath, "Newtonsoft.Json.dll"));
+                    Assembly.LoadFile(Path.Combine(CommonPaths.ManagedPath, "Newtonsoft.Json.dll"));
                 }
                 catch (Exception e)
                 {
@@ -114,18 +115,18 @@ internal static class PathsGenerator
 
     private static string GetSpaceWarpPathsCode()
     {
-        var disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
+        var disabledPluginsFilepath = Path.Combine(CommonPaths.BepInExRootPath, "disabled_plugins.cfg");
         var allDisabled = File.ReadAllText(disabledPluginsFilepath)
             .Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-        var allSwinfoPaths = new DirectoryInfo(Path.Combine(Paths.BepInExRootPath, "plugins"))
+        var allSwinfoPaths = new DirectoryInfo(Path.Combine(CommonPaths.BepInExRootPath, "plugins"))
             .EnumerateFiles("swinfo.json", SearchOption.AllDirectories)
             .Where(x => IsDisabled(x, allDisabled));
 
-        var gameDataMods = new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods"));
+        var gameDataMods = new DirectoryInfo(Path.Combine(CommonPaths.GameRootPath, "GameData", "Mods"));
         if (gameDataMods.Exists)
         {
             allSwinfoPaths = allSwinfoPaths.Concat(
-                new DirectoryInfo(Path.Combine(Paths.GameRootPath, "GameData", "Mods"))
+                new DirectoryInfo(Path.Combine(CommonPaths.GameRootPath, "GameData", "Mods"))
                     .EnumerateFiles("swinfo.json", SearchOption.AllDirectories)
             );
         }

@@ -4,9 +4,9 @@ using BepInEx;
 using BepInEx.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using SpaceWarp.Patcher.API;
+using SpaceWarp.Preload.API;
 
-namespace SpaceWarp.Patcher.Backend;
+namespace SpaceWarp.Patches.Backend;
 
 internal static class RoslynCompiler
 {
@@ -36,18 +36,18 @@ internal static class RoslynCompiler
                 "System.Numerics.Vectors"
             ];
 
-            var loc = new DirectoryInfo(Assembly.GetExecutingAssembly().Location).Parent!.FullName;
+            var loc = new DirectoryInfo(Assembly.GetExecutingAssembly().Location).Parent!.Parent!.FullName;
             foreach (var file in toLoad)
             {
                 trueLogger.LogInfo($"Loading: {file}");
                 Assembly.LoadFile(Path.Combine(loc, "lib", $"{file}.dll"));
             }
 
-            var cacheLocation = Path.Combine(Paths.BepInExRootPath, "AssemblyCache");
-            var modListHash = Path.Combine(Paths.BepInExRootPath, "ModListHash.txt");
-            var disabledPluginsFilepath = Path.Combine(Paths.BepInExRootPath, "disabled_plugins.cfg");
+            var cacheLocation = Path.Combine(CommonPaths.BepInExRootPath, "AssemblyCache");
+            var modListHash = Path.Combine(CommonPaths.BepInExRootPath, "ModListHash.txt");
+            var disabledPluginsFilepath = Path.Combine(CommonPaths.BepInExRootPath, "disabled_plugins.cfg");
 
-            var allPluginsSwinfo = string.Join("", new DirectoryInfo(Path.Combine(Paths.BepInExRootPath, "plugins"))
+            var allPluginsSwinfo = string.Join("", new DirectoryInfo(Path.Combine(CommonPaths.BepInExRootPath, "plugins"))
                 .EnumerateFiles("swinfo.json", SearchOption.AllDirectories)
                 .Select(x => File.ReadAllText(x.FullName)));
             allPluginsSwinfo += File.ReadAllText(disabledPluginsFilepath);
@@ -100,7 +100,7 @@ internal static class RoslynCompiler
 
             trueLogger.LogInfo("Loaded assemblies");
             // So now we can compile roslyn based mods by first importing every precompiled DLL
-            var pluginsFilePath = new DirectoryInfo(Path.Combine(Paths.BepInExRootPath, "plugins"));
+            var pluginsFilePath = new DirectoryInfo(Path.Combine(CommonPaths.BepInExRootPath, "plugins"));
             // So now we do a loop and generate a reference table to every plugin name that does not start with "roslyn-"
             // And we keep track of every folder that contains a src folder
 
