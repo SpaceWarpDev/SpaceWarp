@@ -8,7 +8,6 @@
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Core/SpaceWarp.Core.csproj" Private="false"/>
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Game/SpaceWarp.Game.csproj" Private="false"/>
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Messaging/SpaceWarp.Messaging.csproj" Private="false"/>
-        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Preloader/SpaceWarp.Preloader.csproj" Private="false"/>
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Sound/SpaceWarp.Sound.csproj" Private="false"/>
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.UI/SpaceWarp.UI.csproj" Private="false"/>
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.VersionChecking/SpaceWarp.VersionChecking.csproj" Private="false"/>

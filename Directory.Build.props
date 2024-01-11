@@ -23,8 +23,6 @@
         <PatcherObjPath>$(SolutionDir)build/obj/patcher/$(Configuration)</PatcherObjPath>
         <RestarterBinPath>$(SolutionDir)build/bin/restarter/$(Configuration)</RestarterBinPath>
         <RestarterObjPath>$(SolutionDir)build/obj/restarter/$(Configuration)</RestarterObjPath>
-        <PreloaderBinPath>$(SolutionDir)build/bin/preloader/$(Configuration)</PreloaderBinPath>
-        <PreloaderObjPath>$(SolutionDir)build/obj/preloader/$(Configuration)</PreloaderObjPath>
         <RestarterDistPath>$(SolutionDir)dist/$(Configuration)/BepInEx/plugins/SpaceWarp/restarter</RestarterDistPath>
         <BaseOutputPath>$(ModulesBinPath)/$(MSBuildProjectName)</BaseOutputPath>
         <BaseIntermediateOutputPath>$(ModulesObjPath)/$(MSBuildProjectName)</BaseIntermediateOutputPath>
