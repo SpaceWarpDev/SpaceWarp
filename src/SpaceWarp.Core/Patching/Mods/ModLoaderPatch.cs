@@ -8,8 +8,8 @@ using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.Backend.Modding;
 using SpaceWarp.InternalUtilities;
-using SpaceWarpPatcher;
-using SpaceWarpPatcher.API;
+using SpaceWarp.Patcher;
+using SpaceWarp.Patcher.API;
 using UnityEngine;
 using File = System.IO.File;
 

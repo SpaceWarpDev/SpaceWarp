@@ -1,6 +1,6 @@
 using BepInEx;
 
-namespace SpaceWarpPatcher.API;
+namespace SpaceWarp.Patcher.API;
 
 /// <summary>
 /// Contains methods related to the mod list.

@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarp.UI", "src/SpaceWa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarp.VersionChecking", "src/SpaceWarp.VersionChecking/SpaceWarp.VersionChecking.csproj", "{6B76C415-5BC2-4AB0-8862-760D9DC8F485}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarpPatcher", "src/SpaceWarpPatcher/SpaceWarpPatcher.csproj", "{2EF642D0-F66D-461C-A5B0-953E39307B76}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarp.Patcher", "src\SpaceWarp.Patcher\SpaceWarp.Patcher.csproj", "{2EF642D0-F66D-461C-A5B0-953E39307B76}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWarpTest", "src/SpaceWarpTest/SpaceWarpTest.csproj", "{8DB42693-9177-40B9-AC6A-B6D7A4823FAD}"
 EndProject

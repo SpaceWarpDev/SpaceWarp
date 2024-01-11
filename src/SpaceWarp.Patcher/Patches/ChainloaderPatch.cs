@@ -4,10 +4,10 @@ using BepInEx.Logging;
 using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using SpaceWarpPatcher.API;
-using SpaceWarpPatcher.Backend;
+using SpaceWarp.Patcher.API;
+using SpaceWarp.Patcher.Backend;
 
-namespace SpaceWarpPatcher.Patches;
+namespace SpaceWarp.Patcher.Patches;
 
 /// <summary>
 /// Patches the Chainloader.Start method to disable plugins.

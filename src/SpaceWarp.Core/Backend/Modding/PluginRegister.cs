@@ -7,9 +7,9 @@ using SpaceWarp.API.Logging;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
-using SpaceWarpPatcher;
-using SpaceWarpPatcher.API;
-using SpaceWarpPatcher.Patches;
+using SpaceWarp.Patcher;
+using SpaceWarp.Patcher.API;
+using SpaceWarp.Patcher.Patches;
 
 namespace SpaceWarp.Backend.Modding;
 

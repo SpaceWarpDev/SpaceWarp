@@ -3,7 +3,7 @@ using System.Text;
 using BepInEx;
 using Newtonsoft.Json.Linq;
 
-namespace SpaceWarpPatcher.Backend;
+namespace SpaceWarp.Patcher.Backend;
 
 internal static class SwinfoTransformer
 {

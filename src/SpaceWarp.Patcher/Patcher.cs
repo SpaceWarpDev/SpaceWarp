@@ -1,14 +1,13 @@
-﻿using BepInEx;
-using BepInEx.Logging;
+﻿using BepInEx.Logging;
 using HarmonyLib;
 using JetBrains.Annotations;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using SpaceWarpPatcher.API;
-using SpaceWarpPatcher.Patches;
+using SpaceWarp.Patcher.API;
+using SpaceWarp.Patcher.Patches;
 
-namespace SpaceWarpPatcher;
+namespace SpaceWarp.Patcher;
 
 /// <summary>
 /// Patcher for the UnityEngine.CoreModule assembly.
@@ -31,7 +30,7 @@ public static class Patcher
     [UsedImplicitly]
     public static void Patch(ref AssemblyDefinition asm)
     {
-        LogSource = Logger.CreateLogSource("SpaceWarpPatcher");
+        LogSource = Logger.CreateLogSource("SpaceWarp.Patcher");
 
         switch (asm.Name.Name)
         {
@@ -48,7 +47,7 @@ public static class Patcher
         var targetMethod = targetType.Methods.Single(x => x.Name == ".cctor");
 
         using var thisAsm = AssemblyDefinition.ReadAssembly(typeof(Patcher).Assembly.Location);
-        var delayer = thisAsm.MainModule.GetType("SpaceWarpPatcher.Delayer");
+        var delayer = thisAsm.MainModule.GetType("SpaceWarp.Patcher.Delayer");
         var patchMethod = delayer.Methods.Single(m => m.Name == "PatchChainloaderStart");
 
         ILContext il = new(targetMethod);

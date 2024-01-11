@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json.Linq;
 
-namespace SpaceWarpPatcher.Backend;
+namespace SpaceWarp.Patcher.Backend;
 
 internal static class PathsGenerator
 {

@@ -5,7 +5,7 @@ using Mono.Collections.Generic;
 using MonoMod.Cil;
 using MonoMod.Utils;
 
-namespace SpaceWarpPatcher.Patches;
+namespace SpaceWarp.Patcher.Patches;
 
 /// <summary>
 /// Patcher for the game's main DLL

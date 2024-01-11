@@ -4,9 +4,9 @@ using BepInEx;
 using BepInEx.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using SpaceWarpPatcher.API;
+using SpaceWarp.Patcher.API;
 
-namespace SpaceWarpPatcher.Backend;
+namespace SpaceWarp.Patcher.Backend;
 
 internal static class RoslynCompiler
 {
