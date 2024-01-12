@@ -113,6 +113,7 @@ public static class Entrypoint
             LogSource.LogInfo($"Found patcher: {patcherType.Name}");
             var loadedAsm = Assembly.LoadFile(dllPath);
             var patcher = (BasePatcher)Activator.CreateInstance(loadedAsm.GetType(patcherType.FullName));
+            patcher.Logger = Logger.CreateLogSource(patcherType.Name);
             Patchers.Add(patcher);
         }
     }

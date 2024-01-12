@@ -14,7 +14,7 @@ public abstract class BasePatcher : IPatcher
     /// <summary>
     /// Logger for the patcher.
     /// </summary>
-    protected internal ManualLogSource Logger => Entrypoint.LogSource;
+    protected internal ManualLogSource Logger;
 
     /// <inheritdoc/>
     public abstract IEnumerable<string> DLLsToPatch { get; }
