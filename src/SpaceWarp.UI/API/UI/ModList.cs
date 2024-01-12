@@ -1,10 +1,11 @@
-﻿using System;
-using JetBrains.Annotations;
-using SpaceWarp.UI.ModList;
+﻿using JetBrains.Annotations;
 using UnityEngine.UIElements;
 
 namespace SpaceWarp.API.UI;
 
+/// <summary>
+/// API for the mod list UI
+/// </summary>
 [PublicAPI]
 public static class ModList
 {

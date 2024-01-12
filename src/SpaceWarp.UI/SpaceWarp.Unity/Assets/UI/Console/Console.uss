@@ -1,0 +1,175 @@
+@import url('../SpaceWarpUI.uss');
+
+.unity-toggle > .unity-label {
+    background-color: rgb(26, 29, 36);
+    border-width: 1px;
+}
+
+.log-level-toggle {
+    padding: 0;
+    margin: 0 1px 0 0;
+}
+
+.log-level-toggle Label {
+    width: 100%;
+    height: 100%;
+    -unity-text-align: middle-center;
+    position: absolute;
+}
+
+Toggle.log-level-toggle {
+    visibility: hidden;
+}
+
+Toggle.log-level-toggle > Label {
+    visibility: visible;
+}
+
+Toggle.log-level-toggle:checked > Label {
+    color: rgb(34, 38, 46);
+}
+
+.debug Label {
+    border-color: rgb(57, 59, 142);
+}
+
+Toggle.debug:hover > .unity-label {
+    background-color: rgba(57, 59, 142, 0.25);
+}
+
+Toggle.debug:checked > .unity-label {
+    background-color: rgb(57, 59, 142);
+}
+
+.message Label {
+    border-color: rgb(99, 99, 186);
+}
+
+Toggle.message:hover > .unity-label {
+    background-color: rgba(99, 99, 186, 0.25);
+}
+
+Toggle.message:checked > .unity-label {
+    background-color: rgb(99, 99, 186);
+}
+
+.info Label {
+    border-color: rgb(1, 161, 255);
+}
+
+Toggle.info:hover > .unity-label {
+    background-color: rgba(1, 161, 255, 0.25);
+}
+
+Toggle.info:checked > .unity-label {
+    background-color: rgb(1, 161, 255);
+}
+
+.warning Label {
+    border-color: rgb(255, 228, 103);
+}
+
+Toggle.warning:hover > .unity-label {
+    background-color: rgba(255, 228, 103, 0.25);
+}
+
+Toggle.warning:checked > .unity-label {
+    background-color: rgb(255, 228, 103);
+}
+
+.error Label {
+    border-color: rgb(255, 66, 72);
+}
+
+Toggle.error:hover > .unity-label {
+    background-color: rgba(255, 66, 72, 0.25);
+}
+
+Toggle.error:checked > .unity-label {
+    background-color: rgb(255, 66, 72);
+}
+
+.auto-scroll Label {
+    border-color: rgb(170, 185, 242);
+}
+
+Toggle.auto-scroll:hover > .unity-label {
+    background-color: rgba(170, 185, 242, 0.25);
+}
+
+Toggle.auto-scroll:checked > .unity-label {
+    background-color: rgb(170, 185, 242);
+}
+
+.left-section {
+    border-radius: 4px 0 0 4px;
+}
+
+.right-section {
+    border-radius: 0 4px 4px 0;
+}
+
+.search-bar TextField {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.search-bar TextField .unity-text-field__input {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#exit-button:hover {
+    background-color: rgba(102, 126, 196, 0.25);
+}
+
+#exit-button:active {
+    background-color: rgb(102, 126, 196);
+}
+
+.spacewarp-logEntry {
+}
+
+.spacewarp-logEntry-element {
+    font-size: 10px;
+}
+
+.spacewarp-logEntry__headerContent {
+    flex-direction: row;
+    align-items: flex-start;
+    flex-grow: 1;
+}
+
+.spacewarp-logEntry__messageContent {
+    flex-direction: row;
+    align-items: flex-start;
+    flex-grow: 1;
+    flex-shrink: 0;
+}
+
+.spacewarp-logEntry-element {
+}
+
+.spacewarp-logEntry__messageLabel {
+    white-space: normal;
+}
+
+.spacewarp-logEntry:hover {
+    background-color: rgb(34, 38, 46);
+}
+
+.spacewarp-logEntry__timeDate {
+    flex-shrink: 0;
+}
+
+.spacewarp-logEntry__logLevel {
+    flex-shrink: 0;
+}
+
+.spacewarp-logEntry__logSource {
+    flex-shrink: 0;
+}
+
+.spacewarp-logEntry__logMessage {
+    white-space: normal;
+    flex-grow: 0;
+    flex-shrink: 1;
+}

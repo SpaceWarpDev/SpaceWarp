@@ -1,7 +1,5 @@
 ﻿global using UnityObject = UnityEngine.Object;
 global using System.Linq;
-using System;
-using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
@@ -21,28 +19,47 @@ using SpaceWarp.Patching.LoadingActions;
 
 namespace SpaceWarp;
 
-[BepInDependency("com.bepis.bepinex.configurationmanager", "17.1")]
+/// <summary>
+/// The main SpaceWarp plugin class.
+/// </summary>
 [BepInDependency(UitkForKsp2Plugin.ModGuid, UitkForKsp2Plugin.ModVer)]
 [BepInIncompatibility("com.shadow.quantum")]
 [BepInPlugin(ModGuid, ModName, ModVer)]
 public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
 {
+    /// <summary>
+    /// SpaceWarp plugin instance.
+    /// </summary>
     public static SpaceWarpPlugin Instance;
 
-    [PublicAPI] public const string ModGuid = "com.github.x606.spacewarp";
-    [PublicAPI] public const string ModName = "Space Warp";
-    [PublicAPI] public const string ModVer = MyPluginInfo.PLUGIN_VERSION; // TODO: Don't hard code this, but I don't know much msbuild stuff so @munix wil have to do that,
-                                                                          //       and @munix is really lazy to do it right now but he definitely will at some point :P
-                                                      
+    /// <summary>
+    /// The GUID of the SpaceWarp plugin.
+    /// </summary>
+    [PublicAPI] public const string ModGuid = MyPluginInfo.PLUGIN_GUID;
+
+    /// <summary>
+    /// The name of the SpaceWarp plugin.
+    /// </summary>
+    [PublicAPI] public const string ModName = MyPluginInfo.PLUGIN_NAME;
+
+    /// <summary>
+    /// The version of the SpaceWarp plugin.
+    /// </summary>
+    [PublicAPI] public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
+
     internal ScriptEnvironment GlobalLuaState;
 
     internal new static ManualLogSource Logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SpaceWarpPlugin"/> class.
+    /// </summary>
     public SpaceWarpPlugin()
     {
         // Load the type forwarders
         Assembly.LoadFile(
-            $"{new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName}\\SpaceWarp.dll");
+            $"{new FileInfo(Assembly.GetExecutingAssembly().Location).Directory!.FullName}\\SpaceWarp.dll"
+        );
         Logger = base.Logger;
         Instance = this;
     }
@@ -55,9 +72,10 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
 
         asset.mSource.owner = asset;
-        LocalizationManager.AddSource(asset.mSource);
+        LocalizationHelpers.AddSource(asset.mSource);
     }
-    public void Awake()
+
+    private void Awake()
     {
         BepInEx.Bootstrap.Chainloader.ManagerObject.Persist();
         // IOProvider.Init();
@@ -65,9 +83,22 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         Harmony.CreateAndPatchAll(typeof(SpaceWarpPlugin).Assembly, ModGuid);
         ModuleManager.LoadAllModules();
 
-        Loading.AddAssetLoadingAction("bundles", "loading asset bundles", FunctionalLoadingActions.AssetBundleLoadingAction, "bundle");
-        Loading.AddAssetLoadingAction("images", "loading images", FunctionalLoadingActions.ImageLoadingAction);
-        Loading.AddAddressablesLoadingAction<LanguageSourceAsset>("localization","language_source",OnLanguageSourceAssetLoaded);
+        Loading.AddAssetLoadingAction(
+            "bundles",
+            "loading asset bundles",
+            FunctionalLoadingActions.AssetBundleLoadingAction,
+            "bundle"
+        );
+        Loading.AddAssetLoadingAction(
+            "images",
+            "loading images",
+            FunctionalLoadingActions.ImageLoadingAction
+        );
+        Loading.AddAddressablesLoadingAction<LanguageSourceAsset>(
+            "localization",
+            "language_source",
+            OnLanguageSourceAssetLoaded
+        );
     }
 
     private void SetupLuaState()
@@ -96,18 +127,27 @@ public sealed class SpaceWarpPlugin : BaseSpaceWarpPlugin
         }
     }
 
+    private void UpdateLanguagesDropdown()
+    {
+        Game.SettingsMenuManager._generalSettings.InitializeLanguageDropdown();
+    }
+
+    /// <inheritdoc/>
     public override void OnPreInitialized()
     {
         // Persist all game objects so I don't need to stomp on config
         ModuleManager.PreInitializeAllModules();
     }
 
+    /// <inheritdoc/>
     public override void OnInitialized()
     {
         ModuleManager.InitializeAllModules();
         SetupLuaState();
+        UpdateLanguagesDropdown();
     }
 
+    /// <inheritdoc/>
     public override void OnPostInitialized()
     {
         ModuleManager.PostInitializeAllModules();

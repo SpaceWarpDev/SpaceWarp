@@ -1,0 +1,23 @@
+.mod-item {
+    padding: 2px 0;
+    flex-direction: row;
+    -unity-text-align: middle-left;
+    justify-content: space-between;
+}
+
+.mod-item.selected {
+    background-color: rgb(83, 69, 170);
+}
+
+.mod-item:hover {
+    background-color: rgb(68, 87, 136);
+}
+
+.mod-item-label {
+    padding: 6px 6px 6px 8px;
+}
+
+.mod-toggle {
+    -unity-text-align: middle-left;
+    padding: 4px;
+}

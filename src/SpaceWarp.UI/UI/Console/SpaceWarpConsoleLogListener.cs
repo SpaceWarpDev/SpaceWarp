@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BepInEx.Logging;
+﻿using BepInEx.Logging;
 
 namespace SpaceWarp.UI.Console;
 

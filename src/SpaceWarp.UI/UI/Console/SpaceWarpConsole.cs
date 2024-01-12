@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using BepInEx.Logging;
 using KSP.Game;
 using UitkForKsp2.API;
@@ -6,10 +7,10 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using static SpaceWarp.UI.Console.SpaceWarpConsoleLogListener;
 
-namespace SpaceWarp.UI.Console;	
+namespace SpaceWarp.UI.Console;
 
-internal sealed class SpaceWarpConsole : KerbalMonoBehaviour	
-{	
+internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
+{
     // State
     private bool _isLoaded;
     private bool _isWindowVisible;
@@ -28,26 +29,22 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
     private Toggle _toggleError;
     private Toggle _toggleAutoScroll;
 
-
-    // Debugging
-    private static ManualLogSource _logger;
-
     private void Start()
     {
         foreach (var logMessage in LogMessages)
         {
             CreateNewLogEntry(logMessage);
         }
+
         // Binds the OnNewMessageReceived function to the OnNewMessage event
-        OnNewLog += CreateNewLogEntry;
+        OnNewLog += AddToQueue;
     }
 
 
     private void OnDestroy()
     {
         // Unbinds the OnNewMessageReceived function to the OnNewMessage event when destroyed
-        OnNewLog -= CreateNewLogEntry;
-    
+        OnNewLog -= AddToQueue;
     }
 
     private void CreateNewLogEntry(LogInfo logInfo)
@@ -63,18 +60,23 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
 
         //First in first out
         if (_consoleContent.contentContainer.childCount > Modules.UI.Instance.ConfigDebugMessageLimit.Value)
-            _consoleContent.contentContainer.RemoveAt(0); 
-        if(_toggleAutoScroll.value)
+        {
+            _consoleContent.contentContainer.RemoveAt(0);
+        }
+
+        if (_toggleAutoScroll.value)
+        {
             AutoScrollToBottom();
+        }
     }
 
 
     private void Awake()
     {
-        if (_isLoaded) return;
-        
-        // Debugging
-        _logger = SpaceWarpPlugin.Logger;
+        if (_isLoaded)
+        {
+            return;
+        }
 
         // Run the main UITK setup functions
         SetupDocument();
@@ -89,7 +91,7 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))   
+        if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))
         {
             ToggleWindow();
         }
@@ -97,6 +99,16 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
         if (_isWindowVisible && Input.GetKey(KeyCode.Escape))
         {
             HideWindow();
+        }
+
+        if (!_isWindowVisible)
+        {
+            return;
+        }
+
+        while (_queue.TryDequeue(out var info))
+        {
+            CreateNewLogEntry(info);
         }
     }
 
@@ -111,9 +123,9 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
         {
             document.EnableLocalization();
         }
-        
+
         _container = document.rootVisualElement;
-        
+
         StartCoroutine(SetupWindow());
     }
 
@@ -141,8 +153,9 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
 
         // Binding all of the buttons to their respective functions
         _container.Q<Button>("exit-button").RegisterCallback<ClickEvent>(_ => HideWindow());
-        _container.Q<Button>("clear-button").RegisterCallback<ClickEvent>(_ => _consoleContent.contentContainer.Clear());
-        
+        _container.Q<Button>("clear-button")
+            .RegisterCallback<ClickEvent>(_ => _consoleContent.contentContainer.Clear());
+
         _toggleError = _container.Q<Toggle>("toggle-error");
         _toggleWarning = _container.Q<Toggle>("toggle-warning");
         _toggleDebug = _container.Q<Toggle>("toggle-debug");
@@ -150,14 +163,14 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
         _toggleInfo = _container.Q<Toggle>("toggle-info");
         _toggleAutoScroll = _container.Q<Toggle>("toggle-autoscroll");
     }
-    
-    private void FilterHandler (ChangeEvent<bool> evt) => FilterMessages();
-    private void SearchHandler (ChangeEvent<string> evt) => FilterMessages();
+
+    private void FilterHandler(ChangeEvent<bool> evt) => FilterMessages();
+    private void SearchHandler(ChangeEvent<string> evt) => FilterMessages();
 
     private void BindFunctions()
     {
         _consoleSearch.RegisterValueChangedCallback(SearchHandler);
-        
+
         _toggleError.RegisterValueChangedCallback(FilterHandler);
         _toggleWarning.RegisterValueChangedCallback(FilterHandler);
         _toggleDebug.RegisterValueChangedCallback(FilterHandler);
@@ -171,7 +184,7 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
     {
         //WHAT IS THIS?
         _consoleSearch.RegisterValueChangedCallback(SearchHandler);
-        
+
         _toggleError.UnregisterValueChangedCallback(FilterHandler);
         _toggleWarning.UnregisterValueChangedCallback(FilterHandler);
         _toggleDebug.UnregisterValueChangedCallback(FilterHandler);
@@ -226,7 +239,11 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
             if (string.IsNullOrEmpty(SearchFilter)) return;
             var lowercaseSearch = SearchFilter.ToLower();
             if (logEntry.LogSource.SourceName.ToLower().Contains(lowercaseSearch) ||
-                logEntry.LogMessage.ToLower().Contains(lowercaseSearch)) return;
+                logEntry.LogMessage.ToLower().Contains(lowercaseSearch))
+            {
+                return;
+            }
+
             logEntry.style.display = DisplayStyle.None;
         }
         else
@@ -266,18 +283,18 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
     {
         StartCoroutine(AutoScrollToBottomCoroutine());
     }
-    
+
     private IEnumerator AutoScrollToBottomCoroutine()
     {
         yield return null;
         _consoleContent.ScrollTo(_consoleContent.contentContainer[_consoleContent.contentContainer.childCount - 1]);
         //put a while loop here to make this automatic!
     }
-    
+
     private void ToggleWindow()
     {
         _isWindowVisible = !_isWindowVisible;
-    
+
         if (_isWindowVisible)
         {
             _container.style.display = DisplayStyle.Flex;
@@ -298,4 +315,14 @@ internal sealed class SpaceWarpConsole : KerbalMonoBehaviour
         UnbindFunctions();
     }
 
+    private readonly ConcurrentQueue<LogInfo> _queue = new();
+
+    private void AddToQueue(LogInfo info)
+    {
+        _queue.Enqueue(info);
+        while (_queue.Count > Modules.UI.Instance.ConfigDebugMessageLimit.Value && _queue.TryDequeue(out _))
+        {
+            // Do nothing
+        }
+    }
 }

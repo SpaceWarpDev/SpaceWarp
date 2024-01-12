@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using KSP.Game.Flow;
+﻿using KSP.Game.Flow;
 using SpaceWarp.API.Mods;
 using SpaceWarp.InternalUtilities;
 
@@ -27,9 +25,14 @@ internal sealed class LoadLocalizationAction : FlowAction
         catch (Exception e)
         {
             if (_plugin.Plugin != null)
+            {
                 _plugin.Plugin.SWLogger.LogError(e.ToString());
+            }
             else
-                SpaceWarpPlugin.Logger.LogError(_plugin.SWInfo.Name + ": " + e);
+            {
+                SpaceWarpPlugin.Instance.SWLogger.LogError(_plugin.SWInfo.Name + ": " + e);
+            }
+
             reject(null);
         }
     }

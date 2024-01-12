@@ -21,6 +21,9 @@
         <PackageReference Include="UnityEngine.Modules" Version="2022.3.5" Publicize="true"/>
     </ItemGroup>
     <ItemGroup Label="Project references">
-        <ProjectReference Include="$(SolutionDir)/src/SpaceWarpPatcher/SpaceWarpPatcher.csproj" Private="false" PrivateAssets="all"/>
+        <ProjectReference Include="..\SpaceWarp.Preload\SpaceWarp.Preload.csproj">
+          <Private>false</Private>
+          <PrivateAssets>all</PrivateAssets>
+        </ProjectReference>
     </ItemGroup>
 </Project>

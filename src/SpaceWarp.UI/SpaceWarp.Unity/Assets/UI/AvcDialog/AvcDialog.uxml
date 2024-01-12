@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="AvcDialog.uss" />
+    <ui:VisualElement name="avc-dialog" class="root">
+        <ui:VisualElement name="title-bar">
+            <ui:Label text="#SpaceWarp/AvcDialog/Title" />
+        </ui:VisualElement>
+        <ui:VisualElement name="avc-text-container">
+            <ui:Label text="#SpaceWarp/AvcDialog/MainText" name="avc-text-main" />
+            <ui:Label text="#SpaceWarp/AvcDialog/MinorText" name="avc-text-minor" />
+        </ui:VisualElement>
+        <ui:VisualElement name="avc-buttons-container">
+            <ui:Button text="#SpaceWarp/Yes" display-tooltip-when-elided="true" name="yes-button" />
+            <ui:Button text="#SpaceWarp/No" display-tooltip-when-elided="true" name="no-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

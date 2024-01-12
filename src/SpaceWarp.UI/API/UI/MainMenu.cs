@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
 namespace SpaceWarp.API.UI;
 
+/// <summary>
+/// Used to register buttons in the game's main menu.
+/// </summary>
 [PublicAPI]
 public static class MainMenu
 {

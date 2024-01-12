@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Reflection;
 using BepInEx.Configuration;
 using I2.Loc;
@@ -16,17 +13,39 @@ using UnityObject = UnityEngine.Object;
 
 namespace SpaceWarp.API.UI.Settings;
 
+/// <summary>
+/// This class is used to register custom property drawers for the settings UI.
+/// </summary>
 [PublicAPI]
 public static class ModsPropertyDrawers
 {
     private static readonly Dictionary<Type, Func<ConfigEntryBase, GameObject>> AllPropertyDrawers = new();
     private static readonly Dictionary<Type, Func<string, IConfigEntry, GameObject>> AllAbstractedPropertyDrawers = new();
 
+    /// <summary>
+    /// Registers a custom property drawer for a specific type.
+    /// </summary>
+    /// <param name="drawerGenerator">
+    /// A function that takes a <see cref="ConfigEntryBase"/> and returns a <see cref="GameObject"/> that will be used
+    /// as the property drawer.
+    /// </param>
+    /// <typeparam name="T">The type to register the drawer for.</typeparam>
     public static void AddDrawer<T>(Func<ConfigEntryBase, GameObject> drawerGenerator) =>
         AllPropertyDrawers.Add(typeof(T), drawerGenerator);
 
+    /// <summary>
+    /// Registers a custom abstract property drawer for a specific type.
+    /// </summary>
+    /// <param name="drawerGenerator"></param>
+    /// <typeparam name="T"></typeparam>
     public static void AddAbstractedDrawer<T>(Func<string, IConfigEntry, GameObject> drawerGenerator) =>
         AllAbstractedPropertyDrawers.Add(typeof(T), drawerGenerator);
+
+    /// <summary>
+    /// Gets a property drawer for a config entry.
+    /// </summary>
+    /// <param name="entry">The config entry to get a drawer for.</param>
+    /// <returns>A <see cref="GameObject"/> that will be used as the property drawer.</returns>
     public static GameObject Drawer(ConfigEntryBase entry)
     {
         if (entry.SettingType.IsEnum && !AllPropertyDrawers.ContainsKey(entry.SettingType))
@@ -45,6 +64,12 @@ public static class ModsPropertyDrawers
         return AllPropertyDrawers.TryGetValue(entry.SettingType, out var func) ? func(entry) : null;
     }
 
+    /// <summary>
+    /// Gets a property drawer for a config entry with a name.
+    /// </summary>
+    /// <param name="name">The name of the config entry.</param>
+    /// <param name="entry">The config entry to get a drawer for.</param>
+    /// <returns></returns>
     public static GameObject Drawer(string name, IConfigEntry entry)
     {
         if (entry.ValueType.IsEnum && !AllAbstractedPropertyDrawers.ContainsKey(entry.ValueType))
@@ -78,7 +103,7 @@ public static class ModsPropertyDrawers
             {
                 var memberInfos = t.GetMember(optionNames[i]);
                 var enumValueInfo = memberInfos.FirstOrDefault(m => m.DeclaringType == t);
-                var valueAttributes = enumValueInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
+                var valueAttributes = enumValueInfo!.GetCustomAttributes(typeof(DescriptionAttribute), false);
                 optionNames[i] = ((DescriptionAttribute)valueAttributes[0]).Description;
             }
             catch
@@ -190,7 +215,7 @@ public static class ModsPropertyDrawers
             {
                 var memberInfos = t.GetMember(optionNames[i]);
                 var enumValueInfo = memberInfos.FirstOrDefault(m => m.DeclaringType == t);
-                var valueAttributes = enumValueInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
+                var valueAttributes = enumValueInfo!.GetCustomAttributes(typeof(DescriptionAttribute), false);
                 optionNames[i] = ((DescriptionAttribute)valueAttributes[0]).Description;
             }
             catch
@@ -358,7 +383,7 @@ public static class ModsPropertyDrawers
                 t.GenericTypeArguments[0] == entrySettingType)
             {
                 if (valueListMethod != null)
-                    return (GameObject)valueListMethod.Invoke(null, new object[] { name, entry, entry.Constraint });
+                    return (GameObject)valueListMethod.Invoke(null, [name, entry, entry.Constraint]);
             }
 
             if (t?.GetGenericTypeDefinition() == typeof(RangeConstraint<>) &&
@@ -366,7 +391,7 @@ public static class ModsPropertyDrawers
             {
                 if (valueRangeMethod != null)
                 {
-                    return (GameObject)valueRangeMethod.Invoke(null, new object[] { name, entry, entry.Constraint });
+                    return (GameObject)valueRangeMethod.Invoke(null, [name, entry, entry.Constraint]);
                 }
             }
             var inputFieldCopy = UnityObject.Instantiate(InputFieldPrefab);
@@ -584,7 +609,7 @@ public static class ModsPropertyDrawers
             TypeCode.Decimal => x => (T)(object)Convert.ToDecimal(x),
             TypeCode.Double => x => (T)(object)Convert.ToDouble(x),
             TypeCode.Single => x => (T)(object)x,
-            _ => x => throw new NotImplementedException(typeof(T).ToString())
+            _ => _ => throw new NotImplementedException(typeof(T).ToString())
         };
         slider.minValue = toFloat(acceptableValues.MinValue);
         slider.maxValue = toFloat(acceptableValues.MaxValue);
@@ -626,7 +651,7 @@ public static class ModsPropertyDrawers
                 ? (color.a < 1 ? ColorUtility.ToHtmlStringRGBA(color) : ColorUtility.ToHtmlStringRGB(color))
                 : option.ToString())));
         }
-        
+
         extended.value = constraint.AcceptableValues.IndexOf(value.Value);
         extended.onValueChanged.AddListener(idx => { value.Value = constraint.AcceptableValues[idx]; });
         var sec = ddCopy.AddComponent<CustomSettingsElementDescriptionController>();
@@ -671,7 +696,7 @@ public static class ModsPropertyDrawers
             TypeCode.Decimal => x => (T)(object)Convert.ToDecimal(x),
             TypeCode.Double => x => (T)(object)Convert.ToDouble(x),
             TypeCode.Single => x => (T)(object)x,
-            _ => x => throw new NotImplementedException(typeof(T).ToString())
+            _ => _ => throw new NotImplementedException(typeof(T).ToString())
         };
         slider.minValue = toFloat(constraint.Minimum);
         slider.maxValue = toFloat(constraint.Maximum);
@@ -681,9 +706,8 @@ public static class ModsPropertyDrawers
             // var trueValue = (acceptableValues.MaxValue-acceptableValues.MinValue) * (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFrom(value)
             // var trueValue = (toFloat(acceptableValues.MaxValue) - toFloat(acceptableValues.MinValue)) * value +
             //                 toFloat(acceptableValues.MinValue);
-            var trueValue = val;
 
-            value.Value = toT(trueValue) ?? value.Value;
+            value.Value = toT(val) ?? value.Value;
             if (entry.Value != null) text.text = entry.Value.ToString();
             slider.SetWithoutCallback(toFloat(value.Value));
         });
@@ -715,7 +739,7 @@ public static class ModsPropertyDrawers
         textField.readOnly = false;
         textField.interactable = true;
         textField.text = entry.Value;
-        textField.onValueChanged.AddListener(str => { entry.Value = str; });
+        textField.onValueChanged.AddListener(text => { entry.Value = text; });
         var rectTransform = textFieldObject.transform.parent.gameObject.GetComponent<RectTransform>();
         rectTransform.anchorMin = new Vector2(0, 2.7f);
         rectTransform.anchorMax = new Vector2(0.19f, 2.25f);
@@ -729,6 +753,10 @@ public static class ModsPropertyDrawers
 
     private static GameObject CreateStringConfigAbstracted(string name, IConfigEntry entry)
     {
+        if (entry.Constraint is ListConstraint<string> constraint)
+        {
+            return CreateFromListConstraint(name, entry, constraint);
+        }
         var inputFieldCopy = UnityObject.Instantiate(InputFieldPrefab);
         var lab = inputFieldCopy.GetChild("Label");
         lab.GetComponent<Localize>().SetTerm(name);

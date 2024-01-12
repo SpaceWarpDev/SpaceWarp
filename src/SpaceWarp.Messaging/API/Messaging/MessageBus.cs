@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using UnityEngine;
+﻿using JetBrains.Annotations;
 
 namespace SpaceWarp.API.Messaging;
 
+/// <summary>
+/// MessageBus that can be used to publish messages with no arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus : MessageBusBase
 {
@@ -12,21 +12,42 @@ public class MessageBus : MessageBusBase
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action handler)
     {
         if (handler == null)
+        {
             throw new ArgumentNullException();
+        }
 
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
+        {
             if (_handlers[i] == handler)
+            {
                 _handlers.RemoveAt(i);
+            }
+        }
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish()
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -43,6 +64,9 @@ public class MessageBus : MessageBusBase
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 1 argument to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1> : MessageBusBase
 {
@@ -50,21 +74,39 @@ public class MessageBus<T1> : MessageBusBase
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1> handler)
     {
         if (handler == null)
+        {
             throw new ArgumentNullException();
+        }
 
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
+        {
             if (_handlers[i] == handler)
+            {
                 _handlers.RemoveAt(i);
+            }
+        }
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -81,6 +123,9 @@ public class MessageBus<T1> : MessageBusBase
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 2 argument to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2> : MessageBusBase
 {
@@ -88,6 +133,11 @@ public class MessageBus<T1, T2> : MessageBusBase
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2> handler)
     {
         if (handler == null)
@@ -96,6 +146,10 @@ public class MessageBus<T1, T2> : MessageBusBase
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2> handler)
     {
         for (int i = _handlers.Count; i-- > 0;)
@@ -103,6 +157,9 @@ public class MessageBus<T1, T2> : MessageBusBase
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -119,6 +176,9 @@ public class MessageBus<T1, T2> : MessageBusBase
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 3 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3> : MessageBusBase
 {
@@ -126,6 +186,11 @@ public class MessageBus<T1, T2, T3> : MessageBusBase
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3> handler)
     {
         if (handler == null)
@@ -134,6 +199,10 @@ public class MessageBus<T1, T2, T3> : MessageBusBase
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -141,6 +210,9 @@ public class MessageBus<T1, T2, T3> : MessageBusBase
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -157,6 +229,9 @@ public class MessageBus<T1, T2, T3> : MessageBusBase
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 4 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4> : MessageBusBase
 {
@@ -164,6 +239,11 @@ public class MessageBus<T1, T2, T3, T4> : MessageBusBase
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4> handler)
     {
         if (handler == null)
@@ -172,6 +252,10 @@ public class MessageBus<T1, T2, T3, T4> : MessageBusBase
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -179,6 +263,9 @@ public class MessageBus<T1, T2, T3, T4> : MessageBusBase
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -195,6 +282,9 @@ public class MessageBus<T1, T2, T3, T4> : MessageBusBase
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 5 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5> : MessageBusBase
 {
@@ -202,6 +292,11 @@ public class MessageBus<T1, T2, T3, T4, T5> : MessageBusBase
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5> handler)
     {
         if (handler == null)
@@ -210,6 +305,10 @@ public class MessageBus<T1, T2, T3, T4, T5> : MessageBusBase
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -217,6 +316,9 @@ public class MessageBus<T1, T2, T3, T4, T5> : MessageBusBase
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -233,6 +335,9 @@ public class MessageBus<T1, T2, T3, T4, T5> : MessageBusBase
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 6 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5, T6> : MessageBusBase
 {
@@ -240,6 +345,11 @@ public class MessageBus<T1, T2, T3, T4, T5, T6> : MessageBusBase
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5, T6> handler)
     {
         if (handler == null)
@@ -248,6 +358,10 @@ public class MessageBus<T1, T2, T3, T4, T5, T6> : MessageBusBase
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5, T6> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -255,6 +369,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6> : MessageBusBase
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4, T6 arg5)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -271,6 +388,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6> : MessageBusBase
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 7 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5, T6, T7> : MessageBusBase
 {
@@ -278,6 +398,11 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7> : MessageBusBase
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5, T6, T7> handler)
     {
         if (handler == null)
@@ -286,6 +411,10 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7> : MessageBusBase
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5, T6, T7> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -293,6 +422,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7> : MessageBusBase
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4, T6 arg5, T7 arg6)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -309,6 +441,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7> : MessageBusBase
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 8 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8> : MessageBusBase
 {
@@ -316,6 +451,11 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8> : MessageBusBase
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8> handler)
     {
         if (handler == null)
@@ -324,6 +464,10 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8> : MessageBusBase
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -331,6 +475,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8> : MessageBusBase
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4, T6 arg5, T7 arg6, T8 arg7)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -347,6 +494,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8> : MessageBusBase
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 9 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9> : MessageBusBase
 {
@@ -354,6 +504,11 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9> : MessageBusBase
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> handler)
     {
         if (handler == null)
@@ -362,6 +517,10 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9> : MessageBusBase
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -369,6 +528,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9> : MessageBusBase
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4, T6 arg5, T7 arg6, T8 arg7, T9 arg8)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -385,6 +547,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9> : MessageBusBase
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 10 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : MessageBusBase
 {
@@ -392,6 +557,11 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : MessageBusBas
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> handler)
     {
         if (handler == null)
@@ -400,6 +570,10 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : MessageBusBas
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -407,6 +581,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : MessageBusBas
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4, T6 arg5, T7 arg6, T8 arg7, T9 arg8, T10 arg9)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -423,6 +600,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : MessageBusBas
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 11 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : MessageBusBase
 {
@@ -430,6 +610,11 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : MessageB
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> handler)
     {
         if (handler == null)
@@ -438,6 +623,10 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : MessageB
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -445,6 +634,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : MessageB
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4, T6 arg5, T7 arg6, T8 arg7, T9 arg8, T10 arg9,
         T11 arg10)
     {
@@ -462,6 +654,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : MessageB
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 12 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : MessageBusBase
 {
@@ -469,6 +664,11 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : Mes
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> handler)
     {
         if (handler == null)
@@ -477,6 +677,10 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : Mes
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -484,6 +688,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : Mes
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4, T6 arg5, T7 arg6, T8 arg7, T9 arg8, T10 arg9,
         T11 arg10, T12 arg11)
     {
@@ -501,6 +708,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : Mes
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 13 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> : MessageBusBase
 {
@@ -508,6 +718,11 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> 
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> handler)
     {
         if (handler == null)
@@ -516,6 +731,10 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> 
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -523,6 +742,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> 
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4, T6 arg5, T7 arg6, T8 arg7, T9 arg8, T10 arg9,
         T11 arg10, T12 arg11, T13 arg12)
     {
@@ -540,6 +762,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> 
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 14 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> : MessageBusBase
 {
@@ -547,6 +772,11 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, 
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> handler)
     {
         if (handler == null)
@@ -555,6 +785,10 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, 
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -562,6 +796,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, 
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4, T6 arg5, T7 arg6, T8 arg7, T9 arg8, T10 arg9,
         T11 arg10, T12 arg11, T13 arg12, T14 arg13)
     {
@@ -580,6 +817,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, 
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 15 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> : MessageBusBase
 {
@@ -587,6 +827,11 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, 
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> handler)
     {
         if (handler == null)
@@ -595,6 +840,10 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, 
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -602,6 +851,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, 
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4, T6 arg5, T7 arg6, T8 arg7, T9 arg8, T10 arg9,
         T11 arg10, T12 arg11, T13 arg12, T14 arg13, T15 arg14)
     {
@@ -620,6 +872,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, 
     }
 }
 
+/// <summary>
+/// MessageBus that can be used to publish messages with 16 arguments to subscribers.
+/// </summary>
 [PublicAPI]
 public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> : MessageBusBase
 {
@@ -629,6 +884,11 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, 
     internal override IReadOnlyList<Delegate> Handlers => _handlers;
     internal override void RemoveHandlerAt(int index) => _handlers.RemoveAt(index);
 
+    /// <summary>
+    /// Subscribes a handler to the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to subscribe.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the handler is null.</exception>
     public void Subscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> handler)
     {
         if (handler == null)
@@ -637,6 +897,10 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, 
         _handlers.Add(handler);
     }
 
+    /// <summary>
+    /// Unsubscribes a handler from the MessageBus.
+    /// </summary>
+    /// <param name="handler">The handler to unsubscribe.</param>
     public void Unsubscribe(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> handler)
     {
         for (var i = _handlers.Count; i-- > 0;)
@@ -644,6 +908,9 @@ public class MessageBus<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, 
                 _handlers.RemoveAt(i);
     }
 
+    /// <summary>
+    /// Publishes a message to all subscribers.
+    /// </summary>
     public void Publish(T1 arg0, T2 arg1, T3 arg2, T4 arg3, T5 arg4, T6 arg5, T7 arg6, T8 arg7, T9 arg8, T10 arg9,
         T11 arg10, T12 arg11, T13 arg12, T14 arg13, T15 arg14, T16 arg15)
     {

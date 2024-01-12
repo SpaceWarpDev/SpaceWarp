@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using SpaceWarp.API.Logging;
 using SpaceWarp.API.Lua;
 using UnityEngine;
 using Logger = BepInEx.Logging.Logger;
 
 namespace SpaceWarp.API.Assets;
 
+/// <summary>
+/// Manages all mod assets loaded by SpaceWarp
+/// </summary>
 [SpaceWarpLuaAPI("Assets")]
 [PublicAPI]
 public static class AssetManager
@@ -17,7 +18,7 @@ public static class AssetManager
     internal static async Task RegisterAssetBundle(string modId, string assetBundleName, AssetBundle assetBundle)
     {
         assetBundleName = assetBundleName.Replace(".bundle", "");
-        var logger = Logger.CreateLogSource($"{modId}/{assetBundleName}");
+        var logger = BaseLogger.CreateDefault($"{modId}/{assetBundleName}");
 
         var names = assetBundle.GetAllAssetNames();
 

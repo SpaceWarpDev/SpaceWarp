@@ -1,5 +1,4 @@
-﻿using System;
-using KSP.Game.Flow;
+﻿using KSP.Game.Flow;
 using SpaceWarp.API.Mods;
 
 namespace SpaceWarp.Patching.LoadingActions;
@@ -19,7 +18,10 @@ internal sealed class PostInitializeModAction : FlowAction
         try
         {
             if (_plugin.DoLoadingActions)
-                _plugin.Plugin.OnPostInitialized();
+            {
+                _plugin.Plugin!.OnPostInitialized();
+            }
+
             resolve();
         }
         catch (Exception e)

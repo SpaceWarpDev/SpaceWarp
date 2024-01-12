@@ -1,0 +1,143 @@
+@import url('project://database/Assets/UI/SpaceWarpUI.uss?fileID=7433441132597879392&guid=492f9c9847101cf4bab4ad09d8d46f3f&type=3#SpaceWarpUI');
+.root {
+    min-width: 1200px;
+    min-height: 720px;
+    height: 66%;
+    width: 62.5%;
+    flex-direction: column;
+    padding: 12px;
+}
+
+#body-container {
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.unity-scroll-view {
+    background-color: rgb(28, 34, 42);
+}
+
+.unity-label.disabled {
+    color: rgb(128, 128, 128);
+}
+
+.disabled > .unity-label {
+    color: rgb(128, 128, 128);
+}
+
+.unity-label.outdated {
+    color: rgb(255, 235, 4);
+}
+
+.outdated > .unity-label {
+    color: rgb(255, 235, 4);
+}
+
+.unity-label.unsupported {
+    color: rgb(128, 0, 0);
+}
+
+.unsupported > .unity-label {
+    color: rgb(128, 0, 0);
+}
+
+.unity-label.errored {
+    color: rgb(255, 0, 0);
+}
+
+.errored > .unity-label {
+    color: rgb(255, 0, 0);
+}
+
+#modlist-scrollview {
+    flex-grow: 0;
+    flex-shrink: 5;
+    margin-right: 12px;
+}
+
+#toggle-buttons-container {
+    margin-bottom: 8px;
+}
+
+#toggle-buttons-row {
+    flex-direction: row;
+    margin-bottom: 8px;
+}
+
+#toggle-buttons-row > .right-button {
+    margin-left: 8px;
+}
+
+#toggle-buttons-row > .unity-button {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+#changes-label {
+    white-space: normal;
+    -unity-text-align: upper-left;
+}
+
+.mods-foldout {
+    margin-bottom: 8px;
+}
+
+.details-item {
+    flex-direction: row;
+    padding: 4px;
+}
+
+.details-label {
+    color: rgb(208, 213, 243);
+    margin: 4px 0 8px 0;
+    padding: 0;
+    white-space: normal;
+}
+
+.details-key-label {
+    -unity-font-style: bold;
+}
+
+.details-value-label {
+    margin-left: 4px;
+    flex-shrink: 1;
+}
+
+.details-warning {
+    margin-left: 4px;
+    flex-shrink: 1;
+    flex-direction: row;
+}
+
+#details-scrollview {
+    flex-grow: 0;
+    flex-shrink: 2;
+}
+
+#details-name {
+    font-size: 22px;
+    -unity-font-definition: var(--font-regular);
+    margin-bottom: 16px;
+    color: rgb(208, 213, 243);
+}
+
+#details-dependencies-foldout {
+    margin-top: 8px;
+}
+
+#details-conflicts-foldout {
+    color: rgb(185, 0, 0);
+    margin-top: 8px;
+}
+
+#footer {
+    flex-direction: row;
+    margin-top: 8px;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+#footer > .unity-button {
+    flex-grow: 1;
+    margin: 0 4px;
+}

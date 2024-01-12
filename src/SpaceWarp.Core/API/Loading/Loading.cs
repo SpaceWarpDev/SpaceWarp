@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using KSP.Game.Flow;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
 using SpaceWarp.InternalUtilities;
 using SpaceWarp.Patching.LoadingActions;
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 namespace SpaceWarp.API.Loading;
 
+/// <summary>
+/// API for mods to register their actions for the loading of assets.
+/// </summary>
 [PublicAPI]
 public static class Loading
 {
@@ -20,7 +22,7 @@ public static class Loading
     internal static List<Func<FlowAction>> GeneralLoadingActions = new();
 
     /// <summary>
-    /// Registers an asset loading function for space warp, will load assets from the subfolder. Should be added either on Awake() or Start().
+    /// Registers an asset loading function for SpaceWarp, will load assets from the subfolder. Should be added either on Awake() or Start().
     /// </summary>
     /// <param name="subfolder">The subfolder under "assets" that this loader matches</param>
     /// <param name="name">The name to be displayed for this loader, it gets displayed like the following "Mod Name: [name]"</param>
@@ -98,7 +100,7 @@ public static class Loading
                     }
                     catch (Exception e)
                     {
-                        plugin.ModLogger.LogError(e.ToString());
+                        plugin.SWLogger.LogError(e.ToString());
                     }
                 }
             }
@@ -127,7 +129,7 @@ public static class Loading
                         if (plugin.Plugin != null)
                             plugin.Plugin.SWLogger.LogError(e.ToString());
                         else
-                            SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
+                            SpaceWarpPlugin.Instance.SWLogger.LogError(plugin.SWInfo.Name + ": " + e);
                     }
                 }
             }
@@ -195,7 +197,7 @@ public static class Loading
                 }
                 catch (Exception e)
                 {
-                    plugin.ModLogger.LogError(e.ToString());
+                    plugin.SWLogger.LogError(e.ToString());
                 }
             }
         };
@@ -221,7 +223,7 @@ public static class Loading
                     if (plugin.Plugin != null)
                         plugin.Plugin.SWLogger.LogError(e.ToString());
                     else
-                        SpaceWarpPlugin.Logger.LogError(plugin.SWInfo.Name + ": " + e);
+                        SpaceWarpPlugin.Instance.SWLogger.LogError(plugin.SWInfo.Name + ": " + e);
                 }
             }
         };

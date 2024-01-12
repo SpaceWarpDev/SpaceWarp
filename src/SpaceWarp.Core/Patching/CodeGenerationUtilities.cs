@@ -6,7 +6,7 @@ namespace SpaceWarp.Patching;
 internal static class CodeGenerationUtilities
 {
     /// <summary>
-    ///     Creates a CodeInstruction that pushed an integer to the stack.
+    /// Creates a CodeInstruction that pushed an integer to the stack.
     /// </summary>
     /// <param name="i">The integer to push</param>
     /// <returns>An new CodeInstruction to push i</returns>

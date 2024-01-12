@@ -1,13 +1,25 @@
-﻿using System.IO;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.Mods.JSON;
 
 namespace SpaceWarp.API.Mods;
 
+/// <summary>
+/// A descriptor for a SpaceWarp plugin.
+/// </summary>
 [PublicAPI]
 public class SpaceWarpPluginDescriptor
 {
+    /// <summary>
+    /// Creates a new plugin descriptor.
+    /// </summary>
+    /// <param name="plugin">The plugin instance.</param>
+    /// <param name="guid">The plugin's GUID.</param>
+    /// <param name="name">The plugin's name.</param>
+    /// <param name="swInfo">The plugin's swinfo.</param>
+    /// <param name="folder">The plugin's folder.</param>
+    /// <param name="doLoadingActions">Whether or not to do loading actions.</param>
+    /// <param name="configFile">The plugin's config file.</param>
     public SpaceWarpPluginDescriptor(
         [CanBeNull] ISpaceWarpMod plugin,
         string guid,
@@ -27,19 +39,53 @@ public class SpaceWarpPluginDescriptor
         ConfigFile = configFile;
     }
 
+    /// <summary>
+    /// The plugin instance.
+    /// </summary>
     [CanBeNull] public ISpaceWarpMod Plugin;
+
+    /// <summary>
+    /// The plugin's GUID.
+    /// </summary>
     public readonly string Guid;
+
+    /// <summary>
+    /// The plugin's name.
+    /// </summary>
     public readonly string Name;
+
+    /// <summary>
+    /// The plugin's swinfo.
+    /// </summary>
     public readonly ModInfo SWInfo;
+
+    /// <summary>
+    /// The plugin's folder.
+    /// </summary>
     public readonly DirectoryInfo Folder;
+
+    /// <summary>
+    /// Whether or not to do loading actions.
+    /// </summary>
     public bool DoLoadingActions;
+
+    /// <summary>
+    /// The plugin's config file.
+    /// </summary>
     [CanBeNull] public IConfigFile ConfigFile;
 
-    // Set by the version checking system
+    /// <summary>
+    /// Whether or not the plugin is outdated. Set by the version checking system.
+    /// </summary>
     public bool Outdated;
 
-    public bool Unsupported = false;
+    /// <summary>
+    /// Whether or not the plugin is unsupported.
+    /// </summary>
+    public bool Unsupported;
 
-    // Used to check for mods that have not been pre-initialized
+    /// <summary>
+    /// Whether or not the plugin has been pre-initialized yet.
+    /// </summary>
     public bool LatePreInitialize;
 }

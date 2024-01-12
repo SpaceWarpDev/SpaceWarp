@@ -80,6 +80,11 @@
               SourceFiles="@(PatcherPDBs)"
               DestinationFolder="$(SolutionDir)/dist/$(ConfigurationName)/BepInEx/patchers/$(ProjectName)"/>
 
+        <!-- Publishing restarter to build directory -->
+        <Message Text="Publishing restarter to build directory"/>
+        <Exec Command="cd"/>
+        <Exec Command="dotnet publish &quot;$(SolutionDir)src\SpaceWarpRestarter\SpaceWarpRestarter.csproj&quot; -c $(ConfigurationName) -r win-x64 -o &quot;$(SolutionDir)dist\$(ConfigurationName)\BepInEx\plugins\$(ProjectName)\restarter&quot; /p:SolutionDir=&quot;$(SolutionDir)&quot;"/>
+
         <!-- Compressing build directory for release -->
         <Message Text="Compressing built plugin folder" Condition="$(ConfigurationName) == Release"/>
         <Delete Condition="$(ConfigurationName) == Release"
@@ -123,15 +128,19 @@
                    Directories="$(KSP2DIR)/BepInEx/plugins/$(ProjectName)"/>
         <RemoveDir Condition="$(ConfigurationName) == Deploy Or $(ConfigurationName) == DeployAndRun"
                    Directories="$(KSP2DIR)/BepInEx/patchers/$(ProjectName)"/>
+        <Delete Files="$(KSP2DIR)/BepInEx/core/SpaceWarp.Preloader.dll"
+                Condition="$(ConfigurationName) == Deploy Or $(ConfigurationName) == DeployAndRun"/>
+        <Delete Files="$(KSP2DIR)/BepInEx/core/SpaceWarp.Preloader.pdb"
+                Condition="$(ConfigurationName) == Deploy Or $(ConfigurationName) == DeployAndRun"/>
 
         <ItemGroup Label="Dist folder to be copied">
-            <DistFolder Include="$(SolutionDir)/dist/$(ConfigurationName)/BepInEx/**/*.*"/>
+            <DistFolder Include="$(SolutionDir)/dist/$(ConfigurationName)/**/*.*"/>
         </ItemGroup>
         <Message Text="Deploy plugin to game folder"
                  Condition="$(ConfigurationName) == Deploy Or $(ConfigurationName) == DeployAndRun"/>
         <Copy Condition="$(ConfigurationName) == Deploy Or $(ConfigurationName) == DeployAndRun"
               SourceFiles="@(DistFolder)"
-              DestinationFolder="$(KSP2DIR)/BepInEx/%(RecursiveDir)"/>
+              DestinationFolder="$(KSP2DIR)/%(RecursiveDir)"/>
 
         <!-- Run game after deploy -->
         <Message Text="Deploy plugin and run game" Condition="$(ConfigurationName) == DeployAndRun"/>
@@ -147,4 +156,3 @@
                    Condition="Exists('$(SolutionDir)/temp_nuget')"/>
     </Target>
 </Project>
-

@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace SpaceWarp.UI.AvcDialog;
 
-public class AvcDialogController : MonoBehaviour
+internal class AvcDialogController : MonoBehaviour
 {
     internal VersionChecking Module;
 

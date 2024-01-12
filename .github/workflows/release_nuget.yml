@@ -1,4 +1,7 @@
 name: Publish NuGet Package
+env:
+  MOD_ID: 3277
+  KSP2_ID: 22407
 
 on:
   release:
@@ -7,7 +10,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-
+    permissions: write-all
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -32,6 +35,7 @@ jobs:
           echo "artifact_name=spacewarp-release-$version.zip" >> $GITHUB_ENV
           echo "zip=$(ls -1 dist/SpaceWarp-*.zip | head -n 1)" >> $GITHUB_ENV
           echo "upload_url=$(wget -qO- https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq '.[0].upload_url' | tr -d \")" >> $GITHUB_ENV
+          wget -qO- https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq -r '.[0].body' > ./changelog.md
 
       - name: Check if version exists
         id: check-version
@@ -41,7 +45,6 @@ jobs:
           exists=$(echo "$response" | jq -r --arg id "SpaceWarp" --arg version "$version" '.data[] | select(.id == $id) | .versions[] | select(.version == $version) | .version')
           if [ "$exists" == "$version" ]; then
             echo "Version $version already exists in the NuGet repository"
-            exit 1
           else
             echo "Version $version does not exist in the NuGet repository"
             echo "should_publish=true" >> $GITHUB_ENV
@@ -62,4 +65,17 @@ jobs:
           asset_path: ${{ env.zip }}
           asset_name: ${{ env.artifact_name }}
           asset_content_type: application/zip  
+    
+      - name: Add Mask
+        run: echo "::add-mask::${{ secrets.SPACEDOCK_PASSWORD }}"
         
+      - name: Update spacedock
+        uses: KSP2Community/spacedock-upload@v1.0.0
+        with:
+          username: ${{ secrets.SPACEDOCK_USER }}
+          password: ${{ secrets.SPACEDOCK_PASSWORD }}
+          game_id: 22407
+          mod_id: 3277
+          version: ${{ env.version }}
+          zipball: ${{ env.zip }}
+          changelog: ./changelog.md

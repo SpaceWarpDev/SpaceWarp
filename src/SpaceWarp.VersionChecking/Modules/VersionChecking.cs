@@ -11,15 +11,33 @@ using UnityEngine.Networking;
 
 namespace SpaceWarp.Modules;
 
+/// <summary>
+/// Module that handles version checking.
+/// </summary>
 [PublicAPI]
 public class VersionChecking : SpaceWarpModule
 {
+    /// <inheritdoc />
     public override string Name => "SpaceWarp.VersionChecking";
+
+    /// <summary>
+    /// The config value for whether this is the first launch.
+    /// </summary>
     public ConfigValue<bool> ConfigFirstLaunch;
+
+    /// <summary>
+    /// The config value for whether to check versions.
+    /// </summary>
     public ConfigValue<bool> ConfigCheckVersions;
+
+    /// <summary>
+    /// The instance of the version checking module.
+    /// </summary>
     public static VersionChecking Instance;
+
     private string _kspVersion;
 
+    /// <inheritdoc />
     public override void LoadModule()
     {
         Instance = this;
@@ -29,12 +47,15 @@ public class VersionChecking : SpaceWarpModule
             "Set this to true to automatically check versions over the internet"));
     }
 
+    /// <inheritdoc />
     public override void PreInitializeModule()
     {
-        _kspVersion = typeof(VersionID).GetField("VERSION_TEXT", BindingFlags.Static | BindingFlags.Public)
+        _kspVersion = typeof(VersionID)
+            .GetField("VERSION_TEXT", BindingFlags.Static | BindingFlags.Public)
             ?.GetValue(null) as string;
     }
 
+    /// <inheritdoc />
     public override void InitializeModule()
     {
         if (ConfigCheckVersions.Value)
@@ -45,11 +66,15 @@ public class VersionChecking : SpaceWarpModule
         CheckKspVersions();
     }
 
+    /// <inheritdoc />
     public override void PostInitializeModule()
     {
         ConfigFirstLaunch.Value = false;
     }
 
+    /// <summary>
+    /// Clears the outdated flag on all plugins.
+    /// </summary>
     public void ClearVersions()
     {
         foreach (var plugin in PluginList.AllPlugins)
@@ -58,6 +83,9 @@ public class VersionChecking : SpaceWarpModule
         }
     }
 
+    /// <summary>
+    /// Checks the versions of all plugins.
+    /// </summary>
     public void CheckVersions()
     {
         var uiModule = (SpaceWarpModule)AppDomain.CurrentDomain.GetAssemblies()
@@ -104,8 +132,6 @@ public class VersionChecking : SpaceWarpModule
                 SpaceWarpPlugin.Instance.StartCoroutine(CheckVersion(info.Guid, info, versionCheckCallback));
             }
         }
-
-        return;
     }
 
     private IEnumerator CheckVersion(string guid, SpaceWarpPluginDescriptor info, Func<string, bool, bool> callback)
@@ -121,26 +147,31 @@ public class VersionChecking : SpaceWarpModule
         {
             var isOutdated = false;
             var unsupported = false;
-            SupportedVersionsInfo newKSP2Versions = null;
+            SupportedVersionsInfo newKsp2Versions = null;
             var results = www.downloadHandler.text;
             try
             {
                 if (info.SWInfo.Spec >= SpecVersion.V2_0)
                 {
                     isOutdated = CheckSemanticVersion(guid, info.SWInfo.Version, results, out unsupported,
-                        out newKSP2Versions);
+                        out newKsp2Versions);
                 }
+                // TODO: Remove this in 2.0
+#pragma warning disable CS0618 // Type or member is obsolete
                 else
                 {
+
+
                     isOutdated = info.SWInfo.VersionCheckType switch
                     {
                         VersionCheckType.SwInfo => CheckJsonVersion(guid, info.SWInfo.Version, results, out unsupported,
-                            out newKSP2Versions),
+                            out newKsp2Versions),
                         VersionCheckType.Csproj => CheckCsprojVersion(guid, info.SWInfo.Version, results,
-                            out unsupported, out newKSP2Versions),
+                            out unsupported, out newKsp2Versions),
                         _ => throw new ArgumentOutOfRangeException(nameof(info), "Invalid version_check_type")
                     };
                 }
+#pragma warning restore CS0618 // Type or member is obsolete
             }
             catch (Exception e)
             {
@@ -157,7 +188,7 @@ public class VersionChecking : SpaceWarpModule
             if (unsupported)
             {
                 ModuleLogger.LogWarning($"{guid} is unsupported");
-                info.SWInfo.SupportedKsp2Versions = newKSP2Versions;
+                info.SWInfo.SupportedKsp2Versions = newKsp2Versions;
             }
 
             while (!callback(guid, isOutdated))

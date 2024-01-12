@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Bootstrap;
 using JetBrains.Annotations;
 using SpaceWarp.API.Mods.JSON;
 using SpaceWarp.API.Versions;
-using SpaceWarpPatcher;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Switch.LowLevel;
+using SpaceWarp.Preload.API;
 
 // Disable obsolete warning for Chainloader.Plugins
 #pragma warning disable CS0618
@@ -26,7 +22,7 @@ public static class PluginList
     /// Set if the plugin list is different in any way since last run (version differences, new mods, mods removed,
     /// mods disabled, description differences, any different in any swinfo file and the disabled mod list).
     /// </summary>
-    public static bool ModListChangedSinceLastRun => ChainloaderPatch.ModListChangedSinceLastRun;
+    public static bool ModListChangedSinceLastRun => ModList.ChangedSinceLastRun;
 
     /// <summary>
     /// Contains information about all currently loaded plugins. The key is the BepInEx GUID of the plugin.
@@ -36,8 +32,8 @@ public static class PluginList
     /// <summary>
     /// Contains information about all currently disabled plugins. The key is the BepInEx GUID of the plugin.
     /// </summary>
-    public static Dictionary<string, PluginInfo> DisabledPluginInfos { get; } = ChainloaderPatch
-        .DisabledPluginGuids.Zip(ChainloaderPatch.DisabledPlugins, (guid, info) => new { guid, info })
+    public static Dictionary<string, PluginInfo> DisabledPluginInfos { get; } = ModList.DisabledPluginGuids
+        .Zip(ModList.DisabledPlugins, (guid, info) => new { guid, info })
         .ToDictionary(item => item.guid, item => item.info);
 
     /// <summary>
@@ -75,12 +71,9 @@ public static class PluginList
     /// <returns><see cref="ModInfo"/> of the plugin or null if not found</returns>
     public static ModInfo TryGetSwinfo(string guid)
     {
-        var swModInfo = AllEnabledAndActivePlugins
-            .FirstOrDefault(item => item.Guid == guid);
-
-        if (swModInfo != null)
+        if (TryGetDescriptor(guid) is { SWInfo: var swInfo })
         {
-            return swModInfo.SWInfo;
+            return swInfo;
         }
 
         var disabledModInfo = AllDisabledPlugins
@@ -99,8 +92,7 @@ public static class PluginList
     /// <returns><see cref="SpaceWarpPluginDescriptor"/> of the plugin or null if not found</returns>
     public static SpaceWarpPluginDescriptor TryGetDescriptor(string guid)
     {
-        return AllEnabledAndActivePlugins
-            .FirstOrDefault(item => item.Guid == guid);
+        return AllEnabledAndActivePlugins.FirstOrDefault(item => item.Guid == guid);
     }
 
     /// <summary>
@@ -123,41 +115,53 @@ public static class PluginList
 
     #region Registering Plugins
 
-    private static List<SpaceWarpPluginDescriptor> _allEnabledAndActivePlugins = new();
+    private static List<SpaceWarpPluginDescriptor> _allEnabledAndActivePlugins = [];
+    private static List<SpaceWarpPluginDescriptor> _allDisabledPlugins = [];
+    private static List<SpaceWarpErrorDescription> _allErroredPlugins = [];
 
     /// <summary>
-    /// All plugins that are enabled, and active (not errored)
+    /// All plugins that are enabled and active (not errored)
     /// </summary>
     public static IReadOnlyList<SpaceWarpPluginDescriptor> AllEnabledAndActivePlugins => _allEnabledAndActivePlugins;
-
-    private static List<SpaceWarpPluginDescriptor> _allDisabledPlugins = new();
 
     /// <summary>
     /// All disabled plugins
     /// </summary>
     public static IReadOnlyList<SpaceWarpPluginDescriptor> AllDisabledPlugins => _allDisabledPlugins;
 
-    private static List<SpaceWarpErrorDescription> _allErroredPlugins = new();
+    /// <summary>
+    /// All errored plugins
+    /// </summary>
     public static IReadOnlyList<SpaceWarpErrorDescription> AllErroredPlugins => _allErroredPlugins;
 
+    /// <summary>
+    /// All plugins, including disabled and errored
+    /// </summary>
     public static IEnumerable<SpaceWarpPluginDescriptor> AllPlugins => _allEnabledAndActivePlugins
-        .Concat(_allDisabledPlugins).Concat(_allErroredPlugins.Select(x => x.Plugin));
+        .Concat(_allDisabledPlugins)
+        .Concat(_allErroredPlugins.Select(x => x.Plugin));
 
-    public static void RegisterPlugin(SpaceWarpPluginDescriptor plugin)
+    internal static void RegisterPlugin(SpaceWarpPluginDescriptor plugin)
     {
         if (AllPlugins.Any(x => x.Guid == plugin.Guid))
         {
-            SpaceWarpPlugin.Logger.LogError($"Attempting to register a mod with a duplicate GUID: {plugin.Guid}");
+            SpaceWarpPlugin.Instance.SWLogger.LogError($"Attempting to register a mod with a duplicate GUID: {plugin.Guid}");
         }
 
-        SpaceWarpPlugin.Logger.LogInfo($"Registered plugin: {plugin.Guid}");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Registered plugin: {plugin.Guid}");
         _allEnabledAndActivePlugins.Add(plugin);
     }
 
-    public static void Disable(string guid)
+    internal static void Disable(string guid)
     {
-        var descriptor = _allEnabledAndActivePlugins.FirstOrDefault(x =>
-            string.Equals(x.Guid, guid, StringComparison.InvariantCultureIgnoreCase));
+        var descriptor = _allEnabledAndActivePlugins.FirstOrDefault(
+            x => string.Equals(
+                x.Guid,
+                guid,
+                StringComparison.InvariantCultureIgnoreCase
+            )
+        );
+
         if (descriptor != null)
         {
             _allEnabledAndActivePlugins.Remove(descriptor);
@@ -165,9 +169,8 @@ public static class PluginList
         }
     }
 
-    public static SpaceWarpErrorDescription GetErrorDescriptor(SpaceWarpPluginDescriptor plugin)
+    internal static SpaceWarpErrorDescription GetErrorDescriptor(SpaceWarpPluginDescriptor plugin)
     {
-        
         if (_allErroredPlugins.Any(x => x.Plugin == plugin))
         {
             return _allErroredPlugins.First(x => x.Plugin == plugin);
@@ -183,31 +186,31 @@ public static class PluginList
         return newError;
     }
 
-    public static void NoteMissingSwinfoError(SpaceWarpPluginDescriptor plugin)
+    internal static void NoteMissingSwinfoError(SpaceWarpPluginDescriptor plugin)
     {
         var errorDescriptor = GetErrorDescriptor(plugin);
         errorDescriptor.MissingSwinfo = true;
     }
 
-    public static void NoteBadDirectoryError(SpaceWarpPluginDescriptor plugin)
+    internal static void NoteBadDirectoryError(SpaceWarpPluginDescriptor plugin)
     {
         var errorDescriptor = GetErrorDescriptor(plugin);
         errorDescriptor.BadDirectory = true;
     }
 
-    public static void NoteBadIDError(SpaceWarpPluginDescriptor plugin)
+    internal static void NoteBadIDError(SpaceWarpPluginDescriptor plugin)
     {
         var errorDescriptor = GetErrorDescriptor(plugin);
         errorDescriptor.BadID = true;
     }
 
-    public static void NoteMismatchedVersionError(SpaceWarpPluginDescriptor plugin)
+    internal static void NoteMismatchedVersionError(SpaceWarpPluginDescriptor plugin)
     {
         var errorDescriptor = GetErrorDescriptor(plugin);
         errorDescriptor.MismatchedVersion = true;
     }
 
-    public static void NoteUnspecifiedDependencyError(SpaceWarpPluginDescriptor plugin, string dependency)
+    internal static void NoteUnspecifiedDependencyError(SpaceWarpPluginDescriptor plugin, string dependency)
     {
         var errorDescriptor = GetErrorDescriptor(plugin);
         errorDescriptor.UnspecifiedDependencies.Add(dependency);
@@ -216,7 +219,7 @@ public static class PluginList
     private static SemanticVersion PadVersion(string version)
     {
         var length = version.Split('.').Length;
-        for (var i = 0; i < 3-length; i++)
+        for (var i = 0; i < 3 - length; i++)
         {
             version += ".0";
         }
@@ -231,7 +234,7 @@ public static class PluginList
         var maxVersion = PadVersion(max.Replace("*", $"{int.MaxValue}"));
         return basicVersion >= minVersion && basicVersion <= maxVersion;
     }
-    
+
     private static bool DependencyResolved(
         SpaceWarpPluginDescriptor descriptor,
         List<SpaceWarpPluginDescriptor> resolvedPlugins
@@ -239,10 +242,12 @@ public static class PluginList
     {
         if (descriptor.SWInfo.Spec < SpecVersion.V1_3) return true;
         return !(from dependency in descriptor.SWInfo.Dependencies
-            let info = resolvedPlugins.FirstOrDefault(x => string.Equals(
-                x.Guid,
-                dependency.ID,
-                StringComparison.InvariantCultureIgnoreCase)
+            let info = resolvedPlugins.FirstOrDefault(
+                x => string.Equals(
+                    x.Guid,
+                    dependency.ID,
+                    StringComparison.InvariantCultureIgnoreCase
+                )
             )
             where info == null || !IsSupportedSemver(
                 info.SWInfo.Version,
@@ -271,10 +276,13 @@ public static class PluginList
         for (var i = _allEnabledAndActivePlugins.Count - 1; i >= 0; i--)
         {
             var info = _allEnabledAndActivePlugins[i];
-            SpaceWarpPlugin.Logger.LogError($"Missing dependency for mod: {info.Name}, this mod will not be loaded");
+            SpaceWarpPlugin.Instance.SWLogger.LogError($"Missing dependency for mod: {info.Name}, this mod will not be loaded");
             var error = GetErrorDescriptor(info);
-            error.MissingDependencies = info.SWInfo.Dependencies.Select(x => x.ID).Where(x =>
-                !newOrder.Any(y => string.Equals(x, y.Guid, StringComparison.InvariantCultureIgnoreCase))).ToList();
+            error.MissingDependencies = info.SWInfo
+                .Dependencies
+                .Select(x => x.ID)
+                .Where(x => !newOrder.Any(y => string.Equals(x, y.Guid, StringComparison.InvariantCultureIgnoreCase)))
+                .ToList();
         }
 
         _allEnabledAndActivePlugins = newOrder;
@@ -282,8 +290,9 @@ public static class PluginList
 
     private static void GetDependencyErrors()
     {
-        foreach (var erroredPlugin in _allErroredPlugins.Where(erroredPlugin =>
-                     erroredPlugin.MissingDependencies.Count != 0))
+        foreach (var erroredPlugin in _allErroredPlugins.Where(
+                     erroredPlugin => erroredPlugin.MissingDependencies.Count != 0
+                 ))
         {
             for (var i = erroredPlugin.MissingDependencies.Count - 1; i >= 0; i--)
             {
@@ -312,19 +321,30 @@ public static class PluginList
 
     private static void CheckCompatibility()
     {
-        var incompatibilities = _allEnabledAndActivePlugins.Select(x => (Key: x.Guid, Value: new HashSet<string>()))
+        var incompatibilities = _allEnabledAndActivePlugins
+            .Select(x => (Key: x.Guid, Value: new HashSet<string>()))
             .ToDictionary(x => x.Key, x => x.Value);
-        var versionLookup = _allEnabledAndActivePlugins.Select(x => (Key: x.Guid, Value: x.SWInfo.Version))
+        var versionLookup = _allEnabledAndActivePlugins
+            .Select(x => (Key: x.Guid, Value: x.SWInfo.Version))
             .ToDictionary(x => x.Key, x => x.Value);
-        var pluginDictionary = _allEnabledAndActivePlugins.ToDictionary(x => x.Guid, x => x);
+        var pluginDictionary = _allEnabledAndActivePlugins
+            .ToDictionary(x => x.Guid, x => x);
         foreach (var mod in _allEnabledAndActivePlugins)
         {
             var swinfo = mod.SWInfo;
-            if (swinfo.Spec < SpecVersion.V2_0) continue;
+            if (swinfo.Spec < SpecVersion.V2_0)
+            {
+                continue;
+            }
+
             foreach (var conflict in swinfo.Conflicts)
             {
                 if (!versionLookup.TryGetValue(conflict.ID, out var conflictingVersion) ||
-                    !IsSupportedSemver(conflictingVersion, conflict.Version.Min, conflict.Version.Max)) continue;
+                    !IsSupportedSemver(conflictingVersion, conflict.Version.Min, conflict.Version.Max))
+                {
+                    continue;
+                }
+
                 incompatibilities[mod.Guid].Add(conflict.ID);
                 incompatibilities[conflict.ID].Add(mod.Guid);
             }
@@ -332,7 +352,11 @@ public static class PluginList
 
         foreach (var incompatibility in incompatibilities)
         {
-            if (incompatibility.Value.Count <= 0) continue;
+            if (incompatibility.Value.Count <= 0)
+            {
+                continue;
+            }
+
             var descriptor = GetErrorDescriptor(pluginDictionary[incompatibility.Key]);
             descriptor.Incompatibilities.AddRange(incompatibility.Value);
         }

@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement class="details-item" style="flex-direction: row;">
+        <ui:Label class="details-label details-key-label" />
+        <ui:Label text=":" class="details-label" />
+        <ui:Label class="details-label details-value-label" />
+        <ui:Label text="(WARNING) " name="WarningInformation" class="details-warning details-label error" style="color: rgb(255, 0, 0); display: none;" />
+    </ui:VisualElement>
+</ui:UXML>

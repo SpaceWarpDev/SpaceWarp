@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using BepInEx.Bootstrap;
 using JetBrains.Annotations;
 using KSP.UI.Binding;
@@ -9,17 +7,20 @@ using UnityEngine;
 
 namespace SpaceWarp.API.UI.Appbar;
 
+/// <summary>
+/// Used to register buttons on the game's AppBar.
+/// </summary>
 [PublicAPI]
 public static class Appbar
 {
     private static readonly List<(string text, Sprite icon, string ID, Action<bool> action)> ButtonsToBeLoaded = new();
 
-    private static readonly List<(string text, Sprite icon, string ID, Action<bool> action)> OABButtonsToBeLoaded = new();
+    private static readonly List<(string text, Sprite icon, string ID, Action<bool> action)> OabButtonsToBeLoaded = new();
 
-    private static readonly List<(string text, Sprite icon, string ID, Action action)> KSCButtonsToBeLoaded = new();
+    private static readonly List<(string text, Sprite icon, string ID, Action action)> KscButtonsToBeLoaded = new();
 
     /// <summary>
-    /// Register an appbar menu for the game
+    /// Register an AppBar menu for the game.
     /// </summary>
     /// <param name="text">The text in the appbar menu</param>
     /// <param name="title">The title of the menu</param>
@@ -27,6 +28,7 @@ public static class Appbar
     /// <param name="icon">A Sprite for the icon in the appbar</param>
     /// <typeparam name="T">The type of the appbar menu, must extend AppbarMenu</typeparam>
     /// <returns>An instance of T which has been added to a GameObject</returns>
+#pragma warning disable CS0618 // Type or member is obsolete
     public static T RegisterGameAppbarMenu<T>(string text, string title, string id, Sprite icon) where T : AppbarMenu
     {
         var toolBarUIObject = new GameObject($"Toolbar: {id}");
@@ -37,11 +39,11 @@ public static class Appbar
         toolBarUIObject.transform.SetParent(Chainloader.ManagerObject.transform);
         toolBarUIObject.SetActive(true);
         ButtonsToBeLoaded.Add((text, icon, id, menu.ToggleGUI));
-        return menu as T;
+        return (T)menu;
     }
 
     /// <summary>
-    /// Register a appbar menu for the game
+    /// Register an AppBar menu for the game.
     /// </summary>
     /// <param name="text">The text in the appbar menu</param>
     /// <param name="title">The title of the menu</param>
@@ -53,9 +55,10 @@ public static class Appbar
     {
         return RegisterGameAppbarMenu<T>(text, title, id, GetAppBarIconFromTexture(icon));
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
-    /// Register a button on the games AppBar
+    /// Register a button on the game's AppBar
     /// </summary>
     /// <param name="text">The text in the appbar menu</param>
     /// <param name="id">A unique id for the appbar menu eg: "BTN-Example"</param>
@@ -67,7 +70,7 @@ public static class Appbar
     }
 
     /// <summary>
-    /// Register a button on the games AppBar
+    /// Register a button on the game's AppBar
     /// </summary>
     /// <param name="text">The text in the appbar menu</param>
     /// <param name="id">A unique id for the appbar menu eg: "BTN-Example"</param>
@@ -85,9 +88,10 @@ public static class Appbar
     /// <param name="id">A unique id for the appbar menu eg: "BTN-ExampleOAB"</param>
     /// <param name="icon">A Sprite for the icon in the appbar</param>
     /// <param name="func">The function to be called when this button is clicked</param>
+    // ReSharper disable once InconsistentNaming
     public static void RegisterOABAppButton(string text, string id, Sprite icon, Action<bool> func)
     {
-        OABButtonsToBeLoaded.Add((text, icon, id, func));
+        OabButtonsToBeLoaded.Add((text, icon, id, func));
     }
 
     /// <summary>
@@ -97,6 +101,7 @@ public static class Appbar
     /// <param name="id">A unique id for the appbar menu eg: "BTN-ExampleOAB"</param>
     /// <param name="icon">A Texture2D for the icon in the appbar</param>
     /// <param name="func">The function to be called when this button is clicked</param>
+    // ReSharper disable once InconsistentNaming
     public static void RegisterOABAppButton(string text, string id, Texture2D icon, Action<bool> func)
     {
         RegisterOABAppButton(text, id, GetAppBarIconFromTexture(icon), func);
@@ -109,9 +114,10 @@ public static class Appbar
     /// <param name="id">A unique id for the appbar menu eg: "BTN-ExampleKSC"</param>
     /// <param name="icon">A Sprite for the icon in the appbar</param>
     /// <param name="func">The function to be called when this button is clicked</param>
+    // ReSharper disable once InconsistentNaming
     public static void RegisterKSCAppButton(string text, string id, Sprite icon, Action func)
     {
-        KSCButtonsToBeLoaded.Add((text, icon, id, func));
+        KscButtonsToBeLoaded.Add((text, icon, id, func));
     }
 
     /// <summary>
@@ -121,6 +127,7 @@ public static class Appbar
     /// <param name="id">A unique id for the appbar menu eg: "BTN-ExampleKSC"</param>
     /// <param name="icon">A Texture2D for the icon in the appbar</param>
     /// <param name="func">The function to be called when this button is clicked</param>
+    // ReSharper disable once InconsistentNaming
     public static void RegisterKSCAppButton(string text, string id, Texture2D icon, Action func)
     {
         RegisterKSCAppButton(text, id, GetAppBarIconFromTexture(icon), func);
@@ -167,17 +174,19 @@ public static class Appbar
         }
     }
 
+    // ReSharper disable once InconsistentNaming
     internal static void LoadOABButtons()
     {
-        foreach (var button in OABButtonsToBeLoaded)
+        foreach (var button in OabButtonsToBeLoaded)
         {
             AppbarBackend.AddOABButton(button.text, button.icon, button.ID, button.action);
         }
     }
 
+    // ReSharper disable once InconsistentNaming
     internal static void LoadKSCButtons()
     {
-        foreach (var button in KSCButtonsToBeLoaded)
+        foreach (var button in KscButtonsToBeLoaded)
         {
             AppbarBackend.AddKSCButton(button.text, button.icon, button.ID, button.action);
         }
