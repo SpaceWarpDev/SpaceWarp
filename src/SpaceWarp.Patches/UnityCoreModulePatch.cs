@@ -10,13 +10,6 @@ namespace SpaceWarp.Patches;
 [UsedImplicitly]
 internal class UnityCoreModulePatch : BasePatcher
 {
-    internal static UnityCoreModulePatch Instance { get; private set; }
-
-    public UnityCoreModulePatch()
-    {
-        Instance = this;
-    }
-
     public override IEnumerable<string> DLLsToPatch { get; } = ["UnityEngine.CoreModule.dll"];
     public override void ApplyPatch(ref AssemblyDefinition assembly)
     {

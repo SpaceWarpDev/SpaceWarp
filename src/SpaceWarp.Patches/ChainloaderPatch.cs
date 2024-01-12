@@ -1,4 +1,3 @@
-using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
@@ -59,7 +58,7 @@ internal static class ChainloaderPatch
     private static void DisablePluginsIL(ILContext il)
     {
         ILCursor c = new(il);
-    
+
         ILLabel continueLabel = default;
         c.GotoNext(
             MoveType.After,
@@ -68,7 +67,7 @@ internal static class ChainloaderPatch
             x => x.MatchLdcI4(0), // false
             x => x.MatchStloc(24) // someBool = false
         );
-    
+
         c.Emit(OpCodes.Ldloc, 23); // current PluginInfo
         c.Emit(OpCodes.Ldloc, 5); // set of denied plugins so far
         // false means skip to this plugin, true means continue loading it
