@@ -49,7 +49,7 @@ public static class ModuleManager
                     AllSpaceWarpModules.Add(mod);
                 }
 
-                Harmony.CreateAndPatchAll(assembly);
+                // Harmony.CreateAndPatchAll(assembly);
             }
             catch (Exception e)
             {

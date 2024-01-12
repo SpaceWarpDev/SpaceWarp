@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using HarmonyLib;
+using JetBrains.Annotations;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.UI.Appbar;
@@ -74,6 +75,7 @@ public class UI : SpaceWarpModule
             "Show Warning for Errored Mods", true,
             "Whether or not Space Warp should display a warning in main menu if there are errored mods"));
         BepInEx.Logging.Logger.Listeners.Add(new SpaceWarpConsoleLogListener(this));
+        Harmony.CreateAndPatchAll(GetType().Assembly);
     }
 
     /// <inheritdoc/>
