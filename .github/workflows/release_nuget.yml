@@ -35,8 +35,7 @@ jobs:
           echo "artifact_name=spacewarp-release-$version.zip" >> $GITHUB_ENV
           echo "zip=$(ls -1 dist/SpaceWarp-*.zip | head -n 1)" >> $GITHUB_ENV
           echo "upload_url=$(wget -qO- https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq '.[0].upload_url' | tr -d \")" >> $GITHUB_ENV
-          echo "changelog=$(wget -qO- https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq '.[0].body' | tr -d \" | jq -Rr @uri)" >> $GITHUB_ENV
-          echo "${{ env.changelog }}" > ./changelog.md
+          wget -qO- https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq -r '.[0].body' > ./changelog.md
 
       - name: Check if version exists
         id: check-version
@@ -70,28 +69,13 @@ jobs:
       - name: Add Mask
         run: echo "::add-mask::${{ secrets.SPACEDOCK_PASSWORD }}"
         
-      - name: Log in to spacedock
-        run: |
-          login_response=$(curl -F username=${{ secrets.SPACEDOCK_USER }} -F password=${{ secrets.SPACEDOCK_PASSWORD }} -c ./cookies "https://spacedock.info/api/login")
-          login_errored=$(echo $login_response | jq .error)
-          if [ "$login_errored" == "true" ]; then
-            echo "Login to space dock errored: $(echo $login_response | jq .reason)"
-            exit 1
-          else
-            echo "Login to space dock successful"
-          fi
-          
-      - name: Query latest game version
-        run: |
-          echo "LATEST_GAME_VERSION=$(curl 'https://spacedock.info/api/${{ env.KSP2_ID }}/versions' | jq '.[0].friendly_version' | tr -d \")" >> $GITHUB_ENV
-      
-      - name: Update mod on spacedock
-        run: |
-          result=$(curl -b ./cookies -F "version=${{ env.version }}" -F "changelog=@./changelog.md" -F "game-version=${{ env.LATEST_GAME_VERSION }}" -F "notify-followers=yes" -F "zipball=@${{ env.zip }}" "https://spacedock.info/api/mod/${{ env.MOD_ID }}/update")
-          errored=$(echo $result | jq .error)
-          if [ "$errored" == "true" ]; then
-            echo "Upload to space dock errored: $(echo $result | jq .reason)"
-            exit 1
-          else
-            echo "Upload to space dock successful"
-          fi
+      - name: Update spacedock
+        uses: KSP2Community/spacedock-upload@v1.0.0
+        with:
+          username: ${{ secrets.SPACEDOCK_USER }}
+          password: ${{ secrets.SPACEDOCK_PASSWORD }}
+          game_id: 22407
+          mod_id: 3277
+          version: ${{ env.version }}
+          zipball: ${{ env.zip }}
+          changelog: ./changelog.md
