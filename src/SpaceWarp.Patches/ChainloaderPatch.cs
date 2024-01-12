@@ -1,3 +1,4 @@
+using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
@@ -40,12 +41,25 @@ internal static class ChainloaderPatch
         }
     }
 
+    private static bool CheckIfModIsDisabled(PluginInfo plugin, HashSet<string> deniedSet)
+    {
+        if (Array.IndexOf(ModList.DisabledPluginGuids, plugin.Metadata.GUID) == -1)
+        {
+            return true;
+        }
+
+        deniedSet.Add(plugin.Metadata.GUID);
+        ModList.DisabledPlugins.Add(plugin);
+        Entrypoint.LogSource.LogInfo($"{plugin.Metadata.GUID} was disabled, skipping loading...");
+        return false;
+
+    }
     [HarmonyILManipulator]
     [HarmonyPatch(typeof(Chainloader), nameof(Chainloader.Start))]
     private static void DisablePluginsIL(ILContext il)
     {
         ILCursor c = new(il);
-
+    
         ILLabel continueLabel = default;
         c.GotoNext(
             MoveType.After,
@@ -54,23 +68,11 @@ internal static class ChainloaderPatch
             x => x.MatchLdcI4(0), // false
             x => x.MatchStloc(24) // someBool = false
         );
-
+    
         c.Emit(OpCodes.Ldloc, 23); // current PluginInfo
         c.Emit(OpCodes.Ldloc, 5); // set of denied plugins so far
         // false means skip to this plugin, true means continue loading it
-        c.EmitDelegate(static bool (PluginInfo plugin, HashSet<string> deniedSet) =>
-        {
-            if (Array.IndexOf(ModList.DisabledPluginGuids, plugin.Metadata.GUID) == -1)
-            {
-                return true;
-            }
-
-            deniedSet.Add(plugin.Metadata.GUID);
-            ModList.DisabledPlugins.Add(plugin);
-            Entrypoint.LogSource.LogInfo($"{plugin.Metadata.GUID} was disabled, skipping loading...");
-            return false;
-
-        });
+        c.EmitDelegate(CheckIfModIsDisabled);
         c.Emit(OpCodes.Brfalse, continueLabel);
     }
 }
