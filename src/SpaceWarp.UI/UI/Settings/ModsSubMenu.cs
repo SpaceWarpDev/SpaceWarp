@@ -124,48 +124,6 @@ internal class ModsSubMenu : SettingsSubMenu
                 GenerateDivider().transform.SetParent(transform);
             }
         }
-#pragma warning disable CS0618
-
-        var mods = BepInEx.Bootstrap.Chainloader.Plugins.Where(
-            mod => mod.Config.Count > 0
-                   && (mod is not BaseSpaceWarpPlugin || (
-                           mod is BaseSpaceWarpPlugin baseSpaceWarpPlugin
-                           && baseSpaceWarpPlugin.SWConfiguration.Sections.Count == 0)
-                   )
-        );
-
-        foreach (var mod in mods)
-        {
-            // This is where do a "Add Name" function
-            GenerateTitle(mod.Info.Metadata.Name).transform.SetParent(transform);
-            GenerateDivider().transform.SetParent(transform);
-            Dictionary<string, List<ConfigEntryBase>> modConfigCategories = new();
-            foreach (var config in mod.Config)
-            {
-                var section = config.Key.Section;
-                var conf = config.Value;
-                if (modConfigCategories.TryGetValue(section, out var list))
-                {
-                    list.Add(conf);
-                }
-                else
-                {
-                    modConfigCategories[section] = [conf];
-                }
-            }
-
-            foreach (var config in modConfigCategories)
-            {
-                var header = GenerateSectionHeader(config.Key);
-                header.transform.SetParent(transform);
-                foreach (var drawer in config.Value.Select(ModsPropertyDrawers.Drawer).Where(drawer => drawer != null))
-                {
-                    drawer.transform.SetParent(header.transform);
-                }
-
-                GenerateDivider().transform.SetParent(transform);
-            }
-        }
     }
 
     public override void OnShow()
