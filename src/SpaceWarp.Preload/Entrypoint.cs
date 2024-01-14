@@ -27,7 +27,7 @@ public static class Entrypoint
         {
             LogSource = Logger.CreateLogSource("SpaceWarp.Preload");
             AddEnabledPatchers();
-            return Patchers.SelectMany(patcher => patcher.DLLsToPatch).ToList();
+            return Patchers.SelectMany(patcher => patcher.DLLsToPatch).ToHashSet();
         }
     }
 
