@@ -87,6 +87,7 @@ public class UI : SpaceWarpModule
     /// <inheritdoc/>
     public override void InitializeModule()
     {
+
         ModuleLogger.LogInfo("Initializing UI");
         if (VersionChecking.Instance.ConfigFirstLaunch.Value)
         {

@@ -46,3 +46,4 @@ SpaceWarp/Console/Off,Text,,Off,Off,Off,关
 SpaceWarp/AvcDialog/Title,Text,,spacewarp.avc,spacewarp.avc,spacewarp.avc,spacewarp.avc
 SpaceWarp/AvcDialog/MainText,Text,,Allow Space Warp to automatically check for mod updates online?,Permitir que o Space Warp verifique automaticamente se há atualizações de mods online?,Autoriser Space Warp à vérifier automatiquement les mises à jour de mods en ligne ?,允许 Space Warp 自动在线检查模组更新？
 SpaceWarp/AvcDialog/MinorText,Text,,*You can change this later in the settings menu.,*Pode alterá-lo mais tarde no menu de definições.,*Vous pouvez modifier plus tard dans le menu des réglages.,*您可以稍后在设置菜单中更改此设置。
+SpaceWarp/Menu/Apps,Text,,Apps,Aplicativos,Applications,应用

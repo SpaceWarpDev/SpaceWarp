@@ -95,7 +95,7 @@ internal static class AppbarBackend
         var localizer = text.gameObject.GetComponent<Localize>();
         if (localizer)
         {
-            UnityObject.Destroy(localizer);
+            localizer.Term = buttonText;
         }
 
         // Change the icon.
@@ -260,7 +260,7 @@ internal static class AppbarBackend
         var localizer = text.gameObject.GetComponent<Localize>();
         if (localizer)
         {
-            UnityObject.Destroy(localizer);
+            localizer.Term = buttonText;
         }
 
         // Change the icon.
@@ -356,13 +356,9 @@ internal static class AppbarBackend
         var title = kscAppTrayButton.GetChild("TXT-Launchpad");
         {
             // Suppress renaming of the button to Launchpad
+            title.GetComponent<TextMeshProUGUI>().text = "Apps"; // Set the text in case term does not exist
             var localizer = title.GetComponent<Localize>();
-            if (localizer)
-            {
-                UnityObject.Destroy(localizer);
-            }
-            var text = title.GetComponent<TextMeshProUGUI>();
-            text.text = "Apps";
+            localizer.Term = "SpaceWarp/Menu/Apps";
         }
 
         // Get the popup tray and rename it
@@ -437,7 +433,8 @@ internal static class AppbarBackend
         var localizer = modText.gameObject.GetComponent<Localize>();
         if (localizer)
         {
-            UnityObject.Destroy(localizer);
+            // UnityObject.Destroy(localizer);
+            localizer.Term = buttonText;
         }
 
         // Change the icon
