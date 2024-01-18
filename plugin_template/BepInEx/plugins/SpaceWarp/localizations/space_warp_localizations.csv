@@ -3,8 +3,8 @@ SpaceWarp/ModList/EnableAll,Text,,Enable All,Ativar todos,Activer tous,Abilita t
 SpaceWarp/ModList/DisableAll,Text,,Disable All,Desativar todos,Désactiver tous,Disabilita tutto,全部禁用
 SpaceWarp/ModList/RevertChanges,Text,,Revert Changes,Reverter alterações,Rétablir les changements,Annulla modifiche,还原更改
 SpaceWarp/ModList/ApplyChanges,Text,,Apply and restart,Aplicar e reiniciar,Appliquer et redémarrer,Applica e riavvia,应用并重新启动
-SpaceWarp/ModList/multipleChangesDetected,Text,,"{0} changes detected, please restart to apply them","{0} alterações detetadas, porfavor reinicie o jogo","{0} changements détectés, veuillez redémarrer pour les appliquer","{0} modifiche rilevate, si prega di riavviare per applicarle",{0}检测到更改，请重新启动以应用它们
-SpaceWarp/ModList/singleChangeDetected,Text,,"1 change detected, please restart to apply it","1 alteração detectada, reinicie para aplicá-la","1 changement détecté, veuillez redémarrer pour l'appliquer","1 modifica rilevata, si prega di riavviare per applicarla",检测到 1 个更改，请重新启动以应用它
+SpaceWarp/ModList/multipleChangesDetected,Text,,"{0} changes detected, please restart to apply them","{0} alterações detetadas, porfavor reinicie o jogo","{0} changements détectés, veuillez redémarrer pour les appliquer","{0} modifiche rilevate, si prega di riavviare per applicarle","{0}检测到更改，请重新启动以应用它们"
+SpaceWarp/ModList/singleChangeDetected,Text,,"1 change detected, please restart to apply it","1 alteração detectada, reinicie para aplicá-la","1 changement détecté, veuillez redémarrer pour l'appliquer","1 modifica rilevata, si prega di riavviare per applicarla","检测到 1 个更改，请重新启动以应用它"
 SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist,spacewarp.modlist,spacewarp.modlist,模组列表
 SpaceWarp/ModList/CoreMods,Text,,Core Mods,Mods do jogo,Mods du jeu,Mod Principali,核心模组
 SpaceWarp/ModList/EnabledMods,Text,,Enabled Mods,Mods ativos,Mods activés,Mod Abilitate,启用的模组
