@@ -1,49 +1,49 @@
-Key,Type,Description,English,Portuguese BR,French,Chinese-Simplified [zh-CN]
-SpaceWarp/ModList/EnableAll,Text,,Enable All,Ativar todos,Activer tous,全部启用
-SpaceWarp/ModList/DisableAll,Text,,Disable All,Desativar todos,Désactiver tous,全部禁用
-SpaceWarp/ModList/RevertChanges,Text,,Revert Changes,Reverter alterações,Rétablir les changements,还原更改
-SpaceWarp/ModList/ApplyChanges,Text,,Apply and restart,Aplicar e reiniciar,Appliquer et redémarrer,应用并重新启动
-SpaceWarp/ModList/multipleChangesDetected,Text,,"{0} changes detected, please restart to apply them","{0} alterações detetadas, porfavor reinicie o jogo","{0} changements détectés, veuillez redémarrer pour les appliquer","{0}检测到更改，请重新启动以应用它们"
-SpaceWarp/ModList/singleChangeDetected,Text,,"1 change detected, please restart to apply it","1 alteração detectada, reinicie para aplicá-la","1 changement détecté, veuillez redémarrer pour l'appliquer","检测到 1 个更改，请重新启动以应用它"
-SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist,spacewarp.modlist,模组列表
-SpaceWarp/ModList/CoreMods,Text,,Core Mods,Mods do jogo,Mods du jeu,核心模组
-SpaceWarp/ModList/EnabledMods,Text,,Enabled Mods,Mods ativos,Mods activés,启用的模组
-SpaceWarp/ModList/ErroredMods,Text,,Errored Mods,Mods com erros,Mods avec des erreurs,错误的模组
-SpaceWarp/ModList/DisabledMods,Text,,Disabled Mods,Mods desativados,Mods désactivés,禁用的模组
-SpaceWarp/ModList/Version,Text,,Version,Versão,Version,版本
-SpaceWarp/ModList/Author,Text,,Author,Autor,Auteur,作者
-SpaceWarp/ModList/Source,Text,,Source,Fonte,Source,源
-SpaceWarp/ModList/Description,Text,,Description,Descrição,Description,描述
-SpaceWarp/ModList/KSP2Version,Text,,KSP2 Version,Versão do jogo,Version de KSP2,KSP2版本
-SpaceWarp/ModList/Dependencies,Text,,Dependencies,Dependências,Dépendances,依赖
-SpaceWarp/ModList/outdated,Text,,(outdated),(desatualizado),(obsolète),(已过时)
-SpaceWarp/ModList/unsupported,Text,,(unsupported),(não suportado),(non pris en charge),(不支持)
-SpaceWarp/ModList/disabled,Text,,(disabled),(desativado),(désactivé),(已禁用)
-SpaceWarp/ModList/mismatched,Text,,(mismatched),(não corresponde com o swinfo),(non concordant),(不匹配)
-SpaceWarp/ModList/baddirectory,Text,,(bad directory),(problemas no diretorio),(mauvais dossier),(目录错误)
-SpaceWarp/ModList/missingswinfo,Text,,(missing SW Info),(não possui um swinfo),(SW Info manquant),(缺少SW信息)
-SpaceWarp/ModList/OpenModSettings,Text,,Mod Settings,Configurações dos mods,Paramètres des mods,模组设置
-SpaceWarp/ModList/OpenModsFolder,Text,,Open Mods Folder,Abrir pasta de mods,Ouvrir le dossier des mods,打开Mods文件夹
-SpaceWarp/ModList/MissingDependency,Text,,Dependency is missing,Esta dependência não está presente,Cette dépendance est manquante,缺少依赖项
-SpaceWarp/ModList/ErroredDependency,Text,,Dependency had an error while loading,Esta dependência teve um erro durante o loading,Une erreur s'est produite lors du chargement de cette dépendance,依赖项在加载时出错
-SpaceWarp/ModList/DisabledDependency,Text,,Dependency is disabled,Esta dependência esta desativada,Cette dépendance est manquante,依赖项已禁用
-SpaceWarp/ModList/UnspecifiedDependency,Text,,Dependency was not specified in SW info,Esta dependência não está presente no swinfo,Cette dépendance n'a pas été spécifiée dans SW Info,未在软件信息中指定依赖项
-SpaceWarp/ModList/UnsupportedDependency,Text,,Dependency is of an unsupported version,Esta dependência é de uma versão nao suportada,Cette dépendance est d'une version non supportée,依赖项的版本不受支持
-SpaceWarp/ModList/Conflicts,Text,,Conflicts,Incompatibilidades,Conflits,冲突
-SpaceWarp/ModList/Details,Text,,Details,Detalhes,Détails,详细信息
-SpaceWarp/Mods,Text,,Mods,Mods,Mods,模组
-SpaceWarp/Mods/Outdated,Text,,Mods <color=yellow>⚠</color>,Mods <color=yellow>⚠</color>,Mods <color=yellow>⚠</color>,模组 <color=yellow>⚠/color>
-SpaceWarp/Mods/Errored,Text,,Mods <color=red>⚠</color>,Mods <color=red>⚠</color>,Mods <color=red>⚠</color>,模组 <color=red>⚠/color>
-SpaceWarp,Text,,Space Warp,Space Warp,Space Warp,空间扭曲
-SpaceWarp/VersionChecking,Text,,Allow Space Warp to check versions for mods over the network?,Deixar Space Warp verificar a versão dos mods na internet?,Autoriser Space Warp à vérifier les versions des mods sur le réseau ?,是否允许 Space Warp 通过网络检查模组的版本?
-SpaceWarp/Yes,Text,,Yes,Sim,Oui,是
-SpaceWarp/No,Text,,No,Não,Non,否
-SpaceWarp/Console/Header,Text,,SPACE WARP - Console,SPACE WARP - Consola,SPACE WARP - Console,控制台
-SpaceWarp/Console/Clear,Text,,Clear,Limpar,Effacer,清理
-SpaceWarp/Console/AutoScroll,Text,,Auto Scroll,Scroll automatico,Défilement automatique,自动滚动
-SpaceWarp/Console/On,Text,,On,On,On,开
-SpaceWarp/Console/Off,Text,,Off,Off,Off,关
-SpaceWarp/AvcDialog/Title,Text,,spacewarp.avc,spacewarp.avc,spacewarp.avc,spacewarp.avc
-SpaceWarp/AvcDialog/MainText,Text,,Allow Space Warp to automatically check for mod updates online?,Permitir que o Space Warp verifique automaticamente se há atualizações de mods online?,Autoriser Space Warp à vérifier automatiquement les mises à jour de mods en ligne ?,允许 Space Warp 自动在线检查模组更新？
-SpaceWarp/AvcDialog/MinorText,Text,,*You can change this later in the settings menu.,*Pode alterá-lo mais tarde no menu de definições.,*Vous pouvez modifier plus tard dans le menu des réglages.,*您可以稍后在设置菜单中更改此设置。
-SpaceWarp/Menu/Apps,Text,,Apps,Aplicativos,Applications,应用
+Key,Type,Description,English,Portuguese BR,French,Italiano,Chinese-Simplified [zh-CN]
+SpaceWarp/ModList/EnableAll,Text,,Enable All,Ativar todos,Activer tous,Abilita tutto,全部启用
+SpaceWarp/ModList/DisableAll,Text,,Disable All,Desativar todos,Désactiver tous,Disabilita tutto,全部禁用
+SpaceWarp/ModList/RevertChanges,Text,,Revert Changes,Reverter alterações,Rétablir les changements,Annulla modifiche,还原更改
+SpaceWarp/ModList/ApplyChanges,Text,,Apply and restart,Aplicar e reiniciar,Appliquer et redémarrer,Applica e riavvia,应用并重新启动
+SpaceWarp/ModList/multipleChangesDetected,Text,,"{0} changes detected, please restart to apply them","{0} alterações detetadas, porfavor reinicie o jogo","{0} changements détectés, veuillez redémarrer pour les appliquer","{0} modifiche rilevate, si prega di riavviare per applicarle",{0}检测到更改，请重新启动以应用它们
+SpaceWarp/ModList/singleChangeDetected,Text,,"1 change detected, please restart to apply it","1 alteração detectada, reinicie para aplicá-la","1 changement détecté, veuillez redémarrer pour l'appliquer","1 modifica rilevata, si prega di riavviare per applicarla",检测到 1 个更改，请重新启动以应用它
+SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist,spacewarp.modlist,spacewarp.modlist,模组列表
+SpaceWarp/ModList/CoreMods,Text,,Core Mods,Mods do jogo,Mods du jeu,Mod Principali,核心模组
+SpaceWarp/ModList/EnabledMods,Text,,Enabled Mods,Mods ativos,Mods activés,Mod Abilitate,启用的模组
+SpaceWarp/ModList/ErroredMods,Text,,Errored Mods,Mods com erros,Mods avec des erreurs,Mod con Errori,错误的模组
+SpaceWarp/ModList/DisabledMods,Text,,Disabled Mods,Mods desativados,Mods désactivés,Mod Disabilitate,禁用的模组
+SpaceWarp/ModList/Version,Text,,Version,Versão,Version,Versione,版本
+SpaceWarp/ModList/Author,Text,,Author,Autor,Auteur,Autore,作者
+SpaceWarp/ModList/Source,Text,,Source,Fonte,Source,Fonte,源
+SpaceWarp/ModList/Description,Text,,Description,Descrição,Description,Descrizione,描述
+SpaceWarp/ModList/KSP2Version,Text,,KSP2 Version,Versão do jogo,Version de KSP2,Versione KSP2,KSP2版本
+SpaceWarp/ModList/Dependencies,Text,,Dependencies,Dependências,Dépendances,Dipendenze,依赖
+SpaceWarp/ModList/outdated,Text,,(outdated),(desatualizado),(obsolète),(obsoleto),(已过时)
+SpaceWarp/ModList/unsupported,Text,,(unsupported),(não suportado),(non pris en charge),(non supportato),(不支持)
+SpaceWarp/ModList/disabled,Text,,(disabled),(desativado),(désactivé),(disabilitata),(已禁用)
+SpaceWarp/ModList/mismatched,Text,,(mismatched),(não corresponde com o swinfo),(non concordant),(non corrispondente),(不匹配)
+SpaceWarp/ModList/baddirectory,Text,,(bad directory),(problemas no diretorio),(mauvais dossier),(cartella errata),(目录错误)
+SpaceWarp/ModList/missingswinfo,Text,,(missing SW Info),(não possui um swinfo),(SW Info manquant),(mancanza di informazioni SW),(缺少SW信息)
+SpaceWarp/ModList/OpenModSettings,Text,,Mod Settings,Configurações dos mods,Paramètres des mods,Impostazioni Mod,模组设置
+SpaceWarp/ModList/OpenModsFolder,Text,,Open Mods Folder,Abrir pasta de mods,Ouvrir le dossier des mods,Apri Cartella Mod,打开Mods文件夹
+SpaceWarp/ModList/MissingDependency,Text,,Dependency is missing,Esta dependência não está presente,Cette dépendance est manquante,Mancanza di una dipendenza,缺少依赖项
+SpaceWarp/ModList/ErroredDependency,Text,,Dependency had an error while loading,Esta dependência teve um erro durante o loading,Une erreur s'est produite lors du chargement de cette dépendance,Errore nel caricamento di una dipendenza,依赖项在加载时出错
+SpaceWarp/ModList/DisabledDependency,Text,,Dependency is disabled,Esta dependência esta desativada,Cette dépendance est manquante,Dipendenza disabilitata,依赖项已禁用
+SpaceWarp/ModList/UnspecifiedDependency,Text,,Dependency was not specified in SW info,Esta dependência não está presente no swinfo,Cette dépendance n'a pas été spécifiée dans SW Info,Dipendenza non specificata nelle info SW,未在软件信息中指定依赖项
+SpaceWarp/ModList/UnsupportedDependency,Text,,Dependency is of an unsupported version,Esta dependência é de uma versão nao suportada,Cette dépendance est d'une version non supportée,Dipendenza di una versione non supportata,依赖项的版本不受支持
+SpaceWarp/ModList/Conflicts,Text,,Conflicts,Incompatibilidades,Conflits,Conflitti,冲突
+SpaceWarp/ModList/Details,Text,,Details,Detalhes,Détails,Dettagli,详细信息
+SpaceWarp/Mods,Text,,Mods,Mods,Mods,Mod,模组
+SpaceWarp/Mods/Outdated,Text,,Mods <color=yellow>⚠</color>,Mods <color=yellow>⚠</color>,Mods <color=yellow>⚠</color>,Mod <color=yellow>⚠</color>,模组 <color=yellow>⚠/color>
+SpaceWarp/Mods/Errored,Text,,Mods <color=red>⚠</color>,Mods <color=red>⚠</color>,Mods <color=red>⚠</color>,Mod <color=red>⚠</color>,模组 <color=red>⚠/color>
+SpaceWarp,Text,,Space Warp,Space Warp,Space Warp,Space Warp,空间扭曲
+SpaceWarp/VersionChecking,Text,,Allow Space Warp to check versions for mods over the network?,Deixar Space Warp verificar a versão dos mods na internet?,Autoriser Space Warp à vérifier les versions des mods sur le réseau ?,Autorizzare Space Warp a controllare le versioni delle mod su internet?,是否允许 Space Warp 通过网络检查模组的版本?
+SpaceWarp/Yes,Text,,Yes,Sim,Oui,Sì,是
+SpaceWarp/No,Text,,No,Não,Non,No,否
+SpaceWarp/Console/Header,Text,,SPACE WARP - Console,SPACE WARP - Consola,SPACE WARP - Console,SPACE WARP - Console,控制台
+SpaceWarp/Console/Clear,Text,,Clear,Limpar,Effacer,Pulisci,清理
+SpaceWarp/Console/AutoScroll,Text,,Auto Scroll,Scroll automatico,Défilement automatique,Scorrimento automatico,自动滚动
+SpaceWarp/Console/On,Text,,On,On,On,On,开
+SpaceWarp/Console/Off,Text,,Off,Off,Off,Off,关
+SpaceWarp/AvcDialog/Title,Text,,spacewarp.avc,spacewarp.avc,spacewarp.avc,spacewarp.avc,spacewarp.avc
+SpaceWarp/AvcDialog/MainText,Text,,Allow Space Warp to automatically check for mod updates online?,Permitir que o Space Warp verifique automaticamente se há atualizações de mods online?,Autoriser Space Warp à vérifier automatiquement les mises à jour de mods en ligne ?,Autorizzare Space Warp a controllare automaticamente gli aggiornamenti delle mod online?,允许 Space Warp 自动在线检查模组更新？
+SpaceWarp/AvcDialog/MinorText,Text,,*You can change this later in the settings menu.,*Pode alterá-lo mais tarde no menu de definições.,*Vous pouvez modifier plus tard dans le menu des réglages.,*Puoi cambiare questa impostazione più tardi nel menu delle impostazioni.,*您可以稍后在设置菜单中更改此设置。
+SpaceWarp/Menu/Apps,Text,,Apps,Aplicativos,Applications,Applicazioni,应用
