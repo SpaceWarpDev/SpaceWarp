@@ -1,0 +1,48 @@
+Key,Type,Description,Chinese-Simplified [zh-CN]
+SpaceWarp/ModList/EnableAll,Text,,全部启用
+SpaceWarp/ModList/DisableAll,Text,,全部禁用
+SpaceWarp/ModList/RevertChanges,Text,,还原更改
+SpaceWarp/ModList/ApplyChanges,Text,,应用并重新启动
+SpaceWarp/ModList/multipleChangesDetected,Text,,"{0}检测到更改，请重新启动以应用它们"
+SpaceWarp/ModList/singleChangeDetected,Text,,"检测到 1 个更改，请重新启动以应用它"
+SpaceWarp/ModList/Header,Text,,模组列表
+SpaceWarp/ModList/CoreMods,Text,,核心模组
+SpaceWarp/ModList/EnabledMods,Text,,模组状态
+SpaceWarp/ModList/ErroredMods,Text,,错误的模组
+SpaceWarp/ModList/DisabledMods,Text,,禁用的模组
+SpaceWarp/ModList/Version,Text,,版本
+SpaceWarp/ModList/Author,Text,,作者
+SpaceWarp/ModList/Source,Text,,来源
+SpaceWarp/ModList/Description,Text,,描述
+SpaceWarp/ModList/KSP2Version,Text,,支持KSP2版本
+SpaceWarp/ModList/Dependencies,Text,,依赖模组
+SpaceWarp/ModList/outdated,Text,,(已过时)
+SpaceWarp/ModList/unsupported,Text,,(不支持)
+SpaceWarp/ModList/disabled,Text,,(已禁用)
+SpaceWarp/ModList/mismatched,Text,,(不匹配)
+SpaceWarp/ModList/baddirectory,Text,,(目录错误)
+SpaceWarp/ModList/missingswinfo,Text,,(缺少SW信息)
+SpaceWarp/ModList/OpenModSettings,Text,,模组设置
+SpaceWarp/ModList/OpenModsFolder,Text,,打开模组文件夹
+SpaceWarp/ModList/MissingDependency,Text,,缺少依赖项
+SpaceWarp/ModList/ErroredDependency,Text,,依赖项在加载时出错
+SpaceWarp/ModList/DisabledDependency,Text,,依赖项已禁用
+SpaceWarp/ModList/UnspecifiedDependency,Text,,未在软件信息中指定依赖项
+SpaceWarp/ModList/UnsupportedDependency,Text,,依赖项的版本不受支持
+SpaceWarp/ModList/Conflicts,Text,,冲突
+SpaceWarp/ModList/Details,Text,,详细信息
+SpaceWarp/Mods,Text,,模组
+SpaceWarp/Mods/Outdated,Text,,模组<color=yellow>⚠/color>
+SpaceWarp/Mods/Errored,Text,,模组 <color=red>⚠/color>
+SpaceWarp,Text,,空间扭曲
+SpaceWarp/VersionChecking,Text,,是否允许 Space Warp 通过网络检查模组的版本?
+SpaceWarp/Yes,Text,,是
+SpaceWarp/No,Text,,否
+SpaceWarp/Console/Header,Text,,控制台
+SpaceWarp/Console/Clear,Text,,清理
+SpaceWarp/Console/AutoScroll,Text,,自动滚动
+SpaceWarp/Console/On,Text,,开
+SpaceWarp/Console/Off,Text,,关
+SpaceWarp/AvcDialog/Title,Text,,spacewarp.avc
+SpaceWarp/AvcDialog/MainText,Text,,允许 SpaceWarp 自动在线检查模组更新？
+SpaceWarp/AvcDialog/MinorText,Text,,您可以稍后在设置菜单中更改此设置。
