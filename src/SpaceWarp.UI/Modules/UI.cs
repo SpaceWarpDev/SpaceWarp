@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using JetBrains.Annotations;
+using KSP.UI.Flight;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.UI.Appbar;

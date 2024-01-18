@@ -303,21 +303,28 @@ internal static class AppbarBackend
     #region KSC App Bar
 
     private static GameObject _kscTray;
-
+    
     // ReSharper disable once InconsistentNaming
     private static GameObject KSCTray
     {
         get
         {
             if (_kscTray == null)
-            {
-                return _kscTray = CreateKSCTray();
+            { 
+               return _kscTray = CreateKSCTray();
             }
 
             return _kscTray;
         }
     }
 
+    private const string KscMenuPath =
+        "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Main Canvas/KSCMenu(Clone)/Panel/Window-FacilityMenu/GRP-Body/Content/Menu";
+
+    private const string FlyoutName = "LaunchLocationFlyoutHeaderToggle";
+
+    private const string TargetName = "LaunchLocationsFlyoutTarget";
+    
     // ReSharper disable once InconsistentNaming
     private static GameObject CreateKSCTray()
     {
@@ -326,8 +333,8 @@ internal static class AppbarBackend
         // Find the KSC launch locations menu item; it will be used for cloning the app tray
 
         // Get the Launch Pads menu item
-        var kscMenu = GameObject.Find("GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Main Canvas/KSCMenu(Clone)/LandingPanel/InteriorWindow/MenuButtons/Content/Menu");
-        var launchLocationsButton = kscMenu != null ? kscMenu.GetChild("LaunchLocationFlyoutHeaderToggle") : null;
+        var kscMenu = GameObject.Find(KscMenuPath);
+        var launchLocationsButton = kscMenu != null ? kscMenu.GetChild(FlyoutName) : null;
 
         if (kscMenu == null || launchLocationsButton == null)
         {
@@ -340,13 +347,13 @@ internal static class AppbarBackend
         kscAppTrayButton.name = "KSC-AppTrayButton";
 
         // Set the button icon (use OAB app tray icon)
-        var image = kscAppTrayButton.GetChild("Header").GetChild("Content").GetChild("Icon Panel").GetChild("icon").GetComponent<Image>();
+        var image = kscAppTrayButton.GetChild("ICO-Launchpad").GetComponent<Image>();
         var tex = AssetManager.GetAsset<Texture2D>($"{SpaceWarpPlugin.ModGuid}/images/oabTrayButton.png");
         tex.filterMode = FilterMode.Point;
         image.sprite = Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f));
 
         // Change the text to APPS
-        var title = kscAppTrayButton.GetChild("Header").GetChild("Content").GetChild("Title");
+        var title = kscAppTrayButton.GetChild("TXT-Launchpad");
         {
             // Suppress renaming of the button to Launchpad
             var localizer = title.GetComponent<Localize>();
@@ -359,19 +366,42 @@ internal static class AppbarBackend
         }
 
         // Get the popup tray and rename it
-        var kscAppTray = kscAppTrayButton.GetChild("LaunchLocationsFlyoutTarget");
+        var originalFlyout = kscMenu.GetChild(TargetName);
+        var originalToggle = launchLocationsButton.GetComponent<ToggleExtended>();
+        var kscAppTray = UnityObject.Instantiate(originalFlyout, kscMenu.transform);
         kscAppTray.name = "KSC-AppTray";
+        
 
         // Delete existing buttons and separators in the tray
         for (var i = 0; i < kscAppTray.transform.childCount; i++)
         {
             var child = kscAppTray.transform.GetChild(i);
-
+        
             // Destroy all objects inside the tray, but keep the arrow ("thingy") that points to the menu button
-            if (!child.name.ToLowerInvariant().Contains("thingy"))
+            if (!child.name.ToLowerInvariant().Contains("bg-panel"))
                 UnityObject.Destroy(child.gameObject);
         }
 
+        var toggleFlyout = kscAppTrayButton.GetComponent<ToggleFlyout>();
+        toggleFlyout.OnDisable();
+        toggleFlyout._target = kscAppTray;
+        toggleFlyout._toggle = kscAppTrayButton.GetComponent<ToggleExtended>();
+        toggleFlyout._toggleCanvas = kscAppTray.GetComponent<Canvas>();
+        toggleFlyout.OnEnable();
+        toggleFlyout._toggleCanvas.enabled = true;
+        toggleFlyout._toggle.onValueChanged.AddListener(x =>
+        {
+            if (!x) return;
+            if (!originalToggle.isOn) return;
+            originalToggle.Set(false);
+        });
+        originalToggle.onValueChanged.AddListener(x =>
+        {
+            if (!x) return;
+            if (!toggleFlyout._toggle.isOn) return;
+            toggleFlyout._toggle.Set(false);
+        });
+        
         Logger.LogInfo("Created KSC app tray.");
 
         return kscAppTray;
@@ -386,7 +416,7 @@ internal static class AppbarBackend
 
         // Find the Launchpad_1 button.
         var kscLaunchLocationsFlyoutTarget = GameObject.Find(
-            "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Main Canvas/KSCMenu(Clone)/LandingPanel/InteriorWindow/MenuButtons/Content/Menu/LaunchLocationFlyoutHeaderToggle/LaunchLocationsFlyoutTarget");
+            $"{KscMenuPath}/{TargetName}");
         var launchPadButton = kscLaunchLocationsFlyoutTarget != null ? kscLaunchLocationsFlyoutTarget.GetChild("Launchpad_1") : null;
 
         if (launchPadButton == null)
@@ -400,7 +430,7 @@ internal static class AppbarBackend
         modButton.name = buttonId;
 
         // Change the text
-        var modText = modButton.GetChild("Content").GetChild("Text (TMP)").GetComponent<TextMeshProUGUI>();
+        var modText = modButton.GetChild("TXT-LocationName").GetComponent<TextMeshProUGUI>();
         modText.text = buttonText;
 
         // Suppress renaming of the button
@@ -411,7 +441,7 @@ internal static class AppbarBackend
         }
 
         // Change the icon
-        var icon = modButton.GetChild("Icon");
+        var icon = modButton.GetChild("ICO-Location");
         var image = icon.GetComponent<Image>();
         image.sprite = buttonIcon;
 
