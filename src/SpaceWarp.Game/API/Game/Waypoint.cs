@@ -11,6 +11,21 @@ namespace SpaceWarp.API.Game;
 /// </summary>
 [PublicAPI]
 public class Waypoint {
+  /// <summary>
+  /// This contains the state for a waypoint
+  /// </summary>
+  public enum WaypointState
+  {
+    /// <summary>
+    /// The waypoint is shown in the flight/map view
+    /// </summary>
+    Visible,
+    /// <summary>
+    /// The waypoint is hidden in the flight/map view
+    /// </summary>
+    Hidden
+  }
+  
   private SimulationObjectModel _waypointObject;
   /// <summary>
   /// The current name of the waypoint
@@ -37,9 +52,62 @@ public class Waypoint {
   /// </summary>
   public double AltitudeFromRadius { get; private set; }
 
+  [CanBeNull] private string _hiddenRename;
+  
+  private WaypointState _state = WaypointState.Visible;
+  /// <summary>
+  /// Set the state of the waypoint to either being hidden/shown
+  /// </summary>
+  /// <exception cref="Exception">Thrown when trying to set the state of a destroyed waypoint</exception>
+  public WaypointState State
+  {
+    get => _state;
+    set
+    {
+      if (_isDestroyed)
+      {
+        throw new Exception("Waypoint was already destroyed");
+      }
+      if (value == _state) return;
+      _state = value;
+      if (value == WaypointState.Hidden)
+      {
+        _hiddenRename = Name;
+        _waypointObject.Destroy();
+      }
+      else
+      {
+        var spaceSimulation = GameManager.Instance.Game.SpaceSimulation;
+        var celestialBodies = GameManager.Instance.Game.UniverseModel.GetAllCelestialBodies();
+        var body = celestialBodies.Find(c => c.Name == BodyName);
+        if (body == null)
+          throw new Exception($"Could not create waypoint as there is no body with the name of {BodyName}");
+        var waypointComponentDefinition = new WaypointComponentDefinition { Name = _hiddenRename };
+        _waypointObject = spaceSimulation.CreateWaypointSimObject(
+          waypointComponentDefinition, body, Latitude, Longitude, AltitudeFromRadius);
+        _hiddenRename = null;
+      }
+    }
+  }
+  
   private bool _isDestroyed;
 
   private static long _nextID;
+
+  /// <summary>
+  /// Creates a waypoint handle from a preexisting waypoint
+  /// </summary>
+  /// <param name="preexistingWaypoint">The preexisting waypoint</param>
+  public Waypoint(WaypointComponent preexistingWaypoint)
+  {
+    _waypointObject = preexistingWaypoint.SimulationObject;
+    var body = _waypointObject.transform.parent.transform.objectModel.CelestialBody;
+    BodyName = body.Name;
+    body.GetLatLonAltFromRadius(_waypointObject.transform.Position, out var latitude, out var longitude, out var altitudeFromRadius);
+    Latitude = latitude;
+    Longitude = longitude;
+    AltitudeFromRadius = altitudeFromRadius;
+  }
   
   /// <summary>
   /// Create a new waypoint at the specified location
@@ -100,10 +168,11 @@ public class Waypoint {
     Latitude = latitude;
     Longitude = longitude;
     AltitudeFromRadius = altitudeFromRadius.Value;
+    if (_state != WaypointState.Visible) return;
     var bodyFrame = body.transform.bodyFrame;
-    var relSurfacePosition = body.GetRelSurfacePosition(latitude,longitude,altitudeFromRadius.Value);
+    var relSurfacePosition = body.GetRelSurfacePosition(latitude, longitude, altitudeFromRadius.Value);
     _waypointObject.transform.parent = bodyFrame;
-    _waypointObject.transform.Position = new Position(bodyFrame,relSurfacePosition);
+    _waypointObject.transform.Position = new Position(bodyFrame, relSurfacePosition);
   }
   
   /// <summary>
@@ -115,7 +184,24 @@ public class Waypoint {
     if (_isDestroyed) {
       throw new Exception("Waypoint was already destroyed");
     }
-    _waypointObject.Name = name ?? $"Waypoint-{_nextID++}";
+
+    if (State == WaypointState.Visible)
+    {
+      _waypointObject.Name = name ?? $"Waypoint-{_nextID++}";
+    }
+    else
+    {
+      _hiddenRename = _waypointObject.Name;
+    }
   }
-  
+
+
+  /// <summary>
+  /// Hides the waypoint
+  /// </summary>
+  public void Hide() => State = WaypointState.Hidden;
+  /// <summary>
+  /// Shows the waypoint
+  /// </summary>
+  public void Show() => State = WaypointState.Visible;
 }
