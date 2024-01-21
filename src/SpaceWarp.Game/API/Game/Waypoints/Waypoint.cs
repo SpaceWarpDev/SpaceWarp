@@ -5,7 +5,7 @@ using KSP.Sim.Definitions;
 using KSP.Sim.impl;
 using Newtonsoft.Json;
 
-namespace SpaceWarp.API.Game;
+namespace SpaceWarp.API.Game.Waypoints;
 
 /// <summary>
 /// A handle for a waypoint in the flight/map view for KSP2
@@ -13,35 +13,7 @@ namespace SpaceWarp.API.Game;
 [PublicAPI]
 public class Waypoint
 {
-    /// <summary>
-    /// This contains the state for a waypoint
-    /// </summary>
-    public enum WaypointState
-    {
-        /// <summary>
-        /// The waypoint is shown in the flight/map view
-        /// </summary>
-        Visible,
-
-        /// <summary>
-        /// The waypoint is hidden in the flight/map view
-        /// </summary>
-        Hidden
-    }
-
-    /// <summary>
-    /// This contains the serialized information for a waypoint, used for saving/loading waypoints
-    /// </summary>
-    [Serializable]
-    [method: JsonConstructor]
-    public struct SerializedWaypoint(string name, string bodyName, double latitude, double longitude, double altitude, WaypointState state)
-    {
-        /// <summary>
-        /// Deserializes the waypoint, creating an actual waypoint from it
-        /// </summary>
-        /// <returns>A newly created waypoint from the serialized waypoint's parameters</returns>
-        public Waypoint Deserialize() => new(latitude, longitude, altitude, bodyName, name, state);
-    }
+    
     
     private SimulationObjectModel _waypointObject;
 
@@ -255,6 +227,6 @@ public class Waypoint
     /// Serializes the waypoint to be saved in save data
     /// </summary>
     /// <returns>The waypoint as a serialized record</returns>
-    public SerializedWaypoint Serialize() =>
+    public virtual SerializedWaypoint Serialize() =>
         new(Name, BodyName, Latitude, Longitude, AltitudeFromRadius, State);
 }
