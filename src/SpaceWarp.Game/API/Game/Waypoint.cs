@@ -117,9 +117,5 @@ public class Waypoint {
     }
     _waypointObject.Name = name ?? $"Waypoint-{_nextID++}";
   }
-
-  ~Waypoint()
-  {
-    Destroy();
-  }
+  
 }
