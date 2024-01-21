@@ -7,7 +7,7 @@ using KSP.Sim.impl;
 namespace SpaceWarp.API.Game;
 
 /// <summary>
-/// A handle for a waypoint in the map view for KSP2
+/// A handle for a waypoint in the flight/map view for KSP2
 /// </summary>
 [PublicAPI]
 public class Waypoint {
@@ -116,5 +116,10 @@ public class Waypoint {
       throw new Exception("Waypoint was already destroyed");
     }
     _waypointObject.Name = name ?? $"Waypoint-{_nextID++}";
+  }
+
+  ~Waypoint()
+  {
+    Destroy();
   }
 }
