@@ -30,7 +30,7 @@ public class Waypoint {
   /// <summary>
   /// The current name of the waypoint
   /// </summary>
-  public string Name => _waypointObject.Name;
+  public string Name => State == WaypointState.Visible ? _waypointObject.Name : _hiddenRename;
 
   /// <summary>
   /// The current body that the waypoint is placed on
@@ -74,6 +74,7 @@ public class Waypoint {
       {
         _hiddenRename = Name;
         _waypointObject.Destroy();
+        _waypointObject = null;
       }
       else
       {
@@ -143,6 +144,7 @@ public class Waypoint {
       throw new Exception("Waypoint was already destroyed");
     }
     _waypointObject.Destroy();
+    _waypointObject = null;
     _isDestroyed = true;
   }
   
