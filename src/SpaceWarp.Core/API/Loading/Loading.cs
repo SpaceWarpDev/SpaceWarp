@@ -80,6 +80,21 @@ public static class Loading
         AddGeneralLoadingAction(() => new AddressableAction<T>(name, label, action));
     }
 
+    /// <summary>
+    /// Registers an action to be done on addressables after addressables have been loaded. Should be added either on Awake() or Start().
+    /// Allows to keep asset in memory after loading them. This is useful for textures or UXML templates, for example.
+    /// </summary>
+    /// <param name="name">The name of the action</param>
+    /// <param name="label">The addressables label to hook into</param>
+    /// <param name="keepAssets">Indicates if assets should be kept in memory after loading them.</param>
+    /// <param name="action">The action to be done on each addressables asset</param>
+    /// <typeparam name="T">The type of asset that this action is done upon</typeparam>
+    public static void AddAddressablesLoadingAction<T>(string name, string label, bool keepAssets, Action<T> action)
+        where T : UnityObject
+    {
+        AddGeneralLoadingAction(() => new AddressableAction<T>(name, label, keepAssets, action));
+    }
+
 
     private static Action<BaseSpaceWarpPlugin> CreateAssetLoadingActionWithExtensions(string subfolder,
         Func<string, string, List<(string name, UnityObject asset)>> importFunction, string[] extensions)
