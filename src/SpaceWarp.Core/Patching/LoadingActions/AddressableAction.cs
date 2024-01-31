@@ -18,6 +18,7 @@ public class AddressableAction<T> : FlowAction where T : UnityObject
 {
     private string _label;
     private Action<T> _action;
+    private bool _keepAssets;
 
     /// <summary>
     /// Creates a new addressable loading action.
@@ -29,6 +30,19 @@ public class AddressableAction<T> : FlowAction where T : UnityObject
     {
         _label = label;
         _action = action;
+    }
+    
+    /// <summary>
+    /// Creates a new addressable loading action, with the option to keep the asset in memory after loading.
+    /// This is useful for textures or UXML templates, for example.
+    /// </summary>
+    /// <param name="name">Name of the action.</param>
+    /// <param name="label">Label of the asset to load.</param>
+    /// <param name="action">Action to perform on the loaded asset.</param>
+    /// <param name="keepAssets">Allows to keep asset in memory after loading them.</param>
+    public AddressableAction(string name, string label, bool keepAssets, Action<T> action) : this(name, label, action)
+    {
+        _keepAssets = keepAssets;
     }
 
     private bool DoesLabelExist(object label)
@@ -55,7 +69,7 @@ public class AddressableAction<T> : FlowAction where T : UnityObject
         {
             GameManager.Instance.Assets.LoadByLabel(_label,_action,delegate(IList<T> assetLocations)
             {
-                if (assetLocations != null)
+                if (assetLocations != null && !_keepAssets)
                 {
                     Addressables.Release(assetLocations);
                 }
