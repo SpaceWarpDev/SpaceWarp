@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using JetBrains.Annotations;
+using KSP.UI.Flight;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Configuration;
 using SpaceWarp.API.UI.Appbar;
@@ -86,6 +87,7 @@ public class UI : SpaceWarpModule
     /// <inheritdoc/>
     public override void InitializeModule()
     {
+
         ModuleLogger.LogInfo("Initializing UI");
         if (VersionChecking.Instance.ConfigFirstLaunch.Value)
         {

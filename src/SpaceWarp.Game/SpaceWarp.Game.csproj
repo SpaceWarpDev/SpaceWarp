@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <!-- References -->
+    <PropertyGroup>
+      <RootNamespace>SpaceWarp</RootNamespace>
+    </PropertyGroup>
     <ItemGroup Label="NuGet package references">
-        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.5"/>
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.2.0" Publicize="true"/>
     </ItemGroup>
     <ItemGroup Label="Project references">
         <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Core/SpaceWarp.Core.csproj" Private="false"/>
+        <ProjectReference Include="..\SpaceWarp.UI\SpaceWarp.UI.csproj" />
     </ItemGroup>
 </Project>

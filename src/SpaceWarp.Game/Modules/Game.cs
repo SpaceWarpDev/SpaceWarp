@@ -1,7 +1,14 @@
-﻿using JetBrains.Annotations;
+﻿using System.Reflection;
+using HarmonyLib;
+using JetBrains.Annotations;
 using KSP.Game;
 using KSP.Messages;
+using SpaceWarp.API.Assets;
 using SpaceWarp.API.Game.Messages;
+using SpaceWarp.API.Game.Waypoints;
+using UnityEngine;
+using ILogger = SpaceWarp.API.Logging.ILogger;
+using Object = UnityEngine.Object;
 
 namespace SpaceWarp.Modules;
 
@@ -11,8 +18,17 @@ namespace SpaceWarp.Modules;
 [UsedImplicitly]
 public class Game : SpaceWarpModule
 {
+
+    internal static ILogger Logger;
     /// <inheritdoc />
     public override string Name => "SpaceWarp.Game";
+
+    /// <inheritdoc />
+    public override void PreInitializeModule()
+    {
+        Logger = ModuleLogger;
+        Harmony.CreateAndPatchAll(typeof(Patches.MapPatches));
+    }
 
     /// <inheritdoc />
     public override void InitializeModule()
