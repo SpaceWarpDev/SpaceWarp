@@ -85,6 +85,11 @@ public class Waypoint
 
     private bool _isDestroyed;
 
+    /// <summary>
+    /// Whether or not this waypoint has been destroyed
+    /// </summary>
+    public bool IsDestroyed => _isDestroyed || _waypointObject is { _isDestroyed: true };
+
     private static long _nextID;
 
     /// <summary>
@@ -147,13 +152,17 @@ public class Waypoint
     /// <exception cref="Exception">Thrown if the waypoint was already destroyed</exception>
     public void Destroy()
     {
-        if (_isDestroyed)
+        if (IsDestroyed)
         {
             throw new Exception("Waypoint was already destroyed");
         }
 
-        _waypointObject.Destroy();
-        _waypointObject = null;
+        if (State == WaypointState.Visible)
+        {
+            _waypointObject.Destroy();
+            _waypointObject = null;
+        }
+
         _isDestroyed = true;
     }
 
@@ -168,7 +177,7 @@ public class Waypoint
     public void Move(double latitude, double longitude, double? altitudeFromRadius = null,
         [CanBeNull] string bodyName = null)
     {
-        if (_isDestroyed)
+        if (IsDestroyed)
         {
             throw new Exception("Waypoint was already destroyed");
         }
@@ -197,7 +206,7 @@ public class Waypoint
     /// <exception cref="Exception">Thrown if the waypoint is destroyed</exception>
     public void Rename([CanBeNull] string name = null)
     {
-        if (_isDestroyed)
+        if (IsDestroyed)
         {
             throw new Exception("Waypoint was already destroyed");
         }
