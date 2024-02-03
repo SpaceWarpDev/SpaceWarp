@@ -2,7 +2,8 @@ name: Publish NuGet Package
 env:
   MOD_ID: 3277
   KSP2_ID: 22407
-
+  FORUM_URL: 'https://forum.kerbalspaceprogram.com/topic/218490-space-warp-v190-for-ksp2-0200/'
+  FORUM_TITLE: 'Space Warp [v{version} for KSP2 {ksp2_version}]'
 on:
   release:
     types: [ "published" ]
@@ -78,4 +79,16 @@ jobs:
           mod_id: 3277
           version: ${{ env.version }}
           zipball: ${{ env.zip }}
+          changelog: ./changelog.md
+
+      - name: Update mod topic 
+        uses: Kerbalight/ksp2-forum-post-action@latest
+        with:
+          username: ${{ secrets.FORUM_USER }}
+          password: ${{ secrets.FORUM_PASSWORD }}
+          forum_topic_url: ${{ env.FORUM_URL }}
+          forum_topic_title: ${{ env.FORUM_TITLE }} 
+          spacedock_url: https://spacedock.info/mod/3277/Space%20Warp%20+%20BepInEx
+          version: ${{ env.version }}
+          swinfo_path: 'plugin_template/BepInEx/plugins/SpaceWarp/swinfo.json'
           changelog: ./changelog.md
