@@ -1,0 +1,39 @@
+name: Update Forum Topic
+env:
+  FORUM_URL: 'https://forum.kerbalspaceprogram.com/topic/218490-space-warp-v190-for-ksp2-0200/'
+  FORUM_TITLE: 'Space Warp [v{version} for KSP2 {ksp2_version}]'
+  
+on:
+  workflow_dispatch:
+
+jobs:
+  update_topic:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v2.1.0
+
+      - name: Extract current version
+        id: get-version
+        run: |
+          version=$(jq -r '.version' plugin_template/BepInEx/plugins/SpaceWarp/swinfo.json)
+          echo "Version is $version"
+          echo "version=$version" >> $GITHUB_ENV
+          wget -qO- https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq -r '.[0].body' > ./changelog.md
+
+      - name: Update mod topic
+        uses: Kerbalight/ksp2-forum-post-action@latest
+        with:
+          username: ${{ secrets.FORUM_USER }}
+          password: ${{ secrets.FORUM_PASSWORD }}
+          forum_topic_url: ${{ env.FORUM_URL }}
+          forum_topic_title: ${{ env.FORUM_TITLE }}
+          spacedock_url: https://spacedock.info/mod/3277/Space%20Warp%20+%20BepInEx
+          version: ${{ env.version }}
+          swinfo_path: 'plugin_template/BepInEx/plugins/SpaceWarp/swinfo.json'
+          changelog: ./changelog.md
+          
