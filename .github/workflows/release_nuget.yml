@@ -90,4 +90,5 @@ jobs:
           forum_topic_title: ${{ env.FORUM_TITLE }} 
           spacedock_url: https://spacedock.info/mod/3277/Space%20Warp%20+%20BepInEx
           version: ${{ env.version }}
+          swinfo_path: 'plugin_template/BepInEx/plugins/SpaceWarp/swinfo.json'
           changelog: ./changelog.md
