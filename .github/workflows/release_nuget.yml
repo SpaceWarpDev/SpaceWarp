@@ -92,3 +92,23 @@ jobs:
           version: ${{ env.version }}
           swinfo_path: 'plugin_template/BepInEx/plugins/SpaceWarp/swinfo.json'
           changelog: ./changelog.md
+          
+      - name: Prepare content
+        shell: bash
+        run: |
+          echo -e "## SpaceWarp v${version}\n" > ./content.md
+          cat ./changelog.md >> ./content.md
+          {
+            echo 'discord_message<<EOF'
+            cat ./content.md
+            echo EOF
+          } >> "$GITHUB_ENV"
+          
+      - name: Post discord server announcement
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          content: ${{ env.disord_message }}
+          username: "Space Warp"
+          avatar-url: https://spacewarp.org/assets/swlogo.svg
+      
