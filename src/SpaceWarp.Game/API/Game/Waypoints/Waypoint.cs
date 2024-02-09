@@ -13,8 +13,6 @@ namespace SpaceWarp.API.Game.Waypoints;
 [PublicAPI]
 public class Waypoint
 {
-    
-    
     private SimulationObjectModel _waypointObject;
 
     /// <summary>
@@ -130,7 +128,17 @@ public class Waypoint
         var body = celestialBodies.Find(c => c.Name == bodyName);
         if (body == null)
             throw new Exception($"Could not create waypoint as there is no body with the name of {bodyName}");
-        altitudeFromRadius ??= body.SurfaceProvider.GetTerrainAltitudeFromCenter(latitude, longitude) - body.radius;
+        if (altitudeFromRadius == null)
+        {
+            altitudeFromRadius = body.SurfaceProvider.GetTerrainAltitudeFromCenter(latitude, longitude) - body.radius;
+            
+            // if the local space of the body is not loaded, then the altitude of the terrain from its center is equal to the radius
+            if (altitudeFromRadius == 0)
+            {
+                // we'll set the altitude to the MaxTerrainHeight, so that the waypoint will always appear above the surface
+                altitudeFromRadius += body.MaxTerrainHeight;
+            }
+        }
         AltitudeFromRadius = altitudeFromRadius.Value;
         _state = waypointState;
         if (_state == WaypointState.Visible)
