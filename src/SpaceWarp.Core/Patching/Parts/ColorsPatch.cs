@@ -50,7 +50,7 @@ internal class ColorsPatch
     [HarmonyPatch(typeof(SimulationObjectView), nameof(SimulationObjectView.InitializeView))]
     public static void UpdateColorsInFlight(GameObject instance)
     {
-        foreach (var renderer in instance.GetComponentsInChildren<Renderer>())
+        foreach (var renderer in instance.GetComponentsInChildren<Renderer>(true))
         {
             var shaderName = renderer.material.shader.name;
             if (shaderName is not ("Parts Replace" or "KSP2/Parts/Paintable"))
