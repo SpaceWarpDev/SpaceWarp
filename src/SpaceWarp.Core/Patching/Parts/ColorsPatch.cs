@@ -28,7 +28,7 @@ internal class ColorsPatch
     [HarmonyPatch(typeof(ObjectAssemblyPartTracker), nameof(ObjectAssemblyPartTracker.OnPartPrefabLoaded))]
     public static void Prefix(IObjectAssemblyAvailablePart obj, ref GameObject prefab)
     {
-        foreach (var renderer in prefab.GetComponentsInChildren<Renderer>())
+        foreach (var renderer in prefab.GetComponentsInChildren<Renderer>(true))
         {
             var shaderName = renderer.material.shader.name;
             if (shaderName is not ("Parts Replace" or "KSP2/Parts/Paintable"))
