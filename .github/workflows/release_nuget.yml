@@ -103,12 +103,4 @@ jobs:
             cat ./content.md
             echo EOF
           } >> "$GITHUB_ENV"
-          
-      - name: Post discord server announcement
-        uses: tsickert/discord-webhook@v5.3.0
-        with:
-          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-          content: ${{ env.disord_message }}
-          username: "Space Warp"
-          avatar-url: https://spacewarp.org/assets/swlogo.svg
       
