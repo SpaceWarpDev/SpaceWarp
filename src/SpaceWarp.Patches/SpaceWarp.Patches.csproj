@@ -7,6 +7,6 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
     </ItemGroup>
     <ItemGroup Label="Project references">
-        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Preload/SpaceWarp.Preload.csproj" Private="false"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Preload/SpaceWarp.Preload.csproj" Private="false" PrivateAssets="all"/>
     </ItemGroup>
 </Project>

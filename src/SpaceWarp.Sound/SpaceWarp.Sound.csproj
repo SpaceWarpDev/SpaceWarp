@@ -3,9 +3,9 @@
     <!-- References -->
     <ItemGroup Label="NuGet package references">
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all"/>
-        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.5" Publicize="true"/>
+        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.2.1" Publicize="true"/>
     </ItemGroup>
     <ItemGroup Label="Project references">
-        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Core/SpaceWarp.Core.csproj" Private="false"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Core/SpaceWarp.Core.csproj" Private="false" PrivateAssets="all"/>
     </ItemGroup>
 </Project>

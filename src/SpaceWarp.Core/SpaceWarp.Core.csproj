@@ -13,7 +13,7 @@
         <PackageReference Include="BepInEx.BaseLib" Version="5.4.21" Publicize="true"/>
         <PackageReference Include="BepInEx.Core" Version="5.4.21"/>
         <PackageReference Include="HarmonyX" Version="2.10.1"/>
-        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.1.5" Publicize="true" PrivateAssets="all"/>
+        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.2.1" Publicize="true" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="SpaceWarp.PluginInfoProps" Version="1.*" PrivateAssets="all"/>
@@ -21,9 +21,6 @@
         <PackageReference Include="UnityEngine.Modules" Version="2022.3.5" Publicize="true"/>
     </ItemGroup>
     <ItemGroup Label="Project references">
-        <ProjectReference Include="..\SpaceWarp.Preload\SpaceWarp.Preload.csproj">
-          <Private>false</Private>
-          <PrivateAssets>all</PrivateAssets>
-        </ProjectReference>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Preload/SpaceWarp.Preload.csproj" Private="false" PrivateAssets="all"/>
     </ItemGroup>
 </Project>

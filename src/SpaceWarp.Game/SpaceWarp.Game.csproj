@@ -9,10 +9,10 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.2.0" Publicize="true"/>
+        <PackageReference Include="KerbalSpaceProgram2.GameLibs" Version="0.2.1" Publicize="true"/>
     </ItemGroup>
     <ItemGroup Label="Project references">
-        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Core/SpaceWarp.Core.csproj" Private="false"/>
-        <ProjectReference Include="..\SpaceWarp.UI\SpaceWarp.UI.csproj" />
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.Core/SpaceWarp.Core.csproj" Private="false" PrivateAssets="all"/>
+        <ProjectReference Include="$(SolutionDir)/src/SpaceWarp.UI/SpaceWarp.UI.csproj" Private="false" PrivateAssets="all"/>
     </ItemGroup>
 </Project>
