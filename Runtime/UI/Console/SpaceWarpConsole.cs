@@ -286,7 +286,10 @@ internal sealed class SpaceWarpConsole : MonoBehaviour
     private IEnumerator AutoScrollToBottomCoroutine()
     {
         yield return null;
-        _consoleContent.ScrollTo(_consoleContent.contentContainer[_consoleContent.contentContainer.childCount - 1]);
+        if (_consoleContent.contentContainer.childCount > 0)
+        {
+            _consoleContent.ScrollTo(_consoleContent.contentContainer[_consoleContent.contentContainer.childCount - 1]);
+        }
         //put a while loop here to make this automatic!
     }
 
