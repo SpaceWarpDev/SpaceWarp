@@ -7,13 +7,11 @@ using ReduxLib.Configuration;
 using ReduxLib.Logging;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.Mods.JSON;
+using UnityEngine;
 namespace SpaceWarp.API.Backend.Modding;
 
 internal static class PluginRegister
 {
-    
-    
-    
     public static void RegisterAllMods()
     {
         RegisterSpaceWarp();
@@ -27,14 +25,14 @@ internal static class PluginRegister
         foreach (var mod in IInternalModRegister.Instance.InternalPluginDescriptors)
         {
             mod.Plugin.SWLogger ??= ReduxLib.ReduxLib.GetLogger(mod.Guid);
-            mod.Plugin.SWConfiguration = mod.ConfigFile = new JsonConfigFile(Path.Combine(mod.Folder.FullName,"config.json"));
+            mod.Plugin.SWConfiguration = mod.ConfigFile = new JsonConfigFile(Path.Combine(mod.Folder.FullName, "config.json"));
             mod.IsCore = true;
             PluginList.RegisterPlugin(mod);
         }
     }
 
 
-    private static readonly ILogger Logger = SpaceWarpPlugin.Logger;
+    private static readonly ReduxLib.Logging.ILogger Logger = SpaceWarpPlugin.Logger;
 
     private static bool AssertFolderPath(ISpaceWarpMod plugin, string folderPath)
     {
@@ -45,8 +43,8 @@ internal static class PluginRegister
             $"not be initialized."
         );
 
-    return false;
-}
+        return false;
+    }
 
     private static bool AssertModInfoExistence(ISpaceWarpMod plugin, string modInfoPath, string folderPath)
     {
@@ -63,14 +61,14 @@ internal static class PluginRegister
         PluginList.NoteMissingSwinfoError(new SpaceWarpPluginDescriptor(plugin, "unknown", Path.GetFileName(folderPath),
             new ModInfo(), new DirectoryInfo(folderPath)));
 
-    return false;
-}
+        return false;
+    }
 
     private static bool TryReadModInfo(
         ISpaceWarpMod plugin,
         string modInfoPath,
         string folderPath,
-        out ModInfo? metadata
+        out ModInfo metadata
     )
     {
         try
@@ -104,7 +102,7 @@ internal static class PluginRegister
         descriptor.IsCore = true;
         PluginList.RegisterPlugin(descriptor);
     }
-    
+
     private static void RegisterMods()
     {
         var pluginPath = new DirectoryInfo(CommonPaths.ModsFolder);
@@ -143,21 +141,45 @@ internal static class PluginRegister
                     Assembly.LoadFile(dll.FullName);
                 }
             }
-            
+
             // But then load the 
             ISpaceWarpMod swMod = new AssetOnlyMod(swinfoData.Name);
             if (swinfoData.MainAssembly != null && !ModList.DisabledPluginGuids.Contains(swinfoData.ModID))
             {
-                var dll = Path.Combine(swinfo.Directory!.FullName, swinfoData.MainAssembly);
-                if (!File.Exists(dll))
+                Assembly asm = null;
+                if (Application.isEditor)
                 {
-                    // TODO: Add a bad assembly error to the mods list
-                    Logger.LogError(
-                        $"Main assembly {swinfoData.MainAssembly} for {swinfoData.Name} could not be found, this mod will be ignored");
-                    continue;
+                    // The mod assembly may be compiled by unity and should already be in the loaded app domain.
+                    var shortName = Path.GetFileNameWithoutExtension(swinfoData.MainAssembly);
+                    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        var thisShortName = assembly.GetName().Name;
+                        if (shortName == thisShortName)
+                        {
+                            asm = assembly;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    var dll = Path.Combine(swinfo.Directory!.FullName, swinfoData.MainAssembly);
+                    if (!File.Exists(dll))
+                    {
+                        // TODO: Add a bad assembly error to the mods list
+                        Logger.LogError(
+                            $"Main assembly {swinfoData.MainAssembly} for {swinfoData.Name} could not be found, this mod will be ignored");
+                        continue;
+                    }
+
+                    asm = Assembly.LoadFile(dll);
                 }
 
-                var asm = Assembly.LoadFile(dll);
+                if (asm is null)
+                {
+                    Debug.LogWarning($"Can't find main assembly {swinfoData.MainAssembly} for mod {swinfoData.Name}");
+                    continue;
+                }
 
                 foreach (var type in asm.GetTypes())
                 {
@@ -203,6 +225,4 @@ internal static class PluginRegister
             PluginList.Disable(mod);
         }
     }
-    
-
 }
