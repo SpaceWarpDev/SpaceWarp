@@ -1,0 +1,20 @@
+{
+    "name": "SpaceWarp",
+    "rootNamespace": "SpaceWarp",
+    "references": [
+        "GUID:c8ac239925593834ba7eac32cbc92146",
+        "GUID:9e24947de15b9834991c9d8411ea37cf",
+        "GUID:84651a3751eca9349aac36a66bba901b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "DataLink.Shared.Net.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
