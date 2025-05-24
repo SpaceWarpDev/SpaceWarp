@@ -94,7 +94,7 @@ public class VersionChecking : SpaceWarpModule
         var uiModule = (SpaceWarpModule)AppDomain.CurrentDomain.GetAssemblies()
             .First(assembly => assembly.FullName.StartsWith("SpaceWarp.UI"))
             .GetTypes()
-            .First(type => type.FullName == "SpaceWarp.Modules.UI")
+            .First(type => type.FullName == "SpaceWarp.UI.UI")
             .GetField("Instance", BindingFlags.Static | BindingFlags.NonPublic)
             ?.GetValue(null)!;
 
