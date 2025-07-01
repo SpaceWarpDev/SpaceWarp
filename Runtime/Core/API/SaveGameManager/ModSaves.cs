@@ -66,17 +66,25 @@ public static class ModSaves
         }
 
         saveData ??= Activator.CreateInstance<T>();
-
-        saveDataList.Add(new PluginSaveData
+        var dataObject = new PluginSaveData
         {
             ModGuid = modGuid,
             SaveEventCallback = SaveCallbackAdapter,
             LoadEventCallback = LoadCallbackAdapter,
             NewEventCallback = NewCallbackAdapter,
             SaveData = saveData
-        });
+        };
+        saveDataList.Add(dataObject);
         SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Registered '{modGuid}' for {persistenceKind.ToPersistenceString()} save/load events.");
-        return saveData;
+        if (persistenceKind == PersistenceKind.PerCampaign)
+        {
+            ISaveGameApi.Instance.PopulateCampaignData(dataObject);
+        }
+        else
+        {
+            ISaveGameApi.Instance.PopulateSaveData(dataObject);
+        }
+        return (dataObject.SaveData as T)!;
 
         // Create adapter functions to convert Action<T> to CallbackFunctionDelegate
 
