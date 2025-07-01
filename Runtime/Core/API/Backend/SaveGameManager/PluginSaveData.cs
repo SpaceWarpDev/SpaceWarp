@@ -6,6 +6,7 @@ namespace SpaceWarp.API.Backend.SaveGameManager;
 /// The delegate type that will be called when a save or load event is triggered.
 /// </summary>
 public delegate void SaveGameCallbackFunctionDelegate(object data);
+public delegate object ResetDataCallbackFunctionDelegate(object data);
 
 /// <summary>
 /// This class is used to store your mod data for saving and loading.
@@ -27,4 +28,6 @@ public class PluginSaveData
     public SaveGameCallbackFunctionDelegate SaveEventCallback;
     [NonSerialized]
     public SaveGameCallbackFunctionDelegate LoadEventCallback;
+    [NonSerialized]
+    public ResetDataCallbackFunctionDelegate NewEventCallback;
 }
