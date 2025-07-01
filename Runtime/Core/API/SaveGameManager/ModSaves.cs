@@ -34,6 +34,10 @@ public static class ModSaves
     /// <param name="onLoad">
     /// Function that will execute when a LOAD event is triggered. Defaults to null or no callback.
     /// </param>
+    /// <param name="onNew">
+    /// Function that will execute when a LOAD event happens where there was not data prior in the save or campaign for
+    /// this mod. What is passed in is the old data, and what is returned becomes the new data. 
+    /// </param>
     /// <param name="saveData">
     /// Your object that will be saved to a save file during a save event and that will be updated when a load event
     /// pulls new data. Ensure that a new instance of this object is NOT created after registration.
@@ -49,6 +53,7 @@ public static class ModSaves
         string modGuid,
         Action<T>? onSave = null,
         Action<T>? onLoad = null,
+        Func<T,T>? onNew = null,
         T? saveData = null,
         PersistenceKind persistenceKind = PersistenceKind.PerSave
     ) where T : class
@@ -67,6 +72,7 @@ public static class ModSaves
             ModGuid = modGuid,
             SaveEventCallback = SaveCallbackAdapter,
             LoadEventCallback = LoadCallbackAdapter,
+            NewEventCallback = NewCallbackAdapter,
             SaveData = saveData
         });
         SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Registered '{modGuid}' for {persistenceKind.ToPersistenceString()} save/load events.");
@@ -88,6 +94,15 @@ public static class ModSaves
             {
                 onSave(data);
             }
+        }
+
+        object NewCallbackAdapter(object dataToBeReset)
+        {
+            if (onNew != null && dataToBeReset is T data)
+            {
+                return onNew(data);
+            }
+            return dataToBeReset;
         }
     }
 
@@ -122,6 +137,10 @@ public static class ModSaves
     /// <param name="onLoad">
     /// Function that will execute when a LOAD event is triggered. Defaults to null or no callback.
     /// </param>
+    /// <param name="onNew">
+    /// Function that will execute when a LOAD event is triggered where there was not data prior in the save or campaign for
+    /// this mod. What is passed in is the old data, and what is returned becomes the new data.
+    /// </param>
     /// <param name="saveData">
     /// Your object that will be saved to a save file during a save event and that will be
     /// updated when a load event pulls new data. Ensure that a new instance of this object is NOT created after
@@ -138,12 +157,20 @@ public static class ModSaves
         string modGuid,
         Action<T>? onSave = null,
         Action<T>? onLoad = null,
+        Func<T,T>? onNew = null,
         T? saveData = null,
         PersistenceKind persistenceKind = PersistenceKind.PerSave
     ) where T : class
     {
         UnRegisterSaveLoadGameData(modGuid);
-        return RegisterSaveLoadGameData(modGuid, onSave, onLoad, saveData);
+        return RegisterSaveLoadGameData(modGuid, onSave, onLoad, onNew, saveData, persistenceKind);
     }
     
+    /// <summary>
+    /// Manually trigger a campaign save data flush
+    /// </summary>
+    public static void TriggerCampaignSaveDataUpdate()
+    {
+        ISaveGameApi.Instance.UpdateCampaignSaveData();
+    }
 }
