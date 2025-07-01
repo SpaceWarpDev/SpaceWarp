@@ -11,7 +11,14 @@ namespace SpaceWarp.API.SaveGameManager;
 [PublicAPI]
 public static class ModSaves
 {
+    /// <summary>
+    /// Per-save plugin data
+    /// </summary>
     public static List<PluginSaveData> PluginSaveData = new();
+    /// <summary>
+    /// Per-campaign plugin data
+    /// </summary>
+    public static List<PluginSaveData> PluginCampaignData = new();
 
     /// <summary>
     /// Registers your mod data for saving and loading events.
@@ -31,32 +38,38 @@ public static class ModSaves
     /// Your object that will be saved to a save file during a save event and that will be updated when a load event
     /// pulls new data. Ensure that a new instance of this object is NOT created after registration.
     /// </param>
+    /// <param name="persistenceKind">
+    /// How the save data is persisted, per save or per campaign, your mod can register save data in one of each of these
+    /// slots
+    /// </param>
     /// <returns>
     /// T saveData object you passed as a parameter, or a default instance of object T if you didn't pass anything
     /// </returns>
     public static T RegisterSaveLoadGameData<T>(
         string modGuid,
-        Action<T> onSave = null,
-        Action<T> onLoad = null,
-        T saveData = default
+        Action<T>? onSave = null,
+        Action<T>? onLoad = null,
+        T? saveData = null,
+        PersistenceKind persistenceKind = PersistenceKind.PerSave
     ) where T : class
     {
+        var saveDataList = persistenceKind == PersistenceKind.PerSave ? PluginSaveData : PluginCampaignData;
         // Check if this GUID is already registered
-        if (PluginSaveData.Find(p => p.ModGuid == modGuid) != null)
+        if (saveDataList.Find(p => p.ModGuid == modGuid) != null)
         {
             throw new ArgumentException($"Mod GUID '{modGuid}' is already registered. Skipping.", nameof(modGuid));
         }
 
         saveData ??= Activator.CreateInstance<T>();
 
-        PluginSaveData.Add(new PluginSaveData
+        saveDataList.Add(new PluginSaveData
         {
             ModGuid = modGuid,
             SaveEventCallback = SaveCallbackAdapter,
             LoadEventCallback = LoadCallbackAdapter,
             SaveData = saveData
         });
-        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Registered '{modGuid}' for save/load events.");
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Registered '{modGuid}' for {persistenceKind.ToPersistenceString()} save/load events.");
         return saveData;
 
         // Create adapter functions to convert Action<T> to CallbackFunctionDelegate
@@ -83,12 +96,16 @@ public static class ModSaves
     /// to be saved and loaded.
     /// </summary>
     /// <param name="modGuid">Your mod GUID you used when registering.</param>
-    public static void UnRegisterSaveLoadGameData(string modGuid)
+    /// <param name="persistenceKind">
+    /// The type of persistence you used when registering.
+    /// </param>
+    public static void UnRegisterSaveLoadGameData(string modGuid, PersistenceKind persistenceKind = PersistenceKind.PerSave)
     {
-        var toRemove = PluginSaveData.Find(p => p.ModGuid == modGuid);
+        var saveDataList = persistenceKind == PersistenceKind.PerSave ? PluginSaveData : PluginCampaignData;
+        var toRemove = saveDataList.Find(p => p.ModGuid == modGuid);
         if (toRemove == null) return;
-        PluginSaveData.Remove(toRemove);
-        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Unregistered '{modGuid}' for save/load events.");
+        saveDataList.Remove(toRemove);
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Unregistered '{modGuid}' for {persistenceKind.ToPersistenceString()} save/load events.");
     }
 
     /// <summary>
@@ -110,14 +127,19 @@ public static class ModSaves
     /// updated when a load event pulls new data. Ensure that a new instance of this object is NOT created after
     /// registration.
     /// </param>
+    /// <param name="persistenceKind">
+    /// How the save data is persisted, per save or per campaign, your mod can register save data in one of each of these
+    /// slots
+    /// </param>
     /// <returns>
     /// T saveData object you passed as a parameter, or a default instance of object T if you didn't pass anything
     /// </returns>
     public static T ReregisterSaveLoadGameData<T>(
         string modGuid,
-        Action<T> onSave = null,
-        Action<T> onLoad = null,
-        T saveData = default
+        Action<T>? onSave = null,
+        Action<T>? onLoad = null,
+        T? saveData = null,
+        PersistenceKind persistenceKind = PersistenceKind.PerSave
     ) where T : class
     {
         UnRegisterSaveLoadGameData(modGuid);
