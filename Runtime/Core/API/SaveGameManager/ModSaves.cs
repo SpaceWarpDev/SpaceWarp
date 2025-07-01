@@ -170,7 +170,7 @@ public static class ModSaves
         PersistenceKind persistenceKind = PersistenceKind.PerSave
     ) where T : class
     {
-        UnRegisterSaveLoadGameData(modGuid);
+        UnRegisterSaveLoadGameData(modGuid, persistenceKind);
         return RegisterSaveLoadGameData(modGuid, onSave, onLoad, onNew, saveData, persistenceKind);
     }
     
