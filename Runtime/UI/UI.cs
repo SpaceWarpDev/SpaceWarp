@@ -132,7 +132,6 @@ public class UI : SpaceWarpModule
     public override void PostInitializeModule()
     {
         ModuleLogger.LogInfo("Post Initializing UI");
-        InitializeSettingsUI();
         InitializeSpaceWarpDetailsFoldout();
         ModListController.AddMainMenuItem();
     }
@@ -163,15 +162,6 @@ public class UI : SpaceWarpModule
         swConsoleOptions.Parent = ui.transform;
         var swConsole = Window.Create(swConsoleOptions, swConsoleUxml);
         SpaceWarpConsole = swConsole.gameObject.AddComponent<SpaceWarpConsole>();
-    }
-
-    public static Type SettingsMenuController;
-
-    private static void InitializeSettingsUI()
-    {
-        GameObject settingsController = ReduxLib.ReduxLib.GetAlwaysLoadedObject("Space Warp Settings Controller");
-        settingsController.AddComponent(SettingsMenuController);
-        settingsController.SetActive(true);
     }
 
     private static VisualElement GenerateSpaceWarpModulesText()

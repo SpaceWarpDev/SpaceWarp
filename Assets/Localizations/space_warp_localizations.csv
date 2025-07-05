@@ -35,6 +35,7 @@ SpaceWarp/Mods,Text,,Mods,Mods,Mods,Mod,模组,Mods,Mods
 SpaceWarp/Mods/Outdated,Text,,Mods <color=yellow>⚠</color>,Mods <color=yellow>⚠</color>,Mods <color=yellow>⚠</color>,Mod <color=yellow>⚠</color>,模组<color=yellow>⚠</color>,Mods <color=yellow>⚠</color>,Mods <color=yellow>⚠</color>
 SpaceWarp/Mods/Errored,Text,,Mods <color=red>⚠</color>,Mods <color=red>⚠</color>,Mods <color=red>⚠</color>,Mod <color=red>⚠</color>,模组<color=red>⚠</color>,Mods <color=red>⚠</color>,Mods <color=red>⚠</color>
 SpaceWarp,Text,,Space Warp,Space Warp,Space Warp,Space Warp,Space Warp,Space Warp,Space Warp
+ResetSpaceWarp,Text,,Reset Space Warp,Reset Space Warp,Reset Space Warp,Reset Space Warp,Reset Space Warp,Reset Space Warp,Reset Space Warp
 SpaceWarp/VersionChecking,Text,,Allow Space Warp to check versions for mods over the network?,Deixar Space Warp verificar a versão dos mods na internet?,Autoriser Space Warp à vérifier les versions des mods sur le réseau ?,Autorizzare Space Warp a controllare le versioni delle mod su internet?,是否允许Space Warp通过网络检查模组的版本?,¿Permitir que Space Warp verifique las versiones de mods a través de la red?,"Space Warp erlauben, Versionen für Mods über das Netzwerk zu überprüfen?"
 SpaceWarp/Yes,Text,,Yes,Sim,Oui,Sì,是,Si,Ja
 SpaceWarp/No,Text,,No,Não,Non,No,否,No,Nein
