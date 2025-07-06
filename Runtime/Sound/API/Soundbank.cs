@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
+using SpaceWarp.Sound.Backend;
 
 namespace SpaceWarp.Sound.API;
 
@@ -60,19 +61,20 @@ public class Soundbank
     /// Loads the Soundbank.
     /// </summary>
     /// <returns>The result of the operation.</returns>
-    public AKRESULT Load()
+    public int Load(out string errorMessage)
     {
         // Pins BankData array in memory
         BankDataPtr ??= (Memory = GCHandle.Alloc(BankData, GCHandleType.Pinned)).Value.AddrOfPinnedObject();
 
         // Loads the entire array as a bank
-        var result = AkSoundEngine.LoadBankMemoryView(
+        var result = ISoundApi.Instance.LoadWWiseBankMemoryView(
             BankDataPtr!.Value,
             (uint)BankData.Length,
-            out WwiseID
+            out WwiseID,
+            out errorMessage
         );
 
-        if (result == AKRESULT.AK_Success)
+        if (result == ISoundApi.Success)
         {
             // BankData is held by the GCHandle or was created from a raw pointer, no need for the array
             BankData = null;

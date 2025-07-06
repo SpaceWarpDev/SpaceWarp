@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using SpaceWarp.Sound.Backend;
 
 namespace SpaceWarp.Sound.API;
 
@@ -20,11 +21,11 @@ public static class SoundbankManager
     public static bool LoadSoundbank(string modId, string internalPath, byte[] bankData, out Soundbank soundbank)
     {
         var bank = new Soundbank(bankData);
-        var result = bank.Load();
+        var result = bank.Load(out var resultMessage);
 
-        if (result != AKRESULT.AK_Success)
+        if (result != ISoundApi.Success)
         {
-            Sound.Instance.ModuleLogger.LogError($"Soundbank loading failed with result {result}");
+            Sound.Instance.ModuleLogger.LogError($"Soundbank loading failed with result {resultMessage}");
             soundbank = null;
             return false;
         }
