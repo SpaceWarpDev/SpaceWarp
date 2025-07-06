@@ -34,7 +34,7 @@ public sealed class SpaceWarpPlugin : GeneralMod
         ReduxLib.ReduxLib.OnReduxLibInitialized += CreateMonoBehaviours;
         
         Loading.AddAddressablesLoadingAction<TextAsset>("Loading addressables localizations (csv)", "loc_csv", OnCsvLoaded);
-        Loading.AddAddressablesLoadingAction<TextAsset>("Loading addressables localizations (csv)", "loc_i2csv", OnI2CsvLoaded);
+        Loading.AddAddressablesLoadingAction<TextAsset>("Loading addressables localizations (i2csv)", "loc_i2csv", OnI2CsvLoaded);
     }
 
     private static void OnCsvLoaded(TextAsset csv)
