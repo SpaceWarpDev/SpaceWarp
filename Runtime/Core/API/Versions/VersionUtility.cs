@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
-namespace SpaceWarp.API.Versions;
+namespace SpaceWarp2.API.Versions;
 
 /// <summary>
 /// Utility class for comparing semantic versions

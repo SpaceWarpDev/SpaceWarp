@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using ReduxLib.Configuration;
 
-namespace SpaceWarp.UI.API.Settings;
+namespace SpaceWarp2.UI.API.Settings;
 
 /// <summary>
 /// API for the mod settings menu

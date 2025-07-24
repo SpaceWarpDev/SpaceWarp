@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using SpaceWarp.API.Mods;
-using SpaceWarp.API.Mods.JSON;
+using SpaceWarp2.API.Mods;
+using SpaceWarp2.API.Mods.JSON;
 
-namespace SpaceWarp.API.Backend.Modding;
+namespace SpaceWarp2.API.Backend.Modding;
 
 public interface IInternalModRegister
 {

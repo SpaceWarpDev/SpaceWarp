@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 #pragma warning disable CS0660, CS0661
 
-namespace SpaceWarp.API.Versions;
+namespace SpaceWarp2.API.Versions;
 
 /// <summary>
 /// Extended version of semantic versioning (see https://semver.org/) that supports an unlimited amount of

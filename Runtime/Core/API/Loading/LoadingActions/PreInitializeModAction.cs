@@ -1,8 +1,8 @@
 using System;
 using ReduxLib.GameInterfaces;
-using SpaceWarp.API.Mods;
+using SpaceWarp2.API.Mods;
 
-namespace SpaceWarp.Patching.LoadingActions;
+namespace SpaceWarp2.Patching.LoadingActions;
 
 internal sealed class PreInitializeModAction : BaseFlowAction
 {

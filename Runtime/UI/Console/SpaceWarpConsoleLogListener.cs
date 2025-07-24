@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ReduxLib.Logging;
 using ILogger = ReduxLib.Logging.ILogger;
 
-namespace SpaceWarp.UI.Console;
+namespace SpaceWarp2.UI.Console;
 
 internal sealed class SpaceWarpConsoleLogListener
 {	

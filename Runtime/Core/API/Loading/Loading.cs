@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using ReduxLib.GameInterfaces;
-using SpaceWarp.API.Loading.LoadingActions;
-using SpaceWarp.API.Mods;
-using SpaceWarp.InternalUtilities;
-using SpaceWarp.Patching.LoadingActions;
+using SpaceWarp2.InternalUtilities;
+using SpaceWarp2.API.Loading.LoadingActions;
+using SpaceWarp2.API.Mods;
+using SpaceWarp2.Patching.LoadingActions;
 using UnityObject = UnityEngine.Object;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 
-namespace SpaceWarp.API.Loading;
+namespace SpaceWarp2.API.Loading;
 
 /// <summary>
 /// API for mods to register their actions for the loading of assets.

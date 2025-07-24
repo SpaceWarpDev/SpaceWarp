@@ -2,7 +2,7 @@
 using System.Reflection;
 using UnityEngine.ResourceManagement.ResourceLocations;
 
-namespace SpaceWarp.InternalUtilities;
+namespace SpaceWarp2.InternalUtilities;
 
 
 #if UNITY_EDITOR

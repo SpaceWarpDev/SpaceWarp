@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Collections;
 using UnityObject = UnityEngine.Object;
 
-namespace SpaceWarp.InternalUtilities;
+namespace SpaceWarp2.InternalUtilities;
 
 internal static class InternalExtensions
 {

@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace SpaceWarp.API;
+namespace SpaceWarp2.API;
 
 /// <summary>
 /// Contains paths to various directories.

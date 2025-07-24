@@ -5,9 +5,9 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
-using SpaceWarp.API;
+using SpaceWarp2.API;
 
-namespace SpaceWarp.InternalUtilities;
+namespace SpaceWarp2.InternalUtilities;
 
 internal static class SpaceWarpPathsGenerator
 {

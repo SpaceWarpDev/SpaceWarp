@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace SpaceWarp.API.Parts;
+namespace SpaceWarp2.API.Parts;
 
 /// <summary>
 /// This class allows you to register your custom PartComponentModule for background resource processing.

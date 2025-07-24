@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace SpaceWarp.API.Mods.JSON.Converters;
+namespace SpaceWarp2.API.Mods.JSON.Converters;
 
 internal class SpecVersionConverter : JsonConverter<SpecVersion>
 {

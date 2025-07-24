@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityObject = UnityEngine.Object;
 
-namespace SpaceWarp.API.Loading.LoadingActions;
+namespace SpaceWarp2.API.Loading.LoadingActions;
 
 
 // TODO: Move this to SpaceWarp.API.Loading in 2.0.0

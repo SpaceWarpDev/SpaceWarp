@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using ReduxLib.Configuration;
-using SpaceWarp.Modules;
-using SpaceWarp.UI.API.Appbar;
-using SpaceWarp.UI.AvcDialog;
-using SpaceWarp.UI.Backend.UI.Appbar;
-using SpaceWarp.UI.Console;
-using SpaceWarp.UI.ModList;
+using SpaceWarp2.Modules;
+using SpaceWarp2.API.Loading;
+using SpaceWarp2.UI.API.Appbar;
+using SpaceWarp2.UI.AvcDialog;
+using SpaceWarp2.UI.Backend.UI.Appbar;
+using SpaceWarp2.UI.Console;
+using SpaceWarp2.UI.ModList;
 using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -15,7 +16,7 @@ using Object = UnityEngine.Object;
 
 // using SpaceWarp.API.UI.Appbar;
 
-namespace SpaceWarp.UI;
+namespace SpaceWarp2.UI;
 
 /// <summary>
 /// The UI module for Space Warp.
@@ -77,7 +78,7 @@ public class UI : SpaceWarpModule
             "Show Warning for Errored Mods", true,
             "Whether or not Space Warp should display a warning in main menu if there are errored mods"));
         
-        SpaceWarp.API.Loading.Loading.AddAddressablesLoadingAction<VisualTreeAsset>("Loading Space Warp UI Assets", "spacewarp-ui", true, OnSpaceWarpUILoad);
+        Loading.AddAddressablesLoadingAction<VisualTreeAsset>("Loading Space Warp UI Assets", "spacewarp-ui", true, OnSpaceWarpUILoad);
         
     }
 

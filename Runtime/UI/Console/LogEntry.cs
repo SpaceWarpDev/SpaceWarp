@@ -2,10 +2,10 @@
 using ReduxLib.Logging;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static SpaceWarp.UI.Console.SpaceWarpConsoleLogListener;
+using static SpaceWarp2.UI.Console.SpaceWarpConsoleLogListener;
 using ILogger = ReduxLib.Logging.ILogger;
 
-namespace SpaceWarp.UI.Console;
+namespace SpaceWarp2.UI.Console;
 
 internal class LogEntry : BindableElement
 {
@@ -118,7 +118,7 @@ internal class LogEntry : BindableElement
 
     private Color _textColor = Color.white;
 
-    public LogEntry(LogInfo logInfo, bool startCollapsed = true)
+    public LogEntry(SpaceWarpConsoleLogListener.LogInfo logInfo, bool startCollapsed = true)
     {
         AddToClassList(USSClassName);
 

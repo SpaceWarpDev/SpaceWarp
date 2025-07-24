@@ -2,7 +2,7 @@
 using ReduxLib.Configuration;
 using ReduxLib.Logging;
 
-namespace SpaceWarp.API.Mods;
+namespace SpaceWarp2.API.Mods;
 
 public abstract class GeneralMod : ISpaceWarpMod
 {

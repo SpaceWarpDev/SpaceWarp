@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-namespace SpaceWarp.API.Mods.JSON;
+namespace SpaceWarp2.API.Mods.JSON;
 
 /// <summary>
 /// Representation of the mod info JSON file.

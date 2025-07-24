@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace SpaceWarp.API.Loading.LoadingActions;
+namespace SpaceWarp2.API.Loading.LoadingActions;
 
 internal static class FunctionalLoadingActions
 {

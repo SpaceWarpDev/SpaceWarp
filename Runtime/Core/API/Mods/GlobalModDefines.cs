@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using JetBrains.Annotations;
 
-namespace SpaceWarp.API.Mods;
+namespace SpaceWarp2.API.Mods;
 
 /// <summary>
 /// Global definitions for all SpaceWarp mods.

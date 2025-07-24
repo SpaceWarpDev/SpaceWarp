@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-namespace SpaceWarp.Game.API.Waypoints;
+namespace SpaceWarp2.Game.API.Waypoints;
 
 /// <summary>
 /// This contains the serialized information for a waypoint, used for saving/loading waypoints

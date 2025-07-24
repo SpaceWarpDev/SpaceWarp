@@ -2,7 +2,7 @@
 using ReduxLib.Configuration;
 using ReduxLib.Logging;
 
-namespace SpaceWarp.Modules;
+namespace SpaceWarp2.Modules;
 
 /// <summary>
 /// Base class for SpaceWarp modules.

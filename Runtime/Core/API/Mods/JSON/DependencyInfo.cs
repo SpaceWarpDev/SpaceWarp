@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-namespace SpaceWarp.API.Mods.JSON;
+namespace SpaceWarp2.API.Mods.JSON;
 
 /// <summary>
 /// Represents the json property info. Properties have to use the same name as in the JSON file, that's why they break

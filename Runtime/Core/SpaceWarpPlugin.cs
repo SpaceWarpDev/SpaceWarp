@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using ReduxLib.GameInterfaces;
-using SpaceWarp.API;
-using SpaceWarp.API.Backend.Modding;
-using SpaceWarp.API.Loading;
-using SpaceWarp.API.Mods;
-using SpaceWarp.API.Mods.JSON;
-using SpaceWarp.InternalUtilities;
-using SpaceWarp.Modules;
-using SpaceWarp.Patching.LoadingActions;
+using SpaceWarp2.API;
+using SpaceWarp2.API.Backend.Modding;
+using SpaceWarp2.API.Loading;
+using SpaceWarp2.API.Mods;
+using SpaceWarp2.API.Mods.JSON;
+using SpaceWarp2.InternalUtilities;
+using SpaceWarp2.Modules;
+using SpaceWarp2.Patching.LoadingActions;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using ILogger = ReduxLib.Logging.ILogger;
 
-namespace SpaceWarp;
+namespace SpaceWarp2;
 
 public sealed class SpaceWarpPlugin : GeneralMod
 {
@@ -115,7 +115,7 @@ public sealed class SpaceWarpPlugin : GeneralMod
     internal static ModInfo SpaceWarpModInfo = new()
     {
         Spec = SpecVersion.V2_1,
-        ModID = "com.github.x606.spacewarp",
+        ModID = "SpaceWarp2",
         Name = "Space Warp",
         Author = "Space Warp Dev + Rendezvous Entertainment",
         Description = "A C# modding API for KSP2 Redux Modding",

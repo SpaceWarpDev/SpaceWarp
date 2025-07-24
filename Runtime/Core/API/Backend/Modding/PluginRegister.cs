@@ -5,10 +5,10 @@ using System.Reflection;
 using Newtonsoft.Json;
 using ReduxLib.Configuration;
 using ReduxLib.Logging;
-using SpaceWarp.API.Mods;
-using SpaceWarp.API.Mods.JSON;
+using SpaceWarp2.API.Mods;
+using SpaceWarp2.API.Mods.JSON;
 using UnityEngine;
-namespace SpaceWarp.API.Backend.Modding;
+namespace SpaceWarp2.API.Backend.Modding;
 
 internal static class PluginRegister
 {

@@ -1,6 +1,6 @@
-﻿using SpaceWarp.Game.API.Waypoints;
+﻿using SpaceWarp2.Game.API.Waypoints;
 
-namespace SpaceWarp.Game.API;
+namespace SpaceWarp2.Game.API;
 
 public interface IWaypointManager
 {

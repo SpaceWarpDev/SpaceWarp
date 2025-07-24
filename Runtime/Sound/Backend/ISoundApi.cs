@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpaceWarp.Sound.Backend;
+namespace SpaceWarp2.Sound.Backend;
 
 public interface ISoundApi
 {

@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using UnityEngine.UIElements;
 
-namespace SpaceWarp.UI.API;
+namespace SpaceWarp2.UI.API;
 
 /// <summary>
 /// API for the mod list UI

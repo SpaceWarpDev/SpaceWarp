@@ -7,14 +7,14 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using ReduxLib.Configuration;
 using ReduxLib.GameInterfaces;
-using SpaceWarp.API.Mods;
-using SpaceWarp.API.Mods.JSON;
-using SpaceWarp.API.Versions;
-using SpaceWarp.Modules;
+using SpaceWarp2.Modules;
+using SpaceWarp2.API.Mods;
+using SpaceWarp2.API.Mods.JSON;
+using SpaceWarp2.API.Versions;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace SpaceWarp.VersionChecking;
+namespace SpaceWarp2.VersionChecking;
 
 /// <summary>
 /// Module that handles version checking.

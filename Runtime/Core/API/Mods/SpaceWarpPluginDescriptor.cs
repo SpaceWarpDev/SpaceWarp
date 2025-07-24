@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using JetBrains.Annotations;
 using ReduxLib.Configuration;
-using SpaceWarp.API.Mods.JSON;
+using SpaceWarp2.API.Mods.JSON;
 
-namespace SpaceWarp.API.Mods;
+namespace SpaceWarp2.API.Mods;
 
 /// <summary>
 /// A descriptor for a SpaceWarp plugin.

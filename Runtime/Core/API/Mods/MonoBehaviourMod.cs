@@ -3,7 +3,7 @@ using ReduxLib.Configuration;
 using UnityEngine;
 using ILogger = ReduxLib.Logging.ILogger;
 
-namespace SpaceWarp.API.Mods;
+namespace SpaceWarp2.API.Mods;
 
 public abstract class MonoBehaviourMod : MonoBehaviour, ISpaceWarpMod
 {

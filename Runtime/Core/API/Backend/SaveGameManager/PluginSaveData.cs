@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpaceWarp.API.Backend.SaveGameManager;
+namespace SpaceWarp2.API.Backend.SaveGameManager;
 
 /// <summary>
 /// The delegate type that will be called when a save or load event is triggered.

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using SpaceWarp.UI.Backend.UI.Appbar;
+using SpaceWarp2.UI.Backend.UI.Appbar;
 using UnityEngine;
 
-namespace SpaceWarp.UI.API.Appbar;
+namespace SpaceWarp2.UI.API.Appbar;
 
 /// <summary>
 /// Used to register buttons on the game's AppBar.

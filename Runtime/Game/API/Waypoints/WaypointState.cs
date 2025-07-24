@@ -1,4 +1,4 @@
-﻿namespace SpaceWarp.Game.API.Waypoints;
+﻿namespace SpaceWarp2.Game.API.Waypoints;
 
 /// <summary>
 /// This contains the state for a waypoint

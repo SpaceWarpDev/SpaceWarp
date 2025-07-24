@@ -1,7 +1,7 @@
 ﻿using System;
 using ReduxLib.GameInterfaces;
 
-namespace SpaceWarp.UI.Backend;
+namespace SpaceWarp2.UI.Backend;
 
 public struct LocalizedString
 {

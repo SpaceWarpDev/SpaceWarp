@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace SpaceWarp.API.Mods;
+namespace SpaceWarp2.API.Mods;
 
 /// <summary>
 /// This class is used to describe the errors that occur when loading a plugin

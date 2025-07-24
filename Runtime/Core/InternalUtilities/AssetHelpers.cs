@@ -3,7 +3,7 @@ using ReduxLib.GameInterfaces;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace SpaceWarp.InternalUtilities;
+namespace SpaceWarp2.InternalUtilities;
 
 internal static class AssetHelpers
 {

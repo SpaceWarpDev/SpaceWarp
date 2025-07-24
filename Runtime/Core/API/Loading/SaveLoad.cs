@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using ReduxLib.GameInterfaces;
 
-namespace SpaceWarp.API.Loading;
+namespace SpaceWarp2.API.Loading;
 
 /// <summary>
 /// An API to register flow actions to be run during loading and saving.

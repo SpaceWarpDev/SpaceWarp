@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using SpaceWarp.API;
-using SpaceWarp.API.Mods;
-using SpaceWarp.UI.API;
-using SpaceWarp.UI.Backend;
-using SpaceWarp.UI.Backend.Extensions;
+using SpaceWarp2.UI.Backend.Extensions;
+using SpaceWarp2.API;
+using SpaceWarp2.API.Mods;
+using SpaceWarp2.UI.API;
+using SpaceWarp2.UI.Backend;
 using UitkForKsp2;
 using UitkForKsp2.API;
 using UnityEngine;
@@ -17,7 +17,7 @@ using Button = UnityEngine.UIElements.Button;
 using Enumerable = System.Linq.Enumerable;
 using Toggle = UnityEngine.UIElements.Toggle;
 
-namespace SpaceWarp.UI.ModList;
+namespace SpaceWarp2.UI.ModList;
 
 internal class ModListController : MonoBehaviour
 {

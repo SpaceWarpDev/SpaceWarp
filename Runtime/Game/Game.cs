@@ -1,8 +1,8 @@
 ﻿using JetBrains.Annotations;
-using SpaceWarp.Modules;
+using SpaceWarp2.Modules;
 using ILogger = ReduxLib.Logging.ILogger;
 
-namespace SpaceWarp.Game;
+namespace SpaceWarp2.Game;
 
 /// <summary>
 /// The module for game-related APIs.

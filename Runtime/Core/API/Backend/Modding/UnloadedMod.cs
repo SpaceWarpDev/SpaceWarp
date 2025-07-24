@@ -1,10 +1,10 @@
 ﻿using System;
 using ReduxLib.Configuration;
-using SpaceWarp.API.Mods;
+using SpaceWarp2.API.Mods;
 using UnityEngine;
 using ILogger = ReduxLib.Logging.ILogger;
 
-namespace SpaceWarp.API.Backend.Modding;
+namespace SpaceWarp2.API.Backend.Modding;
 internal class UnloadedMod : ISpaceWarpMod
 {
     public Type ToLoad;

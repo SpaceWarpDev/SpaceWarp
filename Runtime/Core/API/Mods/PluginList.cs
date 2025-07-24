@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using SpaceWarp.API.Backend.Modding;
-using SpaceWarp.API.Mods.JSON;
-using SpaceWarp.API.Versions;
+using SpaceWarp2.API.Backend.Modding;
+using SpaceWarp2.API.Mods.JSON;
+using SpaceWarp2.API.Versions;
 using UnityEngine;
 
-namespace SpaceWarp.API.Mods;
+namespace SpaceWarp2.API.Mods;
 
 /// <summary>
 /// API for accessing information about currently loaded and disabled plugins.

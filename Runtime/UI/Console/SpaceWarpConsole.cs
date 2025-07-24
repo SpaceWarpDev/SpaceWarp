@@ -4,9 +4,9 @@ using ReduxLib.Logging;
 using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static SpaceWarp.UI.Console.SpaceWarpConsoleLogListener;
+using static SpaceWarp2.UI.Console.SpaceWarpConsoleLogListener;
 
-namespace SpaceWarp.UI.Console;
+namespace SpaceWarp2.UI.Console;
 
 internal sealed class SpaceWarpConsole : MonoBehaviour
 {
@@ -46,7 +46,7 @@ internal sealed class SpaceWarpConsole : MonoBehaviour
         OnNewLog -= AddToQueue;
     }
 
-    private void CreateNewLogEntry(LogInfo logInfo)
+    private void CreateNewLogEntry(SpaceWarpConsoleLogListener.LogInfo logInfo)
     {
         LogEntry entry = new(logInfo)
         {
@@ -317,9 +317,9 @@ internal sealed class SpaceWarpConsole : MonoBehaviour
         UnbindFunctions();
     }
 
-    private readonly ConcurrentQueue<LogInfo> _queue = new();
+    private readonly ConcurrentQueue<SpaceWarpConsoleLogListener.LogInfo> _queue = new();
 
-    private void AddToQueue(LogInfo info)
+    private void AddToQueue(SpaceWarpConsoleLogListener.LogInfo info)
     {
         _queue.Enqueue(info);
         while (_queue.Count > UI.Instance.ConfigDebugMessageLimit.Value && _queue.TryDequeue(out _))

@@ -1,8 +1,8 @@
 ﻿using ReduxLib.Configuration;
 using ReduxLib.Logging;
-using SpaceWarp.API.Mods;
+using SpaceWarp2.API.Mods;
 
-namespace SpaceWarp.API.Backend.Modding;
+namespace SpaceWarp2.API.Backend.Modding;
 
 internal class AssetOnlyMod : ISpaceWarpMod
 {

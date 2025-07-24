@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text;
 
-namespace SpaceWarp.API;
+namespace SpaceWarp2.API;
 
 /// <summary>
 /// Contains methods related to the mod list.

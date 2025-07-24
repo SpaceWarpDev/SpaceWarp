@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using ReduxLib.Configuration;
 using UnityEngine;
 
-namespace SpaceWarp.UI.API.Settings;
+namespace SpaceWarp2.UI.API.Settings;
 
 /// <summary>
 /// This class is used to register custom property drawers for the settings UI.

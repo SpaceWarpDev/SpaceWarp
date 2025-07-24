@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpaceWarp.Game.API.Waypoints;
+namespace SpaceWarp2.Game.API.Waypoints;
 
 public interface IWaypoint
 {

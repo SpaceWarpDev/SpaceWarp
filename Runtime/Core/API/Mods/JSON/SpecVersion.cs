@@ -1,9 +1,9 @@
 ﻿using System;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using SpaceWarp.API.Mods.JSON.Converters;
+using SpaceWarp2.API.Mods.JSON.Converters;
 
-namespace SpaceWarp.API.Mods.JSON;
+namespace SpaceWarp2.API.Mods.JSON;
 
 /// <summary>
 /// Represents the version of the API specification from the swinfo.json file.

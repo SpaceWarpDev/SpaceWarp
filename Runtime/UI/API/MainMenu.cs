@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace SpaceWarp.UI.API;
+namespace SpaceWarp2.UI.API;
 
 /// <summary>
 /// Used to register buttons in the game's main menu.

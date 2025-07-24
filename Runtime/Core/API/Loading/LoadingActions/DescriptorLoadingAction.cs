@@ -1,9 +1,9 @@
 ﻿using System;
 using JetBrains.Annotations;
 using ReduxLib.GameInterfaces;
-using SpaceWarp.API.Mods;
+using SpaceWarp2.API.Mods;
 
-namespace SpaceWarp.Patching.LoadingActions;
+namespace SpaceWarp2.Patching.LoadingActions;
 
 // TODO: Move this to SpaceWarp.API.Loading in 2.0.0
 

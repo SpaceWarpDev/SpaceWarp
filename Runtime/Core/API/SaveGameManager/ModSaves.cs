@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using SpaceWarp.API.Backend.SaveGameManager;
+using SpaceWarp2.API.Backend.SaveGameManager;
 
-namespace SpaceWarp.API.SaveGameManager;
+namespace SpaceWarp2.API.SaveGameManager;
 
 /// <summary>
 /// This class allows you to register your mod data for the game's save file system .

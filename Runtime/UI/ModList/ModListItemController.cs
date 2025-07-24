@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using SpaceWarp.API.Mods;
+using SpaceWarp2.API.Mods;
 using UnityEngine.UIElements;
 
-namespace SpaceWarp.UI.ModList;
+namespace SpaceWarp2.UI.ModList;
 
 internal class ModListItemController
 {

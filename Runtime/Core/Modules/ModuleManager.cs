@@ -6,7 +6,7 @@ using System.Reflection;
 using ReduxLib.Configuration;
 using ReduxLib.Logging;
 
-namespace SpaceWarp.Modules;
+namespace SpaceWarp2.Modules;
 
 /// <summary>
 /// Manager of SpaceWarp modules.

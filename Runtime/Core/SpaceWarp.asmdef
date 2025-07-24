@@ -1,6 +1,6 @@
 {
-    "name": "SpaceWarp",
-    "rootNamespace": "SpaceWarp",
+    "name": "SpaceWarp2",
+    "rootNamespace": "SpaceWarp2",
     "references": [
         "GUID:c8ac239925593834ba7eac32cbc92146",
         "GUID:9e24947de15b9834991c9d8411ea37cf",

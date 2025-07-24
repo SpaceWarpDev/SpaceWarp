@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
-using SpaceWarp.Sound.Backend;
+using SpaceWarp2.Sound.Backend;
 
-namespace SpaceWarp.Sound.API;
+namespace SpaceWarp2.Sound.API;
 
 /// <summary>
 /// Represents a Soundbank.

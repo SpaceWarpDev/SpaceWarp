@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SpaceWarp.UI.Backend.UI.Appbar;
+namespace SpaceWarp2.UI.Backend.UI.Appbar;
 
 public interface IAppbarBackend
 {

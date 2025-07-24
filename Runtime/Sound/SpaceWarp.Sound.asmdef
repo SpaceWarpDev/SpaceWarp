@@ -1,5 +1,5 @@
 ﻿{
-  "name": "SpaceWarp.Sound",
+  "name": "SpaceWarp2.Sound",
   "references":[ "GUID:c8ac239925593834ba7eac32cbc92146", "GUID:f57724eff4597e34fb68b171db4d57da" ],
-  "rootNamespace": "SpaceWarp.Sound"
+  "rootNamespace": "SpaceWarp2.Sound"
 }

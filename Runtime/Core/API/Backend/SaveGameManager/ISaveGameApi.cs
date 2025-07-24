@@ -1,4 +1,4 @@
-﻿namespace SpaceWarp.API.Backend.SaveGameManager;
+﻿namespace SpaceWarp2.API.Backend.SaveGameManager;
 
 public interface ISaveGameApi
 {

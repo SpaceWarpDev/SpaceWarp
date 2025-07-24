@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
-using SpaceWarp.API.Loading;
-using SpaceWarp.Modules;
-using SpaceWarp.Sound.API;
+using SpaceWarp2.Modules;
+using SpaceWarp2.API.Loading;
+using SpaceWarp2.Sound.API;
 
-namespace SpaceWarp.Sound;
+namespace SpaceWarp2.Sound;
 
 /// <summary>
 /// Module that handles sound.

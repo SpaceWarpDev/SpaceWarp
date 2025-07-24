@@ -1,7 +1,7 @@
-﻿using SpaceWarp.API.Mods;
-using SpaceWarp.UI.ModList;
+﻿using SpaceWarp2.API.Mods;
+using SpaceWarp2.UI.ModList;
 
-namespace SpaceWarp.UI.Backend.Extensions;
+namespace SpaceWarp2.UI.Backend.Extensions;
 
 internal static class ErrorDescriptionExtensions
 {

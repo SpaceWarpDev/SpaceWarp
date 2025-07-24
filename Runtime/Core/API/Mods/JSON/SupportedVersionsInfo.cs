@@ -1,8 +1,8 @@
 ﻿using JetBrains.Annotations;
 using Newtonsoft.Json;
-using SpaceWarp.API.Versions;
+using SpaceWarp2.API.Versions;
 
-namespace SpaceWarp.API.Mods.JSON;
+namespace SpaceWarp2.API.Mods.JSON;
 
 /// <summary>
 /// Representation of the supported version info of a mod from a JSON file.

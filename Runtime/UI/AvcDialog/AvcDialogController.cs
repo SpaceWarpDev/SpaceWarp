@@ -1,9 +1,9 @@
-﻿using SpaceWarp.Modules;
+﻿using SpaceWarp2.Modules;
 using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SpaceWarp.UI.AvcDialog;
+namespace SpaceWarp2.UI.AvcDialog;
 
 internal class AvcDialogController : MonoBehaviour
 {

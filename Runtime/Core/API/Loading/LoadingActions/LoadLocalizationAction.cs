@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using ReduxLib.GameInterfaces;
-using SpaceWarp.API.Mods;
-using SpaceWarp.InternalUtilities;
+using SpaceWarp2.InternalUtilities;
+using SpaceWarp2.API.Mods;
 
-namespace SpaceWarp.Patching.LoadingActions;
+namespace SpaceWarp2.Patching.LoadingActions;
 
 internal sealed class LoadLocalizationAction : BaseFlowAction
 {
