@@ -218,6 +218,17 @@ public static class PluginList
 
     private static void GetLoadOrder()
     {
+        // Convert spacewarp dependencies if there isn't a legacy wrapper, as this usually means a part mod
+        if (_allEnabledAndActivePlugins.All(x => x.Guid != "com.github.x606.spacewarp"))
+        {
+            foreach (var dependency in _allEnabledAndActivePlugins.SelectMany(x => x.SWInfo.Dependencies))
+            {
+                if (dependency.ID == "com.github.x606.spacewarp")
+                {
+                    dependency.ID = "SpaceWarp2";
+                }
+            }
+        }
         var changed = true;
         List<SpaceWarpPluginDescriptor> newOrder = new();
         while (changed)
