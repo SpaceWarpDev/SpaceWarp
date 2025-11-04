@@ -108,6 +108,6 @@ public sealed class ModInfo
     [JsonProperty("patchers", Required = Required.DisallowNull)]
     public List<string> Patchers { get; internal set; } = new();
 
-    [JsonProperty("main-assembly")]
+    [JsonProperty("main_assembly")]
     public string? MainAssembly { get; internal set; } = null;
 }
