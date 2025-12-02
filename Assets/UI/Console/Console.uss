@@ -17,11 +17,9 @@
 }
 
 Toggle.log-level-toggle {
-    visibility: hidden;
 }
 
 Toggle.log-level-toggle > Label {
-    visibility: visible;
 }
 
 Toggle.log-level-toggle:checked > Label {
