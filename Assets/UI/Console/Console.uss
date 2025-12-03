@@ -1,4 +1,4 @@
-@import url('project://database/Assets/UI/SpaceWarpUI.uss?fileID=7433441132597879392&guid=492f9c9847101cf4bab4ad09d8d46f3f&type=3#SpaceWarpUI');
+@import url('../SpaceWarpUI.uss');
 .unity-toggle > .unity-label {
     background-color: rgb(26, 29, 36);
     border-width: 1px;
