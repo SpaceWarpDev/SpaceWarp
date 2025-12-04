@@ -1,5 +1,4 @@
 @import url('../SpaceWarpUI.uss');
-
 .unity-toggle > .unity-label {
     background-color: rgb(26, 29, 36);
     border-width: 1px;
@@ -18,11 +17,9 @@
 }
 
 Toggle.log-level-toggle {
-    visibility: hidden;
 }
 
 Toggle.log-level-toggle > Label {
-    visibility: visible;
 }
 
 Toggle.log-level-toggle:checked > Label {
