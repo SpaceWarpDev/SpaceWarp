@@ -31,7 +31,7 @@
                     <ui:VisualElement name="errored-mod-list" />
                 </ui:Foldout>
             </ui:ScrollView>
-            <ui:ScrollView name="details-scrollview" scroll-deceleration-rate="0,135" elasticity="0,1" style="visibility: visible;">
+            <ui:ScrollView name="details-scrollview" scroll-deceleration-rate="0,135" elasticity="0,1">
                 <ui:VisualElement name="details-container" style="visibility: hidden;">
                     <ui:Label name="details-name" />
                     <ui:VisualElement class="details-item">

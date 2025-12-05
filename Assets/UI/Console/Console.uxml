@@ -8,8 +8,8 @@
         <ui:VisualElement name="func" style="height: 50px; width: 100%; flex-direction: row; margin-bottom: 10px; flex-shrink: 0;">
             <ui:VisualElement name="toggles" style="width: 350px; height: 50px; border-left-color: rgb(97, 96, 216); border-right-color: rgb(97, 96, 216); border-top-color: rgb(97, 96, 216); border-bottom-color: rgb(97, 96, 216); border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-top-right-radius: 6px; border-bottom-right-radius: 6px; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; margin-bottom: 10px; margin-right: 10px; min-height: 50px; min-width: 300px; padding-left: 5px; padding-right: 5px; padding-top: 5px; flex-direction: row;">
                 <ui:VisualElement name="buttonsRect" style="height: 30px; width: 100%; flex-direction: row;">
-                    <ui:Toggle name="toggle-debug" value="true" class="log-level-toggle debug" style="height: 100%; width: 45px; visibility: hidden;">
-                        <ui:Label text="DEBUG" display-tooltip-when-elided="true" name="label-debug" class="left-section" style="visibility: visible;" />
+                    <ui:Toggle name="toggle-debug" value="true" class="log-level-toggle debug" style="height: 100%; width: 45px;">
+                        <ui:Label text="DEBUG" display-tooltip-when-elided="true" name="label-debug" class="left-section" />
                     </ui:Toggle>
                     <ui:Toggle name="toggle-message" class="log-level-toggle message" style="height: 100%; width: 45px;">
                         <ui:Label text="MSG" display-tooltip-when-elided="true" name="label-message" class="middle-section" />
