@@ -13,10 +13,10 @@ internal static class AddressablesFixes
     static AddressablesFixes()
     {
         Type t = Type.GetType("ThunderKit.Addressable.Tools.AddressableGraphicsSettings, ThunderKit.Addressable.Tools")!;
-        OriginalThunderkitMethod = t.GetMethod("RedirectInternalIdsToGameDirectory", BindingFlags.Static | BindingFlags.NonPublic)!;
+        OriginalThunderkitMethod = t.GetMethod("RedirectInternalIdsToGameDirectory", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)!;
     }
-    
-    
+
+
     internal static string RedirectInternalIdsToGameDirectoryFixed(IResourceLocation location)
     {
         if (location.InternalId.Contains("Mods") || location.InternalId.Contains("Redux/Addressables")) return location.InternalId;

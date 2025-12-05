@@ -95,12 +95,12 @@ public class VersionChecking : SpaceWarpModule
             .First(assembly => assembly.FullName.StartsWith("SpaceWarp2.UI"))
             .GetTypes()
             .First(type => type.FullName == "SpaceWarp2.UI.UI")
-            .GetField("Instance", BindingFlags.Static | BindingFlags.NonPublic)
+            .GetField("Instance", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
             ?.GetValue(null)!;
 
         var modListControllerField = uiModule
             ?.GetType()
-            .GetField("ModListController", BindingFlags.Instance | BindingFlags.NonPublic);
+            .GetField("ModListController", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
         Func<string,bool,bool> versionCheckCallback = (string guid, bool isOutdated) =>
         {
@@ -113,7 +113,7 @@ public class VersionChecking : SpaceWarpModule
 
             modListControllerField
                 .FieldType
-                .GetMethod("UpdateOutdated", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetMethod("UpdateOutdated", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 ?.Invoke(modListController, new object[] { guid, isOutdated });
 
             return true;
