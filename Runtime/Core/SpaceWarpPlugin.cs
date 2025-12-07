@@ -25,14 +25,14 @@ public sealed class SpaceWarpPlugin : GeneralMod
     internal static ILogger Logger;
 
     private static Assembly _pathsAssembly;
-    
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
     public static void LoadSpaceWarp()
     {
         ModList.Initialize();
         _pathsAssembly = SpaceWarpPathsGenerator.GenerateSpaceWarpPathsAssembly();
         ReduxLib.ReduxLib.OnReduxLibInitialized += CreateMonoBehaviours;
-        
+
         Loading.AddAddressablesLoadingAction<TextAsset>("Loading addressables localizations (csv)", "loc_csv", OnCsvLoaded);
         Loading.AddAddressablesLoadingAction<TextAsset>("Loading addressables localizations (i2csv)", "loc_i2csv", OnI2CsvLoaded);
     }
@@ -45,7 +45,7 @@ public sealed class SpaceWarpPlugin : GeneralMod
 
     private static void OnI2CsvLoaded(TextAsset i2Csv)
     {
-        
+
         var text = i2Csv.text.Replace("\r\n", "\n");
         ILocalizer.Instance.AddI2CsvSource(text);
     }
@@ -80,20 +80,20 @@ public sealed class SpaceWarpPlugin : GeneralMod
             // Space Warps addressables are already loaded by redux at this point
             if (plugin.Guid != "spacewarp")
                 AfterGameLoadActions.Add(new LoadAddressablesAction(plugin));
-            
+
             AfterGameLoadActions.Add(new LoadLocalizationAction(plugin));
-            
+
             foreach (var action in Loading.DescriptorLoadingActionGenerators)
             {
                 AfterGameLoadActions.Add(action(plugin));
             }
         }
-        
+
         foreach (var actionGenerator in Loading.GeneralLoadingActions)
         {
             AfterGameLoadActions.Add(actionGenerator());
         }
-        
+
         foreach (var plugin in PluginList.AllEnabledAndActivePlugins)
         {
             AfterGameLoadActions.Add(new InitializeModAction(plugin));
@@ -110,11 +110,9 @@ public sealed class SpaceWarpPlugin : GeneralMod
         Instance = this;
     }
 
-
-
     internal static ModInfo SpaceWarpModInfo = new()
     {
-        Spec = SpecVersion.V2_1,
+        Spec = SpecVersion.V3_0,
         ModID = "SpaceWarp2",
         Name = "Space Warp",
         Author = "Space Warp Dev + Rendezvous Entertainment",

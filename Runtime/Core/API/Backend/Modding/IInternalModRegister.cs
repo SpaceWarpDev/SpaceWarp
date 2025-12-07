@@ -13,28 +13,39 @@ public interface IInternalModRegister
 
     static DirectoryInfo GetFolder(string guid)
     {
-        var path = $"./Redux/{guid}";
+        string path = $"./Redux/{guid}";
         var info = new DirectoryInfo(path);
-        if (!info.Exists) info.Create();
+        if (!info.Exists)
+        {
+            info.Create();
+        }
+
         return info;
     }
-    
-    static SpaceWarpPluginDescriptor GetPluginDescriptorForInternalMod(Type type, string name, string guid,
-        string version, string description, string source)
+
+    static SpaceWarpPluginDescriptor GetPluginDescriptorForInternalMod(
+        Type type,
+        string name,
+        string guid,
+        string version,
+        string description,
+        string source,
+        string? versionCheck = null
+    )
     {
         var plugin = new UnloadedMod(type);
         var descriptor = new SpaceWarpPluginDescriptor(plugin, guid, name, new ModInfo
         {
-            Spec = new SpecVersion(2,0),
+            Spec = SpecVersion.V3_0,
             Description = description,
             ModID = guid,
             Name = name,
             Author = "Redux Team",
             Version = version,
             Source = source,
-            Dependencies = new List<DependencyInfo>()
+            Dependencies = new List<DependencyInfo>
             {
-                new DependencyInfo
+                new()
                 {
                     ID = SpaceWarpPlugin.SpaceWarpModInfo.ModID,
                     Version = new SupportedVersionsInfo
@@ -44,7 +55,8 @@ public interface IInternalModRegister
                     }
                 }
             },
-        },GetFolder(guid));
+            VersionCheck = versionCheck
+        }, GetFolder(guid));
         plugin.SWMetadata = descriptor;
         return descriptor;
     }

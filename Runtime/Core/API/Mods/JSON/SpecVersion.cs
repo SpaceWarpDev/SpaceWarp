@@ -28,17 +28,17 @@ public sealed record SpecVersion
     // ReSharper disable InconsistentNaming
 
     /// <summary>
-    /// Specification version 1.0 (SpaceWarp &lt; 1.2) - used if "spec" is not specified in the swinfo.json file.
+    /// Specification version 1.0 (SpaceWarp &lt; 1.2.0) - used if "spec" is not specified in the swinfo.json file.
     /// </summary>
     public static SpecVersion Default { get; } = new();
 
     /// <summary>
-    /// Specification version 1.2 (SpaceWarp 1.2.x) - replaces SpaceWarp's proprietary ModID with BepInEx plugin GUID.
+    /// Specification version 1.2 (SpaceWarp 1.2.0 - 1.2.1) - replaces SpaceWarp's proprietary ModID with BepInEx plugin GUID.
     /// </summary>
     public static SpecVersion V1_2 { get; } = new(1, 2);
 
     /// <summary>
-    /// Specification version 1.3 (SpaceWarp 1.3.x) - adds back the ModID field, but enforces that it is the same
+    /// Specification version 1.3 (SpaceWarp 1.3.0 - 1.4.3) - adds back the ModID field, but enforces that it is the same
     /// as the BepInEx plugin GUID if there is a BepInEx plugin attached to the swinfo, since w/ version 1.3 there
     /// does not have to be a plugin.
     /// Also enforces that all dependencies use BepInEx GUID, and that they are loaded.
@@ -46,16 +46,21 @@ public sealed record SpecVersion
     public static SpecVersion V1_3 { get; } = new(1, 3);
 
     /// <summary>
-    /// Specification version 2.0 (SpaceWarp 1.5 - 1.7.x) - removes support for version checking from .csproj files,
+    /// Specification version 2.0 (SpaceWarp 1.5.0 - 1.7.0) - removes support for version checking from .csproj files,
     /// adds support for specifying mod conflicts. Switched to semantic versioning.
     /// </summary>
     public static SpecVersion V2_0 { get; } = new(2, 0);
 
     /// <summary>
-    /// Specification version 2.1 (SpaceWarp 1.8.x) - requires that mods specify their preload patchers in the
+    /// Specification version 2.1 (SpaceWarp 1.8.0 - 1.9.5) - requires that mods specify their preload patchers in the
     /// swinfo.json file.
     /// </summary>
     public static SpecVersion V2_1 { get; } = new(2, 1);
+
+    /// <summary>
+    /// Specification version 3.0 (SpaceWarp 2.0.0 - *) - requires mods to specify their entrypoint DLL in "main_assembly".
+    /// </summary>
+    public static SpecVersion V3_0 { get; } = new(3, 0);
 
 
     // ReSharper restore InconsistentNaming
