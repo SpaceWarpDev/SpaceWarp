@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using ReduxLib.GameInterfaces;
 using SpaceWarp2.UI.Backend.Extensions;
 using SpaceWarp2.API;
 using SpaceWarp2.API.Mods;
@@ -385,18 +386,11 @@ internal class ModListController : MonoBehaviour
             explorer.Start();
         });
 
-        // _openModSettingsButton.RegisterCallback<ClickEvent>(_ =>
-        // {
-        //     var isMainMenu = GameManager.Instance.Game.GlobalGameState.GetState() == GameState.MainMenu;
-        //     GameManager.Instance.Game.SettingsMenuManager.SetVisible(isVisible: true, isMainMenu);
-        //     var modsButton = GameObject.Find(
-        //         "GameManager/Default Game Instance(Clone)/UI Manager(Clone)/Popup Canvas/SettingsMenu(Clone)/Frame/" +
-        //         "Body/Categories/Graphics(Clone)"
-        //     );
-        //     modsButton.GetComponent<UIAction_Void_Toggle>().OnToggleClicked();
-        //     modsButton.GetComponent<ToggleExtended>().isOn = true;
-        //     HideWindow();
-        // });
+        _openModSettingsButton.RegisterCallback<ClickEvent>(_ =>
+        {
+            ISettingsManager.Instance.OpenSettingsMenu();
+            HideWindow();
+        });
     }
 
     private void MakeListItem(ICollection<(string, VisualElement)> list, Action<ModListItemController> bindFunc)

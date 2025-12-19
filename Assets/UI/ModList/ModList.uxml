@@ -1,20 +1,20 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/ModList/ModList.uss?fileID=7433441132597879392&amp;guid=bae714cdf945865409c4463e518a0c17&amp;type=3#ModList" />
+    <Style src="project://database/Packages/spacewarp/Assets/UI/ModList/ModList.uss?fileID=7433441132597879392&amp;guid=bae714cdf945865409c4463e518a0c17&amp;type=3#ModList" />
     <ui:VisualElement class="root">
         <ui:VisualElement name="title-bar">
-            <ui:Button name="back-button" text="←" />
+            <ui:Button name="back-button" />
             <ui:Label text="#SpaceWarp/ModList/Header" />
         </ui:VisualElement>
         <ui:VisualElement name="body-container">
             <ui:ScrollView name="modlist-scrollview" scroll-deceleration-rate="0,135" elasticity="0,1">
                 <ui:VisualElement name="toggle-buttons-container">
                     <ui:VisualElement name="toggle-buttons-row">
-                        <ui:Button name="enable-all-button" text="#SpaceWarp/ModList/EnableAll" />
-                        <ui:Button name="disable-all-button" text="#SpaceWarp/ModList/DisableAll" class="right-button" />
+                        <UitkForKsp2.Controls.OabButton name="enable-all-button" text="#SpaceWarp/ModList/EnableAll" />
+                        <UitkForKsp2.Controls.OabButton name="disable-all-button" text="#SpaceWarp/ModList/DisableAll" class="right-button" />
                     </ui:VisualElement>
                     <ui:VisualElement name="toggle-buttons-row">
-                        <ui:Button name="revert-changes-button" text="#SpaceWarp/ModList/RevertChanges" />
-                        <ui:Button name="apply-changes-button" text="#SpaceWarp/ModList/ApplyChanges" class="right-button" style="display: flex;" />
+                        <UitkForKsp2.Controls.OabButton name="revert-changes-button" text="#SpaceWarp/ModList/RevertChanges" />
+                        <UitkForKsp2.Controls.OabButton name="apply-changes-button" text="#SpaceWarp/ModList/ApplyChanges" class="right-button" style="display: flex;" />
                     </ui:VisualElement>
                     <ui:Label name="changes-label" style="display: none;" />
                 </ui:VisualElement>
@@ -98,8 +98,8 @@
             </ui:ScrollView>
         </ui:VisualElement>
         <ui:VisualElement name="footer">
-            <ui:Button name="open-mods-folder-button" text="#SpaceWarp/ModList/OpenModsFolder" />
-            <ui:Button name="open-mod-settings-button" text="#SpaceWarp/ModList/OpenModSettings" />
+            <UitkForKsp2.Controls.OabButton name="open-mods-folder-button" text="#SpaceWarp/ModList/OpenModsFolder" />
+            <UitkForKsp2.Controls.OabButton name="open-mod-settings-button" text="#SpaceWarp/ModList/OpenModSettings" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

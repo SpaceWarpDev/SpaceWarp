@@ -3,6 +3,9 @@
     flex-direction: row;
     -unity-text-align: middle-left;
     justify-content: space-between;
+    border-radius: 6px;
+    transition-property: background-color;
+    transition-duration: 0.3s;
 }
 
 .mod-item.selected {
