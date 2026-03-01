@@ -13,7 +13,7 @@ public interface IInternalModRegister
 
     static DirectoryInfo GetFolder(string guid)
     {
-        string path = $"./Redux/{guid}";
+        string path = $"./Redux/Config/{guid}";
         var info = new DirectoryInfo(path);
         if (!info.Exists)
         {

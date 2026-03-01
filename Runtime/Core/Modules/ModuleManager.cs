@@ -31,7 +31,7 @@ public static class ModuleManager
     internal static void LoadAllModules()
     {
         _moduleManagerLogSource = ReduxLib.ReduxLib.GetLogger("SpaceWarp.ModuleManager");
-        var configDirectory = new DirectoryInfo(Path.Combine(ReduxLib.ReduxLib.REDUX_FOLDER, "module_config"));
+        var configDirectory = new DirectoryInfo(Path.Combine(ReduxLib.ReduxLib.REDUX_FOLDER, "Config", "SWModuleConfig"));
         _moduleManagerLogSource.LogInfo($"Redux Module Config Path: {configDirectory}");
         if (!Directory.Exists(configDirectory.FullName)) configDirectory.Create();
         // foreach (var module in modules.EnumerateFiles("*.dll", SearchOption.TopDirectoryOnly))
