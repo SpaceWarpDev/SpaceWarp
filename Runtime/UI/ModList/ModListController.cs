@@ -22,7 +22,6 @@ namespace SpaceWarp2.UI.ModList;
 
 internal class ModListController : MonoBehaviour
 {
-
     // Mod list UI element references
     private VisualElement _container;
 
