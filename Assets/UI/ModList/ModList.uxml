@@ -2,7 +2,7 @@
     <Style src="project://database/Packages/spacewarp/Assets/UI/ModList/ModList.uss?fileID=7433441132597879392&amp;guid=bae714cdf945865409c4463e518a0c17&amp;type=3#ModList" />
     <ui:VisualElement class="root">
         <ui:VisualElement name="title-bar">
-            <ui:Button name="back-button" />
+            <ui:Button name="back-button" class="back-button" />
             <ui:Label text="#SpaceWarp/ModList/Header" />
         </ui:VisualElement>
         <ui:VisualElement name="body-container">
