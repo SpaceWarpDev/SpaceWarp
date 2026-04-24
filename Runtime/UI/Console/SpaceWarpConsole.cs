@@ -1,330 +1,106 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
-using ReduxLib.Logging;
-using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static SpaceWarp2.UI.Console.SpaceWarpConsoleLogListener;
 
 namespace SpaceWarp2.UI.Console;
 
+[RequireComponent(typeof(UIDocument))]
 internal sealed class SpaceWarpConsole : MonoBehaviour
 {
-    // State
-    private bool _isLoaded;
-    private bool _isWindowVisible;
-
-    // UITK Stuff
-    private VisualElement _container;
-
-    private TextField _consoleSearch;
-    private string SearchFilter => _consoleSearch.text;
-    private ScrollView _consoleContent;
-
-    private Toggle _toggleDebug;
-    private Toggle _toggleMessage;
-    private Toggle _toggleInfo;
-    private Toggle _toggleWarning;
-    private Toggle _toggleError;
-    private Toggle _toggleAutoScroll;
+    private SpaceWarpConsoleViewModel? _viewModel;
+    private SpaceWarpConsoleView? _view;
 
     private void Start()
     {
-        foreach (var logMessage in LogMessages)
-        {
-            CreateNewLogEntry(logMessage);
-        }
+        var document = GetComponent<UIDocument>();
+        _viewModel = new SpaceWarpConsoleViewModel();
+        _view = new SpaceWarpConsoleView(document, _viewModel);
+        _view.Load();
 
-        // Binds the OnNewMessageReceived function to the OnNewMessage event
-        OnNewLog += AddToQueue;
+        _viewModel.InitializeFromLogs(SpaceWarpConsoleLogListener.LogMessages);
+        _viewModel.CloseRequested += HideWindow;
+        _viewModel.ClearRequested += ClearLogs;
+        SpaceWarpConsoleLogListener.OnNewLog += OnNewLog;
     }
-
 
     private void OnDestroy()
     {
-        // Unbinds the OnNewMessageReceived function to the OnNewMessage event when destroyed
-        OnNewLog -= AddToQueue;
-    }
-
-    private void CreateNewLogEntry(SpaceWarpConsoleLogListener.LogInfo logInfo)
-    {
-        LogEntry entry = new(logInfo)
-        {
-            TextColor = GetColorFromLogLevel(logInfo.Level)
-        };
-        _consoleContent.Add(entry);
-
-        //Check if this entry should be currently hidden
-        CheckFilter(entry);
-
-        //First in first out
-        if (_consoleContent.contentContainer.childCount > UI.Instance.ConfigDebugMessageLimit.Value)
-        {
-            _consoleContent.contentContainer.RemoveAt(0);
-        }
-
-        if (_toggleAutoScroll.value)
-        {
-            AutoScrollToBottom();
-        }
-    }
-
-
-    private void Awake()
-    {
-        if (_isLoaded)
+        SpaceWarpConsoleLogListener.OnNewLog -= OnNewLog;
+        if (_viewModel == null)
         {
             return;
         }
 
-        // Run the main UITK setup functions
-        SetupDocument();
-        InitializeElements();
-        BindFunctions();
-        SetDefaults();
-        // HUH?? See me after class
-        UnbindFunctions();
-
-        _isLoaded = true;
+        _viewModel.CloseRequested -= HideWindow;
+        _viewModel.ClearRequested -= ClearLogs;
     }
 
     private void Update()
     {
+        if (_view == null)
+        {
+            return;
+        }
+
         if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))
         {
             ToggleWindow();
         }
 
-        if (_isWindowVisible && Input.GetKey(KeyCode.Escape))
+        if (_view.IsOpen && Input.GetKeyDown(KeyCode.Escape))
         {
             HideWindow();
         }
-
-        if (!_isWindowVisible)
-        {
-            return;
-        }
-
-        while (_queue.TryDequeue(out var info))
-        {
-            CreateNewLogEntry(info);
-        }
     }
 
-    private void SetupDocument()
+    public void Show()
     {
-        var document = GetComponent<UIDocument>();
-        if (document.TryGetComponent<DocumentLocalization>(out var localization))
-        {
-            localization.Localize();
-        }
-        else
-        {
-            document.EnableLocalization();
-        }
-
-        _container = document.rootVisualElement;
-
-        StartCoroutine(SetupWindow());
+        _view?.Show();
+        _view?.ScrollToBottom();
     }
 
-    private IEnumerator SetupWindow()
+    public void Hide()
     {
-        yield return new WaitForFixedUpdate();
-
-        var root = _container.hierarchy[0];
-        root.transform.position = new Vector3(
-            (Screen.width - root.worldBound.width) / 2,
-            (Screen.height - root.worldBound.height) / 2
-        );
-
-        yield return new WaitForFixedUpdate();
-
-        _container.style.display = DisplayStyle.None;
-    }
-
-    private void InitializeElements()
-    {
-        _consoleContent = _container.Q<ScrollView>("log-entry-content");
-        _consoleContent.Clear();
-        _consoleSearch = _container.Q<TextField>("search-text-field");
-        _consoleSearch.value = string.Empty;
-
-        // Binding all of the buttons to their respective functions
-        _container.Q<Button>("exit-button").RegisterCallback<ClickEvent>(_ => HideWindow());
-        _container.Q<Button>("clear-button")
-            .RegisterCallback<ClickEvent>(_ => _consoleContent.contentContainer.Clear());
-
-        _toggleError = _container.Q<Toggle>("toggle-error");
-        _toggleWarning = _container.Q<Toggle>("toggle-warning");
-        _toggleDebug = _container.Q<Toggle>("toggle-debug");
-        _toggleMessage = _container.Q<Toggle>("toggle-message");
-        _toggleInfo = _container.Q<Toggle>("toggle-info");
-        _toggleAutoScroll = _container.Q<Toggle>("toggle-autoscroll");
-    }
-
-    private void FilterHandler(ChangeEvent<bool> evt) => FilterMessages();
-    private void SearchHandler(ChangeEvent<string> evt) => FilterMessages();
-
-    private void BindFunctions()
-    {
-        _consoleSearch.RegisterValueChangedCallback(SearchHandler);
-
-        _toggleError.RegisterValueChangedCallback(FilterHandler);
-        _toggleWarning.RegisterValueChangedCallback(FilterHandler);
-        _toggleDebug.RegisterValueChangedCallback(FilterHandler);
-        _toggleMessage.RegisterValueChangedCallback(FilterHandler);
-        _toggleInfo.RegisterValueChangedCallback(FilterHandler);
-
-        _toggleAutoScroll.RegisterValueChangedCallback(AutoScrollChanged);
-    }
-
-    private void UnbindFunctions()
-    {
-        //WHAT IS THIS?
-        _consoleSearch.RegisterValueChangedCallback(SearchHandler);
-
-        _toggleError.UnregisterValueChangedCallback(FilterHandler);
-        _toggleWarning.UnregisterValueChangedCallback(FilterHandler);
-        _toggleDebug.UnregisterValueChangedCallback(FilterHandler);
-        _toggleMessage.UnregisterValueChangedCallback(FilterHandler);
-        _toggleInfo.UnregisterValueChangedCallback(FilterHandler);
-
-        _toggleAutoScroll.UnregisterValueChangedCallback(AutoScrollChanged);
-    }
-
-    private void AutoScrollChanged(ChangeEvent<bool> changeEvent)
-    {
-        if (changeEvent.newValue)
-        {
-            StartCoroutine(AutoScrollToBottomCoroutine());
-        }
-        else
-        {
-            StopCoroutine(AutoScrollToBottomCoroutine());
-        }
-    }
-
-    private void SetDefaults()
-    {
-        _toggleInfo.value = true;
-        _toggleMessage.value = true;
-        _toggleDebug.value = true;
-        _toggleWarning.value = true;
-        _toggleError.value = true;
-        _toggleAutoScroll.value = true;
-    }
-
-    private void FilterMessages()
-    {
-        for (var i = 0; i < _consoleContent.childCount; i++)
-        {
-            //Only LogEntries should be in this content
-
-            if (_consoleContent[i] is LogEntry entry)
-            {
-                CheckFilter(entry);
-            }
-        }
-    }
-
-    private void CheckFilter(LogEntry logEntry)
-    {
-        var logLevelPermitted = IsLogLevelEnabled(logEntry.LogLevel);
-
-        if (logLevelPermitted)
-        {
-            logEntry.style.display = DisplayStyle.Flex;
-            if (string.IsNullOrEmpty(SearchFilter)) return;
-            var lowercaseSearch = SearchFilter.ToLower();
-            if (logEntry.LogSource.Name.ToLower().Contains(lowercaseSearch) ||
-                logEntry.LogMessage.ToLower().Contains(lowercaseSearch))
-            {
-                return;
-            }
-
-            logEntry.style.display = DisplayStyle.None;
-        }
-        else
-        {
-            logEntry.style.display = DisplayStyle.None;
-        }
-    }
-
-    private bool IsLogLevelEnabled(LogLevel logLevel)
-    {
-        return logLevel switch
-        {
-            LogLevel.Error => _toggleError.value,
-            LogLevel.Warning => _toggleWarning.value,
-            LogLevel.Message => _toggleMessage.value,
-            LogLevel.Info => _toggleInfo.value,
-            LogLevel.Debug => _toggleDebug.value,
-            _ => true
-        };
-    }
-
-    private static Color GetColorFromLogLevel(LogLevel logLevel)
-    {
-        return logLevel switch
-        {
-            LogLevel.Fatal => Color.red,
-            LogLevel.Error => UI.Instance.ConfigErrorColor.Value,
-            LogLevel.Warning => UI.Instance.ConfigWarningColor.Value,
-            LogLevel.Message => UI.Instance.ConfigMessageColor.Value,
-            LogLevel.Info => UI.Instance.ConfigInfoColor.Value,
-            LogLevel.Debug => UI.Instance.ConfigDebugColor.Value,
-            _ => UI.Instance.ConfigMessageColor.Value
-        };
-    }
-
-    private void AutoScrollToBottom()
-    {
-        StartCoroutine(AutoScrollToBottomCoroutine());
-    }
-
-    private IEnumerator AutoScrollToBottomCoroutine()
-    {
-        yield return null;
-        if (_consoleContent.contentContainer.childCount > 0)
-        {
-            _consoleContent.ScrollTo(_consoleContent.contentContainer[_consoleContent.contentContainer.childCount - 1]);
-        }
-        //put a while loop here to make this automatic!
+        HideWindow();
     }
 
     private void ToggleWindow()
     {
-        _isWindowVisible = !_isWindowVisible;
+        if (_view == null)
+        {
+            return;
+        }
 
-        if (_isWindowVisible)
+        if (_view.IsOpen)
         {
-            _container.style.display = DisplayStyle.Flex;
-            BindFunctions();
-            AutoScrollToBottom();
+            HideWindow();
+            return;
         }
-        else
-        {
-            _container.style.display = DisplayStyle.None;
-            UnbindFunctions();
-        }
+
+        Show();
     }
 
     private void HideWindow()
     {
-        _container.style.display = DisplayStyle.None;
-        _isWindowVisible = false;
-        UnbindFunctions();
+        _view?.Hide();
     }
 
-    private readonly ConcurrentQueue<SpaceWarpConsoleLogListener.LogInfo> _queue = new();
-
-    private void AddToQueue(SpaceWarpConsoleLogListener.LogInfo info)
+    private void ClearLogs()
     {
-        _queue.Enqueue(info);
-        while (_queue.Count > UI.Instance.ConfigDebugMessageLimit.Value && _queue.TryDequeue(out _))
+        UI.Instance.SpaceWarpConsoleLogListener!.Clear();
+        _viewModel?.ClearLogs();
+    }
+
+    private void OnNewLog(SpaceWarpConsoleLogListener.LogInfo info)
+    {
+        if (_viewModel == null)
         {
-            // Do nothing
+            return;
+        }
+
+        _viewModel.AddLog(info);
+        if (_view is { IsOpen: true } && _viewModel.AutoScroll)
+        {
+            _view.ScrollToBottom();
         }
     }
 }

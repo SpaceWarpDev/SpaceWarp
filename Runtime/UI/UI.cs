@@ -37,12 +37,13 @@ public class UI : SpaceWarpModule
     internal ConfigValue<Color> ConfigErrorColor;
     internal ConfigValue<Color> ConfigInfoColor;
     internal ConfigValue<Color> ConfigMessageColor;
-    internal ConfigValue<bool> ConfigShowConsoleButton;
+    internal ConfigValue<bool> ConfigShowConsoleButton = null!;
     internal ConfigValue<bool> ConfigShowTimeStamps;
     internal ConfigValue<string> ConfigTimeStampFormat;
     internal ConfigValue<Color> ConfigWarningColor;
     internal ModListController ModListController;
-    internal SpaceWarpConsole SpaceWarpConsole;
+    internal SpaceWarpConsole SpaceWarpConsole = null!;
+    internal SpaceWarpConsoleLogListener SpaceWarpConsoleLogListener = null!;
 
     /// <inheritdoc/>
     public override void LoadModule()
@@ -77,9 +78,10 @@ public class UI : SpaceWarpModule
         ConfigShowMainMenuWarningForErroredMods = new(ModuleConfiguration.Bind("Version Checking",
             "Show Warning for Errored Mods", true,
             "Whether or not Space Warp should display a warning in main menu if there are errored mods"));
-        
+        SpaceWarpConsoleLogListener = new SpaceWarpConsoleLogListener(this);
+
         Loading.AddAddressablesLoadingAction<VisualTreeAsset>("Loading Space Warp UI Assets", "spacewarp-ui", true, OnSpaceWarpUILoad);
-        
+
     }
 
     private static Dictionary<string, VisualTreeAsset> _uiAssets = new();
@@ -92,7 +94,7 @@ public class UI : SpaceWarpModule
         Instance.ModuleLogger.LogInfo($"Loading {asset.name}");
         _uiAssets[asset.name.ToLowerInvariant()] = asset;
     }
-    
+
     /// <inheritdoc/>
     public override void PreInitializeModule()
     {
@@ -122,7 +124,7 @@ public class UI : SpaceWarpModule
 
         InitializeUI();
     }
-    
+
     private static void Persist(Object obj)
     {
         Object.DontDestroyOnLoad(obj);
@@ -149,7 +151,7 @@ public class UI : SpaceWarpModule
         //     $"{SpaceWarpPlugin.ModGuid}/modlist/ui/modlist/modlist.uxml"
         // );
         var modListUxml = _uiAssets["modlist"];
-        
+
         var modListOptions = WindowOptions.Default;
         modListOptions.WindowId = "Space Warp Mod List";
         modListOptions.Parent = ui.transform;
@@ -159,9 +161,10 @@ public class UI : SpaceWarpModule
         var swConsoleUxml = _uiAssets["console"];
         
         var swConsoleOptions = WindowOptions.Default;
-        swConsoleOptions.WindowId = "Space Warp AVC Dialog";
+        swConsoleOptions.WindowId = "space-warp-console";
         swConsoleOptions.Parent = ui.transform;
         var swConsole = Window.Create(swConsoleOptions, swConsoleUxml);
+        swConsole.Hide();
         SpaceWarpConsole = swConsole.gameObject.AddComponent<SpaceWarpConsole>();
     }
 

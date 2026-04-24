@@ -1,172 +1,399 @@
-@import url('../SpaceWarpUI.uss');
-.unity-toggle > .unity-label {
-    background-color: rgb(26, 29, 36);
-    border-width: 1px;
-}
+@import url('project://database/Packages/spacewarp/Assets/UI/SpaceWarpUI.uss?fileID=7433441132597879392&guid=492f9c9847101cf4bab4ad09d8d46f3f&type=3#SpaceWarpUI');
 
-.log-level-toggle {
-    padding: 0;
-    margin: 0 1px 0 0;
-}
-
-.log-level-toggle Label {
-    width: 100%;
-    height: 100%;
-    -unity-text-align: middle-center;
-    position: absolute;
-}
-
-Toggle.log-level-toggle {
-}
-
-Toggle.log-level-toggle > Label {
-}
-
-Toggle.log-level-toggle:checked > Label {
-    color: rgb(34, 38, 46);
-}
-
-.debug Label {
-    border-color: rgb(57, 59, 142);
-}
-
-Toggle.debug:hover > .unity-label {
-    background-color: rgba(57, 59, 142, 0.25);
-}
-
-Toggle.debug:checked > .unity-label {
-    background-color: rgb(57, 59, 142);
-}
-
-.message Label {
-    border-color: rgb(99, 99, 186);
-}
-
-Toggle.message:hover > .unity-label {
-    background-color: rgba(99, 99, 186, 0.25);
-}
-
-Toggle.message:checked > .unity-label {
-    background-color: rgb(99, 99, 186);
-}
-
-.info Label {
-    border-color: rgb(1, 161, 255);
-}
-
-Toggle.info:hover > .unity-label {
-    background-color: rgba(1, 161, 255, 0.25);
-}
-
-Toggle.info:checked > .unity-label {
-    background-color: rgb(1, 161, 255);
-}
-
-.warning Label {
-    border-color: rgb(255, 228, 103);
-}
-
-Toggle.warning:hover > .unity-label {
-    background-color: rgba(255, 228, 103, 0.25);
-}
-
-Toggle.warning:checked > .unity-label {
-    background-color: rgb(255, 228, 103);
-}
-
-.error Label {
-    border-color: rgb(255, 66, 72);
-}
-
-Toggle.error:hover > .unity-label {
-    background-color: rgba(255, 66, 72, 0.25);
-}
-
-Toggle.error:checked > .unity-label {
-    background-color: rgb(255, 66, 72);
-}
-
-.auto-scroll Label {
-    border-color: rgb(170, 185, 242);
-}
-
-Toggle.auto-scroll:hover > .unity-label {
-    background-color: rgba(170, 185, 242, 0.25);
-}
-
-Toggle.auto-scroll:checked > .unity-label {
-    background-color: rgb(170, 185, 242);
-}
-
-.left-section {
-    border-radius: 4px 0 0 4px;
-}
-
-.right-section {
-    border-radius: 0 4px 4px 0;
-}
-
-.search-bar TextField {
-    background-color: rgba(0, 0, 0, 0);
-}
-
-.search-bar TextField .unity-text-field__input {
-    background-color: rgba(0, 0, 0, 0);
-}
-
-#exit-button:hover {
-    background-color: rgba(102, 126, 196, 0.25);
-}
-
-#exit-button:active {
-    background-color: rgb(102, 126, 196);
-}
-
-.spacewarp-logEntry {
-}
-
-.spacewarp-logEntry-element {
-    font-size: 10px;
-}
-
-.spacewarp-logEntry__headerContent {
-    flex-direction: row;
-    align-items: flex-start;
-    flex-grow: 1;
-}
-
-.spacewarp-logEntry__messageContent {
-    flex-direction: row;
-    align-items: flex-start;
-    flex-grow: 1;
-    flex-shrink: 0;
-}
-
-.spacewarp-logEntry-element {
-}
-
-.spacewarp-logEntry__messageLabel {
-    white-space: normal;
-}
-
-.spacewarp-logEntry:hover {
+.console-root {
+    width: 1040px;
+    height: 720px;
+    min-width: 1040px;
+    max-width: 1040px;
+    min-height: 720px;
+    max-height: 720px;
+    padding: 10px;
     background-color: rgb(34, 38, 46);
+    border-left-width: 1.2px;
+    border-right-width: 1.2px;
+    border-top-width: 1.2px;
+    border-bottom-width: 1.2px;
+    border-left-color: rgba(64, 67, 149, 0.5);
+    border-right-color: rgba(64, 67, 149, 0.5);
+    border-top-color: rgba(64, 67, 149, 0.5);
+    border-bottom-color: rgba(64, 67, 149, 0.5);
+    border-radius: 7px;
+    color: rgb(230, 235, 244);
+    overflow: hidden;
 }
 
-.spacewarp-logEntry__timeDate {
+.title-bar {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.console-toolbar {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
     flex-shrink: 0;
+    min-width: 0;
 }
 
-.spacewarp-logEntry__logLevel {
-    flex-shrink: 0;
-}
-
-.spacewarp-logEntry__logSource {
-    flex-shrink: 0;
-}
-
-.spacewarp-logEntry__logMessage {
-    white-space: normal;
-    flex-grow: 0;
+.console-search-field {
+    flex-grow: 1;
     flex-shrink: 1;
+    min-width: 0;
+    margin-right: 10px;
+}
+
+.console-search-field .unity-base-field__label {
+    min-width: 78px;
+    color: rgb(177, 189, 207);
+    -unity-font-style: bold;
+}
+
+.console-search-field .unity-base-field__input,
+.console-search-field .unity-text-field__input {
+    background-color: rgb(23, 28, 35);
+    border-radius: 4px;
+    color: rgb(230, 235, 244);
+}
+
+.console-action-button {
+    min-width: 120px;
+    height: 34px;
+}
+
+.console-filters {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    flex-shrink: 0;
+    min-width: 0;
+    background-color: rgb(25, 30, 39);
+    border-radius: 6px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgb(55, 62, 76);
+    border-right-color: rgb(55, 62, 76);
+    border-top-color: rgb(55, 62, 76);
+    border-bottom-color: rgb(55, 62, 76);
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.console-filter-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.console-filter-meta {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    flex-grow: 1;
+    min-width: 0;
+    margin-left: 10px;
+    margin-top: 2px;
+}
+
+.console-summary-label {
+    flex-shrink: 1;
+    margin-right: 12px;
+    padding: 0;
+    color: rgb(177, 189, 207);
+    font-size: 12px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.console-level-chip {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 30px;
+    margin-right: 8px;
+    padding: 0 10px;
+    background-color: rgb(31, 37, 47);
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgb(63, 70, 88);
+    border-right-color: rgb(63, 70, 88);
+    border-top-color: rgb(63, 70, 88);
+    border-bottom-color: rgb(63, 70, 88);
+    border-radius: 4px;
+}
+
+.console-level-chip:hover {
+    background-color: rgb(41, 49, 62);
+}
+
+.console-level-chip-label {
+    color: rgb(196, 205, 220);
+    font-size: 12px;
+    -unity-font-style: bold;
+    letter-spacing: 0.2px;
+}
+
+.console-level-chip-dot {
+    width: 8px;
+    height: 8px;
+    margin-left: 8px;
+    border-radius: 999px;
+    background-color: rgb(140, 149, 167);
+    display: none;
+}
+
+.console-level-chip-selected {
+    background-color: rgb(43, 51, 64);
+}
+
+.console-level-chip-selected .console-level-chip-label {
+    color: rgb(255, 255, 255);
+}
+
+.console-level-chip-selected .console-level-chip-dot {
+    display: flex;
+}
+
+.console-level-debug {
+    border-left-color: rgba(57, 59, 142, 0.65);
+    border-right-color: rgba(57, 59, 142, 0.65);
+    border-top-color: rgba(57, 59, 142, 0.65);
+    border-bottom-color: rgba(57, 59, 142, 0.65);
+}
+
+.console-level-debug .console-level-chip-dot {
+    background-color: rgb(93, 95, 184);
+}
+
+.console-level-debug.console-level-chip-selected {
+    background-color: rgba(57, 59, 142, 0.2);
+    border-left-color: rgb(93, 95, 184);
+    border-right-color: rgb(93, 95, 184);
+    border-top-color: rgb(93, 95, 184);
+    border-bottom-color: rgb(93, 95, 184);
+}
+
+.console-level-info {
+    border-left-color: rgba(1, 161, 255, 0.65);
+    border-right-color: rgba(1, 161, 255, 0.65);
+    border-top-color: rgba(1, 161, 255, 0.65);
+    border-bottom-color: rgba(1, 161, 255, 0.65);
+}
+
+.console-level-info .console-level-chip-dot {
+    background-color: rgb(84, 193, 255);
+}
+
+.console-level-info.console-level-chip-selected {
+    background-color: rgba(1, 161, 255, 0.18);
+    border-left-color: rgb(84, 193, 255);
+    border-right-color: rgb(84, 193, 255);
+    border-top-color: rgb(84, 193, 255);
+    border-bottom-color: rgb(84, 193, 255);
+}
+
+.console-level-message {
+    border-left-color: rgba(99, 99, 186, 0.65);
+    border-right-color: rgba(99, 99, 186, 0.65);
+    border-top-color: rgba(99, 99, 186, 0.65);
+    border-bottom-color: rgba(99, 99, 186, 0.65);
+}
+
+.console-level-message .console-level-chip-dot {
+    background-color: rgb(138, 138, 215);
+}
+
+.console-level-message.console-level-chip-selected {
+    background-color: rgba(99, 99, 186, 0.2);
+    border-left-color: rgb(138, 138, 215);
+    border-right-color: rgb(138, 138, 215);
+    border-top-color: rgb(138, 138, 215);
+    border-bottom-color: rgb(138, 138, 215);
+}
+
+.console-level-warning {
+    border-left-color: rgba(255, 228, 103, 0.7);
+    border-right-color: rgba(255, 228, 103, 0.7);
+    border-top-color: rgba(255, 228, 103, 0.7);
+    border-bottom-color: rgba(255, 228, 103, 0.7);
+}
+
+.console-level-warning .console-level-chip-dot {
+    background-color: rgb(255, 236, 144);
+}
+
+.console-level-warning.console-level-chip-selected {
+    background-color: rgba(255, 228, 103, 0.18);
+    border-left-color: rgb(255, 236, 144);
+    border-right-color: rgb(255, 236, 144);
+    border-top-color: rgb(255, 236, 144);
+    border-bottom-color: rgb(255, 236, 144);
+}
+
+.console-level-error {
+    border-left-color: rgba(255, 66, 72, 0.7);
+    border-right-color: rgba(255, 66, 72, 0.7);
+    border-top-color: rgba(255, 66, 72, 0.7);
+    border-bottom-color: rgba(255, 66, 72, 0.7);
+}
+
+.console-level-error .console-level-chip-dot {
+    background-color: rgb(255, 113, 118);
+}
+
+.console-level-error.console-level-chip-selected {
+    background-color: rgba(255, 66, 72, 0.18);
+    border-left-color: rgb(255, 113, 118);
+    border-right-color: rgb(255, 113, 118);
+    border-top-color: rgb(255, 113, 118);
+    border-bottom-color: rgb(255, 113, 118);
+}
+
+.console-autoscroll {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 2px;
+}
+
+.console-autoscroll-label {
+    margin-right: 8px;
+    color: rgb(196, 205, 220);
+    font-size: 12px;
+    -unity-font-style: bold;
+}
+
+.console-autoscroll-switch {
+    margin-right: 0;
+}
+
+.console-autoscroll-switch > .unity-base-field__label.unity-text-element {
+    display: none;
+}
+
+.console-container {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    min-height: 0;
+    padding: 8px;
+    overflow: hidden;
+}
+
+.console-list-shell {
+    flex-grow: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.console-list {
+    flex-grow: 1;
+    min-width: 0;
+    min-height: 0;
+    background-color: rgba(0, 0, 0, 0);
+    overflow: hidden;
+}
+
+.console-list .unity-collection-view__item {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+
+.console-empty-state {
+    margin-bottom: 8px;
+    padding: 10px 12px;
+    background-color: rgb(28, 34, 42);
+    border-radius: 5px;
+    color: rgb(177, 189, 207);
+}
+
+.console-row {
+    width: 100%;
+    min-width: 0;
+    min-height: 50px;
+    margin-bottom: 6px;
+    padding: 6px 10px 7px;
+    background-color: rgb(28, 34, 42);
+    border-left-width: 4px;
+    border-radius: 5px;
+}
+
+.console-row:hover {
+    background-color: rgb(35, 42, 52);
+}
+
+.console-row-body {
+    flex-direction: row;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+.console-row-timestamp {
+    margin-bottom: 3px;
+    color: rgb(132, 145, 164);
+    font-size: 10px;
+    -unity-font-style: bold;
+    letter-spacing: 0.4px;
+}
+
+.console-row-source {
+    flex-shrink: 0;
+    max-width: 190px;
+    margin-right: 8px;
+    color: rgb(230, 235, 244);
+    font-size: 13px;
+    -unity-font-style: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.console-row-message {
+    width: 1px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    color: rgb(222, 227, 236);
+    font-size: 13px;
+    white-space: normal;
+    overflow: hidden;
+}
+
+.console-row-debug {
+    border-left-color: rgb(57, 59, 142);
+}
+
+.console-row-info {
+    border-left-color: rgb(1, 161, 255);
+}
+
+.console-row-message-level {
+    border-left-color: rgb(99, 99, 186);
+}
+
+.console-row-warning {
+    border-left-color: rgb(255, 228, 103);
+}
+
+.console-row-error {
+    border-left-color: rgb(255, 66, 72);
+}
+
+.console-row-fatal {
+    border-left-color: rgb(255, 0, 0);
 }

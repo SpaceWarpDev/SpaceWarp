@@ -11,8 +11,8 @@ internal sealed class SpaceWarpConsoleLogListener
     internal static readonly List<LogInfo> LogMessages = new();   
     private readonly UI _uiModule;
 
-    public static event Action<string> OnNewMessage;
-    public static event Action<LogInfo> OnNewLog;
+    public static event Action<string>? OnNewMessage;
+    public static event Action<LogInfo>? OnNewLog;
 
     public SpaceWarpConsoleLogListener(UI uiModule)
     {
@@ -41,9 +41,16 @@ internal sealed class SpaceWarpConsoleLogListener
         public object Data;
     }
 
+    public void Clear()
+    {
+        DebugMessages.Clear();
+        LogMessages.Clear();
+    }
+
     public void Dispose()	
     {	
-        DebugMessages.Clear();	
+        ReduxLib.ReduxLib.ReduxLogProvider.OnLog -= LogEvent;
+        Clear();
     }	
 
     private void LogMessageJanitor()	
