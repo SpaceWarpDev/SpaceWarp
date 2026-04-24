@@ -24,6 +24,9 @@
                 <ui:Foldout name="enabled-mod-foldout" text="#SpaceWarp/ModList/EnabledMods" class="mods-foldout" style="display: none;">
                     <ui:VisualElement name="enabled-mod-list" />
                 </ui:Foldout>
+                <ui:Foldout name="ksp1-mod-foldout" text="#SpaceWarp/ModList/Ksp1Mods" class="mods-foldout" style="display: none;">
+                    <ui:VisualElement name="ksp1-mod-list" />
+                </ui:Foldout>
                 <ui:Foldout name="disabled-mod-foldout" text="#SpaceWarp/ModList/DisabledMods" class="mods-foldout" style="display: none;">
                     <ui:VisualElement name="disabled-mod-list" />
                 </ui:Foldout>

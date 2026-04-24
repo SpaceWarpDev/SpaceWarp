@@ -69,6 +69,7 @@ public sealed class SpaceWarpPlugin : GeneralMod
     {
         foreach (var plugin in PluginList.AllEnabledAndActivePlugins)
         {
+            if (plugin.IsKsp1) continue;
             BeforeGameLoadActions.Add(new PreInitializeModAction(plugin));
         }
     }
@@ -77,6 +78,8 @@ public sealed class SpaceWarpPlugin : GeneralMod
 
         foreach (var plugin in PluginList.AllEnabledAndActivePlugins)
         {
+            if (plugin.IsKsp1) continue;
+
             // Space Warps addressables are already loaded by redux at this point
             if (plugin.Guid != "spacewarp")
                 AfterGameLoadActions.Add(new LoadAddressablesAction(plugin));
@@ -96,11 +99,13 @@ public sealed class SpaceWarpPlugin : GeneralMod
 
         foreach (var plugin in PluginList.AllEnabledAndActivePlugins)
         {
+            if (plugin.IsKsp1) continue;
             AfterGameLoadActions.Add(new InitializeModAction(plugin));
         }
 
         foreach (var plugin in PluginList.AllEnabledAndActivePlugins)
         {
+            if (plugin.IsKsp1) continue;
             AfterGameLoadActions.Add(new PostInitializeModAction(plugin));
         }
     }

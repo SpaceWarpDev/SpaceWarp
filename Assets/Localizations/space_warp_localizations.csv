@@ -8,6 +8,7 @@ SpaceWarp/ModList/singleChangeDetected,Text,,"1 change detected, please restart 
 SpaceWarp/ModList/Header,Text,,spacewarp.modlist,spacewarp.modlist,spacewarp.modlist,spacewarp.modlist,模组列表,spacewarp.modlist,spacewarp.modlist
 SpaceWarp/ModList/CoreMods,Text,,Core Mods,Mods do jogo,Mods du jeu,Mod Principali,核心模组,Mods Principales,Kern-Mods
 SpaceWarp/ModList/EnabledMods,Text,,Enabled Mods,Mods ativos,Mods activés,Mod Abilitate,启用的模组,Mods Activados,Aktivierte Mods
+SpaceWarp/ModList/Ksp1Mods,Text,,KSP1 Mods,Mods KSP1,Mods KSP1,Mod KSP1,KSP1模组,Mods KSP1,KSP1-Mods
 SpaceWarp/ModList/ErroredMods,Text,,Errored Mods,Mods com erros,Mods avec des erreurs,Mod con Errori,错误的模组,Mods con errores,Fehlerhafte Mods
 SpaceWarp/ModList/DisabledMods,Text,,Disabled Mods,Mods desativados,Mods désactivés,Mod Disabilitate,禁用的模组,Mods Desactivados,Deaktivierte Mods
 SpaceWarp/ModList/Version,Text,,Version,Versão,Version,Versione,版本,Versión,Version

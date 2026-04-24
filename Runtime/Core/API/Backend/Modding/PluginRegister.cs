@@ -16,8 +16,22 @@ internal static class PluginRegister
     {
         RegisterSpaceWarp();
         RegisterInternalMods();
+        RegisterKsp1Mods();
         RegisterMods();
         DisableMods();
+    }
+
+    private static void RegisterKsp1Mods()
+    {
+        foreach (var mod in IInternalModRegister.Instance.Ksp1PluginDescriptors)
+        {
+            mod.IsKsp1 = true;
+            if (mod.Plugin != null)
+            {
+                mod.Plugin.SWLogger ??= ReduxLib.ReduxLib.GetLogger(mod.Guid);
+            }
+            PluginList.RegisterPlugin(mod);
+        }
     }
 
     private static void RegisterInternalMods()

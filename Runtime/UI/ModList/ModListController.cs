@@ -41,6 +41,10 @@ internal class ModListController : MonoBehaviour
     private Foldout _enabledModFoldout;
     private VisualElement _enabledModContainer;
 
+    private List<(string, VisualElement)> _ksp1ModList = new();
+    private Foldout _ksp1ModFoldout;
+    private VisualElement _ksp1ModContainer;
+
     private List<(string, VisualElement)> _erroredModList = new();
     private Foldout _erroredModFoldout;
     private VisualElement _erroredModContainer;
@@ -180,6 +184,9 @@ internal class ModListController : MonoBehaviour
         _enabledModFoldout = _container.Q<Foldout>("enabled-mod-foldout");
         _enabledModContainer = _container.Q<VisualElement>("enabled-mod-list");
 
+        _ksp1ModFoldout = _container.Q<Foldout>("ksp1-mod-foldout");
+        _ksp1ModContainer = _container.Q<VisualElement>("ksp1-mod-list");
+
         _disabledModFoldout = _container.Q<Foldout>("disabled-mod-foldout");
         _disabledModContainer = _container.Q<VisualElement>("disabled-mod-list");
 
@@ -216,9 +223,14 @@ internal class ModListController : MonoBehaviour
         _detailsConflictList = _container.Q<VisualElement>("details-conflicts-list");
 
         // Show only categories that have any mods in them
-        if (PluginList.AllEnabledAndActivePlugins.Count > 0)
+        if (PluginList.AllEnabledAndActivePlugins.Any(x => !x.IsCore && !x.IsKsp1))
         {
             _enabledModFoldout.style.display = DisplayStyle.Flex;
+        }
+
+        if (PluginList.AllEnabledAndActivePlugins.Any(x => x.IsKsp1))
+        {
+            _ksp1ModFoldout.style.display = DisplayStyle.Flex;
         }
 
         if (PluginList.AllDisabledPlugins.Count > 0)
@@ -247,6 +259,16 @@ internal class ModListController : MonoBehaviour
                     {
                         data.SetIsUnsupported();
                     }
+                });
+                continue;
+            }
+
+            if (plugin.IsKsp1)
+            {
+                MakeListItem(_ksp1ModList, data =>
+                {
+                    data.Guid = plugin.Guid;
+                    data.SetInfo(plugin);
                 });
                 continue;
             }
@@ -283,6 +305,7 @@ internal class ModListController : MonoBehaviour
 
         ProcessModList(_coreModList, _coreModContainer);
         ProcessModList(_enabledModList, _enabledModContainer);
+        ProcessModList(_ksp1ModList, _ksp1ModContainer);
         ProcessModList(_disabledModList, _disabledModContainer);
         ProcessModList(_erroredModList, _erroredModContainer);
     }
@@ -298,14 +321,18 @@ internal class ModListController : MonoBehaviour
     private void SetupToggles()
     {
         _initialToggles = PluginList.AllPlugins.Where(
-            item => !item.IsCore
+            item => !item.IsCore && !item.IsKsp1
         ).ToDictionary(item => item.Guid,
             item => !PluginList.AllDisabledPlugins.Any(x =>
                 string.Equals(item.Guid, x.Guid, StringComparison.InvariantCultureIgnoreCase)));
         _toggles = new Dictionary<string, bool>(_initialToggles);
         UpdateToggles();
 
-        var noToggleElements = _modItemElements.Where(pair => PluginList.TryGetDescriptor(pair.Key).IsCore);
+        var noToggleElements = _modItemElements.Where(pair =>
+        {
+            var descriptor = PluginList.TryGetDescriptor(pair.Key);
+            return descriptor != null && (descriptor.IsCore || descriptor.IsKsp1);
+        });
         foreach (var pair in noToggleElements)
         {
             pair.Value.Q<Toggle>().RemoveFromHierarchy();
@@ -324,8 +351,11 @@ internal class ModListController : MonoBehaviour
 
         _disableAllButton.RegisterCallback<ClickEvent>(_ =>
         {
-            _toggles = _toggles.Select(kv => (key: kv.Key, value: PluginList.TryGetDescriptor(kv.Key).IsCore))
-                .ToDictionary(x => x.key, x => x.value);
+            _toggles = _toggles.Select(kv =>
+            {
+                var descriptor = PluginList.TryGetDescriptor(kv.Key);
+                return (key: kv.Key, value: descriptor != null && (descriptor.IsCore || descriptor.IsKsp1));
+            }).ToDictionary(x => x.key, x => x.value);
             UpdateToggles();
             UpdateChangesLabel();
             UpdateDisabledFile();
@@ -403,7 +433,7 @@ internal class ModListController : MonoBehaviour
             BoundItems[data.Guid] = data;
         }
 
-        if (!data.Info.IsCore)
+        if (!data.Info.IsCore && !data.Info.IsKsp1)
         {
             _toggleButtons[data.Guid!] = element.Q<Toggle>();
             element.Q<Toggle>().RegisterCallback<ChangeEvent<bool>>(evt =>
@@ -698,7 +728,7 @@ internal class ModListController : MonoBehaviour
     {
         foreach (var element in _modItemElements.Values)
         {
-            if (element.userData is not ModListItemController data || data.Info.IsCore)
+            if (element.userData is not ModListItemController data || data.Info.IsCore || data.Info.IsKsp1)
             {
                 continue;
             }

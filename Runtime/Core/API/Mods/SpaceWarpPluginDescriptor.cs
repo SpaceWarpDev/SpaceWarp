@@ -94,4 +94,9 @@ public class SpaceWarpPluginDescriptor
     /// Is this a core mod (as in which part of the mod list does it go into)
     /// </summary>
     public bool IsCore;
+
+    /// <summary>
+    /// Is this a KSP1 mod imported via the KSP1 mod importer (controls which foldout in the mod list it goes into).
+    /// </summary>
+    public bool IsKsp1;
 }

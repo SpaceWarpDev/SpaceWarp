@@ -11,6 +11,9 @@ public interface IInternalModRegister
     public static IInternalModRegister Instance;
     public IEnumerable<SpaceWarpPluginDescriptor> InternalPluginDescriptors { get; }
 
+    public IEnumerable<SpaceWarpPluginDescriptor> Ksp1PluginDescriptors =>
+        Array.Empty<SpaceWarpPluginDescriptor>();
+
     static DirectoryInfo GetFolder(string guid)
     {
         string path = $"./Redux/Config/{guid}";
@@ -58,6 +61,46 @@ public interface IInternalModRegister
             VersionCheck = versionCheck
         }, GetFolder(guid));
         plugin.SWMetadata = descriptor;
+        return descriptor;
+    }
+
+    /// <summary>
+    /// Builds a <see cref="SpaceWarpPluginDescriptor"/> for a KSP1 mod surfaced through the
+    /// KSP1 mod importer. These descriptors don't host a real plugin; they exist so the mod
+    /// shows up under the "KSP1 Mods" foldout in the SpaceWarp mod list.
+    /// </summary>
+    static SpaceWarpPluginDescriptor GetPluginDescriptorForKsp1Mod(
+        string name,
+        DirectoryInfo folder,
+        string? description = null,
+        string version = "?",
+        string author = ""
+    )
+    {
+        string guid = $"ksp1.{name}";
+        var descriptor = new SpaceWarpPluginDescriptor(
+            plugin: null,
+            guid: guid,
+            name: name,
+            swInfo: new ModInfo
+            {
+                Spec = SpecVersion.V3_0,
+                Description = description ?? string.Empty,
+                ModID = guid,
+                Name = name,
+                Author = author,
+                Version = version,
+                Source = string.Empty,
+                Dependencies = new List<DependencyInfo>(),
+                VersionCheck = null,
+            },
+            folder: folder,
+            doLoadingActions: false,
+            configFile: null
+        )
+        {
+            IsKsp1 = true,
+        };
         return descriptor;
     }
 }
