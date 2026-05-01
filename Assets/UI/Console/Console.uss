@@ -3,10 +3,8 @@
 .console-root {
     width: 1040px;
     height: 720px;
-    min-width: 1040px;
-    max-width: 1040px;
-    min-height: 720px;
-    max-height: 720px;
+    min-width: 760px;
+    min-height: 520px;
     padding: 10px;
     background-color: rgb(34, 38, 46);
     border-left-width: 1.2px;
@@ -25,7 +23,66 @@
 .title-bar {
     flex-direction: row;
     align-items: center;
+    flex-shrink: 0;
+    height: 54px;
+    min-height: 54px;
+    margin-top: 0;
     margin-bottom: 8px;
+    overflow: visible;
+}
+
+#title-bar > .unity-button.unity-text-element {
+    flex-shrink: 0;
+}
+
+.scope-tabs {
+    flex-direction: row;
+    background-color: rgb(25, 30, 39);
+    border-radius: 6px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgb(55, 62, 76);
+    border-right-color: rgb(55, 62, 76);
+    border-top-color: rgb(55, 62, 76);
+    border-bottom-color: rgb(55, 62, 76);
+    padding: 3px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+}
+
+.scope-tab {
+    flex-grow: 1;
+    height: 34px;
+    margin: 0 3px;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-radius: 4px;
+    color: rgb(177, 189, 207);
+    font-size: 14px;
+    -unity-font-style: bold;
+}
+
+.scope-tab:hover {
+    background-color: rgb(71, 78, 125);
+    color: rgb(255, 255, 255);
+}
+
+.scope-tab-selected {
+    background-color: rgb(75, 96, 115);
+    color: rgb(255, 255, 255);
+}
+
+.console-panel {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    min-height: 0;
 }
 
 .console-toolbar {
@@ -108,7 +165,7 @@
     color: rgb(177, 189, 207);
     font-size: 12px;
     -unity-font-style: bold;
-    white-space: normal;
+    white-space: nowrap;
 }
 
 .console-level-chip {
@@ -396,4 +453,226 @@
 
 .console-row-fatal {
     border-left-color: rgb(255, 0, 0);
+}
+
+.csharp-panel {
+    flex-direction: row;
+}
+
+.csharp-main {
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: 1px;
+    min-width: 0;
+    min-height: 0;
+    margin-right: 10px;
+}
+
+.csharp-editor-shell {
+    height: 210px;
+    flex-shrink: 0;
+    padding: 8px;
+    margin-bottom: 8px;
+}
+
+.csharp-code-field {
+    flex-grow: 1;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+
+.csharp-code-field .unity-base-field__label {
+    display: none;
+}
+
+.csharp-code-field .unity-base-field__input,
+.csharp-code-field .unity-text-field__input {
+    flex-grow: 1;
+    min-height: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-radius: 0;
+    color: rgb(235, 240, 247);
+    font-size: 13px;
+    white-space: normal;
+}
+
+.csharp-actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    margin-bottom: 8px;
+}
+
+.csharp-action-button {
+    margin-left: 8px;
+}
+
+.csharp-output-shell {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    padding: 8px;
+}
+
+.csharp-output-scroll {
+    flex-grow: 1;
+    min-height: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.csharp-output-scroll .unity-scroll-view__content-viewport,
+.csharp-output-scroll .unity-scroll-view__content-container {
+    background-color: rgba(0, 0, 0, 0);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+
+.csharp-output {
+    color: rgb(222, 227, 236);
+    font-size: 13px;
+    white-space: normal;
+}
+
+.cli-activity-shell {
+    width: 360px;
+    flex-shrink: 0;
+    padding: 8px;
+}
+
+.cli-activity-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    margin-bottom: 8px;
+}
+
+.cli-activity-title {
+    color: rgb(230, 235, 244);
+    font-size: 15px;
+    -unity-font-style: bold;
+}
+
+.cli-activity-list {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    background-color: rgba(0, 0, 0, 0);
+    overflow: hidden;
+}
+
+.cli-activity-list .unity-collection-view__item {
+    width: 100%;
+    height: 104px;
+    min-height: 104px;
+    padding: 0;
+    margin: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+
+.cli-activity-list .unity-list-view__empty-label,
+.cli-activity-list .unity-collection-view__empty-label {
+    display: none;
+}
+
+.cli-activity-row {
+    width: 100%;
+    min-width: 0;
+    height: 98px;
+    min-height: 98px;
+    max-height: 98px;
+    margin-bottom: 6px;
+    padding: 7px 8px;
+    background-color: rgb(28, 34, 42);
+    border-left-width: 4px;
+    border-radius: 5px;
+}
+
+.cli-activity-row:hover {
+    background-color: rgb(35, 42, 52);
+}
+
+.cli-activity-row-header {
+    flex-direction: row;
+    align-items: center;
+    min-width: 0;
+    margin-bottom: 4px;
+}
+
+.cli-activity-timestamp {
+    color: rgb(132, 145, 164);
+    font-size: 10px;
+    -unity-font-style: bold;
+    margin-right: 8px;
+}
+
+.cli-activity-source {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    color: rgb(230, 235, 244);
+    font-size: 12px;
+    -unity-font-style: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cli-activity-status {
+    flex-shrink: 0;
+    margin-left: 8px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: rgb(43, 51, 64);
+    color: rgb(230, 235, 244);
+    font-size: 11px;
+    -unity-font-style: bold;
+}
+
+.cli-activity-command {
+    color: rgb(222, 227, 236);
+    font-size: 12px;
+    -unity-font-style: bold;
+    white-space: nowrap;
+    margin-bottom: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cli-activity-payload,
+.cli-activity-result {
+    color: rgb(177, 189, 207);
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cli-activity-row-running {
+    border-left-color: rgb(226, 196, 78);
+}
+
+.cli-activity-row-success {
+    border-left-color: rgb(87, 171, 110);
+}
+
+.cli-activity-row-error {
+    border-left-color: rgb(255, 66, 72);
 }

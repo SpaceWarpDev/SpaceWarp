@@ -163,6 +163,16 @@ public class UI : SpaceWarpModule
         var swConsoleOptions = WindowOptions.Default;
         swConsoleOptions.WindowId = "space-warp-console";
         swConsoleOptions.Parent = ui.transform;
+        swConsoleOptions.MoveOptions = MoveOptions.Default with
+        {
+            HandleElementName = "title-bar"
+        };
+        swConsoleOptions.ResizeOptions = ResizeOptions.Default with
+        {
+            IsResizingEnabled = true,
+            MinWidth = 760,
+            MinHeight = 520
+        };
         var swConsole = Window.Create(swConsoleOptions, swConsoleUxml);
         swConsole.Hide();
         SpaceWarpConsole = swConsole.gameObject.AddComponent<SpaceWarpConsole>();

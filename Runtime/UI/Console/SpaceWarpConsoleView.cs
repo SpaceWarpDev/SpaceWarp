@@ -5,7 +5,7 @@ using LogLevel = ReduxLib.Logging.LogLevel;
 
 namespace SpaceWarp2.UI.Console;
 
-internal sealed class SpaceWarpConsoleView
+internal sealed class SpaceWarpConsoleView : System.IDisposable
 {
     private static readonly string[] RowStyleClasses =
     {
@@ -21,22 +21,31 @@ internal sealed class SpaceWarpConsoleView
     private readonly SpaceWarpConsoleViewModel _viewModel;
 
     private VisualElement? _root;
+    private Button? _logsTab;
+    private Button? _csharpTab;
+    private VisualElement? _logsPanel;
+    private VisualElement? _csharpPanel;
     private ListView? _logList;
+    private ListView? _activityList;
     private Label? _emptyState;
+    private Label? _activityEmptyState;
     private VisualElement? _debugChip;
     private VisualElement? _infoChip;
     private VisualElement? _messageChip;
     private VisualElement? _warningChip;
     private VisualElement? _errorChip;
+    private bool _isOpen;
 
     public SpaceWarpConsoleView(UIDocument window, SpaceWarpConsoleViewModel viewModel)
     {
         _window = window;
         _viewModel = viewModel;
         _viewModel.EntriesChanged += RefreshEntries;
+        _viewModel.ActivityEntriesChanged += RefreshActivityEntries;
+        _viewModel.DisplayStateChanged += RefreshDisplayState;
     }
 
-    public bool IsOpen => _window.rootVisualElement.style.display != DisplayStyle.None;
+    public bool IsOpen => _isOpen;
 
     public void Load()
     {
@@ -45,18 +54,31 @@ internal sealed class SpaceWarpConsoleView
         CacheVisualElements();
         ConfigureListView();
         RefreshEntries();
+        RefreshActivityEntries();
+        RefreshDisplayState();
         Hide();
         _root?.CenterByDefault();
+    }
+
+    public void Dispose()
+    {
+        _viewModel.EntriesChanged -= RefreshEntries;
+        _viewModel.ActivityEntriesChanged -= RefreshActivityEntries;
+        _viewModel.DisplayStateChanged -= RefreshDisplayState;
     }
 
     public void Show()
     {
         _window.Show();
+        _root?.Show();
+        _isOpen = true;
     }
 
     public void Hide()
     {
+        _root?.Hide();
         _window.Hide();
+        _isOpen = false;
     }
 
     public void ScrollToBottom()
@@ -72,8 +94,14 @@ internal sealed class SpaceWarpConsoleView
     private void CacheVisualElements()
     {
         _root = _window.rootVisualElement.Q<VisualElement>("root");
+        _logsTab = _root?.Q<Button>("logs-tab");
+        _csharpTab = _root?.Q<Button>("csharp-tab");
+        _logsPanel = _root?.Q<VisualElement>("logs-panel");
+        _csharpPanel = _root?.Q<VisualElement>("csharp-panel");
         _logList = _root?.Q<ListView>("console-list");
+        _activityList = _root?.Q<ListView>("cli-activity-list");
         _emptyState = _root?.Q<Label>("empty-state");
+        _activityEmptyState = _root?.Q<Label>("cli-activity-empty-state");
         _debugChip = _root?.Q<VisualElement>("toggle-debug");
         _infoChip = _root?.Q<VisualElement>("toggle-info");
         _messageChip = _root?.Q<VisualElement>("toggle-message");
@@ -112,6 +140,17 @@ internal sealed class SpaceWarpConsoleView
             element,
             _viewModel.VisibleEntries[index]
         );
+
+        if (_activityList == null)
+        {
+            return;
+        }
+
+        _activityList.makeItem = CreateActivityRow;
+        _activityList.bindItem = (element, index) => ApplyActivityRow(
+            element,
+            _viewModel.ActivityEntries[index]
+        );
     }
 
     private void RefreshEntries()
@@ -131,6 +170,39 @@ internal sealed class SpaceWarpConsoleView
         }
 
         SyncFilterButtons();
+    }
+
+    private void RefreshActivityEntries()
+    {
+        if (_activityList == null)
+        {
+            return;
+        }
+
+        _activityList.itemsSource = _viewModel.ActivityEntries;
+        _activityList.RefreshItems();
+        if (_activityEmptyState != null)
+        {
+            _activityEmptyState.style.display = _viewModel.ActivityEntries.Count == 0
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+        }
+    }
+
+    private void RefreshDisplayState()
+    {
+        SetTabState(_logsTab, _viewModel.IsShowingLogs);
+        SetTabState(_csharpTab, _viewModel.IsShowingCSharp);
+
+        if (_logsPanel != null)
+        {
+            _logsPanel.style.display = _viewModel.IsShowingLogs ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        if (_csharpPanel != null)
+        {
+            _csharpPanel.style.display = _viewModel.IsShowingCSharp ? DisplayStyle.Flex : DisplayStyle.None;
+        }
     }
 
     private void SyncFilterButtons()
@@ -156,6 +228,23 @@ internal sealed class SpaceWarpConsoleView
         else
         {
             chip.RemoveFromClassList("console-level-chip-selected");
+        }
+    }
+
+    private static void SetTabState(Button? tab, bool isSelected)
+    {
+        if (tab == null)
+        {
+            return;
+        }
+
+        if (isSelected)
+        {
+            tab.AddToClassList("scope-tab-selected");
+        }
+        else
+        {
+            tab.RemoveFromClassList("scope-tab-selected");
         }
     }
 
@@ -203,6 +292,72 @@ internal sealed class SpaceWarpConsoleView
         {
             message.dataSource = row;
         }
+    }
+
+    private static VisualElement CreateActivityRow()
+    {
+        var row = new VisualElement { name = "cli-activity-row" };
+        row.AddToClassList("cli-activity-row");
+
+        var header = new VisualElement();
+        header.AddToClassList("cli-activity-row-header");
+
+        var timestamp = new Label { name = "cli-activity-timestamp" };
+        timestamp.AddToClassList("cli-activity-timestamp");
+        header.Add(timestamp);
+
+        var source = new Label { name = "cli-activity-source" };
+        source.AddToClassList("cli-activity-source");
+        header.Add(source);
+
+        var status = new Label { name = "cli-activity-status" };
+        status.AddToClassList("cli-activity-status");
+        header.Add(status);
+        row.Add(header);
+
+        var command = new Label { name = "cli-activity-command" };
+        command.AddToClassList("cli-activity-command");
+        row.Add(command);
+
+        var payload = new Label { name = "cli-activity-payload" };
+        payload.AddToClassList("cli-activity-payload");
+        row.Add(payload);
+
+        var result = new Label { name = "cli-activity-result" };
+        result.AddToClassList("cli-activity-result");
+        row.Add(result);
+        return row;
+    }
+
+    private static void ApplyActivityRow(VisualElement element, SpaceWarpConsoleCliActivityEntryViewModel row)
+    {
+        element.RemoveFromClassList("cli-activity-row-running");
+        element.RemoveFromClassList("cli-activity-row-success");
+        element.RemoveFromClassList("cli-activity-row-error");
+        if (!string.IsNullOrEmpty(row.StyleClass))
+        {
+            element.AddToClassList(row.StyleClass);
+        }
+
+        SetLabel(element, "cli-activity-timestamp", row.Timestamp);
+        SetLabel(element, "cli-activity-source", row.Source);
+        SetLabel(element, "cli-activity-status", row.Status);
+        SetLabel(element, "cli-activity-command", row.Command);
+        SetLabel(element, "cli-activity-payload", row.Payload);
+        SetLabel(element, "cli-activity-result", row.Result);
+        element.tooltip = row.Tooltip;
+    }
+
+    private static void SetLabel(VisualElement root, string name, string text)
+    {
+        Label label = root.Q<Label>(name);
+        if (label == null)
+        {
+            return;
+        }
+
+        label.text = text;
+        label.tooltip = text;
     }
 
     private static Color GetLevelColor(LogLevel level)
