@@ -267,7 +267,7 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
 
     private void TrimToLimit()
     {
-        int limit = UI.Instance.ConfigDebugMessageLimit.Value;
+        int limit = UI.Instance.ConfigDebugMessageLimit;
         if (_allEntries.Count <= limit)
         {
             return;

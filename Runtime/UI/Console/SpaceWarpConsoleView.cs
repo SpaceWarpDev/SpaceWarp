@@ -365,12 +365,12 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
         return level switch
         {
             LogLevel.Fatal => Color.red,
-            LogLevel.Error => UI.Instance.ConfigErrorColor.Value,
-            LogLevel.Warning => UI.Instance.ConfigWarningColor.Value,
-            LogLevel.Message => UI.Instance.ConfigMessageColor.Value,
-            LogLevel.Info => UI.Instance.ConfigInfoColor.Value,
-            LogLevel.Debug => UI.Instance.ConfigDebugColor.Value,
-            _ => UI.Instance.ConfigMessageColor.Value
+            LogLevel.Error => UI.Instance.ConfigErrorColor,
+            LogLevel.Warning => UI.Instance.ConfigWarningColor,
+            LogLevel.Message => UI.Instance.ConfigMessageColor,
+            LogLevel.Info => UI.Instance.ConfigInfoColor,
+            LogLevel.Debug => UI.Instance.ConfigDebugColor,
+            _ => UI.Instance.ConfigMessageColor
         };
     }
 

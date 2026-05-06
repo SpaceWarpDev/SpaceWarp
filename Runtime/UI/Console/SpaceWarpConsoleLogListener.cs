@@ -55,7 +55,7 @@ internal sealed class SpaceWarpConsoleLogListener
 
     private void LogMessageJanitor()	
     {	
-        var configDebugMessageLimit = _uiModule.ConfigDebugMessageLimit.Value;	
+        var configDebugMessageLimit = _uiModule.ConfigDebugMessageLimit;	
         if (DebugMessages.Count > configDebugMessageLimit)	
             DebugMessages.RemoveRange(0, DebugMessages.Count - configDebugMessageLimit);
         if (LogMessages.Count > configDebugMessageLimit)
@@ -64,8 +64,8 @@ internal sealed class SpaceWarpConsoleLogListener
 
     private string TimestampMessage()	
     {	
-        return _uiModule.ConfigShowTimeStamps.Value	
-            ? "[" + DateTime.Now.ToString((string)_uiModule.ConfigTimeStampFormat.Value) + "] "	
+        return _uiModule.ConfigShowTimeStamps	
+            ? "[" + DateTime.Now.ToString((string)_uiModule.ConfigTimeStampFormat) + "] "	
             : "";	
     }	
 

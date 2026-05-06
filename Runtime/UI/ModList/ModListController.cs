@@ -103,12 +103,12 @@ internal class ModListController : MonoBehaviour
     {
         string term;
 
-        if (UI.Instance.ConfigShowMainMenuWarningForErroredMods.Value &&
+        if (UI.Instance.ConfigShowMainMenuWarningForErroredMods &&
             PluginList.AllErroredPlugins.Count > 0)
         {
             term = "SpaceWarp/Mods/Errored";
         }
-        else if (UI.Instance.ConfigShowMainMenuWarningForOutdatedMods.Value &&
+        else if (UI.Instance.ConfigShowMainMenuWarningForOutdatedMods &&
                  PluginList.AllPlugins.Any(x => x.Outdated))
         {
             term = "SpaceWarp/Mods/Outdated";
