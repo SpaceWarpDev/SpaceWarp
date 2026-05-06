@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using ReduxLib.Configuration;
+using ReduxLib.Configuration.Attributes;
 using SpaceWarp2.Modules;
 using SpaceWarp2.API.Loading;
 using SpaceWarp2.UI.API.Appbar;
@@ -29,18 +30,79 @@ public class UI : SpaceWarpModule
 
     public static UI Instance;
 
-    internal ConfigValue<Color> ConfigAllColor;
-    internal ConfigValue<bool> ConfigShowMainMenuWarningForOutdatedMods;
-    internal ConfigValue<bool> ConfigShowMainMenuWarningForErroredMods;
-    internal ConfigValue<Color> ConfigDebugColor;
-    internal ConfigValue<int> ConfigDebugMessageLimit;
-    internal ConfigValue<Color> ConfigErrorColor;
-    internal ConfigValue<Color> ConfigInfoColor;
-    internal ConfigValue<Color> ConfigMessageColor;
-    internal ConfigValue<bool> ConfigShowConsoleButton = null!;
-    internal ConfigValue<bool> ConfigShowTimeStamps;
-    internal ConfigValue<string> ConfigTimeStampFormat;
-    internal ConfigValue<Color> ConfigWarningColor;
+    [ConfigSection("Debug Console", loc: "Menu/Settings/Sections/DebugConsole")]
+    [ConfigValue("Color Error",
+        "The color for log messages that have the level: Error/Fatal (bolded)",
+        nameLoc: "Menu/Settings/ColorError",
+        descLoc: "Menu/Settings/Description/ColorError")]
+    internal Color ConfigErrorColor = Color.red;
+
+    [ConfigValue("Color Warning",
+        "The color for log messages that have the level: Warning",
+        nameLoc: "Menu/Settings/ColorWarning",
+        descLoc: "Menu/Settings/Description/ColorWarning")]
+    internal Color ConfigWarningColor = Color.yellow;
+
+    [ConfigValue("Color Message",
+        "The color for log messages that have the level: Message",
+        nameLoc: "Menu/Settings/ColorMessage",
+        descLoc: "Menu/Settings/Description/ColorMessage")]
+    internal Color ConfigMessageColor = Color.white;
+
+    [ConfigValue("Color Info",
+        "The color for log messages that have the level: Info",
+        nameLoc: "Menu/Settings/ColorInfo",
+        descLoc: "Menu/Settings/Description/ColorInfo")]
+    internal Color ConfigInfoColor = Color.cyan;
+
+    [ConfigValue("Color Debug",
+        "The color for log messages that have the level: Debug",
+        nameLoc: "Menu/Settings/ColorDebug",
+        descLoc: "Menu/Settings/Description/ColorDebug")]
+    internal Color ConfigDebugColor = Color.green;
+
+    [ConfigValue("Color All",
+        "The color for log messages that have the level: All",
+        nameLoc: "Menu/Settings/ColorAll",
+        descLoc: "Menu/Settings/Description/ColorAll")]
+    internal Color ConfigAllColor = Color.magenta;
+
+    [ConfigValue("Show Console Button",
+        "Show console button in app.bar, requires restart",
+        nameLoc: "Menu/Settings/ShowConsoleButton",
+        descLoc: "Menu/Settings/Description/ShowConsoleButton")]
+    internal bool ConfigShowConsoleButton;
+
+    [ConfigValue("Show Timestamps",
+        "Show time stamps in debug console",
+        nameLoc: "Menu/Settings/ShowTimestamps",
+        descLoc: "Menu/Settings/Description/ShowTimestamps")]
+    internal bool ConfigShowTimeStamps = true;
+
+    [ConfigValue("Timestamp Format",
+        "The format for the timestamps in the debug console.",
+        nameLoc: "Menu/Settings/TimestampFormat",
+        descLoc: "Menu/Settings/Description/TimestampFormat")]
+    internal string ConfigTimeStampFormat = "HH:mm:ss.fff";
+
+    [ConfigValue("Message Limit",
+        "The maximum number of messages to keep in the debug console.",
+        nameLoc: "Menu/Settings/MessageLimit",
+        descLoc: "Menu/Settings/Description/MessageLimit")]
+    internal int ConfigDebugMessageLimit = 1000;
+
+    [ConfigSection("Version Checking", loc: "Menu/Settings/Sections/VersionChecking")]
+    [ConfigValue("Show Warning for Outdated Mods",
+        "Whether or not Space Warp should display a warning in main menu if there are outdated mods",
+        nameLoc: "Menu/Settings/ShowWarningForOutdatedMods",
+        descLoc: "Menu/Settings/Description/ShowWarningForOutdatedMods")]
+    internal bool ConfigShowMainMenuWarningForOutdatedMods = true;
+
+    [ConfigValue("Show Warning for Errored Mods",
+        "Whether or not Space Warp should display a warning in main menu if there are errored mods",
+        nameLoc: "Menu/Settings/ShowWarningForErroredMods",
+        descLoc: "Menu/Settings/Description/ShowWarningForErroredMods")]
+    internal bool ConfigShowMainMenuWarningForErroredMods = true;
     internal ModListController ModListController;
     internal SpaceWarpConsole SpaceWarpConsole = null!;
     internal SpaceWarpConsoleLogListener SpaceWarpConsoleLogListener = null!;
@@ -52,32 +114,7 @@ public class UI : SpaceWarpModule
         IAppbarBackend.Instance.AppBarOABSubscriber.AddListener(Appbar.LoadOABButtons);
         IAppbarBackend.Instance.AppBarKSCSubscriber.AddListener(Appbar.LoadKSCButtons);
         Instance = this;
-        ConfigErrorColor = new(ModuleConfiguration.Bind("Debug Console", "Color Error", Color.red,
-            "The color for log messages that have the level: Error/Fatal (bolded)"));
-        ConfigWarningColor = new(ModuleConfiguration.Bind("Debug Console", "Color Warning", Color.yellow,
-            "The color for log messages that have the level: Warning"));
-        ConfigMessageColor = new(ModuleConfiguration.Bind("Debug Console", "Color Message", Color.white,
-            "The color for log messages that have the level: Message"));
-        ConfigInfoColor = new(ModuleConfiguration.Bind("Debug Console", "Color Info", Color.cyan,
-            "The color for log messages that have the level: Info"));
-        ConfigDebugColor = new(ModuleConfiguration.Bind("Debug Console", "Color Debug", Color.green,
-            "The color for log messages that have the level: Debug"));
-        ConfigAllColor = new(ModuleConfiguration.Bind("Debug Console", "Color All", Color.magenta,
-            "The color for log messages that have the level: All"));
-        ConfigShowConsoleButton = new(ModuleConfiguration.Bind("Debug Console", "Show Console Button", false,
-            "Show console button in app.bar, requires restart"));
-        ConfigShowTimeStamps = new(ModuleConfiguration.Bind("Debug Console", "Show Timestamps", true,
-            "Show time stamps in debug console"));
-        ConfigTimeStampFormat = new(ModuleConfiguration.Bind("Debug Console", "Timestamp Format", "HH:mm:ss.fff",
-            "The format for the timestamps in the debug console."));
-        ConfigDebugMessageLimit = new(ModuleConfiguration.Bind("Debug Console", "Message Limit", 1000,
-            "The maximum number of messages to keep in the debug console."));
-        ConfigShowMainMenuWarningForOutdatedMods = new(ModuleConfiguration.Bind("Version Checking",
-            "Show Warning for Outdated Mods", true,
-            "Whether or not Space Warp should display a warning in main menu if there are outdated mods"));
-        ConfigShowMainMenuWarningForErroredMods = new(ModuleConfiguration.Bind("Version Checking",
-            "Show Warning for Errored Mods", true,
-            "Whether or not Space Warp should display a warning in main menu if there are errored mods"));
+        ModuleConfiguration.Bind(this);
         SpaceWarpConsoleLogListener = new SpaceWarpConsoleLogListener(this);
 
         Loading.AddAddressablesLoadingAction<VisualTreeAsset>("Loading Space Warp UI Assets", "spacewarp-ui", true, OnSpaceWarpUILoad);
@@ -163,6 +200,16 @@ public class UI : SpaceWarpModule
         var swConsoleOptions = WindowOptions.Default;
         swConsoleOptions.WindowId = "space-warp-console";
         swConsoleOptions.Parent = ui.transform;
+        swConsoleOptions.MoveOptions = MoveOptions.Default with
+        {
+            HandleElementName = "title-bar"
+        };
+        swConsoleOptions.ResizeOptions = ResizeOptions.Default with
+        {
+            IsResizingEnabled = true,
+            MinWidth = 760,
+            MinHeight = 520
+        };
         var swConsole = Window.Create(swConsoleOptions, swConsoleUxml);
         swConsole.Hide();
         SpaceWarpConsole = swConsole.gameObject.AddComponent<SpaceWarpConsole>();

@@ -33,8 +33,8 @@ internal sealed class SpaceWarpConsoleEntryViewModel : ViewModelBase
 
     public static SpaceWarpConsoleEntryViewModel FromLogInfo(SpaceWarpConsoleLogListener.LogInfo info)
     {
-        string timestamp = UI.Instance.ConfigShowTimeStamps.Value
-            ? info.DateTime.ToString(UI.Instance.ConfigTimeStampFormat.Value)
+        string timestamp = UI.Instance.ConfigShowTimeStamps
+            ? info.DateTime.ToString(UI.Instance.ConfigTimeStampFormat)
             : string.Empty;
         return new SpaceWarpConsoleEntryViewModel(
             timestamp,

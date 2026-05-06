@@ -25,6 +25,7 @@ internal sealed class SpaceWarpConsole : MonoBehaviour
     private void OnDestroy()
     {
         SpaceWarpConsoleLogListener.OnNewLog -= OnNewLog;
+        _view?.Dispose();
         if (_viewModel == null)
         {
             return;
@@ -39,6 +40,11 @@ internal sealed class SpaceWarpConsole : MonoBehaviour
         if (_view == null)
         {
             return;
+        }
+
+        if (_view.IsOpen)
+        {
+            _viewModel?.PollCliIntegrationActivity();
         }
 
         if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.C))

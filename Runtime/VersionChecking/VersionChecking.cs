@@ -6,6 +6,7 @@ using System.Xml;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using ReduxLib.Configuration;
+using ReduxLib.Configuration.Attributes;
 using ReduxLib.GameInterfaces;
 using SpaceWarp2.Modules;
 using SpaceWarp2.API.Mods;
@@ -28,12 +29,21 @@ public class VersionChecking : SpaceWarpModule
     /// <summary>
     /// The config value for whether this is the first launch.
     /// </summary>
-    public ConfigValue<bool> ConfigFirstLaunch;
+    [ConfigSection("Main", loc: "Menu/Settings/Sections/Main")]
+    [ConfigValue("First Launch",
+        "Set this to false to get the version check prompt next launch",
+        nameLoc: "Menu/Settings/FirstLaunch",
+        descLoc: "Menu/Settings/Description/FirstLaunch")]
+    public ConfigValue<bool> ConfigFirstLaunch = new ConfigDescription<bool>(true);
 
     /// <summary>
     /// The config value for whether to check versions.
     /// </summary>
-    public ConfigValue<bool> ConfigCheckVersions;
+    [ConfigValue("Check Versions",
+        "Set this to true to automatically check versions over the internet",
+        nameLoc: "Menu/Settings/CheckVersions",
+        descLoc: "Menu/Settings/Description/CheckVersions")]
+    public ConfigValue<bool> ConfigCheckVersions = new ConfigDescription<bool>(false);
 
     /// <summary>
     /// The instance of the version checking module.
@@ -46,10 +56,7 @@ public class VersionChecking : SpaceWarpModule
     public override void LoadModule()
     {
         Instance = this;
-        ConfigFirstLaunch = new ConfigValue<bool>(ModuleConfiguration.Bind("Main", "First Launch", true,
-            "Set this to false to get the version check prompt next launch"));
-        ConfigCheckVersions = new ConfigValue<bool>(ModuleConfiguration.Bind("Main", "Check Versions", false,
-            "Set this to true to automatically check versions over the internet"));
+        ModuleConfiguration.Bind(this);
     }
 
     /// <inheritdoc />
