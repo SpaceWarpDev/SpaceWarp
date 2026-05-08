@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="console-row" class="console-row">
+        <ui:Label name="console-row-timestamp" class="console-row-timestamp" tabindex="-1">
+            <Bindings>
+                <ui:DataBinding property="text" data-source-path="Timestamp" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleEntryViewModel, SpaceWarp2.UI" binding-mode="ToTarget" />
+            </Bindings>
+        </ui:Label>
+        <ui:VisualElement class="console-row-body">
+            <ui:Label name="console-row-source" class="console-row-source" tabindex="-1" display-tooltip-when-elided="true">
+                <Bindings>
+                    <ui:DataBinding property="text" data-source-path="Source" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleEntryViewModel, SpaceWarp2.UI" binding-mode="ToTarget" />
+                </Bindings>
+            </ui:Label>
+            <ui:Label name="console-row-message" class="console-row-message" tabindex="-1">
+                <Bindings>
+                    <ui:DataBinding property="text" data-source-path="Message" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleEntryViewModel, SpaceWarp2.UI" binding-mode="ToTarget" />
+                </Bindings>
+            </ui:Label>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

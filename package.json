@@ -1,0 +1,18 @@
+{
+    "name": "spacewarp",
+    "version": "2.0.0",
+    "displayName": "Space Warp",
+    "description": "This package contains a modloader for KSP2",
+    "unity": "2022.3",
+    "unityRelease": "5f1",
+    "documentationUrl": "https://github.com/SpaceWarpDev/SpaceWarp",
+    "licensesUrl": "https://raw.githubusercontent.com/SpaceWarpDev/SpaceWarp/main/LICENSE",
+    "hideInEditor": false,
+    "keywords": [
+      "ksp",
+      "mods"
+    ],
+    "author": {
+      "name": "spacewarp-dev"
+    }
+  }

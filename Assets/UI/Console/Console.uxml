@@ -1,0 +1,136 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Packages/spacewarp/Assets/UI/Console/Console.uss?fileID=7433441132597879392&amp;guid=a3501e36e3199cc4aadc08344a94b6cf&amp;type=3#Console"/>
+    <ui:VisualElement name="root" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" class="root console-root">
+        <ui:VisualElement name="title-bar" class="title-bar">
+            <ui:Button name="close-button" class="back-button">
+                <Bindings>
+                    <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="CloseCommand"/>
+                </Bindings>
+            </ui:Button>
+            <ui:Label text="Console" name="header-title" class="header-title"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="console-tabs" class="scope-tabs">
+            <ui:Button name="logs-tab" text="Logs" class="scope-tab scope-tab-selected">
+                <Bindings>
+                    <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="ShowLogsCommand"/>
+                </Bindings>
+            </ui:Button>
+            <ui:Button name="csharp-tab" text="C#" class="scope-tab">
+                <Bindings>
+                    <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="ShowCSharpCommand"/>
+                </Bindings>
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="logs-panel" class="console-panel">
+            <ui:VisualElement class="console-toolbar">
+                <ui:TextField name="search-field" class="console-search-field">
+                    <Bindings>
+                        <ui:DataBinding property="value" data-source-path="SearchText" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="TwoWay"/>
+                    </Bindings>
+                </ui:TextField>
+                <ui:Button name="clear-button" text="#SpaceWarp/Console/Clear" class="console-action-button">
+                    <Bindings>
+                        <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="ClearCommand"/>
+                    </Bindings>
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:VisualElement class="console-filters">
+                <ui:VisualElement class="console-filter-group">
+                    <ui:VisualElement name="toggle-debug" class="console-level-chip console-level-debug">
+                        <ui:Label text="Debug" class="console-level-chip-label"/>
+                        <ui:VisualElement class="console-level-chip-dot"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="toggle-info" class="console-level-chip console-level-info">
+                        <ui:Label text="Info" class="console-level-chip-label"/>
+                        <ui:VisualElement class="console-level-chip-dot"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="toggle-message" class="console-level-chip console-level-message">
+                        <ui:Label text="Message" class="console-level-chip-label"/>
+                        <ui:VisualElement class="console-level-chip-dot"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="toggle-warning" class="console-level-chip console-level-warning">
+                        <ui:Label text="Warning" class="console-level-chip-label"/>
+                        <ui:VisualElement class="console-level-chip-dot"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="toggle-error" class="console-level-chip console-level-error">
+                        <ui:Label text="Error" class="console-level-chip-label"/>
+                        <ui:VisualElement class="console-level-chip-dot"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="console-filter-meta">
+                    <ui:Label name="summary-label" class="console-summary-label">
+                        <Bindings>
+                            <ui:DataBinding property="text" data-source-path="SummaryText" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="ToTarget"/>
+                        </Bindings>
+                    </ui:Label>
+                    <ui:VisualElement class="console-autoscroll">
+                        <ui:Label text="#SpaceWarp/Console/AutoScroll" class="console-autoscroll-label"/>
+                        <ui:Toggle name="toggle-autoscroll" class="switch console-autoscroll-switch">
+                            <Bindings>
+                                <ui:DataBinding property="value" data-source-path="AutoScroll" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="TwoWay"/>
+                            </Bindings>
+                        </ui:Toggle>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <UitkForKsp2.Controls.InvertedCornerBox name="console-container" border-color="#747680FF" background-color="#1B1E24FF" class="console-container">
+                <ui:VisualElement class="console-list-shell">
+                    <ui:Label name="empty-state" text="No log entries match the current filters." class="console-empty-state"/>
+                    <ui:ListView name="console-list" binding-source-selection-mode="AutoAssign" item-template="ConsoleRow.uxml" virtualization-method="DynamicHeight" show-border="false" selection-type="None" horizontal-scrolling="false" class="console-list">
+                        <Bindings>
+                            <ui:DataBinding property="itemsSource" data-source-path="VisibleEntries" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="ToTarget"/>
+                        </Bindings>
+                    </ui:ListView>
+                </ui:VisualElement>
+            </UitkForKsp2.Controls.InvertedCornerBox>
+        </ui:VisualElement>
+        <ui:VisualElement name="csharp-panel" class="console-panel csharp-panel">
+            <ui:VisualElement class="csharp-main">
+                <UitkForKsp2.Controls.InvertedCornerBox border-color="#747680FF" background-color="#1B1E24FF" class="csharp-editor-shell">
+                    <ui:TextField name="csharp-code" multiline="true" class="csharp-code-field">
+                        <Bindings>
+                            <ui:DataBinding property="value" data-source-path="CSharpCode" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="TwoWay"/>
+                        </Bindings>
+                    </ui:TextField>
+                </UitkForKsp2.Controls.InvertedCornerBox>
+                <ui:VisualElement class="csharp-actions">
+                    <ui:Button name="csharp-run" text="Run C#" class="console-action-button csharp-action-button">
+                        <Bindings>
+                            <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="RunCSharpCommand"/>
+                        </Bindings>
+                    </ui:Button>
+                    <ui:Button name="csharp-reset" text="Reset" class="console-action-button csharp-action-button">
+                        <Bindings>
+                            <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="ResetCSharpCommand"/>
+                        </Bindings>
+                    </ui:Button>
+                </ui:VisualElement>
+                <UitkForKsp2.Controls.InvertedCornerBox border-color="#747680FF" background-color="#1B1E24FF" class="csharp-output-shell">
+                    <ui:ScrollView mode="Vertical" class="csharp-output-scroll">
+                        <ui:Label name="csharp-output" class="csharp-output">
+                            <Bindings>
+                                <ui:DataBinding property="text" data-source-path="CSharpOutput" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="ToTarget"/>
+                            </Bindings>
+                        </ui:Label>
+                    </ui:ScrollView>
+                </UitkForKsp2.Controls.InvertedCornerBox>
+            </ui:VisualElement>
+            <UitkForKsp2.Controls.InvertedCornerBox border-color="#747680FF" background-color="#1B1E24FF" class="cli-activity-shell">
+                <ui:VisualElement class="cli-activity-header">
+                    <ui:Label text="Activity" class="cli-activity-title"/>
+                    <ui:Label name="cli-activity-summary" class="console-summary-label">
+                        <Bindings>
+                            <ui:DataBinding property="text" data-source-path="ActivitySummaryText" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="ToTarget"/>
+                        </Bindings>
+                    </ui:Label>
+                </ui:VisualElement>
+                <ui:Label name="cli-activity-empty-state" text="No CLI integration entries yet." class="console-empty-state"/>
+                <ui:ListView name="cli-activity-list" virtualization-method="FixedHeight" fixed-item-height="104" show-border="false" selection-type="None" horizontal-scrolling="false" class="cli-activity-list">
+                    <Bindings>
+                        <ui:DataBinding property="itemsSource" data-source-path="ActivityEntries" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="ToTarget"/>
+                    </Bindings>
+                </ui:ListView>
+            </UitkForKsp2.Controls.InvertedCornerBox>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
