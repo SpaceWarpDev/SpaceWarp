@@ -2,14 +2,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using SpaceWarp2.API;
 
 namespace SpaceWarp2.UI.Console;
 
 internal static class SpaceWarpConsoleCliIntegrationBridge
 {
     private const string NotLoadedMessage = "CLI integration runtime is not loaded.";
+    private static bool _luaOutputSubscribed;
+
+    public static event Action<string>? LuaOutputReceived;
 
     public static IReadOnlyList<SpaceWarpConsoleCliActivityEntryViewModel> GetActivityEntries()
     {
@@ -104,6 +109,156 @@ internal static class SpaceWarpConsoleCliIntegrationBridge
         resetMethod?.Invoke(null, null);
     }
 
+    public static SpaceWarpConsoleCSharpResult RunLua(string code)
+    {
+        EnsureLuaOutputSubscription();
+        Type? gameManagerType = FindType("KSP.Game.GameManager");
+        object? gameManager = gameManagerType
+            ?.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)
+            ?.GetValue(null);
+        object? game = gameManager
+            ?.GetType()
+            .GetProperty("Game", BindingFlags.Public | BindingFlags.Instance)
+            ?.GetValue(gameManager);
+        object? scriptEnvironment = game
+            ?.GetType()
+            .GetProperty("ScriptEnvironment", BindingFlags.Public | BindingFlags.Instance)
+            ?.GetValue(game);
+        object? runInterop = scriptEnvironment
+            ?.GetType()
+            .GetProperty("RunInterop", BindingFlags.Public | BindingFlags.Instance)
+            ?.GetValue(scriptEnvironment);
+        MethodInfo? runMethod = runInterop
+            ?.GetType()
+            .GetMethod(
+                "RunScript",
+                BindingFlags.Public | BindingFlags.Instance,
+                null,
+                new[] { typeof(string), typeof(string) },
+                null
+            );
+        if (runMethod == null)
+        {
+            return SpaceWarpConsoleCSharpResult.Failure("Game script environment is not ready.");
+        }
+
+        try
+        {
+            object? result = runMethod.Invoke(runInterop, new object[] { code, "SpaceWarpConsole.lua" });
+            string resultText = result?.ToString() ?? string.Empty;
+            return SpaceWarpConsoleCSharpResult.FromSuccess(
+                string.IsNullOrWhiteSpace(resultText) || string.Equals(resultText, "nil", StringComparison.OrdinalIgnoreCase)
+                    ? "Started. Script.Log output appears on the Logs tab."
+                    : resultText
+            );
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException != null)
+        {
+            return SpaceWarpConsoleCSharpResult.Failure(ex.InnerException.GetBaseException().Message);
+        }
+        catch (Exception ex)
+        {
+            return SpaceWarpConsoleCSharpResult.Failure(ex.GetBaseException().Message);
+        }
+    }
+
+    public static IReadOnlyList<string> ListLuaScripts()
+    {
+        try
+        {
+            string root = GetLuaScriptRoot();
+            if (!Directory.Exists(root))
+            {
+                Directory.CreateDirectory(root);
+            }
+
+            return Directory
+                .EnumerateFiles(root, "*.lua", SearchOption.AllDirectories)
+                .Select(path => Path.GetRelativePath(root, path).Replace('\\', '/'))
+                .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+        catch
+        {
+            return Array.Empty<string>();
+        }
+    }
+
+    public static SpaceWarpConsoleCSharpResult ReadLuaScript(string relativePath)
+    {
+        try
+        {
+            string path = ResolveLuaScriptPath(relativePath, mustBeLuaFile: true);
+            return File.Exists(path)
+                ? SpaceWarpConsoleCSharpResult.FromSuccess(File.ReadAllText(path))
+                : SpaceWarpConsoleCSharpResult.Failure("Lua script file does not exist.");
+        }
+        catch (Exception ex)
+        {
+            return SpaceWarpConsoleCSharpResult.Failure(ex.GetBaseException().Message);
+        }
+    }
+
+    public static SpaceWarpConsoleCSharpResult WriteLuaScript(string relativePath, string text)
+    {
+        try
+        {
+            string path = ResolveLuaScriptPath(relativePath, mustBeLuaFile: true);
+            Directory.CreateDirectory(Path.GetDirectoryName(path) ?? GetLuaScriptRoot());
+            File.WriteAllText(path, text ?? string.Empty);
+            return SpaceWarpConsoleCSharpResult.FromSuccess("Saved " + NormalizeLuaRelativePath(relativePath) + ".");
+        }
+        catch (Exception ex)
+        {
+            return SpaceWarpConsoleCSharpResult.Failure(ex.GetBaseException().Message);
+        }
+    }
+
+    public static SpaceWarpConsoleCSharpResult CreateLuaScript()
+    {
+        try
+        {
+            string root = GetLuaScriptRoot();
+            Directory.CreateDirectory(root);
+            for (int index = 0; index < 1000; index++)
+            {
+                string relativePath = index == 0 ? "new_script.lua" : $"new_script_{index}.lua";
+                string path = ResolveLuaScriptPath(relativePath, mustBeLuaFile: true);
+                if (File.Exists(path))
+                {
+                    continue;
+                }
+
+                File.WriteAllText(path, "-- New Lua script\n");
+                return SpaceWarpConsoleCSharpResult.FromSuccess(relativePath);
+            }
+
+            return SpaceWarpConsoleCSharpResult.Failure("Could not create a unique Lua script name.");
+        }
+        catch (Exception ex)
+        {
+            return SpaceWarpConsoleCSharpResult.Failure(ex.GetBaseException().Message);
+        }
+    }
+
+    public static SpaceWarpConsoleCSharpResult OpenLuaScriptFolder()
+    {
+        try
+        {
+            string root = GetLuaScriptRoot();
+            Directory.CreateDirectory(root);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(root)
+            {
+                UseShellExecute = true
+            });
+            return SpaceWarpConsoleCSharpResult.FromSuccess(root);
+        }
+        catch (Exception ex)
+        {
+            return SpaceWarpConsoleCSharpResult.Failure(ex.GetBaseException().Message);
+        }
+    }
+
     private static SpaceWarpConsoleCliActivityEntryViewModel ToActivityViewModel(object entry)
     {
         return new SpaceWarpConsoleCliActivityEntryViewModel(
@@ -178,6 +333,69 @@ internal static class SpaceWarpConsoleCliIntegrationBridge
         }
 
         return value[..maxLength] + "...";
+    }
+
+    private static string GetLuaScriptRoot()
+    {
+        return Path.GetFullPath(CommonPaths.LuaFolder);
+    }
+
+    private static string ResolveLuaScriptPath(string relativePath, bool mustBeLuaFile)
+    {
+        relativePath = NormalizeLuaRelativePath(relativePath);
+        if (string.IsNullOrWhiteSpace(relativePath))
+        {
+            throw new ArgumentException("Lua script path is required.");
+        }
+
+        if (Path.IsPathRooted(relativePath))
+        {
+            throw new InvalidOperationException("Lua script path must be relative to Lua.");
+        }
+
+        if (mustBeLuaFile && !relativePath.EndsWith(".lua", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("Lua script path must end with .lua.");
+        }
+
+        string root = GetLuaScriptRoot();
+        string fullPath = Path.GetFullPath(Path.Combine(root, relativePath.Replace('/', Path.DirectorySeparatorChar)));
+        string rootWithSeparator = root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        if (!fullPath.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(fullPath, root, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("Lua script path is outside Lua.");
+        }
+
+        return fullPath;
+    }
+
+    private static string NormalizeLuaRelativePath(string relativePath)
+    {
+        return (relativePath ?? string.Empty).Trim().Replace('\\', '/');
+    }
+
+    private static void EnsureLuaOutputSubscription()
+    {
+        if (_luaOutputSubscribed)
+        {
+            return;
+        }
+
+        Type? utilityType = FindType("KSP.ScriptInterop.LuaScriptUtilityMgr");
+        EventInfo? outputEvent = utilityType?.GetEvent("OutputLogged", BindingFlags.Public | BindingFlags.Static);
+        if (outputEvent == null)
+        {
+            return;
+        }
+
+        outputEvent.AddEventHandler(null, (Action<string>)OnLuaOutputLogged);
+        _luaOutputSubscribed = true;
+    }
+
+    private static void OnLuaOutputLogged(string message)
+    {
+        LuaOutputReceived?.Invoke(message);
     }
 
     private static Type? FindType(string fullName)

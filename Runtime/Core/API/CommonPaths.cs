@@ -20,6 +20,7 @@ public static class CommonPaths
 //     public const string HASH_LOCATION = "mods_list_hash.txt";
 // // #endif
     public static string ModsFolder = "Assets/Mods";
+    public static string LuaFolder = "Assets/Lua";
     public static string DisabledPlugins = "disabled_plugins.cfg";
     public static string HashLocation = "mod_list_hash.txt";
 
@@ -28,6 +29,7 @@ public static class CommonPaths
         if (!Application.isEditor)
         {
             ModsFolder = "./mods";
+            LuaFolder = "./Lua";
         }
     }
 }
