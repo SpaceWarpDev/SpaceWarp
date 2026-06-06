@@ -12,6 +12,9 @@ public static class MainMenu
 {
     public static readonly List<(string name, Action onClicked)> MenuButtonsToBeAdded = new();
     public static readonly List<(string term, Action onClicked)> LocalizedMenuButtonsToBeAdded = new();
+    public static readonly List<(Func<string> termProvider, Action onClicked)> DynamicLocalizedMenuButtonsToBeAdded = new();
+
+    public static event Action? DynamicLocalizedMenuButtonsChanged;
 
     /// <summary>
     /// Registers a button to be added to the main menu.
@@ -31,6 +34,21 @@ public static class MainMenu
     public static void RegisterLocalizedMenuButton(string term, Action onClicked)
     {
         LocalizedMenuButtonsToBeAdded.Add((term, onClicked));
+    }
+
+    /// <summary>
+    /// Registers a localized button whose term can change after the main menu has been built.
+    /// </summary>
+    /// <param name="termProvider">Function returning the current translation term for the button.</param>
+    /// <param name="onClicked">The action that is invoked when the button is pressed</param>
+    public static void RegisterDynamicLocalizedMenuButton(Func<string> termProvider, Action onClicked)
+    {
+        DynamicLocalizedMenuButtonsToBeAdded.Add((termProvider, onClicked));
+    }
+
+    public static void RefreshDynamicLocalizedMenuButtons()
+    {
+        DynamicLocalizedMenuButtonsChanged?.Invoke();
     }
 
 }

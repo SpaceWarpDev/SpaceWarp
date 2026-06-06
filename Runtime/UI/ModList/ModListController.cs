@@ -101,6 +101,11 @@ internal class ModListController : MonoBehaviour
 
     internal void AddMainMenuItem()
     {
+        MainMenu.RegisterDynamicLocalizedMenuButton(GetMainMenuTerm, ToggleWindow);
+    }
+
+    internal string GetMainMenuTerm()
+    {
         string term;
 
         if (UI.Instance.ConfigShowMainMenuWarningForErroredMods &&
@@ -118,7 +123,7 @@ internal class ModListController : MonoBehaviour
             term = "SpaceWarp/Mods";
         }
 
-        MainMenu.RegisterLocalizedMenuButton(term, ToggleWindow);
+        return term;
     }
 
     private void OnEnable()
@@ -259,6 +264,11 @@ internal class ModListController : MonoBehaviour
                     {
                         data.SetIsUnsupported();
                     }
+
+                    if (plugin.Outdated)
+                    {
+                        data.SetIsOutdated();
+                    }
                 });
                 continue;
             }
@@ -269,6 +279,11 @@ internal class ModListController : MonoBehaviour
                 {
                     data.Guid = plugin.Guid;
                     data.SetInfo(plugin);
+
+                    if (plugin.Outdated)
+                    {
+                        data.SetIsOutdated();
+                    }
                 });
                 continue;
             }
@@ -282,6 +297,11 @@ internal class ModListController : MonoBehaviour
                 {
                     data.SetIsUnsupported();
                 }
+
+                if (plugin.Outdated)
+                {
+                    data.SetIsOutdated();
+                }
             });
         }
 
@@ -292,6 +312,11 @@ internal class ModListController : MonoBehaviour
                 data.Guid = pluginInfo.Guid;
                 data.SetInfo(pluginInfo);
                 data.SetIsDisabled();
+
+                if (pluginInfo.Outdated)
+                {
+                    data.SetIsOutdated();
+                }
             });
         }
 
@@ -773,10 +798,17 @@ internal class ModListController : MonoBehaviour
 
     internal void UpdateOutdated(string guid, bool isOutdated)
     {
-        if (isOutdated)
+        if (isOutdated && _modItemElements.TryGetValue(guid, out VisualElement element) &&
+            element.userData is ModListItemController data)
         {
-            (_modItemElements[guid]?.userData as ModListItemController)?.SetIsOutdated();
+            data.SetIsOutdated();
+            if (element[0].ClassListContains("selected") && data.Info != null)
+            {
+                SetSelectedModInfo(data, data.Info);
+            }
         }
+
+        MainMenu.RefreshDynamicLocalizedMenuButtons();
     }
 
     private void ToggleWindow()

@@ -1,19 +1,20 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using ReduxLib;
 using ReduxLib.Configuration;
 using ReduxLib.Configuration.Attributes;
-using SpaceWarp2.Modules;
 using SpaceWarp2.API.Loading;
+using SpaceWarp2.Modules;
+using SpaceWarp2.UI.API;
 using SpaceWarp2.UI.API.Appbar;
-using SpaceWarp2.UI.AvcDialog;
 using SpaceWarp2.UI.Backend.UI.Appbar;
 using SpaceWarp2.UI.Console;
 using SpaceWarp2.UI.ModList;
 using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
 // using SpaceWarp.API.UI.Appbar;
 
@@ -106,6 +107,7 @@ public class UI : SpaceWarpModule
     internal ModListController ModListController;
     internal SpaceWarpConsole SpaceWarpConsole = null!;
     internal SpaceWarpConsoleLogListener SpaceWarpConsoleLogListener = null!;
+    private bool _shouldShowAvcDialogOnMainMenu;
 
     /// <inheritdoc/>
     public override void LoadModule()
@@ -144,28 +146,87 @@ public class UI : SpaceWarpModule
         ModuleLogger.LogInfo("Initializing UI");
         if (VersionChecking.VersionChecking.Instance.ConfigFirstLaunch.Value)
         {
-            var ui = ReduxLib.ReduxLib.GetAlwaysLoadedObject("Version Checking");
-            ui.SetActive(true);
-
-            // Generate a prompt for whether or not space warp should check mod versions
-            var avcDialogUxml = _uiAssets["avcdialog"];
-
-            var windowOptions = WindowOptions.Default;
-            windowOptions.WindowId = "Space Warp AVC Dialog";
-            windowOptions.Parent = ui.transform;
-            var avcDialog = Window.Create(windowOptions, avcDialogUxml);
-
-            var avcDialogController = avcDialog.gameObject.AddComponent<AvcDialogController>();
-            avcDialogController.Module = VersionChecking.VersionChecking.Instance;
+            _shouldShowAvcDialogOnMainMenu = true;
+            Events.MainMenuLoaded += OnMainMenuLoaded;
         }
 
         InitializeUI();
     }
 
-    private static void Persist(Object obj)
+    private void OnMainMenuLoaded()
     {
-        Object.DontDestroyOnLoad(obj);
-        obj.hideFlags |= HideFlags.HideAndDontSave;
+        Events.MainMenuLoaded -= OnMainMenuLoaded;
+        if (!_shouldShowAvcDialogOnMainMenu)
+        {
+            return;
+        }
+
+        ReduxLib.ReduxLib.Instance.StartCoroutine(ShowAvcDialogWhenMainMenuIsReady());
+    }
+
+    private IEnumerator ShowAvcDialogWhenMainMenuIsReady()
+    {
+        yield return StartupDialogGate.WaitUntilReadyForDialogs();
+        _shouldShowAvcDialogOnMainMenu = false;
+        ShowAvcDialog();
+    }
+
+    private void ShowAvcDialog()
+    {
+        var options = DialogOptions.Default;
+        options.Title = "#SpaceWarp/AvcDialog/Title";
+        options.Message = "#SpaceWarp/AvcDialog/MainText";
+        options.UseCurtain = true;
+        options.WindowOptions = options.WindowOptions with
+        {
+            WindowId = "Space Warp AVC Dialog"
+        };
+        options.Actions = new[]
+        {
+            new DialogAction("#SpaceWarp/Yes", () =>
+            {
+                VersionChecking.VersionChecking.Instance.ConfigFirstLaunch.Value = false;
+                VersionChecking.VersionChecking.Instance.ConfigCheckVersions.Value = true;
+                VersionChecking.VersionChecking.Instance.CheckVersions();
+                RefreshModWarnings();
+            }),
+            new DialogAction("#SpaceWarp/No", () =>
+            {
+                VersionChecking.VersionChecking.Instance.ConfigFirstLaunch.Value = false;
+                VersionChecking.VersionChecking.Instance.ConfigCheckVersions.Value = false;
+                RefreshModWarnings();
+            })
+        };
+
+        DialogHandle handle = Dialog.Open(options);
+        var messageLabel = handle.DialogElement.Q<Label>("dialog-message");
+        if (messageLabel != null)
+        {
+            messageLabel.style.whiteSpace = WhiteSpace.Normal;
+        }
+
+        var note = new Label("#SpaceWarp/AvcDialog/MinorText")
+        {
+            name = "avc-dialog-note",
+            style =
+            {
+                whiteSpace = WhiteSpace.Normal,
+                unityTextAlign = TextAnchor.UpperRight,
+                fontSize = 10,
+                opacity = 0.75f,
+                marginTop = 8
+            }
+        };
+        messageLabel?.parent?.Insert(messageLabel.parent.IndexOf(messageLabel) + 1, note);
+        if (handle.Document.TryGetComponent(out DocumentLocalization localization))
+        {
+            localization.RegisterElement(note);
+        }
+    }
+
+    internal void RefreshModWarnings()
+    {
+        MainMenu.RefreshDynamicLocalizedMenuButtons();
     }
 
     /// <inheritdoc/>
