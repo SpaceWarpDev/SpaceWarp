@@ -9,6 +9,16 @@
             </ui:Button>
             <ui:Label text="Console" name="header-title" class="header-title"/>
             <ui:VisualElement name="title-spacer" class="title-spacer"/>
+            <ui:Button name="compact-lua-run" text="Run Lua" class="console-title-button compact-lua-action-button">
+                <Bindings>
+                    <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="RunLuaCommand"/>
+                </Bindings>
+            </ui:Button>
+            <ui:Button name="compact-lua-stop" text="Stop" class="console-title-button compact-lua-action-button">
+                <Bindings>
+                    <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="StopLuaCommand"/>
+                </Bindings>
+            </ui:Button>
             <ui:Button name="compact-button" text="Compact" class="console-title-button">
                 <Bindings>
                     <ui:DataBinding property="text" data-source-path="CompactToggleText" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="ToTarget"/>
@@ -120,12 +130,12 @@
                     </ui:Button>
                 </ui:VisualElement>
                 <UitkForKsp2.Controls.InvertedCornerBox border-color="#747680FF" background-color="#1B1E24FF" class="csharp-output-shell">
-                    <ui:ScrollView mode="VerticalAndHorizontal" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Auto" class="csharp-output-scroll">
-                        <ui:Label name="csharp-output" class="csharp-output">
+                    <ui:ScrollView name="csharp-output-scroll" mode="VerticalAndHorizontal" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Auto" class="csharp-output-scroll">
+                        <ui:TextField name="csharp-output" multiline="true" readonly="true" class="csharp-output selectable-output">
                             <Bindings>
-                                <ui:DataBinding property="text" data-source-path="CSharpOutput" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="ToTarget"/>
+                                <ui:DataBinding property="value" data-source-path="CSharpOutput" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="ToTarget"/>
                             </Bindings>
-                        </ui:Label>
+                        </ui:TextField>
                     </ui:ScrollView>
                 </UitkForKsp2.Controls.InvertedCornerBox>
             </ui:VisualElement>
@@ -146,7 +156,7 @@
                 </ui:ListView>
             </UitkForKsp2.Controls.InvertedCornerBox>
         </ui:VisualElement>
-        <ui:VisualElement name="lua-panel" class="console-panel csharp-panel">
+        <ui:VisualElement name="lua-panel" class="console-panel csharp-panel lua-panel">
             <ui:VisualElement class="csharp-main">
                 <UitkForKsp2.Controls.InvertedCornerBox border-color="#747680FF" background-color="#1B1E24FF" class="csharp-editor-shell">
                     <ui:ScrollView mode="VerticalAndHorizontal" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Auto" class="csharp-editor-scroll">
@@ -157,29 +167,34 @@
                         </ui:TextField>
                     </ui:ScrollView>
                 </UitkForKsp2.Controls.InvertedCornerBox>
-                <ui:VisualElement class="csharp-actions">
+                <ui:VisualElement class="csharp-actions lua-run-actions">
                     <ui:Button name="lua-run" text="Run Lua" class="console-action-button csharp-action-button">
                         <Bindings>
                             <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="RunLuaCommand"/>
                         </Bindings>
                     </ui:Button>
-                    <ui:Button name="lua-reset" text="Reset" class="console-action-button csharp-action-button">
+                    <ui:Button name="lua-stop" text="Stop" class="console-action-button csharp-action-button">
+                        <Bindings>
+                            <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="StopLuaCommand"/>
+                        </Bindings>
+                    </ui:Button>
+                    <ui:Button name="lua-reset" text="Reset" class="console-action-button csharp-action-button lua-secondary-action">
                         <Bindings>
                             <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="ResetLuaCommand"/>
                         </Bindings>
                     </ui:Button>
                 </ui:VisualElement>
                 <UitkForKsp2.Controls.InvertedCornerBox border-color="#747680FF" background-color="#1B1E24FF" class="csharp-output-shell">
-                    <ui:ScrollView mode="VerticalAndHorizontal" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Auto" class="csharp-output-scroll">
-                        <ui:Label name="lua-output" class="csharp-output">
+                    <ui:ScrollView name="lua-output-scroll" mode="VerticalAndHorizontal" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Auto" class="csharp-output-scroll">
+                        <ui:TextField name="lua-output" multiline="true" readonly="true" class="csharp-output selectable-output">
                             <Bindings>
-                                <ui:DataBinding property="text" data-source-path="LuaOutput" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="ToTarget"/>
+                                <ui:DataBinding property="value" data-source-path="LuaOutput" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="ToTarget"/>
                             </Bindings>
-                        </ui:Label>
+                        </ui:TextField>
                     </ui:ScrollView>
                 </UitkForKsp2.Controls.InvertedCornerBox>
             </ui:VisualElement>
-            <UitkForKsp2.Controls.InvertedCornerBox border-color="#747680FF" background-color="#1B1E24FF" class="cli-activity-shell">
+            <UitkForKsp2.Controls.InvertedCornerBox border-color="#747680FF" background-color="#1B1E24FF" class="cli-activity-shell lua-script-shell">
                 <ui:VisualElement class="cli-activity-header">
                     <ui:Label text="Scripts" class="cli-activity-title"/>
                     <ui:Label name="lua-file-summary" class="console-summary-label">
@@ -188,47 +203,46 @@
                         </Bindings>
                     </ui:Label>
                 </ui:VisualElement>
-                <ui:TextField name="lua-script-path" class="lua-script-path-field">
-                    <Bindings>
-                        <ui:DataBinding property="value" data-source-path="LuaSelectedScriptPath" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="TwoWay"/>
-                    </Bindings>
-                </ui:TextField>
-                <ui:VisualElement class="lua-script-actions">
-                    <ui:Button name="lua-script-load" text="Load" class="console-action-button lua-script-action-button">
+                <ui:VisualElement class="lua-script-controls">
+                    <ui:TextField name="lua-script-path" class="lua-script-path-field">
                         <Bindings>
-                            <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="LoadLuaScriptCommand"/>
+                            <ui:DataBinding property="value" data-source-path="LuaSelectedScriptPath" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="TwoWay"/>
                         </Bindings>
-                    </ui:Button>
-                    <ui:Button name="lua-script-save" text="Save" class="console-action-button lua-script-action-button">
+                    </ui:TextField>
+                    <ui:VisualElement class="lua-script-actions">
+                        <ui:Button name="lua-script-load" text="Load" class="console-action-button lua-script-action-button">
+                            <Bindings>
+                                <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="LoadLuaScriptCommand"/>
+                            </Bindings>
+                        </ui:Button>
+                        <ui:Button name="lua-script-save" text="Save" class="console-action-button lua-script-action-button lua-script-action-button-right">
+                            <Bindings>
+                                <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="SaveLuaScriptCommand"/>
+                            </Bindings>
+                        </ui:Button>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lua-script-actions">
+                        <ui:Button name="lua-script-new" text="New" class="console-action-button lua-script-action-button">
+                            <Bindings>
+                                <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="NewLuaScriptCommand"/>
+                            </Bindings>
+                        </ui:Button>
+                        <ui:Button name="lua-script-refresh" text="Refresh" class="console-action-button lua-script-action-button lua-script-action-button-right">
+                            <Bindings>
+                                <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="RefreshLuaScriptsCommand"/>
+                            </Bindings>
+                        </ui:Button>
+                    </ui:VisualElement>
+                    <ui:Button name="lua-script-open-folder" text="Open Folder" class="console-action-button lua-script-open-folder-button">
                         <Bindings>
-                            <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="SaveLuaScriptCommand"/>
+                            <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="OpenLuaScriptFolderCommand"/>
                         </Bindings>
                     </ui:Button>
                 </ui:VisualElement>
-                <ui:VisualElement class="lua-script-actions">
-                    <ui:Button name="lua-script-new" text="New" class="console-action-button lua-script-action-button">
-                        <Bindings>
-                            <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="NewLuaScriptCommand"/>
-                        </Bindings>
-                    </ui:Button>
-                    <ui:Button name="lua-script-refresh" text="Refresh" class="console-action-button lua-script-action-button">
-                        <Bindings>
-                            <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="RefreshLuaScriptsCommand"/>
-                        </Bindings>
-                    </ui:Button>
+                <ui:VisualElement class="lua-script-list-shell">
+                    <ui:Label name="lua-script-empty-state" text="No .lua files in Lua." class="console-empty-state"/>
+                    <ui:ListView name="lua-script-list" virtualization-method="FixedHeight" fixed-item-height="32" show-border="false" selection-type="Single" horizontal-scrolling="false" class="lua-script-list"/>
                 </ui:VisualElement>
-                <ui:Button name="lua-script-open-folder" text="Open Folder" class="console-action-button lua-script-open-folder-button">
-                    <Bindings>
-                        <UitkForKsp2.MVVM.Bindings.CommandBinding property="viewDataKey" data-source-path="OpenLuaScriptFolderCommand"/>
-                    </Bindings>
-                </ui:Button>
-                <ui:Label name="lua-script-status" class="lua-script-status">
-                    <Bindings>
-                        <ui:DataBinding property="text" data-source-path="LuaScriptStatusText" data-source-type="SpaceWarp2.UI.Console.SpaceWarpConsoleViewModel, SpaceWarp2.UI" binding-mode="ToTarget"/>
-                    </Bindings>
-                </ui:Label>
-                <ui:Label name="lua-script-empty-state" text="No .lua files in Lua." class="console-empty-state"/>
-                <ui:ListView name="lua-script-list" virtualization-method="FixedHeight" fixed-item-height="34" show-border="false" selection-type="Single" horizontal-scrolling="false" class="lua-script-list"/>
             </UitkForKsp2.Controls.InvertedCornerBox>
         </ui:VisualElement>
     </ui:VisualElement>

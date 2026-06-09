@@ -73,6 +73,10 @@
     color: rgb(255, 255, 255);
 }
 
+.compact-lua-action-button {
+    display: none;
+}
+
 .console-compact .title-bar {
     height: 38px;
     min-height: 38px;
@@ -95,8 +99,22 @@
 }
 
 .console-compact .console-title-button {
-    min-width: 84px;
+    min-width: 72px;
     height: 30px;
+    margin-left: 4px;
+    padding: 0 8px;
+}
+
+.console-compact.console-lua-active .compact-lua-action-button {
+    display: flex;
+}
+
+.console-compact #compact-lua-run {
+    min-width: 68px;
+}
+
+.console-compact #compact-lua-stop {
+    min-width: 56px;
 }
 
 .console-compact .scope-tabs,
@@ -127,6 +145,10 @@
 .console-compact .csharp-editor-shell,
 .console-compact .csharp-actions,
 .console-compact .cli-activity-shell {
+    display: none;
+}
+
+.console-compact .lua-panel .lua-run-actions {
     display: none;
 }
 
@@ -668,6 +690,31 @@
     white-space: normal;
 }
 
+.selectable-output {
+    flex-grow: 1;
+    min-height: 100%;
+    background-color: rgba(0, 0, 0, 0);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.selectable-output .unity-text-field__input {
+    background-color: rgba(0, 0, 0, 0);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    color: rgb(222, 227, 236);
+    font-size: 13px;
+    white-space: normal;
+}
+
 .cli-activity-shell {
     width: 360px;
     flex-shrink: 0;
@@ -799,9 +846,65 @@
     border-left-color: rgb(255, 66, 72);
 }
 
+.lua-panel .csharp-main {
+    margin-right: 8px;
+}
+
+.console-compact .lua-panel .csharp-main {
+    margin-right: 0;
+}
+
+.lua-panel .csharp-editor-shell {
+    height: 180px;
+    padding: 6px;
+    margin-bottom: 6px;
+}
+
+.lua-panel .csharp-actions {
+    margin-bottom: 6px;
+}
+
+.lua-panel .console-action-button {
+    min-width: 96px;
+    height: 30px;
+}
+
+.lua-panel .csharp-action-button {
+    margin-left: 6px;
+}
+
+.lua-panel .csharp-output-shell {
+    padding: 6px;
+}
+
+.lua-panel .cli-activity-shell {
+    width: 320px;
+    padding: 6px;
+}
+
+.lua-panel .cli-activity-header {
+    margin-bottom: 6px;
+}
+
+.lua-panel .cli-activity-title {
+    font-size: 14px;
+}
+
+.lua-script-shell {
+    min-width: 300px;
+}
+
+.lua-script-controls {
+    flex-shrink: 0;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(54, 62, 75);
+}
+
 .lua-script-path-field {
     flex-shrink: 0;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .lua-script-path-field .unity-base-field__label {
@@ -820,7 +923,7 @@
     flex-direction: row;
     align-items: center;
     flex-shrink: 0;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .lua-script-action-button {
@@ -830,18 +933,22 @@
     margin-right: 6px;
 }
 
+.lua-script-action-button-right {
+    margin-right: 0;
+}
+
 .lua-script-open-folder-button {
     flex-shrink: 0;
     width: 100%;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 }
 
-.lua-script-status {
-    flex-shrink: 0;
-    margin-bottom: 8px;
-    color: rgb(177, 189, 207);
-    font-size: 11px;
-    white-space: normal;
+.lua-script-list-shell {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    padding: 4px;
+    background-color: rgb(28, 34, 42);
 }
 
 .lua-script-list {
@@ -854,8 +961,8 @@
 
 .lua-script-list .unity-collection-view__item {
     width: 100%;
-    height: 34px;
-    min-height: 34px;
+    height: 32px;
+    min-height: 32px;
     padding: 0;
     margin: 0;
     background-color: rgba(0, 0, 0, 0);
@@ -872,21 +979,45 @@
 
 .lua-script-row {
     width: 100%;
-    height: 30px;
-    min-height: 30px;
-    margin-bottom: 4px;
-    padding: 7px 8px;
-    background-color: rgb(28, 34, 42);
-    border-left-width: 3px;
-    border-left-color: rgb(75, 96, 115);
-    border-radius: 5px;
+    height: 28px;
+    min-height: 28px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding: 2px 0;
+    flex-direction: row;
+    -unity-text-align: middle-left;
+    justify-content: space-between;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 6px;
+    transition-property: background-color;
+    transition-duration: 0.3s;
+}
+
+.lua-script-row-label {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
     color: rgb(222, 227, 236);
     font-size: 12px;
+    padding: 6px 6px 6px 8px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    -unity-text-align: middle-left;
 }
 
-.lua-script-row:hover {
-    background-color: rgb(35, 42, 52);
+.lua-script-list .lua-script-row:hover {
+    background-color: rgb(68, 87, 136);
+}
+
+.lua-script-list .lua-script-row.unity-collection-view__item--selected,
+.lua-script-list .lua-script-row.unity-list-view__item--selected,
+.lua-script-list .lua-script-row:checked {
+    background-color: rgb(83, 69, 170);
+}
+
+.lua-script-list .lua-script-row.unity-collection-view__item--selected .lua-script-row-label,
+.lua-script-list .lua-script-row.unity-list-view__item--selected .lua-script-row-label,
+.lua-script-list .lua-script-row:checked .lua-script-row-label {
+    color: rgb(244, 248, 255);
 }

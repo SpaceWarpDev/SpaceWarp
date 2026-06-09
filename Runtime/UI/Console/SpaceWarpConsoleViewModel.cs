@@ -22,7 +22,7 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
     private string _luaCode = "local info = View.ActiveVehicle.GetInfo()\nlocal telemetry = View.ActiveVehicle.GetTelemetry()\nScript.Log.Info(\"Controlling \" .. info.displayName)\nreturn telemetry.altitudeSeaLevel";
     private string _luaOutput = string.Empty;
     private string _luaSelectedScriptPath = string.Empty;
-    private string _luaScriptStatusText = "Lua";
+    private bool _isLuaRunning;
     private string _searchText = string.Empty;
     private bool _showDebug = true;
     private bool _showError = true;
@@ -39,7 +39,10 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
     public event Action? EntriesChanged;
     public event Action? ActivityEntriesChanged;
     public event Action? LuaScriptsChanged;
+    public event Action? LuaRunStateChanged;
     public event Action? DisplayStateChanged;
+    public event Action? CSharpOutputChanged;
+    public event Action? LuaOutputChanged;
 
     public SpaceWarpConsoleViewModel()
     {
@@ -52,13 +55,14 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
         RunCSharpCommand = new RelayCommand(RunCSharp);
         ResetCSharpCommand = new RelayCommand(ResetCSharp);
         RunLuaCommand = new RelayCommand(RunLua);
+        StopLuaCommand = new RelayCommand(StopLua);
         ResetLuaCommand = new RelayCommand(ResetLua);
-        RefreshLuaScriptsCommand = new RelayCommand(RefreshLuaScripts);
+        RefreshLuaScriptsCommand = new RelayCommand(RefreshLuaScriptsFromCommand);
         LoadLuaScriptCommand = new RelayCommand(LoadLuaScript);
         SaveLuaScriptCommand = new RelayCommand(SaveLuaScript);
         NewLuaScriptCommand = new RelayCommand(NewLuaScript);
         OpenLuaScriptFolderCommand = new RelayCommand(OpenLuaScriptFolder);
-        SpaceWarpConsoleCliIntegrationBridge.LuaOutputReceived += AppendLuaOutput;
+        SpaceWarpConsoleLuaService.LuaOutputReceived += AppendLuaOutput;
     }
 
     [CreateProperty] public RelayCommand CloseCommand { get; }
@@ -70,6 +74,7 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
     [CreateProperty] public RelayCommand RunCSharpCommand { get; }
     [CreateProperty] public RelayCommand ResetCSharpCommand { get; }
     [CreateProperty] public RelayCommand RunLuaCommand { get; }
+    [CreateProperty] public RelayCommand StopLuaCommand { get; }
     [CreateProperty] public RelayCommand ResetLuaCommand { get; }
     [CreateProperty] public RelayCommand RefreshLuaScriptsCommand { get; }
     [CreateProperty] public RelayCommand LoadLuaScriptCommand { get; }
@@ -193,7 +198,13 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
     public string CSharpOutput
     {
         get => _csharpOutput;
-        private set => SetField(ref _csharpOutput, value ?? string.Empty);
+        private set
+        {
+            if (SetField(ref _csharpOutput, value ?? string.Empty))
+            {
+                CSharpOutputChanged?.Invoke();
+            }
+        }
     }
 
     [CreateProperty]
@@ -207,7 +218,13 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
     public string LuaOutput
     {
         get => _luaOutput;
-        private set => SetField(ref _luaOutput, value ?? string.Empty);
+        private set
+        {
+            if (SetField(ref _luaOutput, value ?? string.Empty))
+            {
+                LuaOutputChanged?.Invoke();
+            }
+        }
     }
 
     [CreateProperty]
@@ -215,13 +232,6 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
     {
         get => _luaSelectedScriptPath;
         set => SetField(ref _luaSelectedScriptPath, NormalizeLuaPath(value));
-    }
-
-    [CreateProperty]
-    public string LuaScriptStatusText
-    {
-        get => _luaScriptStatusText;
-        private set => SetField(ref _luaScriptStatusText, value ?? string.Empty);
     }
 
     [CreateProperty]
@@ -239,6 +249,7 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
     }
 
     [CreateProperty] public bool IsCompact => _isCompact;
+    [CreateProperty] public bool IsLuaRunning => _isLuaRunning;
     [CreateProperty] public bool IsShowingLogs => _activeTab == SpaceWarpConsoleTab.Logs;
     [CreateProperty] public bool IsShowingCSharp => _activeTab == SpaceWarpConsoleTab.CSharp;
     [CreateProperty] public bool IsShowingLua => _activeTab == SpaceWarpConsoleTab.Lua;
@@ -302,6 +313,17 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
         RefreshLuaScripts();
     }
 
+    public void TickLuaExecution()
+    {
+        SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleLuaService.TickLua();
+        if (!string.IsNullOrWhiteSpace(result.DisplayText))
+        {
+            AppendLuaOutput(result.DisplayText);
+        }
+
+        SyncLuaRunningState();
+    }
+
     private void ToggleCompact()
     {
         _isCompact = !_isCompact;
@@ -338,7 +360,7 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
         LuaOutput = "Started.";
         try
         {
-            SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleCliIntegrationBridge.RunLua(LuaCode);
+            SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleLuaService.RunLua(LuaCode);
             if (!result.Success)
             {
                 LuaOutput = result.DisplayText;
@@ -356,7 +378,15 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
             SpaceWarpConsoleCliIntegrationBridge.CompleteActivity(activity, false, LuaOutput);
         }
 
+        SyncLuaRunningState();
         PollCliIntegrationActivity();
+    }
+
+    private void StopLua()
+    {
+        SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleLuaService.StopLua();
+        AppendLuaOutput(result.DisplayText);
+        SyncLuaRunningState();
     }
 
     private void ResetLua()
@@ -368,52 +398,56 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
     public void SelectLuaScript(string path)
     {
         LuaSelectedScriptPath = path;
-        LuaScriptStatusText = string.IsNullOrWhiteSpace(LuaSelectedScriptPath)
-            ? "Lua"
-            : LuaSelectedScriptPath;
     }
 
     private void RefreshLuaScripts()
     {
-        LuaScriptFiles = SpaceWarpConsoleCliIntegrationBridge.ListLuaScripts().ToList();
+        LuaScriptFiles = SpaceWarpConsoleLuaService.ListLuaScripts().ToList();
         Notify(nameof(LuaFileSummaryText));
         LuaScriptsChanged?.Invoke();
     }
 
+    private void RefreshLuaScriptsFromCommand()
+    {
+        RefreshLuaScripts();
+        AppendLuaOutput(LuaScriptFiles.Count == 0
+            ? "No scripts found."
+            : $"Refreshed {LuaScriptFiles.Count} Lua script{(LuaScriptFiles.Count == 1 ? string.Empty : "s")}.");
+    }
+
     private void LoadLuaScript()
     {
-        SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleCliIntegrationBridge.ReadLuaScript(LuaSelectedScriptPath);
+        SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleLuaService.ReadLuaScript(LuaSelectedScriptPath);
         if (result.Success)
         {
             LuaCode = result.DisplayText;
-            LuaOutput = "Loaded " + LuaSelectedScriptPath + ".";
-            LuaScriptStatusText = LuaSelectedScriptPath;
+            AppendLuaOutput("Loaded " + LuaSelectedScriptPath + ".");
         }
         else
         {
-            LuaOutput = result.DisplayText;
+            AppendLuaOutput(result.DisplayText);
         }
     }
 
     private void SaveLuaScript()
     {
-        SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleCliIntegrationBridge.WriteLuaScript(LuaSelectedScriptPath, LuaCode);
-        LuaOutput = result.DisplayText;
+        SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleLuaService.WriteLuaScript(LuaSelectedScriptPath, LuaCode);
+        AppendLuaOutput(result.DisplayText);
         RefreshLuaScripts();
     }
 
     private void NewLuaScript()
     {
-        SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleCliIntegrationBridge.CreateLuaScript();
+        SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleLuaService.CreateLuaScript();
         if (result.Success)
         {
             LuaSelectedScriptPath = result.DisplayText;
             LuaCode = "-- New Lua script\n";
-            LuaOutput = "Created " + LuaSelectedScriptPath + ".";
+            AppendLuaOutput("Created " + LuaSelectedScriptPath + ".");
         }
         else
         {
-            LuaOutput = result.DisplayText;
+            AppendLuaOutput(result.DisplayText);
         }
 
         RefreshLuaScripts();
@@ -421,8 +455,8 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
 
     private void OpenLuaScriptFolder()
     {
-        SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleCliIntegrationBridge.OpenLuaScriptFolder();
-        LuaOutput = result.Success ? "Opened " + result.DisplayText + "." : result.DisplayText;
+        SpaceWarpConsoleCSharpResult result = SpaceWarpConsoleLuaService.OpenLuaScriptFolder();
+        AppendLuaOutput(result.Success ? "Opened " + result.DisplayText + "." : result.DisplayText);
     }
 
     private void SetActiveTab(SpaceWarpConsoleTab tab)
@@ -508,6 +542,17 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
         }
 
         LuaOutput = output;
+    }
+
+    private void SyncLuaRunningState()
+    {
+        bool isRunning = SpaceWarpConsoleLuaService.IsLuaRunning;
+        if (!SetField(ref _isLuaRunning, isRunning, nameof(IsLuaRunning)))
+        {
+            return;
+        }
+
+        LuaRunStateChanged?.Invoke();
     }
 
     private static bool IsLuaStartResult(string text)

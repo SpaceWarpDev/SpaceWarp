@@ -268,8 +268,8 @@ public class UI : SpaceWarpModule
         swConsoleOptions.ResizeOptions = ResizeOptions.Default with
         {
             IsResizingEnabled = true,
-            MinWidth = 760,
-            MinHeight = 520
+            MinWidth = 360,
+            MinHeight = 220
         };
         var swConsole = Window.Create(swConsoleOptions, swConsoleUxml);
         swConsole.Hide();

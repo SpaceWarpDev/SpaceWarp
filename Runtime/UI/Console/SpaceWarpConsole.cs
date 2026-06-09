@@ -58,6 +58,11 @@ internal sealed class SpaceWarpConsole : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        _viewModel?.TickLuaExecution();
+    }
+
     public void Show()
     {
         _view?.Show();

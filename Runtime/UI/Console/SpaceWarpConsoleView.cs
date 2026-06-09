@@ -30,6 +30,12 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
     private ListView? _logList;
     private ListView? _activityList;
     private ListView? _luaScriptList;
+    private ScrollView? _csharpOutputScrollView;
+    private ScrollView? _luaOutputScrollView;
+    private Button? _luaRunButton;
+    private Button? _luaStopButton;
+    private Button? _compactLuaRunButton;
+    private Button? _compactLuaStopButton;
     private Label? _emptyState;
     private Label? _activityEmptyState;
     private Label? _luaScriptEmptyState;
@@ -47,7 +53,10 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
         _viewModel.EntriesChanged += RefreshEntries;
         _viewModel.ActivityEntriesChanged += RefreshActivityEntries;
         _viewModel.LuaScriptsChanged += RefreshLuaScripts;
+        _viewModel.LuaRunStateChanged += RefreshLuaRunState;
         _viewModel.DisplayStateChanged += RefreshDisplayState;
+        _viewModel.CSharpOutputChanged += ScrollCSharpOutputToBottomIfPinned;
+        _viewModel.LuaOutputChanged += ScrollLuaOutputToBottomIfPinned;
     }
 
     public bool IsOpen => _isOpen;
@@ -61,6 +70,7 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
         RefreshEntries();
         RefreshActivityEntries();
         RefreshLuaScripts();
+        RefreshLuaRunState();
         RefreshDisplayState();
         Hide();
         _root?.CenterByDefault();
@@ -71,7 +81,10 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
         _viewModel.EntriesChanged -= RefreshEntries;
         _viewModel.ActivityEntriesChanged -= RefreshActivityEntries;
         _viewModel.LuaScriptsChanged -= RefreshLuaScripts;
+        _viewModel.LuaRunStateChanged -= RefreshLuaRunState;
         _viewModel.DisplayStateChanged -= RefreshDisplayState;
+        _viewModel.CSharpOutputChanged -= ScrollCSharpOutputToBottomIfPinned;
+        _viewModel.LuaOutputChanged -= ScrollLuaOutputToBottomIfPinned;
     }
 
     public void Show()
@@ -110,6 +123,12 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
         _logList = _root?.Q<ListView>("console-list");
         _activityList = _root?.Q<ListView>("cli-activity-list");
         _luaScriptList = _root?.Q<ListView>("lua-script-list");
+        _csharpOutputScrollView = _root?.Q<ScrollView>("csharp-output-scroll");
+        _luaOutputScrollView = _root?.Q<ScrollView>("lua-output-scroll");
+        _luaRunButton = _root?.Q<Button>("lua-run");
+        _luaStopButton = _root?.Q<Button>("lua-stop");
+        _compactLuaRunButton = _root?.Q<Button>("compact-lua-run");
+        _compactLuaStopButton = _root?.Q<Button>("compact-lua-stop");
         _emptyState = _root?.Q<Label>("empty-state");
         _activityEmptyState = _root?.Q<Label>("cli-activity-empty-state");
         _luaScriptEmptyState = _root?.Q<Label>("lua-script-empty-state");
@@ -118,6 +137,8 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
         _messageChip = _root?.Q<VisualElement>("toggle-message");
         _warningChip = _root?.Q<VisualElement>("toggle-warning");
         _errorChip = _root?.Q<VisualElement>("toggle-error");
+        _csharpOutputScrollView?.EnablePinnedBottomAutoScroll();
+        _luaOutputScrollView?.EnablePinnedBottomAutoScroll();
         BindFilterChips();
     }
 
@@ -232,6 +253,14 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
         }
     }
 
+    private void RefreshLuaRunState()
+    {
+        _luaRunButton?.SetEnabled(!_viewModel.IsLuaRunning);
+        _luaStopButton?.SetEnabled(_viewModel.IsLuaRunning);
+        _compactLuaRunButton?.SetEnabled(!_viewModel.IsLuaRunning);
+        _compactLuaStopButton?.SetEnabled(_viewModel.IsLuaRunning);
+    }
+
     private void RefreshDisplayState()
     {
         if (_root != null)
@@ -244,6 +273,8 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
             {
                 _root.RemoveFromClassList("console-compact");
             }
+
+            _root.EnableInClassList("console-lua-active", _viewModel.IsShowingLua);
         }
 
         SetTabState(_logsTab, _viewModel.IsShowingLogs);
@@ -264,6 +295,26 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
         {
             _luaPanel.style.display = _viewModel.IsShowingLua ? DisplayStyle.Flex : DisplayStyle.None;
         }
+
+        if (_viewModel.IsShowingCSharp)
+        {
+            ScrollCSharpOutputToBottomIfPinned();
+        }
+
+        if (_viewModel.IsShowingLua)
+        {
+            ScrollLuaOutputToBottomIfPinned();
+        }
+    }
+
+    private void ScrollCSharpOutputToBottomIfPinned()
+    {
+        _csharpOutputScrollView.ScrollToBottomIfPinned();
+    }
+
+    private void ScrollLuaOutputToBottomIfPinned()
+    {
+        _luaOutputScrollView.ScrollToBottomIfPinned();
     }
 
     private void SyncFilterButtons()
@@ -392,20 +443,25 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
 
     private static VisualElement CreateLuaScriptRow()
     {
-        var row = new Label();
+        var row = new VisualElement();
         row.AddToClassList("lua-script-row");
+        var label = new Label { name = "lua-script-row-label" };
+        label.AddToClassList("lua-script-row-label");
+        row.Add(label);
         return row;
     }
 
     private static void ApplyLuaScriptRow(VisualElement element, string path)
     {
-        if (element is not Label label)
+        Label label = element.Q<Label>("lua-script-row-label");
+        if (label == null)
         {
             return;
         }
 
         label.text = path;
         label.tooltip = path;
+        element.tooltip = path;
     }
 
     private static void ApplyActivityRow(VisualElement element, SpaceWarpConsoleCliActivityEntryViewModel row)
