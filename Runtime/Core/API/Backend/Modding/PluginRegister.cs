@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -146,13 +147,15 @@ internal static class PluginRegister
                 continue;
             }
 
+            var modAssemblies = new List<Assembly>();
+
             // Load the libraries as we get them
             if (Directory.Exists(Path.Combine(swinfo.Directory!.FullName, "lib")) && !ModList.DisabledPluginGuids.Contains(swinfoData.ModID))
             {
                 var dirInfo = new DirectoryInfo(Path.Combine(swinfo.Directory!.FullName, "lib"));
                 foreach (var dll in dirInfo.GetFiles("*.dll", SearchOption.AllDirectories))
                 {
-                    Assembly.LoadFile(dll.FullName);
+                    modAssemblies.Add(Assembly.LoadFile(dll.FullName));
                 }
             }
 
@@ -195,6 +198,8 @@ internal static class PluginRegister
                     continue;
                 }
 
+                modAssemblies.Add(asm);
+
                 foreach (var type in asm.GetTypes())
                 {
                     if (!typeof(ISpaceWarpMod).IsAssignableFrom(type) || type.IsAbstract) continue;
@@ -217,6 +222,7 @@ internal static class PluginRegister
                 swMod.SWConfiguration
             );
             swMod.SWMetadata = descriptor;
+            descriptor.Assemblies.AddRange(modAssemblies);
 
             Logger.LogInfo($"Attempting to register mod: {swinfoData.ModID}, {swinfoData.Name}");
 

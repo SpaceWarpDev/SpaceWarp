@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using JetBrains.Annotations;
 using ReduxLib.Configuration;
 using SpaceWarp2.API.Mods.JSON;
@@ -44,6 +46,12 @@ public class SpaceWarpPluginDescriptor
     /// The plugin instance.
     /// </summary>
     public ISpaceWarpMod? Plugin;
+
+    /// <summary>
+    /// Every assembly that belongs to this mod - its main assembly plus any libraries loaded from its lib folder.
+    /// Used to attribute code, such as PatchManager C# patches, back to this mod.
+    /// </summary>
+    public readonly List<Assembly> Assemblies = new();
 
     /// <summary>
     /// The plugin's GUID.
