@@ -5,6 +5,7 @@ using System.Reflection;
 using JetBrains.Annotations;
 using ReduxLib.Configuration;
 using SpaceWarp2.API.Mods.JSON;
+using ILogger = ReduxLib.Logging.ILogger;
 
 namespace SpaceWarp2.API.Mods;
 
@@ -47,6 +48,19 @@ public class SpaceWarpPluginDescriptor
     /// The plugin instance.
     /// </summary>
     public ISpaceWarpMod? Plugin;
+
+    private ILogger _logger;
+
+    /// <summary>
+    /// This mod's logger, resolved lazily from its <see cref="Guid" />. Always present, unlike <see cref="Plugin" />
+    /// (an asset-only mod has no plugin), so loading code logs through the descriptor rather than the optional
+    /// plugin. The plugin's own <c>SWLogger</c> is injected from this when the plugin is created.
+    /// </summary>
+    public ILogger Logger
+    {
+        get => _logger ??= ReduxLib.ReduxLib.GetLogger(Guid);
+        set => _logger = value;
+    }
 
     /// <summary>
     /// Every assembly that belongs to this mod - its main assembly plus any libraries loaded from its lib folder.

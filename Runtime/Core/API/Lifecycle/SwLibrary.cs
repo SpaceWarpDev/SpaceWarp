@@ -35,6 +35,13 @@ public class SwLibrary
     /// <param name="fn">The closure to fire.</param>
     public void PostInit(ScriptExecutionContext context, DynValue fn) => AddHook(context, fn, postInit: true);
 
+    /// <summary>
+    /// Returns an extra named logger, for a mod that wants one beyond its default <c>Log</c> global.
+    /// </summary>
+    /// <param name="name">The logger name.</param>
+    /// <returns>A logger wrapping the named ReduxLib logger.</returns>
+    public ModLogger GetLogger(string name) => new(ReduxLib.ReduxLib.GetLogger(name));
+
     private static void AddHook(ScriptExecutionContext context, DynValue fn, bool postInit)
     {
         var phase = postInit ? "PostInit" : "Init";

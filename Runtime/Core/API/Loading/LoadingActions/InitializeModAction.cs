@@ -27,7 +27,7 @@ internal sealed class InitializeModAction : BaseFlowAction
                 }
                 catch (Exception hookError)
                 {
-                    (_plugin.Plugin ?? SpaceWarpPlugin.Instance).SWLogger.LogError(hookError.ToString());
+                    _plugin.Logger.LogError(hookError.ToString());
                 }
             }
 
@@ -40,7 +40,7 @@ internal sealed class InitializeModAction : BaseFlowAction
         }
         catch (Exception e)
         {
-            (_plugin.Plugin ?? SpaceWarpPlugin.Instance).SWLogger.LogError(e.ToString());
+            _plugin.Logger.LogError(e.ToString());
             reject(e.ToString());
         }
     }

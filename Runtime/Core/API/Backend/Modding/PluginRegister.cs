@@ -58,9 +58,12 @@ internal static class PluginRegister
                 Name = modId,
                 Version = "0.0.0"
             };
+            swMod.SWConfiguration =
+                new JsonConfigFile(Path.Combine(lua.Directory!.FullName, modId + "-config.json"));
             var descriptor = new SpaceWarpPluginDescriptor(
                 swMod, modId, modId, info, lua.Directory!, true, swMod.SWConfiguration);
             swMod.SWMetadata = descriptor;
+            swMod.SWLogger = descriptor.Logger;
             descriptor.ScriptFiles.Add(lua.FullName);
             PluginList.RegisterPlugin(descriptor);
             Logger.LogInfo($"Registered standalone Lua mod: {modId}");
@@ -174,13 +177,13 @@ internal static class PluginRegister
     {
         var mod = new UnloadedMod(typeof(SpaceWarpPlugin))
         {
-            SWLogger = SpaceWarpPlugin.Logger,
             SWConfiguration = ReduxLib.ReduxLib.ReduxCoreConfig
         };
         var descriptor = new SpaceWarpPluginDescriptor(mod,
             SpaceWarpPlugin.SpaceWarpModInfo.ModID, SpaceWarpPlugin.SpaceWarpModInfo.Name,
             SpaceWarpPlugin.SpaceWarpModInfo, new DirectoryInfo(ReduxLib.ReduxLib.REDUX_FOLDER), true, ReduxLib.ReduxLib.ReduxCoreConfig);
         mod.SWMetadata = descriptor;
+        descriptor.Logger = SpaceWarpPlugin.Logger;
         descriptor.IsCore = true;
         PluginList.RegisterPlugin(descriptor);
     }
@@ -275,8 +278,6 @@ internal static class PluginRegister
                 }
             }
 
-            swMod.SWLogger = ReduxLib.ReduxLib.GetLogger(swinfoData.ModID);
-
             swMod.SWConfiguration =
                 new JsonConfigFile(Path.Combine(swinfo.Directory.FullName, swinfoData.ModID + "-config.json"));
 
@@ -289,6 +290,7 @@ internal static class PluginRegister
                 swMod.SWConfiguration
             );
             swMod.SWMetadata = descriptor;
+            swMod.SWLogger = descriptor.Logger;
             descriptor.Assemblies.AddRange(modAssemblies);
             descriptor.ScriptFiles.AddRange(Directory
                 .GetFiles(swinfo.Directory!.FullName, "*.lua", SearchOption.AllDirectories)

@@ -27,7 +27,7 @@ internal sealed class PreInitializeModAction : BaseFlowAction
         }
         catch (Exception e)
         {
-            (_plugin.Plugin ?? SpaceWarpPlugin.Instance).SWLogger.LogError(e.ToString());
+            _plugin.Logger.LogError(e.ToString());
             reject(null);
         }
     }

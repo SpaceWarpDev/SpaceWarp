@@ -34,7 +34,7 @@ public static class ModScriptRuntime
             return;
         }
 
-        var env = CreateModEnv(descriptor.Guid, descriptor.Folder?.FullName);
+        var env = CreateModEnv(descriptor);
         foreach (var file in descriptor.ScriptFiles)
         {
             RunSource(descriptor, env, file, File.ReadAllText(file));
@@ -56,7 +56,7 @@ public static class ModScriptRuntime
             return;
         }
 
-        var env = CreateModEnv(descriptor.Guid, descriptor.Folder?.FullName);
+        var env = CreateModEnv(descriptor);
         foreach (var (key, content) in sources)
         {
             RunSource(descriptor, env, key, content);
@@ -80,18 +80,6 @@ public static class ModScriptRuntime
     }
 
     /// <summary>
-    /// Forks a fresh environment for the given mod and runs a Lua body in it.
-    /// </summary>
-    /// <param name="modId">The mod's ID, seeded as the <c>ModId</c> global.</param>
-    /// <param name="location">The mod's folder, seeded as the <c>Location</c> global, or null.</param>
-    /// <param name="code">The Lua body to run.</param>
-    /// <param name="chunkName">A name for the chunk, used in error messages.</param>
-    public static void RunModBody(string modId, string location, string code, string chunkName)
-    {
-        RunBodyIn(CreateModEnv(modId, location), code, chunkName);
-    }
-
-    /// <summary>
     /// Runs a Lua body in an already-forked mod environment.
     /// </summary>
     /// <param name="env">An environment from <see cref="CreateModEnv" />.</param>
@@ -108,12 +96,11 @@ public static class ModScriptRuntime
     /// <remarks>
     /// Reads fall through to the root globals, writes stay local to the child, so each mod is isolated on the
     /// one shared VM. The runtime seeds the general mod-loading globals (<c>ModId</c>, <c>Location</c>, the
-    /// <c>require</c> loader), then runs every registered contributor.
+    /// <c>require</c> loader, and the <c>Log</c> logger), then runs every registered contributor.
     /// </remarks>
-    /// <param name="modId">The mod's ID, seeded as the <c>ModId</c> global.</param>
-    /// <param name="location">The mod's folder, seeded as the <c>Location</c> global, or null.</param>
+    /// <param name="descriptor">The mod to fork an environment for.</param>
     /// <returns>The forked environment's globals table.</returns>
-    public static Table CreateModEnv(string modId, string location)
+    public static Table CreateModEnv(SpaceWarpPluginDescriptor descriptor)
     {
         var root = IScriptRuntime.Instance.RootGlobals;
         var script = root.OwnerScript;
@@ -124,7 +111,8 @@ public static class ModScriptRuntime
         meta["__index"] = DynValue.NewTable(root);
         child.MetaTable = meta;
 
-        child["ModId"] = modId;
+        child["ModId"] = descriptor.Guid;
+        var location = descriptor.Folder?.FullName;
         if (location != null)
         {
             child["Location"] = location;
@@ -132,6 +120,7 @@ public static class ModScriptRuntime
 
         ModRequire.InstallOn(child);
         SwLibrary.SeedLifecycleGlobals(child);
+        child["Log"] = new ModLogger(descriptor.Logger);
 
         foreach (var contributor in ModRuntime.Contributors)
         {

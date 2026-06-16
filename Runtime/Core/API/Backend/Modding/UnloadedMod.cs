@@ -23,7 +23,7 @@ internal class UnloadedMod : ISpaceWarpMod
             modObject.SetActive(false);
             var mb = modObject.AddComponent(ToLoad);
             var mod = (ISpaceWarpMod)mb;
-            mod.SWLogger = SWLogger;
+            mod.SWLogger = SWMetadata.Logger;
             mod.SWConfiguration = SWConfiguration;
             mod.SWMetadata = SWMetadata;
             SWMetadata.Plugin = mod;
@@ -33,7 +33,7 @@ internal class UnloadedMod : ISpaceWarpMod
         else
         {
             var mod = (ISpaceWarpMod)Activator.CreateInstance(ToLoad);
-            mod.SWLogger = SWLogger;
+            mod.SWLogger = SWMetadata.Logger;
             mod.SWConfiguration = SWConfiguration;
             mod.SWMetadata = SWMetadata;
             SWMetadata.Plugin = mod;
