@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using JetBrains.Annotations;
@@ -52,6 +53,46 @@ public class SpaceWarpPluginDescriptor
     /// Used to attribute code, such as PatchManager C# patches, back to this mod.
     /// </summary>
     public readonly List<Assembly> Assemblies = new();
+
+    /// <summary>
+    /// Lua lifecycle closures registered by this mod's scripts via the SW global, fired during the Init
+    /// phase before the C# OnInitialized. Populated game-side. Plain Actions so the descriptor never needs
+    /// to name a game-side script type.
+    /// </summary>
+    public readonly List<Action> InitHooks = new();
+
+    /// <summary>
+    /// Lua lifecycle closures fired during the PostInit phase, before the C# OnPostInitialized.
+    /// </summary>
+    public readonly List<Action> PostInitHooks = new();
+
+    /// <summary>
+    /// Lua script files belonging to this mod that the runtime runs, set at discovery.
+    /// </summary>
+    public readonly List<string> ScriptFiles = new();
+
+    /// <summary>
+    /// The script sources the runtime ran for this mod, keyed by source identity with the script text as the
+    /// value.
+    /// </summary>
+    /// <remarks>
+    /// Read by PatchManager to feed its patch-cache checksum without re-reading the files.
+    /// </remarks>
+    public readonly Dictionary<string, string> LoadedScripts = new();
+
+    /// <summary>
+    /// Errors thrown by this mod's scripts while the runtime ran them, keyed by source identity.
+    /// </summary>
+    /// <remarks>
+    /// Read by PatchManager into its patch summary.
+    /// </remarks>
+    public readonly List<(string key, string reason)> ScriptErrors = new();
+
+    /// <summary>
+    /// An addressables label whose text assets are this mod's scripts, for mods that ship their scripts as
+    /// addressables rather than loose files. Null for file-based mods.
+    /// </summary>
+    public string AddressableScriptLabel;
 
     /// <summary>
     /// The plugin's GUID.

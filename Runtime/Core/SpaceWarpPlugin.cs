@@ -90,6 +90,8 @@ public sealed class SpaceWarpPlugin : GeneralMod
             {
                 AfterGameLoadActions.Add(action(plugin));
             }
+
+            AfterGameLoadActions.Add(new RunModScriptsAction(plugin));
         }
 
         foreach (var actionGenerator in Loading.GeneralLoadingActions)

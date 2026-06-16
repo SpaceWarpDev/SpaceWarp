@@ -19,7 +19,74 @@ internal static class PluginRegister
         RegisterInternalMods();
         RegisterKsp1Mods();
         RegisterMods();
+        RegisterStandaloneLuaMods();
         DisableMods();
+    }
+
+    /// <summary>
+    /// Registers a descriptor for each standalone drop-in .lua under the mods folder - a .lua with no swinfo
+    /// mod folder around it. These are mods-of-one whose ModId is the filename, matching PatchManager's
+    /// LoadSinglePatchFile convention, so the SW lifecycle global can resolve their descriptor by ModId.
+    /// </summary>
+    private static void RegisterStandaloneLuaMods()
+    {
+        var modsFolder = new DirectoryInfo(CommonPaths.ModsFolder);
+        if (!modsFolder.Exists)
+        {
+            return;
+        }
+
+        foreach (var lua in modsFolder.GetFiles("*.lua", SearchOption.AllDirectories))
+        {
+            // A .lua inside a swinfo mod folder belongs to that mod, not its own mod-of-one.
+            if (HasSwinfoAncestor(lua.Directory, modsFolder))
+            {
+                continue;
+            }
+
+            var modId = Path.GetFileNameWithoutExtension(lua.Name);
+            if (ModList.DisabledPluginGuids.Contains(modId) || PluginList.TryGetDescriptor(modId) != null)
+            {
+                continue;
+            }
+
+            ISpaceWarpMod swMod = new AssetOnlyMod(modId);
+            var info = new ModInfo
+            {
+                Spec = SpecVersion.Default,
+                ModID = modId,
+                Name = modId,
+                Version = "0.0.0"
+            };
+            var descriptor = new SpaceWarpPluginDescriptor(
+                swMod, modId, modId, info, lua.Directory!, true, swMod.SWConfiguration);
+            swMod.SWMetadata = descriptor;
+            descriptor.ScriptFiles.Add(lua.FullName);
+            PluginList.RegisterPlugin(descriptor);
+            Logger.LogInfo($"Registered standalone Lua mod: {modId}");
+        }
+    }
+
+    /// <summary>
+    /// Returns true if <paramref name="dir" /> or any ancestor up to <paramref name="stopAt" /> contains a
+    /// swinfo.json - meaning the file belongs to that swinfo mod rather than being a standalone drop-in.
+    /// </summary>
+    private static bool HasSwinfoAncestor(DirectoryInfo dir, DirectoryInfo stopAt)
+    {
+        for (var current = dir; current != null; current = current.Parent)
+        {
+            if (File.Exists(Path.Combine(current.FullName, "swinfo.json")))
+            {
+                return true;
+            }
+
+            if (string.Equals(current.FullName, stopAt.FullName, StringComparison.OrdinalIgnoreCase))
+            {
+                break;
+            }
+        }
+
+        return false;
     }
 
     private static void RegisterKsp1Mods()
@@ -223,6 +290,9 @@ internal static class PluginRegister
             );
             swMod.SWMetadata = descriptor;
             descriptor.Assemblies.AddRange(modAssemblies);
+            descriptor.ScriptFiles.AddRange(Directory
+                .GetFiles(swinfo.Directory!.FullName, "*.lua", SearchOption.AllDirectories)
+                .Where(f => !Path.GetFileName(f).StartsWith("_")));
 
             Logger.LogInfo($"Attempting to register mod: {swinfoData.ModID}, {swinfoData.Name}");
 

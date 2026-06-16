@@ -17,6 +17,20 @@ internal sealed class InitializeModAction : BaseFlowAction
     {
         try
         {
+            // Fire the mod's Lua lifecycle hooks before its C# OnInitialized so script contributions run first.
+            // Each hook is isolated so one mod's error does not abort the phase for the rest.
+            foreach (var hook in _plugin.InitHooks)
+            {
+                try
+                {
+                    hook();
+                }
+                catch (Exception hookError)
+                {
+                    (_plugin.Plugin ?? SpaceWarpPlugin.Instance).SWLogger.LogError(hookError.ToString());
+                }
+            }
+
             if (_plugin.DoLoadingActions)
             {
                 _plugin.Plugin?.OnInitialized();

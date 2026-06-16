@@ -18,6 +18,19 @@ internal sealed class PostInitializeModAction : BaseFlowAction
     {
         try
         {
+            // Fire the mod's Lua PostInit hooks before its C# OnPostInitialized. Isolated per hook.
+            foreach (var hook in _plugin.PostInitHooks)
+            {
+                try
+                {
+                    hook();
+                }
+                catch (Exception hookError)
+                {
+                    (_plugin.Plugin ?? SpaceWarpPlugin.Instance).SWLogger.LogError(hookError.ToString());
+                }
+            }
+
             if (_plugin.DoLoadingActions)
             {
                 _plugin.Plugin!.OnPostInitialized();
