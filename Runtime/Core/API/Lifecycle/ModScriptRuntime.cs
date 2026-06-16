@@ -4,6 +4,7 @@ using System.IO;
 using MoonSharp.Interpreter;
 using ReduxLib.GameInterfaces;
 using ReduxLib.Logging;
+using SpaceWarp2.API.Config;
 using SpaceWarp2.API.Mods;
 
 namespace SpaceWarp2.API.Lifecycle;
@@ -121,6 +122,8 @@ public static class ModScriptRuntime
         ModRequire.InstallOn(child);
         SwLibrary.SeedLifecycleGlobals(child);
         child["Log"] = new ModLogger(descriptor.Logger);
+        ConfigTypes.SeedOn(child);
+        child["Config"] = new ModConfig(descriptor.ConfigFile);
 
         foreach (var contributor in ModRuntime.Contributors)
         {
