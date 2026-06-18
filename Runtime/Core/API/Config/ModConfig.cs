@@ -9,7 +9,7 @@ namespace SpaceWarp2.API.Config;
 /// fetch existing ones through <see cref="Get" />, and reach another mod's config through <see cref="Mod" />.
 /// </summary>
 /// <remarks>
-/// Seeded per mod environment, wrapping that mod's config file.
+/// Contributed per mod environment, wrapping that mod's config file.
 /// </remarks>
 [MoonSharpUserData]
 public sealed class ModConfig
@@ -24,6 +24,10 @@ public sealed class ModConfig
         UserData.RegisterType<ConfigView>();
     }
 
+    /// <summary>
+    /// Creates a config namespace wrapping the given config file.
+    /// </summary>
+    /// <param name="file">The mod's config file, or null if the mod has none.</param>
     public ModConfig(IConfigFile file)
     {
         _file = file;

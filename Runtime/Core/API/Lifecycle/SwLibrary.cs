@@ -12,7 +12,7 @@ namespace SpaceWarp2.API.Lifecycle;
 /// as plain Actions, so the descriptor never has to name a game-side script type.
 /// </summary>
 [MoonSharpUserData]
-public class SwLibrary
+public sealed class SwLibrary
 {
     private static readonly ILogger Logger = ReduxLib.ReduxLib.GetLogger("SpaceWarp.Lifecycle");
 
@@ -82,13 +82,13 @@ public class SwLibrary
     }
 
     /// <summary>
-    /// Seeds the SW global onto a mod environment's globals table. Called game-side right after the
+    /// Contributes the SW global onto a mod environment's globals table. Called game-side right after the
     /// environment is forked, the one game-side touch on this surface.
     /// </summary>
     /// <param name="globals">The mod environment's globals table.</param>
-    public static void SeedLifecycleGlobals(Table globals)
+    public static void ContributeTo(Table globals)
     {
-        // Assign the raw registered object (auto-wrapped), matching how PM is seeded. Assigning a pre-made
+        // Assign the raw registered object (auto-wrapped), matching how PM is contributed. Assigning a pre-made
         // UserData DynValue through the Table indexer can double-wrap and hide the methods.
         globals["SW"] = new SwLibrary();
     }

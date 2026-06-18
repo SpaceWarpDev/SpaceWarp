@@ -57,7 +57,6 @@ public sealed class SpaceWarpPlugin : GeneralMod
         PluginRegister.RegisterAllMods();
         PluginList.ResolveDependenciesAndLoadOrder();
         PluginList.LoadAllMods();
-        // Now let's add in all our actions
         SetupBeforeGameLoadActions();
         SetupAfterGameLoadActions();
 #if UNITY_EDITOR

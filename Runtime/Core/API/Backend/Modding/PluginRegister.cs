@@ -25,9 +25,12 @@ internal static class PluginRegister
 
     /// <summary>
     /// Registers a descriptor for each standalone drop-in .lua under the mods folder - a .lua with no swinfo
-    /// mod folder around it. These are mods-of-one whose ModId is the filename, matching PatchManager's
-    /// LoadSinglePatchFile convention, so the SW lifecycle global can resolve their descriptor by ModId.
+    /// mod folder around it.
     /// </summary>
+    /// <remarks>
+    /// These are mods-of-one whose ModId is the filename, matching PatchManager's LoadSinglePatchFile
+    /// convention, so the SW lifecycle global can resolve their descriptor by ModId.
+    /// </remarks>
     private static void RegisterStandaloneLuaMods()
     {
         var modsFolder = new DirectoryInfo(CommonPaths.ModsFolder);
@@ -229,7 +232,6 @@ internal static class PluginRegister
                 }
             }
 
-            // But then load the 
             ISpaceWarpMod swMod = new AssetOnlyMod(swinfoData.Name);
             if (swinfoData.MainAssembly != null && !ModList.DisabledPluginGuids.Contains(swinfoData.ModID))
             {

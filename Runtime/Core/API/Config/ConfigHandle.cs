@@ -24,7 +24,7 @@ public sealed class ConfigHandle
     }
 
     /// <summary>
-    /// The current value in the config type's rich Lua domain. Reading deserializes the stored value; writing
+    /// The current value in the config type's rich Lua domain. Reading deserializes the stored value. Writing
     /// serializes, stores (which saves the file), and fires change callbacks.
     /// </summary>
     public DynValue value
@@ -50,8 +50,8 @@ public sealed class ConfigHandle
             closure.Call(_type.Deserialize(oldValue), _type.Deserialize(newValue)));
     }
 
-    /// <summary>Whether the entry carries the given metadata tag.</summary>
+    /// <summary>Determines whether the entry carries the given metadata tag.</summary>
     /// <param name="tag">The tag to check for.</param>
-    /// <returns>True if the entry has the tag.</returns>
+    /// <returns>True if the entry has the tag, false otherwise.</returns>
     public bool HasTag(string tag) => _entry.HasTag(tag);
 }

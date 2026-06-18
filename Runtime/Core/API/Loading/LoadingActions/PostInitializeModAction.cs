@@ -4,6 +4,9 @@ using SpaceWarp2.API.Mods;
 
 namespace SpaceWarp2.Patching.LoadingActions;
 
+/// <summary>
+/// Post-initializes a mod by firing its Lua post-init hooks and its C# OnPostInitialized callback.
+/// </summary>
 internal sealed class PostInitializeModAction : BaseFlowAction
 {
     private readonly SpaceWarpPluginDescriptor _plugin;
@@ -33,7 +36,7 @@ internal sealed class PostInitializeModAction : BaseFlowAction
 
             if (_plugin.DoLoadingActions)
             {
-                _plugin.Plugin!.OnPostInitialized();
+                _plugin.Plugin?.OnPostInitialized();
             }
 
             resolve();

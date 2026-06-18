@@ -8,7 +8,7 @@ namespace SpaceWarp2.API.Config;
 /// </summary>
 /// <remarks>
 /// The storage value's type drives how the settings menu renders the entry - a <c>UnityEngine.Color</c> storage
-/// value gets a color picker, a string gets a text field, and so on. Built-in types implement this in C#; a
+/// value gets a color picker, a string gets a text field, and so on. Built-in types implement this in C#. A
 /// custom Lua type satisfies the same shape as a table with <c>Serialize</c> and <c>Deserialize</c> functions,
 /// so the framework can call either through MoonSharp uniformly. The storage type for a Lua custom type is
 /// inferred from what its <c>Serialize</c> returns.

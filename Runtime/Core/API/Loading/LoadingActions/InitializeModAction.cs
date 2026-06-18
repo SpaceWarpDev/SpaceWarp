@@ -4,6 +4,9 @@ using SpaceWarp2.API.Mods;
 
 namespace SpaceWarp2.Patching.LoadingActions;
 
+/// <summary>
+/// Initializes a mod by firing its Lua init hooks and its C# OnInitialized callback.
+/// </summary>
 internal sealed class InitializeModAction : BaseFlowAction
 {
     private readonly SpaceWarpPluginDescriptor _plugin;

@@ -1,3 +1,4 @@
+using System.Linq;
 using MoonSharp.Interpreter;
 using ReduxLib.Configuration;
 
@@ -33,17 +34,12 @@ public sealed class ConfigView
             return null;
         }
 
-        foreach (var key in configSection.Keys)
+        if (!configSection.Keys.Contains(name))
         {
-            if (key != name)
-            {
-                continue;
-            }
-
-            var entry = configSection[name];
-            return new ConfigHandle(entry, ConfigTypes.Resolve(entry.ValueType));
+            return null;
         }
 
-        return null;
+        var entry = configSection[name];
+        return new ConfigHandle(entry, ConfigTypes.Resolve(entry.ValueType));
     }
 }

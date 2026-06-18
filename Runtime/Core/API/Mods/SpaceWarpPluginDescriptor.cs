@@ -52,10 +52,13 @@ public class SpaceWarpPluginDescriptor
     private ILogger _logger;
 
     /// <summary>
-    /// This mod's logger, resolved lazily from its <see cref="Guid" />. Always present, unlike <see cref="Plugin" />
-    /// (an asset-only mod has no plugin), so loading code logs through the descriptor rather than the optional
-    /// plugin. The plugin's own <c>SWLogger</c> is injected from this when the plugin is created.
+    /// Gets or sets this mod's logger, resolved lazily from its <see cref="Guid" />.
     /// </summary>
+    /// <remarks>
+    /// Always present, unlike <see cref="Plugin" /> (an asset-only mod has no plugin), so loading code logs
+    /// through the descriptor rather than the optional plugin. The plugin's own <c>SWLogger</c> is injected
+    /// from this when the plugin is created.
+    /// </remarks>
     public ILogger Logger
     {
         get => _logger ??= ReduxLib.ReduxLib.GetLogger(Guid);
@@ -69,10 +72,12 @@ public class SpaceWarpPluginDescriptor
     public readonly List<Assembly> Assemblies = new();
 
     /// <summary>
-    /// Lua lifecycle closures registered by this mod's scripts via the SW global, fired during the Init
-    /// phase before the C# OnInitialized. Populated game-side. Plain Actions so the descriptor never needs
-    /// to name a game-side script type.
+    /// Lua lifecycle closures registered by this mod's scripts via the SW global, fired during the Init phase
+    /// before the C# OnInitialized.
     /// </summary>
+    /// <remarks>
+    /// Populated game-side. Plain Actions so the descriptor never needs to name a game-side script type.
+    /// </remarks>
     public readonly List<Action> InitHooks = new();
 
     /// <summary>
@@ -106,7 +111,7 @@ public class SpaceWarpPluginDescriptor
     /// An addressables label whose text assets are this mod's scripts, for mods that ship their scripts as
     /// addressables rather than loose files. Null for file-based mods.
     /// </summary>
-    public string AddressableScriptLabel;
+    public string? AddressableScriptLabel;
 
     /// <summary>
     /// The plugin's GUID.
@@ -154,7 +159,7 @@ public class SpaceWarpPluginDescriptor
     public bool LatePreInitialize;
 
     /// <summary>
-    /// Is this a core mod (as in which part of the mod list does it go into)
+    /// Whether this is a core mod (controls which part of the mod list it goes into).
     /// </summary>
     public bool IsCore;
 

@@ -22,8 +22,12 @@ public sealed class ConfigBuilder
     private string _description = string.Empty;
     private string _nameLoc;
     private string _descLoc;
+    private const int DefaultSliderSteps = 1024;
+
     private double _rangeMin;
     private double _rangeMax;
+    private int _rangeSteps = DefaultSliderSteps;
+    private string _rangeFormat;
     private bool _hasRange;
     private DynValue _values = DynValue.Nil;
     private readonly List<string> _tags = new();
@@ -54,11 +58,17 @@ public sealed class ConfigBuilder
         return this;
     }
 
-    /// <summary>Constrains an ordered value to an inclusive range.</summary>
-    public ConfigBuilder Range(double min, double max)
+    /// <summary>
+    /// Constrains an ordered value to an inclusive range. <paramref name="steps" /> sets the slider granularity
+    /// and <paramref name="format" /> the slider's number format, which defaults to a type-appropriate format
+    /// when omitted.
+    /// </summary>
+    public ConfigBuilder Range(double min, double max, int steps = DefaultSliderSteps, string format = null)
     {
         _rangeMin = min;
         _rangeMax = max;
+        _rangeSteps = steps;
+        _rangeFormat = format;
         _hasRange = true;
         return this;
     }
@@ -137,13 +147,22 @@ public sealed class ConfigBuilder
             var constraintType = typeof(RangeConstraint<>).MakeGenericType(storageType);
             var min = Convert.ChangeType(_rangeMin, storageType);
             var max = Convert.ChangeType(_rangeMax, storageType);
-            return (IValueConstraint)Activator.CreateInstance(constraintType, min, max, 1024, "{0:F2}");
+            var format = _rangeFormat ?? DefaultRangeFormat(storageType);
+            return (IValueConstraint)Activator.CreateInstance(constraintType, min, max, _rangeSteps, format);
         }
         catch (Exception)
         {
             throw new ScriptRuntimeException($"Config :Range is not valid for type '{storageType.Name}'.");
         }
     }
+
+    // Integer types read better without a decimal point. Everything else gets two-decimal float formatting.
+    private static string DefaultRangeFormat(Type storageType) => System.Type.GetTypeCode(storageType) switch
+    {
+        TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or TypeCode.UInt16
+            or TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or TypeCode.UInt64 => "{0}",
+        _ => "{0:F2}"
+    };
 
     private IValueConstraint MakeList()
     {

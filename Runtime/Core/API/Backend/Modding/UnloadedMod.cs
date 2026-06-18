@@ -7,8 +7,7 @@ using ILogger = ReduxLib.Logging.ILogger;
 namespace SpaceWarp2.API.Backend.Modding;
 internal class UnloadedMod : ISpaceWarpMod
 {
-    public Type ToLoad;
-
+    public readonly Type ToLoad;
 
     public UnloadedMod(Type toLoad)
     {
@@ -17,28 +16,25 @@ internal class UnloadedMod : ISpaceWarpMod
 
     public ISpaceWarpMod Load()
     {
+        GameObject modObject = null;
+        ISpaceWarpMod mod;
         if (ToLoad.IsSubclassOf(typeof(MonoBehaviour)))
         {
-            var modObject = ReduxLib.ReduxLib.GetAlwaysLoadedObject(SWMetadata.Guid);
+            modObject = ReduxLib.ReduxLib.GetAlwaysLoadedObject(SWMetadata.Guid);
             modObject.SetActive(false);
-            var mb = modObject.AddComponent(ToLoad);
-            var mod = (ISpaceWarpMod)mb;
-            mod.SWLogger = SWMetadata.Logger;
-            mod.SWConfiguration = SWConfiguration;
-            mod.SWMetadata = SWMetadata;
-            SWMetadata.Plugin = mod;
-            modObject.SetActive(true);
-            return mod;
+            mod = (ISpaceWarpMod)modObject.AddComponent(ToLoad);
         }
         else
         {
-            var mod = (ISpaceWarpMod)Activator.CreateInstance(ToLoad);
-            mod.SWLogger = SWMetadata.Logger;
-            mod.SWConfiguration = SWConfiguration;
-            mod.SWMetadata = SWMetadata;
-            SWMetadata.Plugin = mod;
-            return mod;
+            mod = (ISpaceWarpMod)Activator.CreateInstance(ToLoad);
         }
+
+        mod.SWLogger = SWMetadata.Logger;
+        mod.SWConfiguration = SWConfiguration;
+        mod.SWMetadata = SWMetadata;
+        SWMetadata.Plugin = mod;
+        modObject?.SetActive(true);
+        return mod;
     }
     
     public void OnPreInitialized() { }

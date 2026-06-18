@@ -14,9 +14,24 @@ namespace SpaceWarp2.API.Config;
 [MoonSharpUserData]
 public sealed class LuaColor
 {
+    /// <summary>
+    /// The red channel.
+    /// </summary>
     public double r;
+
+    /// <summary>
+    /// The green channel.
+    /// </summary>
     public double g;
+
+    /// <summary>
+    /// The blue channel.
+    /// </summary>
     public double b;
+
+    /// <summary>
+    /// The alpha channel.
+    /// </summary>
     public double a;
 
     static LuaColor()

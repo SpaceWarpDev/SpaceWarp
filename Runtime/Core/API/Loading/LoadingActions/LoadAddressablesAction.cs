@@ -7,6 +7,9 @@ using SpaceWarp2.API.Mods;
 
 namespace SpaceWarp2.Patching.LoadingActions;
 
+/// <summary>
+/// Loads a mod's addressables catalog when its addressables folder contains one.
+/// </summary>
 internal sealed class LoadAddressablesAction : BaseFlowAction
 {
     private static readonly ILogger Logger = ReduxLib.ReduxLib.GetLogger("Addressables Loader");
@@ -40,7 +43,7 @@ internal sealed class LoadAddressablesAction : BaseFlowAction
         catch (Exception e)
         {
             _plugin.Logger.LogError(e.ToString());
-            reject(null);
+            reject(e.ToString());
         }
     }
 }

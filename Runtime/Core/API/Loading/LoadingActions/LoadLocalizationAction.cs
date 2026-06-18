@@ -6,6 +6,9 @@ using SpaceWarp2.API.Mods;
 
 namespace SpaceWarp2.Patching.LoadingActions;
 
+/// <summary>
+/// Loads a mod's localizations from its localizations folder.
+/// </summary>
 internal sealed class LoadLocalizationAction : BaseFlowAction
 {
     private readonly SpaceWarpPluginDescriptor _plugin;
@@ -27,7 +30,7 @@ internal sealed class LoadLocalizationAction : BaseFlowAction
         catch (Exception e)
         {
             _plugin.Logger.LogError(e.ToString());
-            reject(null);
+            reject(e.ToString());
         }
     }
 }

@@ -37,8 +37,7 @@ public class ModScriptLoader : IScriptLoader
     [CanBeNull]
     private string GetRoot(string pluginGuid)
     {
-        if (PluginList.TryGetDescriptor(pluginGuid) is not { } plugin)
-            return null;
+        if (PluginList.TryGetDescriptor(pluginGuid) is not { } plugin) return null;
         return plugin.Folder.FullName;
     }
 
@@ -77,10 +76,8 @@ public class ModScriptLoader : IScriptLoader
             var root = GetRoot(split[0]);
             return root == null ? null : FindInFolder(root, split[1]);
         }
-        else
-        {
-            var root = GetRoot(globalContext.Get("ModId").CastToString());
-            return root == null ? null : FindInFolder(root, modname);
-        }
+
+        var hostRoot = GetRoot(globalContext.Get("ModId").CastToString());
+        return hostRoot == null ? null : FindInFolder(hostRoot, modname);
     }
 }

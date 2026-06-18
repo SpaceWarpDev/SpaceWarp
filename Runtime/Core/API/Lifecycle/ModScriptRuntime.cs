@@ -11,7 +11,7 @@ namespace SpaceWarp2.API.Lifecycle;
 
 /// <summary>
 /// The SpaceWarp-owned Lua mod runtime. Forks per-mod environments off the game's root runtime
-/// (<see cref="IScriptRuntime" />), seeds the general mod-loading globals, runs registered
+/// (<see cref="IScriptRuntime" />), contributes the general mod-loading globals, runs registered
 /// <see cref="IModEnvContributor" />s, and executes mod bodies.
 /// </summary>
 /// <remarks>
@@ -92,11 +92,11 @@ public static class ModScriptRuntime
     }
 
     /// <summary>
-    /// Forks and seeds a per-mod environment without running anything.
+    /// Forks a per-mod environment and contributes its globals, without running anything.
     /// </summary>
     /// <remarks>
     /// Reads fall through to the root globals, writes stay local to the child, so each mod is isolated on the
-    /// one shared VM. The runtime seeds the general mod-loading globals (<c>ModId</c>, <c>Location</c>, the
+    /// one shared VM. The runtime contributes the general mod-loading globals (<c>ModId</c>, <c>Location</c>, the
     /// <c>require</c> loader, and the <c>Log</c> logger), then runs every registered contributor.
     /// </remarks>
     /// <param name="descriptor">The mod to fork an environment for.</param>
@@ -120,9 +120,9 @@ public static class ModScriptRuntime
         }
 
         ModRequire.InstallOn(child);
-        SwLibrary.SeedLifecycleGlobals(child);
+        SwLibrary.ContributeTo(child);
         child["Log"] = new ModLogger(descriptor.Logger);
-        ConfigTypes.SeedOn(child);
+        ConfigTypes.ContributeTo(child);
         child["Config"] = new ModConfig(descriptor.ConfigFile);
 
         foreach (var contributor in ModRuntime.Contributors)

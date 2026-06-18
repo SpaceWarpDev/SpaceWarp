@@ -8,10 +8,12 @@ using UnityEngine;
 namespace SpaceWarp2.Patching.LoadingActions;
 
 /// <summary>
-/// Runs a mod's Lua scripts as part of its load sequence: its declared script files, plus the text assets of
-/// its addressable script label when it has one. Forks the mod's environment through the
-/// <see cref="ModScriptRuntime" />.
+/// Runs a mod's Lua scripts as part of its load sequence.
 /// </summary>
+/// <remarks>
+/// Runs the declared script files plus the text assets of the addressable script label when one is present.
+/// Forks the mod's environment through the <see cref="ModScriptRuntime" />.
+/// </remarks>
 internal sealed class RunModScriptsAction : BaseFlowAction
 {
     private readonly SpaceWarpPluginDescriptor _plugin;
