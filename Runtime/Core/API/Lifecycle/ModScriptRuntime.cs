@@ -28,16 +28,6 @@ public static class ModScriptRuntime
     private static readonly Dictionary<string, DynValue> ConsoleGlobals = new();
     private static Table _consoleEnv;
 
-    // The console Lua environment and its globals are cached statically. With Domain Reload disabled they
-    // would persist across Play Mode sessions and reuse the previous session's Lua state (stale globals and
-    // references). Reset them each play so the console env is rebuilt fresh on next use.
-    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStaticState()
-    {
-        _consoleEnv = null;
-        ConsoleGlobals.Clear();
-    }
-
     /// <summary>
     /// Runs every script file the descriptor declared at discovery, in one forked environment.
     /// </summary>
