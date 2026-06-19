@@ -49,16 +49,8 @@ public class DescriptorLoadingAction : BaseFlowAction
         }
         catch (Exception e)
         {
-            if (_plugin.Plugin != null)
-            {
-                _plugin.Plugin.SWLogger.LogError(e.ToString());
-            }
-            else
-            {
-                SpaceWarpPlugin.Instance.SWLogger.LogError(_plugin.SWInfo.Name + ": " + e);
-            }
-
-            reject(null);
+            _plugin.Logger.LogError(e.ToString());
+            reject(e.ToString());
         }
     }
 }

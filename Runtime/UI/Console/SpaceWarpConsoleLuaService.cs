@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using SpaceWarp2.API;
+using SpaceWarp2.API.Lifecycle;
 
 namespace SpaceWarp2.UI.Console;
 
@@ -12,7 +13,7 @@ internal static class SpaceWarpConsoleLuaService
     private const string ConsoleLuaOutputPrefix = "[Lua:spacewarp-console] ";
 
     private static bool _luaOutputSubscribed;
-    private static object? _activeLuaThread;
+    private static ConsoleScriptRun? _activeRun;
     private static string _activeLuaRunId = string.Empty;
     private static string _activeLuaCompletionText = string.Empty;
     private static bool _activeLuaErrored;
@@ -21,7 +22,7 @@ internal static class SpaceWarpConsoleLuaService
     private static void ResetStaticState()
     {
         _luaOutputSubscribed = false;
-        _activeLuaThread = null;
+        _activeRun = null;
         _activeLuaRunId = string.Empty;
         _activeLuaCompletionText = string.Empty;
         _activeLuaErrored = false;
@@ -39,35 +40,15 @@ internal static class SpaceWarpConsoleLuaService
             return SpaceWarpConsoleCSharpResult.Failure("A Lua script is already running.");
         }
 
-        object? runInterop = GetRunInterop();
-        MethodInfo? runMethod = runInterop
-            ?.GetType()
-            .GetMethod(
-                "RunScriptAsync",
-                BindingFlags.Public | BindingFlags.Instance,
-                null,
-                new[] { typeof(string) },
-                null
-            );
-        if (runMethod == null)
-        {
-            return SpaceWarpConsoleCSharpResult.Failure("Game script environment is not ready.");
-        }
-
         string runId = string.Empty;
         try
         {
             runId = BeginLuaScriptRun();
             SetCurrentLuaScriptRun(runId);
             _activeLuaRunId = runId;
-            _activeLuaThread = runMethod.Invoke(runInterop, new object[] { code });
+            _activeRun = ModScriptRuntime.RunConsole(code);
+            _activeRun.Resume();
             return CompleteLuaIfFinished("Started. Script.Log output appears on the Logs tab.");
-        }
-        catch (TargetInvocationException ex) when (ex.InnerException != null)
-        {
-            CancelLuaScriptRun(_activeLuaRunId);
-            ClearActiveLuaRun();
-            return SpaceWarpConsoleCSharpResult.Failure(ex.InnerException.GetBaseException().Message);
         }
         catch (Exception ex)
         {
@@ -88,33 +69,13 @@ internal static class SpaceWarpConsoleLuaService
             return SpaceWarpConsoleCSharpResult.FromSuccess(string.Empty);
         }
 
-        if (_activeLuaThread != null && !GetBool(_activeLuaThread, "IsFinished"))
+        if (_activeRun != null && !_activeRun.IsFinished)
         {
-            MethodInfo? resumeMethod = _activeLuaThread.GetType().GetMethod("ResumeCoroutine", BindingFlags.Public | BindingFlags.Instance);
-            if (resumeMethod == null)
-            {
-                CancelLuaScriptRun(_activeLuaRunId);
-                ClearActiveLuaRun();
-                return SpaceWarpConsoleCSharpResult.Failure("Lua script thread cannot be resumed.");
-            }
-
             string runId = _activeLuaRunId;
             try
             {
                 SetCurrentLuaScriptRun(runId);
-                resumeMethod.Invoke(_activeLuaThread, null);
-            }
-            catch (TargetInvocationException ex) when (ex.InnerException != null)
-            {
-                CancelLuaScriptRun(_activeLuaRunId);
-                ClearActiveLuaRun();
-                return SpaceWarpConsoleCSharpResult.Failure(ex.InnerException.GetBaseException().Message);
-            }
-            catch (Exception ex)
-            {
-                CancelLuaScriptRun(_activeLuaRunId);
-                ClearActiveLuaRun();
-                return SpaceWarpConsoleCSharpResult.Failure(ex.GetBaseException().Message);
+                _activeRun.Resume();
             }
             finally
             {
@@ -234,33 +195,13 @@ internal static class SpaceWarpConsoleLuaService
         }
     }
 
-    private static object? GetRunInterop()
-    {
-        Type? gameManagerType = FindType("KSP.Game.GameManager");
-        object? gameManager = gameManagerType
-            ?.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)
-            ?.GetValue(null);
-        object? game = gameManager
-            ?.GetType()
-            .GetProperty("Game", BindingFlags.Public | BindingFlags.Instance)
-            ?.GetValue(gameManager);
-        object? scriptEnvironment = game
-            ?.GetType()
-            .GetProperty("ScriptEnvironment", BindingFlags.Public | BindingFlags.Instance)
-            ?.GetValue(game);
-        return scriptEnvironment
-            ?.GetType()
-            .GetProperty("RunInterop", BindingFlags.Public | BindingFlags.Instance)
-            ?.GetValue(scriptEnvironment);
-    }
-
     private static SpaceWarpConsoleCSharpResult CompleteLuaIfFinished(string runningMessage)
     {
-        if (_activeLuaThread != null && GetBool(_activeLuaThread, "IsFinished"))
+        if (_activeRun != null && _activeRun.IsFinished)
         {
-            _activeLuaErrored = GetBool(_activeLuaThread, "IsErrored");
-            _activeLuaCompletionText = FormatLuaResult(GetValue(_activeLuaThread, "ReturnValue"));
-            _activeLuaThread = null;
+            _activeLuaErrored = _activeRun.IsErrored;
+            _activeLuaCompletionText = FormatLuaResult(_activeRun.Result);
+            _activeRun = null;
             CompleteLuaScriptRun(_activeLuaRunId);
         }
 
@@ -279,15 +220,14 @@ internal static class SpaceWarpConsoleLuaService
             : SpaceWarpConsoleCSharpResult.Failure(resultText);
     }
 
-    private static string FormatLuaResult(object? result)
+    private static string FormatLuaResult(string result)
     {
-        string resultText = result?.ToString() ?? string.Empty;
-        return string.Equals(resultText, "nil", StringComparison.OrdinalIgnoreCase) ? string.Empty : resultText;
+        return string.Equals(result, "nil", StringComparison.OrdinalIgnoreCase) ? string.Empty : result;
     }
 
     private static bool IsLuaRunActive()
     {
-        if (_activeLuaThread != null)
+        if (_activeRun != null)
         {
             return true;
         }
@@ -297,7 +237,7 @@ internal static class SpaceWarpConsoleLuaService
 
     private static void ClearActiveLuaRun()
     {
-        _activeLuaThread = null;
+        _activeRun = null;
         _activeLuaRunId = string.Empty;
         _activeLuaCompletionText = string.Empty;
         _activeLuaErrored = false;
@@ -387,18 +327,6 @@ internal static class SpaceWarpConsoleLuaService
     private static string NormalizeLuaRelativePath(string relativePath)
     {
         return (relativePath ?? string.Empty).Trim().Replace('\\', '/');
-    }
-
-    private static object? GetValue(object target, string propertyName)
-    {
-        return target.GetType()
-            .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)
-            ?.GetValue(target);
-    }
-
-    private static bool GetBool(object target, string propertyName)
-    {
-        return GetValue(target, propertyName) is bool value && value;
     }
 
     private static void EnsureLuaOutputSubscription()

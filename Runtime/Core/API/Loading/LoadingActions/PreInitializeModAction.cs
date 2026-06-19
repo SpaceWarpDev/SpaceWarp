@@ -4,6 +4,9 @@ using SpaceWarp2.API.Mods;
 
 namespace SpaceWarp2.Patching.LoadingActions;
 
+/// <summary>
+/// Pre-initializes a mod by firing its C# OnPreInitialized callback.
+/// </summary>
 internal sealed class PreInitializeModAction : BaseFlowAction
 {
     private readonly SpaceWarpPluginDescriptor _plugin;
@@ -20,15 +23,14 @@ internal sealed class PreInitializeModAction : BaseFlowAction
         {
             if (_plugin.DoLoadingActions)
             {
-                SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Pre-initializing: {_plugin.Name}?");
-                _plugin.Plugin.OnPreInitialized();
+                _plugin.Plugin?.OnPreInitialized();
             }
             resolve();
         }
         catch (Exception e)
         {
-            (_plugin.Plugin ?? SpaceWarpPlugin.Instance).SWLogger.LogError(e.ToString());
-            reject(null);
+            _plugin.Logger.LogError(e.ToString());
+            reject(e.ToString());
         }
     }
 }

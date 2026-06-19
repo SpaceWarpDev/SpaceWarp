@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,7 +19,80 @@ internal static class PluginRegister
         RegisterInternalMods();
         RegisterKsp1Mods();
         RegisterMods();
+        RegisterStandaloneLuaMods();
         DisableMods();
+    }
+
+    /// <summary>
+    /// Registers a descriptor for each standalone drop-in .lua under the mods folder - a .lua with no swinfo
+    /// mod folder around it.
+    /// </summary>
+    /// <remarks>
+    /// These are mods-of-one whose ModId is the filename, matching PatchManager's LoadSinglePatchFile
+    /// convention, so the SW lifecycle global can resolve their descriptor by ModId.
+    /// </remarks>
+    private static void RegisterStandaloneLuaMods()
+    {
+        var modsFolder = new DirectoryInfo(CommonPaths.ModsFolder);
+        if (!modsFolder.Exists)
+        {
+            return;
+        }
+
+        foreach (var lua in modsFolder.GetFiles("*.lua", SearchOption.AllDirectories))
+        {
+            // A .lua inside a swinfo mod folder belongs to that mod, not its own mod-of-one.
+            if (HasSwinfoAncestor(lua.Directory, modsFolder))
+            {
+                continue;
+            }
+
+            var modId = Path.GetFileNameWithoutExtension(lua.Name);
+            if (ModList.DisabledPluginGuids.Contains(modId) || PluginList.TryGetDescriptor(modId) != null)
+            {
+                continue;
+            }
+
+            ISpaceWarpMod swMod = new AssetOnlyMod(modId);
+            var info = new ModInfo
+            {
+                Spec = SpecVersion.Default,
+                ModID = modId,
+                Name = modId,
+                Version = "0.0.0"
+            };
+            swMod.SWConfiguration =
+                new JsonConfigFile(Path.Combine(lua.Directory!.FullName, modId + "-config.json"));
+            var descriptor = new SpaceWarpPluginDescriptor(
+                swMod, modId, modId, info, lua.Directory!, true, swMod.SWConfiguration);
+            swMod.SWMetadata = descriptor;
+            swMod.SWLogger = descriptor.Logger;
+            descriptor.ScriptFiles.Add(lua.FullName);
+            PluginList.RegisterPlugin(descriptor);
+            Logger.LogInfo($"Registered standalone Lua mod: {modId}");
+        }
+    }
+
+    /// <summary>
+    /// Returns true if <paramref name="dir" /> or any ancestor up to <paramref name="stopAt" /> contains a
+    /// swinfo.json - meaning the file belongs to that swinfo mod rather than being a standalone drop-in.
+    /// </summary>
+    private static bool HasSwinfoAncestor(DirectoryInfo dir, DirectoryInfo stopAt)
+    {
+        for (var current = dir; current != null; current = current.Parent)
+        {
+            if (File.Exists(Path.Combine(current.FullName, "swinfo.json")))
+            {
+                return true;
+            }
+
+            if (string.Equals(current.FullName, stopAt.FullName, StringComparison.OrdinalIgnoreCase))
+            {
+                break;
+            }
+        }
+
+        return false;
     }
 
     private static void RegisterKsp1Mods()
@@ -106,13 +180,13 @@ internal static class PluginRegister
     {
         var mod = new UnloadedMod(typeof(SpaceWarpPlugin))
         {
-            SWLogger = SpaceWarpPlugin.Logger,
             SWConfiguration = ReduxLib.ReduxLib.ReduxCoreConfig
         };
         var descriptor = new SpaceWarpPluginDescriptor(mod,
             SpaceWarpPlugin.SpaceWarpModInfo.ModID, SpaceWarpPlugin.SpaceWarpModInfo.Name,
             SpaceWarpPlugin.SpaceWarpModInfo, new DirectoryInfo(ReduxLib.ReduxLib.REDUX_FOLDER), true, ReduxLib.ReduxLib.ReduxCoreConfig);
         mod.SWMetadata = descriptor;
+        descriptor.Logger = SpaceWarpPlugin.Logger;
         descriptor.IsCore = true;
         PluginList.RegisterPlugin(descriptor);
     }
@@ -146,17 +220,18 @@ internal static class PluginRegister
                 continue;
             }
 
+            var modAssemblies = new List<Assembly>();
+
             // Load the libraries as we get them
             if (Directory.Exists(Path.Combine(swinfo.Directory!.FullName, "lib")) && !ModList.DisabledPluginGuids.Contains(swinfoData.ModID))
             {
                 var dirInfo = new DirectoryInfo(Path.Combine(swinfo.Directory!.FullName, "lib"));
                 foreach (var dll in dirInfo.GetFiles("*.dll", SearchOption.AllDirectories))
                 {
-                    Assembly.LoadFile(dll.FullName);
+                    modAssemblies.Add(Assembly.LoadFile(dll.FullName));
                 }
             }
 
-            // But then load the 
             ISpaceWarpMod swMod = new AssetOnlyMod(swinfoData.Name);
             if (swinfoData.MainAssembly != null && !ModList.DisabledPluginGuids.Contains(swinfoData.ModID))
             {
@@ -195,6 +270,8 @@ internal static class PluginRegister
                     continue;
                 }
 
+                modAssemblies.Add(asm);
+
                 foreach (var type in asm.GetTypes())
                 {
                     if (!typeof(ISpaceWarpMod).IsAssignableFrom(type) || type.IsAbstract) continue;
@@ -202,8 +279,6 @@ internal static class PluginRegister
                     break;
                 }
             }
-
-            swMod.SWLogger = ReduxLib.ReduxLib.GetLogger(swinfoData.ModID);
 
             swMod.SWConfiguration =
                 new JsonConfigFile(Path.Combine(swinfo.Directory.FullName, swinfoData.ModID + "-config.json"));
@@ -217,6 +292,11 @@ internal static class PluginRegister
                 swMod.SWConfiguration
             );
             swMod.SWMetadata = descriptor;
+            swMod.SWLogger = descriptor.Logger;
+            descriptor.Assemblies.AddRange(modAssemblies);
+            descriptor.ScriptFiles.AddRange(Directory
+                .GetFiles(swinfo.Directory!.FullName, "*.lua", SearchOption.AllDirectories)
+                .Where(f => !Path.GetFileName(f).StartsWith("_")));
 
             Logger.LogInfo($"Attempting to register mod: {swinfoData.ModID}, {swinfoData.Name}");
 
