@@ -19,6 +19,12 @@ public class Sound : SpaceWarpModule
 
     internal static Sound Instance;
 
+    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        Instance = null;
+    }
+
     private const string SOUNDBANKS_FOLDER = "soundbanks";
 
     /// <inheritdoc />

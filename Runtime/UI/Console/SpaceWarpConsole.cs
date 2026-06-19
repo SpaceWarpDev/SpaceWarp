@@ -33,6 +33,7 @@ internal sealed class SpaceWarpConsole : MonoBehaviour
 
         _viewModel.CloseRequested -= HideWindow;
         _viewModel.ClearRequested -= ClearLogs;
+        _viewModel.Cleanup();
     }
 
     private void Update()

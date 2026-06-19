@@ -13,7 +13,14 @@ namespace SpaceWarp2.UI.API.Settings;
 public static class ModsPropertyDrawers
 {
     private static readonly Dictionary<Type, Func<string, IConfigEntry, GameObject>> AllAbstractedPropertyDrawers = new();
-    
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        EnumDrawerGenerator = null;
+        GenericDrawerGenerator = null;
+    }
+
 
     /// <summary>
     /// Registers a custom abstract property drawer for a specific type.

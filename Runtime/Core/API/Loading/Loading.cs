@@ -6,6 +6,7 @@ using SpaceWarp2.InternalUtilities;
 using SpaceWarp2.API.Loading.LoadingActions;
 using SpaceWarp2.API.Mods;
 using SpaceWarp2.Patching.LoadingActions;
+using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -22,6 +23,13 @@ public static class Loading
         new();
 
     public static List<Func<IFlowAction>> GeneralLoadingActions = new();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        DescriptorLoadingActionGenerators = new();
+        GeneralLoadingActions = new();
+    }
 
     /// <summary>
     /// Registers a per mod loading action (but more general). Should be added either on Awake() or Start().

@@ -24,6 +24,15 @@ public static class CommonPaths
     public static string DisabledPlugins = "disabled_plugins.cfg";
     public static string HashLocation = "mod_list_hash.txt";
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        ModsFolder = "Assets/Mods";
+        LuaFolder = "Assets/Lua";
+        DisabledPlugins = "disabled_plugins.cfg";
+        HashLocation = "mod_list_hash.txt";
+    }
+
     static CommonPaths()
     {
         if (!Application.isEditor)

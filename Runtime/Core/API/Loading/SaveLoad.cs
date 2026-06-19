@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using ReduxLib.GameInterfaces;
+using UnityEngine;
 
 namespace SpaceWarp2.API.Loading;
 
@@ -16,6 +17,16 @@ public static class SaveLoad
     public static Dictionary<string, List<Type>> LoadingFlowActionTypes = new();
     public static Dictionary<string, List<IFlowAction>> SavingFlowActions = new();
     public static Dictionary<string, List<Type>> SavingFlowActionTypes = new();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        GameInitializingFlowActions = new();
+        LoadingFlowActions = new();
+        LoadingFlowActionTypes = new();
+        SavingFlowActions = new();
+        SavingFlowActionTypes = new();
+    }
 
     /// <summary>
     ///     <para>Add a <cref>FlowAction</cref> to the Game's load sequence.</para>

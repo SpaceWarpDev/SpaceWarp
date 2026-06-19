@@ -258,6 +258,16 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
     [CreateProperty] public string ActivitySummaryText => $"{ActivityEntries.Count} entries";
     [CreateProperty] public string LuaFileSummaryText => $"{LuaScriptFiles.Count} files";
 
+    /// <summary>
+    /// Detaches this view model from static events. Must be called when the owning console is
+    /// destroyed, otherwise the handler leaks onto the static event (UDR0004), which duplicates
+    /// when the console is recreated with Domain Reload disabled.
+    /// </summary>
+    public void Cleanup()
+    {
+        SpaceWarpConsoleLuaService.LuaOutputReceived -= AppendLuaOutput;
+    }
+
     public void InitializeFromLogs(IEnumerable<SpaceWarpConsoleLogListener.LogInfo> logs)
     {
         _allEntries.Clear();

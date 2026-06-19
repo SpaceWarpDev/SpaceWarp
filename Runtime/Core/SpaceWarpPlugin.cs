@@ -29,8 +29,36 @@ public sealed class SpaceWarpPlugin : GeneralMod
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
     public static void LoadSpaceWarp()
     {
+        // With Domain Reload disabled this runs on every Play Mode enter, so reset mutable
+        // static state (UDR0002) and re-subscribe idempotently to the static event (UDR0003).
+        Instance = null;
+        Logger = null;
+        BeforeGameLoadActions = new();
+        AfterGameLoadActions = new();
+        SpaceWarpModInfo = new()
+        {
+            Spec = SpecVersion.V3_0,
+            ModID = "SpaceWarp2",
+            Name = "Space Warp",
+            Author = "Space Warp Dev + Rendezvous Entertainment",
+            Description = "A C# modding API for KSP2 Redux Modding",
+            Source = "https://github.com/SpaceWarpDev/SpaceWarp",
+            Version = "2.0.0",
+            Dependencies = new List<DependencyInfo>(),
+            SupportedKsp2Versions = new SupportedVersionsInfo
+            {
+                Min = "0.2.2.0.32914",
+                Max = "*"
+            },
+            VersionCheck = null,
+            Conflicts = new List<DependencyInfo>(),
+            Patchers = new List<string>(),
+            MainAssembly = null
+        };
+
         ModList.Initialize();
         _pathsAssembly = SpaceWarpPathsGenerator.GenerateSpaceWarpPathsAssembly();
+        ReduxLib.ReduxLib.OnReduxLibInitialized -= CreateMonoBehaviours;
         ReduxLib.ReduxLib.OnReduxLibInitialized += CreateMonoBehaviours;
 
         Loading.AddAddressablesLoadingAction<TextAsset>("Loading addressables localizations (csv)", "loc_csv", OnCsvLoaded);

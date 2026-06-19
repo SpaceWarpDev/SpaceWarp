@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+using UnityEngine;
 
 namespace SpaceWarp2.API.Versions;
 
@@ -46,6 +47,13 @@ public static class VersionUtility
 
     private static Regex _toClear = new("[^0-9.*]");
     private static string PreprocessSemanticVersion(string semver) => _toClear.Replace(semver, "");
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        _toClear = new("[^0-9.*]");
+        _prereleaseVersion = new(@"(\D+)(\d+)");
+    }
 
 
     /// <summary>

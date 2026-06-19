@@ -31,6 +31,13 @@ public class UI : SpaceWarpModule
 
     public static UI Instance;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        Instance = null;
+        _uiAssets = new();
+    }
+
     [ConfigSection("Debug Console", loc: "Menu/Settings/Sections/DebugConsole")]
     [ConfigValue("Color Error",
         "The color for log messages that have the level: Error/Fatal (bolded)",
