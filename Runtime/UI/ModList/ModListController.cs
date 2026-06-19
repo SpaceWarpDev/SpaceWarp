@@ -85,6 +85,16 @@ internal class ModListController : MonoBehaviour
     private static LocalizedString _unspecifiedDependency = "SpaceWarp/ModList/UnspecifiedDependency";
     private static LocalizedString _unsupportedDependency = "SpaceWarp/ModList/UnsupportedDependency";
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        _missingDependency = "SpaceWarp/ModList/MissingDependency";
+        _erroredDependency = "SpaceWarp/ModList/ErroredDependency";
+        _disabledDependency = "SpaceWarp/ModList/DisabledDependency";
+        _unspecifiedDependency = "SpaceWarp/ModList/UnspecifiedDependency";
+        _unsupportedDependency = "SpaceWarp/ModList/UnsupportedDependency";
+    }
+
     // State
     private bool _isLoaded;
     private bool _isWindowVisible;

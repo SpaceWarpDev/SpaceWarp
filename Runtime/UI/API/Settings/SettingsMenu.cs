@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using ReduxLib.Configuration;
+using UnityEngine;
 
 namespace SpaceWarp2.UI.API.Settings;
 
@@ -14,6 +15,12 @@ public static class SettingsMenu
     /// Contains a list of all the registered config files
     /// </summary>
     public static Dictionary<string, IConfigFile> RegisteredConfigFiles = new();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        RegisteredConfigFiles = new();
+    }
 
     /// <summary>
     /// Register a manually created config file for the settings menu

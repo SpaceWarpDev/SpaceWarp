@@ -18,6 +18,16 @@ internal static class SpaceWarpConsoleLuaService
     private static string _activeLuaCompletionText = string.Empty;
     private static bool _activeLuaErrored;
 
+    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        _luaOutputSubscribed = false;
+        _activeLuaThread = null;
+        _activeLuaRunId = string.Empty;
+        _activeLuaCompletionText = string.Empty;
+        _activeLuaErrored = false;
+    }
+
     public static event Action<string>? LuaOutputReceived;
 
     public static bool IsLuaRunning => IsLuaRunActive();

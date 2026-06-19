@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using UnityEngine;
 
 namespace SpaceWarp2.API.Parts;
 
@@ -11,6 +12,12 @@ namespace SpaceWarp2.API.Parts;
 public static class PartComponentModuleOverride
 {
     public static List<Type> RegisteredPartComponentOverrides = new();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        RegisteredPartComponentOverrides = new();
+    }
 
     /// <summary>
     /// Registers your custom module for background resource processing.

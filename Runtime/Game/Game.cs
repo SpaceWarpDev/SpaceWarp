@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using SpaceWarp2.Modules;
+using UnityEngine;
 using ILogger = ReduxLib.Logging.ILogger;
 
 namespace SpaceWarp2.Game;
@@ -12,7 +13,13 @@ public class Game : SpaceWarpModule
 {
 
     internal static ILogger Logger;
-    
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        Logger = null;
+    }
+
     /// <inheritdoc />
     public override string Name => "SpaceWarp.Game";
 

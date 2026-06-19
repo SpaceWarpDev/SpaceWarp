@@ -78,6 +78,14 @@ public static class PluginList
     private static List<SpaceWarpPluginDescriptor> _allDisabledPlugins = new() { };
     private static List<SpaceWarpErrorDescription> _allErroredPlugins = new() { };
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        _allEnabledAndActivePlugins = new() { };
+        _allDisabledPlugins = new() { };
+        _allErroredPlugins = new() { };
+    }
+
     /// <summary>
     /// All plugins that are enabled and active (not errored)
     /// </summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using SpaceWarp2.API.Backend.SaveGameManager;
+using UnityEngine;
 
 namespace SpaceWarp2.API.SaveGameManager;
 
@@ -19,6 +20,13 @@ public static class ModSaves
     /// Per-campaign plugin data
     /// </summary>
     public static List<PluginSaveData> PluginCampaignData = new();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        PluginSaveData = new();
+        PluginCampaignData = new();
+    }
 
     /// <summary>
     /// Registers your mod data for saving and loading events.

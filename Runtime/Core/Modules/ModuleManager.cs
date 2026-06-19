@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using ReduxLib.Configuration;
 using ReduxLib.Logging;
+using UnityEngine;
 
 namespace SpaceWarp2.Modules;
 
@@ -14,7 +15,14 @@ namespace SpaceWarp2.Modules;
 public static class ModuleManager
 {
     public static List<SpaceWarpModule> AllSpaceWarpModules = new();
-    private static ILogger _moduleManagerLogSource;
+    private static ReduxLib.Logging.ILogger _moduleManagerLogSource;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        AllSpaceWarpModules = new();
+        _moduleManagerLogSource = null;
+    }
 
     /// <summary>
     /// Gets a SpaceWarp module instance by name.

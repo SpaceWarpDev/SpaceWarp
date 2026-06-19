@@ -18,6 +18,13 @@ internal static class ModList
     /// </summary>
     public static bool ChangedSinceLastRun { get; internal set; }
 
+    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        DisabledPluginGuids = null;
+        ChangedSinceLastRun = default;
+    }
+
     internal static void Initialize()
     {
         if (!File.Exists(CommonPaths.DisabledPlugins))

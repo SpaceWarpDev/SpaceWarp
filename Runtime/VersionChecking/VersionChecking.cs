@@ -50,6 +50,12 @@ public class VersionChecking : SpaceWarpModule
     /// </summary>
     public static VersionChecking Instance;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        Instance = null;
+    }
+
     private string _kspVersion;
 
     /// <inheritdoc />
