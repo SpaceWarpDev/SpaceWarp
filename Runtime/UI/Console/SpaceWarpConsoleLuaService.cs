@@ -22,7 +22,7 @@ internal static class SpaceWarpConsoleLuaService
     private static void ResetStaticState()
     {
         _luaOutputSubscribed = false;
-        _activeLuaThread = null;
+        _activeRun = null;
         _activeLuaRunId = string.Empty;
         _activeLuaCompletionText = string.Empty;
         _activeLuaErrored = false;
