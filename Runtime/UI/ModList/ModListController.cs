@@ -96,6 +96,7 @@ internal class ModListController : MonoBehaviour
     }
 
     // State
+    private PanelRenderer _renderer;
     private bool _isLoaded;
     private bool _isWindowVisible;
 
@@ -143,12 +144,9 @@ internal class ModListController : MonoBehaviour
             return;
         }
 
-        SetupDocument();
-        InitializeElements();
-        FillModLists();
-        SetupToggles();
-        SetupButtons();
+        // Prevent re-entry; the deferred root callback completes the one-time load.
         _isLoaded = true;
+        SetupDocument();
     }
 
     private void Update()
@@ -166,19 +164,26 @@ internal class ModListController : MonoBehaviour
 
     private void SetupDocument()
     {
-        var document = GetComponent<UIDocument>();
-        if (document.TryGetComponent<DocumentLocalization>(out var localization))
+        _renderer = GetComponent<PanelRenderer>();
+        if (_renderer.TryGetComponent<DocumentLocalization>(out var localization))
         {
             localization.Localize();
         }
         else
         {
-            document.EnableLocalization();
+            _renderer.EnableLocalization();
         }
 
-        _container = document.rootVisualElement;
-        _container[0].CenterByDefault();
-        HideWindow();
+        _renderer.OnPanelRoot(panelRoot =>
+        {
+            _container = panelRoot;
+            _container[0].CenterByDefault();
+            HideWindow();
+            InitializeElements();
+            FillModLists();
+            SetupToggles();
+            SetupButtons();
+        });
     }
 
     private void InitializeElements()
@@ -823,13 +828,20 @@ internal class ModListController : MonoBehaviour
 
     private void ToggleWindow()
     {
-        _container.style.display = _isWindowVisible ? DisplayStyle.None : DisplayStyle.Flex;
-        _isWindowVisible = !_isWindowVisible;
+        if (_isWindowVisible)
+        {
+            HideWindow();
+        }
+        else
+        {
+            _renderer.Show();
+            _isWindowVisible = true;
+        }
     }
 
     private void HideWindow()
     {
-        _container.style.display = DisplayStyle.None;
+        _renderer.Hide();
         _isWindowVisible = false;
     }
 }

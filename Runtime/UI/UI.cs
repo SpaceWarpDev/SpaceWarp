@@ -225,7 +225,7 @@ public class UI : SpaceWarpModule
             }
         };
         messageLabel?.parent?.Insert(messageLabel.parent.IndexOf(messageLabel) + 1, note);
-        if (handle.Document.TryGetComponent(out DocumentLocalization localization))
+        if (handle.Renderer.TryGetComponent(out DocumentLocalization localization))
         {
             localization.RegisterElement(note);
         }

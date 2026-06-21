@@ -17,7 +17,7 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
         "console-row-fatal"
     };
 
-    private readonly UIDocument _window;
+    private readonly PanelRenderer _window;
     private readonly SpaceWarpConsoleViewModel _viewModel;
 
     private VisualElement? _root;
@@ -46,7 +46,7 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
     private VisualElement? _errorChip;
     private bool _isOpen;
 
-    public SpaceWarpConsoleView(UIDocument window, SpaceWarpConsoleViewModel viewModel)
+    public SpaceWarpConsoleView(PanelRenderer window, SpaceWarpConsoleViewModel viewModel)
     {
         _window = window;
         _viewModel = viewModel;
@@ -63,17 +63,20 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
 
     public void Load()
     {
-        _window.rootVisualElement.dataSource = _viewModel;
         _window.EnableLocalization();
-        CacheVisualElements();
-        ConfigureListView();
-        RefreshEntries();
-        RefreshActivityEntries();
-        RefreshLuaScripts();
-        RefreshLuaRunState();
-        RefreshDisplayState();
-        Hide();
-        _root?.CenterByDefault();
+        _window.OnPanelRoot(panelRoot =>
+        {
+            panelRoot.dataSource = _viewModel;
+            CacheVisualElements(panelRoot);
+            ConfigureListView();
+            RefreshEntries();
+            RefreshActivityEntries();
+            RefreshLuaScripts();
+            RefreshLuaRunState();
+            RefreshDisplayState();
+            Hide();
+            _root?.CenterByDefault();
+        });
     }
 
     public void Dispose()
@@ -111,9 +114,9 @@ internal sealed class SpaceWarpConsoleView : System.IDisposable
         _logList.schedule.Execute(() => _logList.ScrollToItem(_viewModel.VisibleEntries.Count - 1));
     }
 
-    private void CacheVisualElements()
+    private void CacheVisualElements(VisualElement panelRoot)
     {
-        _root = _window.rootVisualElement.Q<VisualElement>("root");
+        _root = panelRoot.Q<VisualElement>("root");
         _logsTab = _root?.Q<Button>("logs-tab");
         _csharpTab = _root?.Q<Button>("csharp-tab");
         _luaTab = _root?.Q<Button>("lua-tab");

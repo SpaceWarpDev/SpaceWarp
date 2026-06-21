@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace SpaceWarp2.UI.Console;
 
-[RequireComponent(typeof(UIDocument))]
+[RequireComponent(typeof(PanelRenderer))]
 internal sealed class SpaceWarpConsole : MonoBehaviour
 {
     private SpaceWarpConsoleViewModel? _viewModel;
@@ -11,9 +11,9 @@ internal sealed class SpaceWarpConsole : MonoBehaviour
 
     private void Start()
     {
-        var document = GetComponent<UIDocument>();
+        var renderer = GetComponent<PanelRenderer>();
         _viewModel = new SpaceWarpConsoleViewModel();
-        _view = new SpaceWarpConsoleView(document, _viewModel);
+        _view = new SpaceWarpConsoleView(renderer, _viewModel);
         _view.Load();
 
         _viewModel.InitializeFromLogs(SpaceWarpConsoleLogListener.LogMessages);

@@ -6,9 +6,9 @@ using System.Linq;
 using BepInEx;
 using SpaceWarp;
 using SpaceWarp.API.Mods.JSON;
+using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
-
 
 public class ModListView : MonoBehaviour
 {
@@ -68,7 +68,7 @@ public class ModListView : MonoBehaviour
 
     private void InitializeElements()
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
+        var root = GetComponent<PanelRenderer>().GetPanelRoot();
 
         // Register a callback for the back button
         root.Q<Button>("back-button").RegisterCallback<ClickEvent>(evt => transform.gameObject.SetActive(false));
