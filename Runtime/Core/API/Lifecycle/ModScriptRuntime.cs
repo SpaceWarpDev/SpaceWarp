@@ -191,6 +191,23 @@ public static class ModScriptRuntime
     }
 
     /// <summary>
+    /// Runs Lua synchronously on the shared console environment and returns its result, for callers that need an
+    /// immediate value (such as the CLI eval bridge) rather than the frame-resumed coroutine <see cref="RunConsole" /> returns.
+    /// </summary>
+    /// <remarks>
+    /// The console environment carries the same contributed surface a mod gets, so evaluated code sees the SW,
+    /// Game, Config, and other contributor globals - not just the root globals.
+    /// </remarks>
+    /// <param name="code">The Lua source to evaluate.</param>
+    /// <param name="chunkName">A name for the chunk, used in error messages.</param>
+    /// <returns>The value the chunk returned.</returns>
+    public static DynValue EvalConsoleSync(string code, string chunkName)
+    {
+        _consoleEnv ??= CreateConsoleEnv();
+        return _consoleEnv.OwnerScript.DoString(code, _consoleEnv, chunkName);
+    }
+
+    /// <summary>
     /// Registers a value or function as a global on the console environment, so console scripts can use it.
     /// </summary>
     /// <remarks>
