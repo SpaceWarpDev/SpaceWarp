@@ -19,7 +19,7 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
     private bool _isCompact;
     private string _csharpCode = "Game.GlobalGameState.GetState()";
     private string _csharpOutput = string.Empty;
-    private string _luaCode = "local info = View.ActiveVehicle.GetInfo()\nlocal telemetry = View.ActiveVehicle.GetTelemetry()\nScript.Log.Info(\"Controlling \" .. info.displayName)\nreturn telemetry.altitudeSeaLevel";
+    private string _luaCode = "local info = View.ActiveVehicle.GetInfo()\nlocal telemetry = View.ActiveVehicle.GetTelemetry()\nLog.Info(\"Controlling \" .. info.displayName)\nreturn telemetry.altitudeSeaLevel";
     private string _luaOutput = string.Empty;
     private string _luaSelectedScriptPath = string.Empty;
     private bool _isLuaRunning;
@@ -62,7 +62,7 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
         SaveLuaScriptCommand = new RelayCommand(SaveLuaScript);
         NewLuaScriptCommand = new RelayCommand(NewLuaScript);
         OpenLuaScriptFolderCommand = new RelayCommand(OpenLuaScriptFolder);
-        SpaceWarpConsoleLuaService.LuaOutputReceived += AppendLuaOutput;
+        SpaceWarpConsoleLogListener.OnNewLog += OnConsoleScriptLog;
     }
 
     [CreateProperty] public RelayCommand CloseCommand { get; }
@@ -265,7 +265,18 @@ internal sealed class SpaceWarpConsoleViewModel : ViewModelBase
     /// </summary>
     public void Cleanup()
     {
-        SpaceWarpConsoleLuaService.LuaOutputReceived -= AppendLuaOutput;
+        SpaceWarpConsoleLogListener.OnNewLog -= OnConsoleScriptLog;
+    }
+
+    // Mirrors the running console/CLI script's Log output into the REPL area. The log listener carries every
+    // source, so filter to the console environment's source to show only this script's output, not the firehose
+    // the Logs tab shows.
+    private void OnConsoleScriptLog(SpaceWarpConsoleLogListener.LogInfo info)
+    {
+        if (string.Equals(info.Source?.Name, SpaceWarp2.API.Lifecycle.ModScriptRuntime.ConsoleModId, StringComparison.Ordinal))
+        {
+            AppendLuaOutput(info.Data?.ToString() ?? string.Empty);
+        }
     }
 
     public void InitializeFromLogs(IEnumerable<SpaceWarpConsoleLogListener.LogInfo> logs)

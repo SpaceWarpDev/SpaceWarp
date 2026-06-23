@@ -10,9 +10,6 @@ namespace SpaceWarp2.UI.Console;
 
 internal static class SpaceWarpConsoleLuaService
 {
-    private const string ConsoleLuaOutputPrefix = "[Lua:spacewarp-console] ";
-
-    private static bool _luaOutputSubscribed;
     private static ConsoleScriptRun? _activeRun;
     private static string _activeLuaRunId = string.Empty;
     private static string _activeLuaCompletionText = string.Empty;
@@ -21,20 +18,16 @@ internal static class SpaceWarpConsoleLuaService
     [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStaticState()
     {
-        _luaOutputSubscribed = false;
         _activeRun = null;
         _activeLuaRunId = string.Empty;
         _activeLuaCompletionText = string.Empty;
         _activeLuaErrored = false;
     }
 
-    public static event Action<string>? LuaOutputReceived;
-
     public static bool IsLuaRunning => IsLuaRunActive();
 
     public static SpaceWarpConsoleCSharpResult RunLua(string code)
     {
-        EnsureLuaOutputSubscription();
         if (IsLuaRunActive())
         {
             return SpaceWarpConsoleCSharpResult.Failure("A Lua script is already running.");
@@ -247,7 +240,7 @@ internal static class SpaceWarpConsoleLuaService
     {
         Type? utilityType = FindType("KSP.ScriptInterop.LuaScriptUtilityMgr");
         MethodInfo? method = utilityType?.GetMethod("BeginScriptRun", BindingFlags.Public | BindingFlags.Static);
-        return method?.Invoke(null, new object[] { "spacewarp-console", "SpaceWarp Console", "UI" })?.ToString() ?? string.Empty;
+        return method?.Invoke(null, new object[] { ModScriptRuntime.ConsoleModId, "SpaceWarp Console", "UI" })?.ToString() ?? string.Empty;
     }
 
     private static void SetCurrentLuaScriptRun(string runId)
@@ -327,36 +320,6 @@ internal static class SpaceWarpConsoleLuaService
     private static string NormalizeLuaRelativePath(string relativePath)
     {
         return (relativePath ?? string.Empty).Trim().Replace('\\', '/');
-    }
-
-    private static void EnsureLuaOutputSubscription()
-    {
-        if (_luaOutputSubscribed)
-        {
-            return;
-        }
-
-        Type? utilityType = FindType("KSP.ScriptInterop.LuaScriptUtilityMgr");
-        EventInfo? outputEvent = utilityType?.GetEvent("OutputLogged", BindingFlags.Public | BindingFlags.Static);
-        if (outputEvent == null)
-        {
-            return;
-        }
-
-        outputEvent.AddEventHandler(null, (Action<string>)OnLuaOutputLogged);
-        _luaOutputSubscribed = true;
-    }
-
-    private static void OnLuaOutputLogged(string message)
-    {
-        LuaOutputReceived?.Invoke(TrimConsoleLuaOutputPrefix(message));
-    }
-
-    private static string TrimConsoleLuaOutputPrefix(string message)
-    {
-        return message.StartsWith(ConsoleLuaOutputPrefix, StringComparison.Ordinal)
-            ? message[ConsoleLuaOutputPrefix.Length..]
-            : message;
     }
 
     private static Type? FindType(string fullName)

@@ -23,6 +23,12 @@ namespace SpaceWarp2.API.Lifecycle;
 /// </remarks>
 public static class ModScriptRuntime
 {
+    /// <summary>
+    /// The ModId and logger source name of the shared console environment. Console and CLI scripts run here, so
+    /// their Log output is attributed to this source - the console REPL filters on it to show only that output.
+    /// </summary>
+    public const string ConsoleModId = "spacewarp-console";
+
     private static readonly ModScriptLoader Loader = new();
     private static readonly ILogger Logger = ReduxLib.ReduxLib.GetLogger("ModScriptRuntime");
     private static readonly Dictionary<string, DynValue> ConsoleGlobals = new();
@@ -119,9 +125,9 @@ public static class ModScriptRuntime
     /// <returns>The console environment's globals table.</returns>
     public static Table CreateConsoleEnv()
     {
-        var logger = ReduxLib.ReduxLib.GetLogger("spacewarp-console");
+        var logger = ReduxLib.ReduxLib.GetLogger(ConsoleModId);
         var configFile = new JsonConfigFile(Path.Combine(CommonPaths.LuaFolder, "spacewarp-console-config.json"));
-        var env = CreateEnv("spacewarp-console", Path.GetFullPath(CommonPaths.LuaFolder), logger, configFile);
+        var env = CreateEnv(ConsoleModId, Path.GetFullPath(CommonPaths.LuaFolder), logger, configFile);
         foreach (var pair in ConsoleGlobals)
         {
             env[pair.Key] = pair.Value;
