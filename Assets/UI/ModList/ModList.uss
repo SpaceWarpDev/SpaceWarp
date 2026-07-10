@@ -116,7 +116,7 @@
 
 #details-name {
     font-size: 22px;
-    -unity-font-definition: var(--font-regular);
+    -unity-font-definition: url("project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/JetBrainsMono/JetBrainsMono-Regular%20SDF.asset?fileID=11400000&guid=f5454c9c675002c44a5a7234bd40c390&type=2#JetBrainsMono-Regular SDF");
     margin-bottom: 16px;
     color: rgb(208, 213, 243);
 }
