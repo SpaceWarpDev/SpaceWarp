@@ -88,7 +88,7 @@ public sealed class SpaceWarpPlugin : GeneralMod
         SetupBeforeGameLoadActions();
         SetupAfterGameLoadActions();
 #if UNITY_EDITOR
-        Addressables.InternalIdTransformFunc = AddressablesFixes.RedirectInternalIdsToGameDirectoryFixed;
+        AddressablesFixes.Install();
 #endif
     }
 

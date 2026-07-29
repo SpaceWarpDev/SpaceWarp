@@ -16,10 +16,27 @@ internal static class AddressablesFixes
         OriginalThunderkitMethod = t.GetMethod("RedirectInternalIdsToGameDirectory", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)!;
     }
 
+    internal static void Install()
+    {
+        var previousTransform = UnityEngine.AddressableAssets.Addressables
+            .InternalIdTransformFunc;
+        UnityEngine.AddressableAssets.Addressables
+            .InternalIdTransformFunc =
+            location =>
+                RedirectInternalIdsToGameDirectoryFixed(
+                    location,
+                    previousTransform
+                );
+    }
 
-    internal static string RedirectInternalIdsToGameDirectoryFixed(IResourceLocation location)
+    internal static string RedirectInternalIdsToGameDirectoryFixed(
+        IResourceLocation location,
+        Func<IResourceLocation, string> previousTransform
+    )
     {
         if (location.InternalId.Contains("Mods") || location.InternalId.Contains("Redux/Addressables")) return location.InternalId;
+        if (previousTransform != null)
+            return previousTransform(location);
         return (string)OriginalThunderkitMethod.Invoke(null, new object[] {location});
     }
 }
