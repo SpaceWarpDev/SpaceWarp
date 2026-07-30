@@ -43,6 +43,9 @@ public class SpaceWarpPluginDescriptor
         Folder = folder;
         DoLoadingActions = doLoadingActions;
         ConfigFile = configFile;
+        AddressableScriptLabel = swInfo.AddressableScriptLabel;
+        AddressablePrefabPatchLabel =
+            swInfo.AddressablePrefabPatchLabel;
     }
 
     /// <summary>
@@ -121,6 +124,13 @@ public class SpaceWarpPluginDescriptor
     /// addressables rather than loose files. Null for file-based mods.
     /// </summary>
     public string? AddressableScriptLabel;
+
+    /// <summary>
+    /// An Addressables label whose text assets are this mod's declarative
+    /// prefab-patch manifests. Ownership comes from this descriptor rather
+    /// than from the manifest asset's Addressables address.
+    /// </summary>
+    public string? AddressablePrefabPatchLabel;
 
     /// <summary>
     /// The plugin's GUID.
