@@ -5,6 +5,7 @@ using System.Reflection;
 using JetBrains.Annotations;
 using ReduxLib.Configuration;
 using SpaceWarp2.API.Mods.JSON;
+using UnityEngine.AddressableAssets.ResourceLocators;
 using ILogger = ReduxLib.Logging.ILogger;
 
 namespace SpaceWarp2.API.Mods;
@@ -70,6 +71,14 @@ public class SpaceWarpPluginDescriptor
     /// Used to attribute code, such as PatchManager C# patches, back to this mod.
     /// </summary>
     public readonly List<Assembly> Assemblies = new();
+
+    /// <summary>
+    /// Addressables catalogs loaded from this mod's distribution folder.
+    /// Keeps catalog provenance associated with the swinfo descriptor so
+    /// consumers can attribute labeled assets without duplicating mod
+    /// metadata inside those assets.
+    /// </summary>
+    public readonly List<IResourceLocator> AddressableResourceLocators = new();
 
     /// <summary>
     /// Lua lifecycle closures registered by this mod's scripts via the SW global, fired during the Init phase
