@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using ReduxLib.Configuration;
 using ReduxLib.Logging;
+using ReduxLib.Reflection;
 using UnityEngine;
 
 namespace SpaceWarp2.Modules;
@@ -67,7 +68,11 @@ public static class ModuleManager
         // }
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
-            foreach (var type in GetLoadableTypes(assembly))
+            // Runtime evaluators leave dynamic assemblies in the AppDomain when Domain Reload is
+            // disabled. Those assemblies can contain unfinished types and throw from GetTypes on
+            // the next Play Mode enter; they cannot contain compile-time SpaceWarp modules.
+            if (assembly.IsDynamic) continue;
+            foreach (var type in assembly.GetLoadableTypes())
             {
                 if (type.IsAbstract) continue;
                 if (type.IsSubclassOf(typeof(SpaceWarpModule)))
@@ -112,32 +117,6 @@ public static class ModuleManager
         foreach (var module in toRemove)
         {
             AllSpaceWarpModules.Remove(module);
-        }
-    }
-
-    private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
-    {
-        // Runtime compilers and editor consoles can leave unfinished dynamic
-        // assemblies in the AppDomain. They cannot contain a loadable
-        // SpaceWarpModule and AssemblyBuilder.GetTypes can throw while one of
-        // their generated types is still being emitted.
-        if (assembly.IsDynamic)
-            return Enumerable.Empty<Type>();
-
-        try
-        {
-            return assembly.GetTypes();
-        }
-        catch (ReflectionTypeLoadException exception)
-        {
-            _moduleManagerLogSource.LogWarning(
-                $"Only partially scanned assembly '{assembly.FullName}' because one or more types could not be loaded."
-            );
-            return exception.Types.Where(type => type != null);
-        }
-        catch (NotSupportedException)
-        {
-            return Enumerable.Empty<Type>();
         }
     }
 
