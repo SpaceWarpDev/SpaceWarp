@@ -5,6 +5,7 @@ using System.Reflection;
 using JetBrains.Annotations;
 using ReduxLib.Configuration;
 using SpaceWarp2.API.Mods.JSON;
+using UnityEngine.AddressableAssets.ResourceLocators;
 using ILogger = ReduxLib.Logging.ILogger;
 
 namespace SpaceWarp2.API.Mods;
@@ -42,6 +43,9 @@ public class SpaceWarpPluginDescriptor
         Folder = folder;
         DoLoadingActions = doLoadingActions;
         ConfigFile = configFile;
+        AddressableScriptLabel = swInfo.AddressableScriptLabel;
+        AddressablePrefabPatchLabel =
+            swInfo.AddressablePrefabPatchLabel;
     }
 
     /// <summary>
@@ -70,6 +74,14 @@ public class SpaceWarpPluginDescriptor
     /// Used to attribute code, such as PatchManager C# patches, back to this mod.
     /// </summary>
     public readonly List<Assembly> Assemblies = new();
+
+    /// <summary>
+    /// Addressables catalogs loaded from this mod's distribution folder.
+    /// Keeps catalog provenance associated with the swinfo descriptor so
+    /// consumers can attribute labeled assets without duplicating mod
+    /// metadata inside those assets.
+    /// </summary>
+    public readonly List<IResourceLocator> AddressableResourceLocators = new();
 
     /// <summary>
     /// Lua lifecycle closures registered by this mod's scripts via the SW global, fired during the Init phase
@@ -112,6 +124,13 @@ public class SpaceWarpPluginDescriptor
     /// addressables rather than loose files. Null for file-based mods.
     /// </summary>
     public string? AddressableScriptLabel;
+
+    /// <summary>
+    /// An Addressables label whose text assets are this mod's declarative
+    /// prefab-patch manifests. Ownership comes from this descriptor rather
+    /// than from the manifest asset's Addressables address.
+    /// </summary>
+    public string? AddressablePrefabPatchLabel;
 
     /// <summary>
     /// The plugin's GUID.

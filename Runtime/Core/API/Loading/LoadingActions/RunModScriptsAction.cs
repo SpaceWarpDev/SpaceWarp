@@ -30,7 +30,12 @@ internal sealed class RunModScriptsAction : BaseFlowAction
         {
             ModScriptRuntime.RunMod(_plugin);
 
-            if (string.IsNullOrEmpty(_plugin.AddressableScriptLabel))
+            if (
+                string.IsNullOrEmpty(_plugin.AddressableScriptLabel)
+                || !IAssetProvider.Instance.DoesLabelExist(
+                    _plugin.AddressableScriptLabel
+                )
+            )
             {
                 resolve();
                 return;

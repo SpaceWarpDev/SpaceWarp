@@ -2,12 +2,13 @@ using System.IO;
 using ReduxLib.GameInterfaces;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.AddressableAssets.ResourceLocators;
 
 namespace SpaceWarp2.InternalUtilities;
 
 internal static class AssetHelpers
 {
-    public static void LoadAddressable(string catalog)
+    public static IResourceLocator LoadAddressable(string catalog)
     {
         SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Attempting to load {catalog}");
         var operation = Addressables.LoadContentCatalogAsync(catalog);
@@ -15,14 +16,14 @@ internal static class AssetHelpers
         if (operation.Status == AsyncOperationStatus.Failed)
         {
             SpaceWarpPlugin.Instance.SWLogger.LogError($"Failed to load addressables catalog {catalog}");
+            return null;
         }
-        else
-        {
-            SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Loaded addressables catalog {catalog}");
-            var locator = operation.Result;
-            SpaceWarpPlugin.Instance.SWLogger.LogInfo($"{catalog} ----- {locator.LocatorId}");
-            // GameManager.Instance.Assets.RegisterResourceLocator(locator);
-        }
+
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"Loaded addressables catalog {catalog}");
+        var locator = operation.Result;
+        SpaceWarpPlugin.Instance.SWLogger.LogInfo($"{catalog} ----- {locator.LocatorId}");
+        // GameManager.Instance.Assets.RegisterResourceLocator(locator);
+        return locator;
     }
 
     internal static void LoadLocalizationFromFolder(string folder)

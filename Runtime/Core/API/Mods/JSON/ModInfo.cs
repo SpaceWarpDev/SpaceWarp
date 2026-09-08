@@ -110,4 +110,18 @@ public sealed class ModInfo
 
     [JsonProperty("main_assembly")]
     public string? MainAssembly { get; internal set; } = null;
+
+    /// <summary>
+    /// Addressables label containing Lua patch scripts owned by this mod.
+    /// Loose script files remain supported when this is omitted.
+    /// </summary>
+    [JsonProperty("addressable_script_label")]
+    public string? AddressableScriptLabel { get; internal set; }
+
+    /// <summary>
+    /// Addressables label containing declarative prefab-patch manifests owned
+    /// by this mod.
+    /// </summary>
+    [JsonProperty("addressable_prefab_patch_label")]
+    public string? AddressablePrefabPatchLabel { get; internal set; }
 }

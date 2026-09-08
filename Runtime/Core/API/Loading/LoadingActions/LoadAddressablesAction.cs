@@ -31,7 +31,14 @@ internal sealed class LoadAddressablesAction : BaseFlowAction
             if (File.Exists(catalogPath))
             {
                 Logger.LogInfo($"Found addressables for {_plugin.SWInfo.Name}");
-                AssetHelpers.LoadAddressable(catalogPath);
+                var locator = AssetHelpers.LoadAddressable(catalogPath);
+                if (
+                    locator != null
+                    && !_plugin.AddressableResourceLocators.Contains(locator)
+                )
+                {
+                    _plugin.AddressableResourceLocators.Add(locator);
+                }
             }
             else
             {

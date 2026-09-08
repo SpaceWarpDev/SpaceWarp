@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using ReduxLib.Configuration;
 using ReduxLib.Logging;
+using ReduxLib.Reflection;
 using UnityEngine;
 
 namespace SpaceWarp2.Modules;
@@ -67,7 +68,11 @@ public static class ModuleManager
         // }
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
-            foreach (var type in assembly.GetTypes())
+            // Runtime evaluators leave dynamic assemblies in the AppDomain when Domain Reload is
+            // disabled. Those assemblies can contain unfinished types and throw from GetTypes on
+            // the next Play Mode enter; they cannot contain compile-time SpaceWarp modules.
+            if (assembly.IsDynamic) continue;
+            foreach (var type in assembly.GetLoadableTypes())
             {
                 if (type.IsAbstract) continue;
                 if (type.IsSubclassOf(typeof(SpaceWarpModule)))
