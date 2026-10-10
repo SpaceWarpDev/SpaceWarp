@@ -28,4 +28,15 @@ public static class FeatureIds
     /// <param name="modId">The mod id.</param>
     /// <returns>The default feature id, <c>ModId:ModId</c>.</returns>
     public static string DefaultFor(string modId) => $"{modId}{SEPARATOR}{modId}";
+
+    /// <summary>
+    /// Gets the namespace of a qualified feature id, the part before the separator.
+    /// </summary>
+    /// <param name="featureId">The qualified feature id.</param>
+    /// <returns>The namespace, or the whole id when it has no separator.</returns>
+    public static string NamespaceOf(string featureId)
+    {
+        int separator = featureId.IndexOf(SEPARATOR);
+        return separator < 0 ? featureId : featureId.Substring(0, separator);
+    }
 }

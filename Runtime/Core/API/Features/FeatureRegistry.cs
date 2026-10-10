@@ -82,8 +82,8 @@ public class FeatureRegistry
     /// </remarks>
     /// <param name="modId">The declaring mod.</param>
     /// <param name="featureId">The feature id, bare or qualified.</param>
-    /// <param name="requires">The required feature ids, bare ones relative to <paramref name="modId" />.</param>
-    /// <param name="conflicts">The conflicting feature ids, bare ones relative to <paramref name="modId" />.</param>
+    /// <param name="requires">The required feature ids, bare ones relative to the feature's namespace.</param>
+    /// <param name="conflicts">The conflicting feature ids, bare ones relative to the feature's namespace.</param>
     /// <returns>The declared feature.</returns>
     public FeatureDefinition Define(
         string modId,
@@ -93,18 +93,22 @@ public class FeatureRegistry
     )
     {
         string id = FeatureIds.Qualify(modId, featureId);
-        string defaultId = FeatureIds.DefaultFor(modId);
 
-        // A mod's own default feature is the one feature that does not require itself.
+        // A feature belongs to the namespace in its id, which differs from the declaring mod when, for example,
+        // Redux declares the Stock features. Bare relations resolve in that namespace too.
+        string owner = FeatureIds.NamespaceOf(id);
+        string defaultId = FeatureIds.DefaultFor(owner);
+
+        // A namespace's own default feature is the one feature that does not require itself.
         IEnumerable<string> implicitRequires = string.Equals(id, defaultId, StringComparison.OrdinalIgnoreCase)
             ? Array.Empty<string>()
             : new[] { defaultId };
 
         var definition = new FeatureDefinition(
             id,
-            modId,
-            QualifyAll(modId, implicitRequires.Concat(requires ?? Array.Empty<string>())),
-            QualifyAll(modId, conflicts ?? Array.Empty<string>())
+            owner,
+            QualifyAll(owner, implicitRequires.Concat(requires ?? Array.Empty<string>())),
+            QualifyAll(owner, conflicts ?? Array.Empty<string>())
         );
         _features[id] = definition;
         return definition;
