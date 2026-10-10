@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using ReduxLib.GameInterfaces;
 using SpaceWarp2.API;
 using SpaceWarp2.API.Backend.Modding;
+using SpaceWarp2.API.Features;
 using SpaceWarp2.API.Loading;
 using SpaceWarp2.API.Mods;
 using SpaceWarp2.API.Mods.JSON;
@@ -84,6 +86,7 @@ public sealed class SpaceWarpPlugin : GeneralMod
         ModuleManager.LoadAllModules();
         PluginRegister.RegisterAllMods();
         PluginList.ResolveDependenciesAndLoadOrder();
+        FeatureRegistry.BuildInstance(PluginList.AllEnabledAndActivePlugins.Select(plugin => plugin.SWInfo));
         PluginList.LoadAllMods();
         SetupBeforeGameLoadActions();
         SetupAfterGameLoadActions();

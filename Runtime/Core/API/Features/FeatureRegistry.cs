@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using SpaceWarp2.API.Mods.JSON;
+using UnityEngine;
 
 namespace SpaceWarp2.API.Features;
 
@@ -18,6 +19,35 @@ namespace SpaceWarp2.API.Features;
 public class FeatureRegistry
 {
     private readonly Dictionary<string, FeatureDefinition> _features = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Gets the registry built from the installed, enabled mods once their load order is resolved.
+    /// </summary>
+    public static FeatureRegistry Instance { get; private set; } = new();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState() => Instance = new FeatureRegistry();
+
+    internal static void BuildInstance(IEnumerable<ModInfo> mods)
+    {
+        var registry = new FeatureRegistry();
+        foreach (ModInfo mod in mods)
+        {
+            if (mod == null)
+                continue;
+
+            try
+            {
+                registry.AddMod(mod);
+            }
+            catch (Exception exception)
+            {
+                SpaceWarpPlugin.Logger.LogError($"Could not read the features of {mod.Name}: {exception.Message}");
+            }
+        }
+
+        Instance = registry;
+    }
 
     /// <summary>
     /// Gets every declared feature.
