@@ -1,4 +1,3 @@
-using System;
 using JetBrains.Annotations;
 
 namespace SpaceWarp2.API.Features;
@@ -20,12 +19,13 @@ public static class FeatureIds
     /// <param name="modId">The mod the id is relative to.</param>
     /// <param name="featureId">A bare or already qualified feature id.</param>
     /// <returns>The qualified feature id.</returns>
-    public static string Qualify(string modId, string featureId) => throw new NotImplementedException();
+    public static string Qualify(string modId, string featureId) =>
+        featureId.IndexOf(SEPARATOR) >= 0 ? featureId : $"{modId}{SEPARATOR}{featureId}";
 
     /// <summary>
     /// Gets the id of a mod's default feature.
     /// </summary>
     /// <param name="modId">The mod id.</param>
     /// <returns>The default feature id, <c>ModId:ModId</c>.</returns>
-    public static string DefaultFor(string modId) => throw new NotImplementedException();
+    public static string DefaultFor(string modId) => $"{modId}{SEPARATOR}{modId}";
 }
