@@ -1,0 +1,31 @@
+using System;
+using JetBrains.Annotations;
+
+namespace SpaceWarp2.API.Features;
+
+/// <summary>
+/// Builds and splits namespaced feature ids of the form <c>ModId:FeatureId</c>.
+/// </summary>
+[PublicAPI]
+public static class FeatureIds
+{
+    /// <summary>
+    /// The character between the mod id and the feature id.
+    /// </summary>
+    public const char SEPARATOR = ':';
+
+    /// <summary>
+    /// Qualifies a feature id with a mod id unless it already names a mod.
+    /// </summary>
+    /// <param name="modId">The mod the id is relative to.</param>
+    /// <param name="featureId">A bare or already qualified feature id.</param>
+    /// <returns>The qualified feature id.</returns>
+    public static string Qualify(string modId, string featureId) => throw new NotImplementedException();
+
+    /// <summary>
+    /// Gets the id of a mod's default feature.
+    /// </summary>
+    /// <param name="modId">The mod id.</param>
+    /// <returns>The default feature id, <c>ModId:ModId</c>.</returns>
+    public static string DefaultFor(string modId) => throw new NotImplementedException();
+}

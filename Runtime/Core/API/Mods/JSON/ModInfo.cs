@@ -124,4 +124,10 @@ public sealed class ModInfo
     /// </summary>
     [JsonProperty("addressable_prefab_patch_label")]
     public string? AddressablePrefabPatchLabel { get; internal set; }
+
+    /// <summary>
+    /// The features this mod declares beyond its default one, keyed by feature id.
+    /// </summary>
+    [JsonProperty("features", Required = Required.DisallowNull)]
+    public Dictionary<string, FeatureInfo> Features { get; internal set; } = new();
 }
