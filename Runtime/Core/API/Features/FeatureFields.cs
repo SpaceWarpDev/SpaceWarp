@@ -24,6 +24,10 @@ public static class FeatureFields
     /// <param name="modId">The mod bare feature ids belong to.</param>
     public static void Bind(object target, string modId)
     {
+        foreach (var (field, featureId) in FieldsOf(target.GetType()))
+        {
+            field.SetValue(target, ActiveFeatures.IsEnabled(FeatureIds.Qualify(modId, featureId)));
+        }
     }
 
     private static (FieldInfo field, string featureId)[] FieldsOf(Type type)

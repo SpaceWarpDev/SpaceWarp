@@ -30,14 +30,30 @@ public class FeaturesLibrary
     /// <param name="context">The calling script, whose <c>ModId</c> a bare id belongs to.</param>
     /// <param name="featureId">The feature id, bare or qualified.</param>
     /// <returns>True if the feature is on.</returns>
-    public bool Has(ScriptExecutionContext context, string featureId) => false;
+    public bool Has(ScriptExecutionContext context, string featureId)
+    {
+        string modId = context.CurrentGlobalEnv?.Get("ModId").CastToString();
+        return ActiveFeatures.IsEnabled(modId == null ? featureId : FeatureIds.Qualify(modId, featureId));
+    }
 
     /// <summary>
     /// Lists the enabled features as a set.
     /// </summary>
     /// <param name="context">The calling script.</param>
     /// <returns>A new table with each enabled id as a key mapped to true, or nil before any set is active.</returns>
-    public DynValue All(ScriptExecutionContext context) => DynValue.Nil;
+    public DynValue All(ScriptExecutionContext context)
+    {
+        if (ActiveFeatures.Enabled == null)
+            return DynValue.Nil;
+
+        var set = new Table(context.GetScript());
+        foreach (string id in ActiveFeatures.Enabled)
+        {
+            set[id] = true;
+        }
+
+        return DynValue.NewTable(set);
+    }
 }
 
 /// <summary>
@@ -62,6 +78,8 @@ public static class FeatureEnvironments
     /// <param name="modId">The mod the environment belongs to.</param>
     public static void Track(Table env, string modId)
     {
+        Tracked.Add((new WeakReference<Table>(env), modId));
+        env["Enabled"] = ActiveFeatures.IsModEnabled(modId);
     }
 
     /// <summary>
@@ -72,9 +90,18 @@ public static class FeatureEnvironments
     /// </remarks>
     /// <param name="modId">The id the hooks were registered under.</param>
     /// <returns>True if the hooks run.</returns>
-    public static bool RunsHooksOf(string modId) => true;
+    public static bool RunsHooksOf(string modId) =>
+        modId == ModScriptRuntime.ConsoleModId || ActiveFeatures.IsModEnabled(modId);
 
     internal static void Refresh()
     {
+        Tracked.RemoveAll(entry => !entry.env.TryGetTarget(out _));
+        foreach (var (reference, modId) in Tracked)
+        {
+            if (reference.TryGetTarget(out Table env))
+            {
+                env["Enabled"] = ActiveFeatures.IsModEnabled(modId);
+            }
+        }
     }
 }

@@ -159,6 +159,12 @@ public static class ModScriptRuntime
         ConfigTypes.ContributeTo(child);
         child["Config"] = new ModConfig(configFile);
         child["Console"] = new ConsoleLibrary();
+        child["Features"] = FeaturesLibrary.Instance;
+        // The console is not a mod, so it has no Enabled to keep up to date
+        if (modId != ConsoleModId)
+        {
+            FeatureEnvironments.Track(child, modId);
+        }
 
         foreach (var contributor in ModRuntime.Contributors)
         {

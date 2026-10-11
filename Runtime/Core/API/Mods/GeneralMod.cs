@@ -22,6 +22,11 @@ public abstract class GeneralMod : ISpaceWarpMod
     public IConfigFile SWConfiguration { get; set; }
     public SpaceWarpPluginDescriptor SWMetadata { get; set; }
 
+    /// <summary>
+    /// Gets whether this mod's default feature is on in the active set.
+    /// </summary>
+    public bool Enabled => SWMetadata?.Enabled ?? true;
+
     public Harmony CreateHarmonyAndPatchAll()
     {
         var harmony = new Harmony(SWMetadata.Guid);

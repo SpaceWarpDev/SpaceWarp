@@ -138,6 +138,15 @@ public class SpaceWarpPluginDescriptor
     public readonly string Guid;
 
     /// <summary>
+    /// Gets whether this mod's default feature is on in the active set, so the mod should act in the loaded
+    /// campaign.
+    /// </summary>
+    /// <remarks>
+    /// The mod's code stays loaded either way, since an assembly cannot be unloaded per save.
+    /// </remarks>
+    public bool Enabled => SpaceWarp2.API.Features.ActiveFeatures.IsModEnabled(Guid);
+
+    /// <summary>
     /// The plugin's name.
     /// </summary>
     public readonly string Name;

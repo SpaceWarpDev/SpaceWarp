@@ -37,6 +37,16 @@ public static class ActiveFeatures
     /// <param name="features">The set's enabled features, or null for no set.</param>
     public static void Activate(IEnumerable<string>? features)
     {
+        _enabled = features == null ? null : new HashSet<string>(features, StringComparer.OrdinalIgnoreCase);
+        foreach (SpaceWarpPluginDescriptor descriptor in PluginList.AllEnabledAndActivePlugins)
+        {
+            if (descriptor.Plugin != null)
+            {
+                FeatureFields.Bind(descriptor.Plugin, descriptor.Guid);
+            }
+        }
+
+        FeatureEnvironments.Refresh();
     }
 
     /// <summary>
@@ -44,12 +54,12 @@ public static class ActiveFeatures
     /// </summary>
     /// <param name="featureId">The qualified feature id.</param>
     /// <returns>True if the feature is on, or if no set is active.</returns>
-    public static bool IsEnabled(string featureId) => true;
+    public static bool IsEnabled(string featureId) => _enabled == null || _enabled.Contains(featureId);
 
     /// <summary>
     /// Checks whether a mod's default feature is on in the active set.
     /// </summary>
     /// <param name="modId">The mod id.</param>
     /// <returns>True if the mod is on, or if no set is active.</returns>
-    public static bool IsModEnabled(string modId) => true;
+    public static bool IsModEnabled(string modId) => IsEnabled(FeatureIds.DefaultFor(modId));
 }
