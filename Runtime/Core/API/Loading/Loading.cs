@@ -77,4 +77,53 @@ public static class Loading
     {
         AddGeneralLoadingAction(() => new AddressableAction<T>(name, label, keepAssets, action));
     }
+
+    /// <summary>
+    /// Registers data a mod loads for the active feature set, cleared and loaded again whenever the set changes.
+    /// </summary>
+    /// <param name="modId">The mod the data belongs to.</param>
+    /// <param name="name">The name shown while it loads.</param>
+    /// <param name="reset">Clears the data loaded for the previous set.</param>
+    /// <param name="load">Loads the data for the active set, calling its argument once done.</param>
+    /// <returns>The action, for chaining feature selectors.</returns>
+    public static SetLoadingAction AddSetAction(string modId, string name, Action reset, Action<Action> load) =>
+        SetLoading.Add(new SetLoadingAction(modId, name, reset, load));
+
+    /// <summary>
+    /// Registers an addressables label a mod loads for the active feature set, so its patched and gated assets
+    /// are read again whenever the set changes.
+    /// </summary>
+    /// <typeparam name="T">The asset type.</typeparam>
+    /// <param name="modId">The mod the data belongs to.</param>
+    /// <param name="name">The name shown while it loads.</param>
+    /// <param name="label">The addressables label.</param>
+    /// <param name="onAsset">Called with each loaded asset.</param>
+    /// <param name="reset">Clears what the previous set's assets registered.</param>
+    /// <returns>The action, for chaining feature selectors.</returns>
+    public static SetLoadingAction AddSetLoadingAction<T>(
+        string modId,
+        string name,
+        string label,
+        Action<T> onAsset,
+        Action reset
+    ) where T : UnityObject =>
+        AddSetAction(
+            modId,
+            name,
+            reset,
+            done => IAssetProvider.Instance.LoadByLabel<T>(
+                label,
+                onAsset,
+                assets =>
+                {
+                    // A set can have nothing under the label, which comes back as no list at all
+                    if (assets != null)
+                    {
+                        UnityEngine.AddressableAssets.Addressables.Release(assets);
+                    }
+
+                    done();
+                }
+            )
+        );
 }
