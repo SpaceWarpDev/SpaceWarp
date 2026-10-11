@@ -53,6 +53,46 @@ public static class SaveLoad
     /// </summary>
     /// <param name="flowAction">The FlowAction to insert</param>
     /// <param name="referenceAction">The name of the action to insert a TFlowActionType after. Use <c>null</c> to insert it at the start.</param>
+    /// <summary>
+    /// Registers work a mod does every time a campaign it is enabled in loads.
+    /// </summary>
+    /// <param name="modId">The mod the work belongs to.</param>
+    /// <param name="name">The name shown while it runs.</param>
+    /// <param name="phase">Where in loading it runs.</param>
+    /// <param name="load">The work, registering any teardown on its context and calling its second argument once done.</param>
+    /// <returns>The action, for chaining feature selectors.</returns>
+    public static CampaignAction AddCampaignLoadAction(
+        string modId,
+        string name,
+        CampaignPhase phase,
+        Action<CampaignContext, Action> load
+    ) => CampaignLifecycle.Add(new CampaignAction(modId, name, phase, load));
+
+    /// <summary>
+    /// Registers something a mod sets up every time a campaign it is enabled in loads, and disposes when the
+    /// campaign unloads.
+    /// </summary>
+    /// <param name="modId">The mod the scope belongs to.</param>
+    /// <param name="name">The name shown while it is set up.</param>
+    /// <param name="phase">Where in loading it is set up.</param>
+    /// <param name="open">Sets the scope up and returns what disposing tears it down.</param>
+    /// <returns>The action, for chaining feature selectors.</returns>
+    public static CampaignAction AddCampaignScope(
+        string modId,
+        string name,
+        CampaignPhase phase,
+        Func<CampaignContext, IDisposable> open
+    ) => AddCampaignLoadAction(modId, name, phase, (context, done) =>
+    {
+        IDisposable scope = open(context);
+        if (scope != null)
+        {
+            context.OnUnload(scope.Dispose);
+        }
+
+        done();
+    });
+
     public static void AddFlowActionToGameLoadAfter(IFlowAction flowAction, string referenceAction)
     {
         if (GameInitializingFlowActions.TryGetValue(referenceAction, out var actions))

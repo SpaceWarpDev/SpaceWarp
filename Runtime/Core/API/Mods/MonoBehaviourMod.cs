@@ -1,11 +1,12 @@
 ﻿using HarmonyLib;
 using ReduxLib.Configuration;
+using SpaceWarp2.API.Loading;
 using UnityEngine;
 using ILogger = ReduxLib.Logging.ILogger;
 
 namespace SpaceWarp2.API.Mods;
 
-public abstract class MonoBehaviourMod : MonoBehaviour, ISpaceWarpMod
+public abstract class MonoBehaviourMod : MonoBehaviour, ISpaceWarpMod, ICampaignLifecycle
 {
     public virtual void OnPreInitialized()
     {
@@ -31,6 +32,20 @@ public abstract class MonoBehaviourMod : MonoBehaviour, ISpaceWarpMod
     /// Gets whether this mod's default feature is on in the active set.
     /// </summary>
     public bool Enabled => SWMetadata?.Enabled ?? true;
+
+    /// <summary>
+    /// Called once a campaign this mod is enabled in has loaded.
+    /// </summary>
+    public virtual void OnCampaignLoaded()
+    {
+    }
+
+    /// <summary>
+    /// Called before that campaign unloads, to undo what <see cref="OnCampaignLoaded" /> set up.
+    /// </summary>
+    public virtual void OnCampaignUnloading()
+    {
+    }
 
     public Harmony CreateHarmonyAndPatchAll()
     {

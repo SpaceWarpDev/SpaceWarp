@@ -21,6 +21,12 @@ public class SetLoadingAction
     private readonly List<string> _needs = new();
     private readonly List<string> _conflicts = new();
 
+    // Lua registrations hand the action back for chaining selectors
+    static SetLoadingAction()
+    {
+        UserData.RegisterType<SetLoadingAction>();
+    }
+
     /// <summary>
     /// Creates an action without registering it.
     /// </summary>

@@ -69,6 +69,12 @@ public class CampaignAction
     private readonly List<string> _needs = new();
     private readonly List<string> _conflicts = new();
 
+    // Lua registrations hand the action back for chaining selectors
+    static CampaignAction()
+    {
+        UserData.RegisterType<CampaignAction>();
+    }
+
     /// <summary>
     /// Creates an action without registering it.
     /// </summary>
