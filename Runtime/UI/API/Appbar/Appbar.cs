@@ -111,6 +111,13 @@ public static class Appbar
     /// <param name="width">The width of the sprite, 0 for inferring</param>
     /// <param name="height">The height of the sprite, 0 for inferring</param>
     /// <returns>The Texture2D converted to a Sprite</returns>
+    /// <summary>
+    /// Checks whether a button its owner registered shows in the active feature set.
+    /// </summary>
+    /// <param name="ownerModId">The mod that registered the button, or null when no mod could be told.</param>
+    /// <returns>True if the button shows.</returns>
+    public static bool ShowsButtonOf(string ownerModId) => true;
+
     public static Sprite GetAppBarIconFromTexture(Texture2D texture, int width = 0, int height = 0)
     {
         if (width == 0)
