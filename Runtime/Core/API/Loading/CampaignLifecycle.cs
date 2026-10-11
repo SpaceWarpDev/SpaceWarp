@@ -51,6 +51,7 @@ public class CampaignContext
     /// <param name="unload">The teardown.</param>
     public void OnUnload(Action unload)
     {
+        _addUnload(unload);
     }
 }
 
@@ -157,11 +158,14 @@ public interface ICampaignLifecycle
 public static class CampaignLifecycle
 {
     private static readonly List<CampaignAction> Registered = new();
+    private static readonly List<Action> OwedUnloads = new();
 
+    // A play session that ended without unloading leaves nothing for the next one to tear down
     [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStaticState()
     {
         Registered.Clear();
+        OwedUnloads.Clear();
     }
 
     /// <summary>
@@ -189,8 +193,36 @@ public static class CampaignLifecycle
     /// <param name="phase">The phase.</param>
     /// <param name="actions">The actions, in registration order.</param>
     /// <returns>Each step's name and work, the work given a callback to call once done.</returns>
-    public static List<(string name, Action<Action> work)> Steps(CampaignPhase phase, IEnumerable<CampaignAction> actions) =>
-        new();
+    public static List<(string name, Action<Action> work)> Steps(CampaignPhase phase, IEnumerable<CampaignAction> actions)
+    {
+        var steps = new List<(string name, Action<Action> work)>();
+        foreach (CampaignAction action in actions)
+        {
+            if (action.Phase != phase)
+                continue;
+
+            steps.Add((action.Name, done =>
+            {
+                if (!action.Applies())
+                {
+                    done();
+                    return;
+                }
+
+                try
+                {
+                    action.Load(new CampaignContext(OwedUnloads.Add), done);
+                }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.LogError($"[SpaceWarp] Campaign load action {action.Name} of {action.ModId} failed: {e}");
+                    done();
+                }
+            }));
+        }
+
+        return steps;
+    }
 
     /// <summary>
     /// Tells each enabled plugin that the campaign has loaded, and owes it the matching unload.
@@ -198,6 +230,22 @@ public static class CampaignLifecycle
     /// <param name="plugins">Each plugin with its mod id.</param>
     public static void NotifyLoaded(IEnumerable<(string modId, ICampaignLifecycle plugin)> plugins)
     {
+        foreach ((string modId, ICampaignLifecycle plugin) in plugins)
+        {
+            if (!ActiveFeatures.IsModEnabled(modId))
+                continue;
+
+            try
+            {
+                plugin.OnCampaignLoaded();
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogError($"[SpaceWarp] {modId} failed to load its campaign state: {e}");
+            }
+
+            OwedUnloads.Add(plugin.OnCampaignUnloading);
+        }
     }
 
     /// <summary>
@@ -205,5 +253,19 @@ public static class CampaignLifecycle
     /// </summary>
     public static void Unload()
     {
+        // Taken out first, so an unload that triggers another unload finds nothing left to run twice
+        var owed = new List<Action>(OwedUnloads);
+        OwedUnloads.Clear();
+        for (int i = owed.Count - 1; i >= 0; i--)
+        {
+            try
+            {
+                owed[i]();
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogError($"[SpaceWarp] A campaign unload failed: {e}");
+            }
+        }
     }
 }
