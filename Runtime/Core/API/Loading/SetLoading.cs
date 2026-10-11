@@ -57,20 +57,31 @@ public class SetLoadingAction
     /// </summary>
     /// <param name="featureId">The feature id, bare ids belonging to the action's mod.</param>
     /// <returns>This action, for chaining.</returns>
-    public SetLoadingAction Feature(string featureId) => this;
+    public SetLoadingAction Feature(string featureId)
+    {
+        _needs.Add(FeatureIds.Qualify(ModId, featureId));
+        return this;
+    }
 
     /// <summary>
     /// Loads only while a feature is off.
     /// </summary>
     /// <param name="featureId">The feature id, bare ids belonging to the action's mod.</param>
     /// <returns>This action, for chaining.</returns>
-    public SetLoadingAction NoFeature(string featureId) => this;
+    public SetLoadingAction NoFeature(string featureId)
+    {
+        _conflicts.Add(FeatureIds.Qualify(ModId, featureId));
+        return this;
+    }
 
     /// <summary>
     /// Checks whether the action loads in the active set.
     /// </summary>
     /// <returns>True if the mod and every selected feature allow it.</returns>
-    public bool Applies() => true;
+    public bool Applies() =>
+        ActiveFeatures.IsModEnabled(ModId)
+        && _needs.TrueForAll(ActiveFeatures.IsEnabled)
+        && !_conflicts.Exists(ActiveFeatures.IsEnabled);
 }
 
 /// <summary>
@@ -112,5 +123,35 @@ public static class SetLoading
     /// </remarks>
     /// <param name="actions">The actions, in registration order.</param>
     /// <returns>Each step's name and work, the work given a callback to call once done.</returns>
-    public static List<(string name, Action<Action> work)> Steps(IEnumerable<SetLoadingAction> actions) => new();
+    public static List<(string name, Action<Action> work)> Steps(IEnumerable<SetLoadingAction> actions)
+    {
+        var all = new List<SetLoadingAction>(actions);
+        var steps = new List<(string name, Action<Action> work)>();
+        foreach (SetLoadingAction action in all)
+        {
+            steps.Add(($"Clearing {action.Name}", done =>
+            {
+                action.Reset();
+                done();
+            }));
+        }
+
+        // Selectors are read as each load starts, which is after the new set has activated
+        foreach (SetLoadingAction action in all)
+        {
+            steps.Add((action.Name, done =>
+            {
+                if (action.Applies())
+                {
+                    action.Load(done);
+                }
+                else
+                {
+                    done();
+                }
+            }));
+        }
+
+        return steps;
+    }
 }
