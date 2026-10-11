@@ -145,13 +145,11 @@ public class UI : SpaceWarpModule
         IAppbarBackend.Instance.AppBarKSCSubscriber.AddListener(Appbar.LoadKSCButtons);
         // The flight tray outlives the campaign, so its buttons go when the campaign unloads and the next flight
         // builds the ones the next campaign's features allow
-        CampaignLifecycle.Add(
-            new CampaignAction("SpaceWarp2", "Clearing the flight app bar", CampaignPhase.Loaded, (campaign, done) =>
-            {
-                campaign.OnUnload(Appbar.RemoveFlightButtons);
-                done();
-            })
-        );
+        SaveLoad.AddCampaignLoadAction("SpaceWarp2", "Clearing the flight app bar", CampaignPhase.Loaded, done =>
+        {
+            SaveLoad.OnCampaignUnload(Appbar.RemoveFlightButtons);
+            done();
+        });
         Instance = this;
         ModuleConfiguration.Bind(this);
         SpaceWarpConsoleLogListener = new SpaceWarpConsoleLogListener(this);

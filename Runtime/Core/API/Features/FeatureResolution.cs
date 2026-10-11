@@ -20,9 +20,9 @@ public class FeatureResolution
     public IReadOnlyList<string> Missing { get; }
 
     /// <summary>
-    /// Gets each pair of enabled features where one conflicts with the other.
+    /// Gets each pair of enabled features where one conflicts with the other, the ordinally first id first.
     /// </summary>
-    public IReadOnlyList<FeatureConflict> Conflicts { get; }
+    public IReadOnlyList<(string First, string Second)> Conflicts { get; }
 
     /// <summary>
     /// Creates a resolution.
@@ -33,40 +33,11 @@ public class FeatureResolution
     public FeatureResolution(
         IReadOnlyList<string> enabled,
         IReadOnlyList<string> missing,
-        IReadOnlyList<FeatureConflict> conflicts
+        IReadOnlyList<(string First, string Second)> conflicts
     )
     {
         Enabled = enabled;
         Missing = missing;
         Conflicts = conflicts;
-    }
-}
-
-/// <summary>
-/// Two enabled features where at least one declares a conflict with the other.
-/// </summary>
-[PublicAPI]
-public class FeatureConflict
-{
-    /// <summary>
-    /// Gets the id that sorts first ordinally.
-    /// </summary>
-    public string First { get; }
-
-    /// <summary>
-    /// Gets the id that sorts second ordinally.
-    /// </summary>
-    public string Second { get; }
-
-    /// <summary>
-    /// Creates a conflict between two features, in either order.
-    /// </summary>
-    /// <param name="a">One feature id.</param>
-    /// <param name="b">The other feature id.</param>
-    public FeatureConflict(string a, string b)
-    {
-        bool aFirst = string.CompareOrdinal(a, b) <= 0;
-        First = aFirst ? a : b;
-        Second = aFirst ? b : a;
     }
 }

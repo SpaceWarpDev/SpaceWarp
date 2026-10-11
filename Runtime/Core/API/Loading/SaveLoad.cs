@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using ReduxLib.GameInterfaces;
+using SpaceWarp2.API.Features;
 using UnityEngine;
 
 namespace SpaceWarp2.API.Loading;
@@ -26,6 +27,171 @@ public static class SaveLoad
         LoadingFlowActionTypes = new();
         SavingFlowActions = new();
         SavingFlowActionTypes = new();
+        // A play session that ended without unloading leaves nothing for the next one to tear down
+        CampaignActions.Clear();
+        OwedUnloads.Clear();
+    }
+
+    // Work mods do every time a campaign loads, by where in loading it runs
+    private static readonly Dictionary<CampaignPhase, List<FeatureGatedAction>> CampaignActions = new();
+
+    // Teardown owed for the campaign loaded now, run latest first when it unloads
+    private static readonly List<Action> OwedUnloads = new();
+
+    /// <summary>
+    /// Registers work a mod does every time a campaign it is enabled in loads, a quickload or revert into the same
+    /// set included.
+    /// </summary>
+    /// <param name="modId">The mod the work belongs to.</param>
+    /// <param name="name">The name shown while it runs.</param>
+    /// <param name="phase">Where in loading it runs.</param>
+    /// <param name="load">The work, calling its argument once done. Teardown for what it sets up is registered
+    /// with <see cref="OnCampaignUnload" />.</param>
+    /// <returns>The action, for chaining feature selectors.</returns>
+    public static FeatureGatedAction AddCampaignLoadAction(
+        string modId,
+        string name,
+        CampaignPhase phase,
+        Action<Action> load
+    )
+    {
+        var action = new FeatureGatedAction(modId, name, load);
+        if (!CampaignActions.TryGetValue(phase, out List<FeatureGatedAction> actions))
+        {
+            CampaignActions[phase] = actions = new List<FeatureGatedAction>();
+        }
+
+        actions.Add(action);
+        return action;
+    }
+
+    /// <summary>
+    /// Registers something a mod sets up every time a campaign it is enabled in loads, and disposes when the
+    /// campaign unloads.
+    /// </summary>
+    /// <param name="modId">The mod the scope belongs to.</param>
+    /// <param name="name">The name shown while it is set up.</param>
+    /// <param name="phase">Where in loading it is set up.</param>
+    /// <param name="open">Sets the scope up and returns what disposing tears it down.</param>
+    /// <returns>The action, for chaining feature selectors.</returns>
+    public static FeatureGatedAction AddCampaignScope(
+        string modId,
+        string name,
+        CampaignPhase phase,
+        Func<IDisposable> open
+    ) => AddCampaignLoadAction(modId, name, phase, done =>
+    {
+        IDisposable scope = open();
+        if (scope != null)
+        {
+            OnCampaignUnload(scope.Dispose);
+        }
+
+        done();
+    });
+
+    /// <summary>
+    /// Registers teardown for something set up for the campaign loaded now, run when the campaign unloads.
+    /// </summary>
+    /// <remarks>
+    /// Unloads run in the reverse order they were registered, on quitting to the main menu, before any other load
+    /// replaces the campaign, and when a load fails part way.
+    /// </remarks>
+    /// <param name="unload">The teardown.</param>
+    public static void OnCampaignUnload(Action unload)
+    {
+        OwedUnloads.Add(unload);
+    }
+
+    /// <summary>
+    /// Gets the work registered for one phase of loading a campaign, in registration order.
+    /// </summary>
+    /// <param name="phase">The phase.</param>
+    /// <returns>The actions.</returns>
+    public static IReadOnlyList<FeatureGatedAction> CampaignActionsIn(CampaignPhase phase) =>
+        CampaignActions.TryGetValue(phase, out List<FeatureGatedAction> actions)
+            ? actions
+            : Array.Empty<FeatureGatedAction>();
+
+    /// <summary>
+    /// Lists the steps that run campaign load work.
+    /// </summary>
+    /// <remarks>
+    /// Each step decides whether its action applies when it runs, which is after the campaign's set activated.
+    /// </remarks>
+    /// <param name="actions">The actions, normally <see cref="CampaignActionsIn" /> for one phase.</param>
+    /// <returns>Each step's name and work, the work given a callback to call once done.</returns>
+    public static List<(string name, Action<Action> work)> CampaignSteps(IEnumerable<FeatureGatedAction> actions)
+    {
+        var steps = new List<(string name, Action<Action> work)>();
+        foreach (FeatureGatedAction action in actions)
+        {
+            steps.Add((action.Name, done =>
+            {
+                if (!action.Applies())
+                {
+                    done();
+                    return;
+                }
+
+                try
+                {
+                    action.Run(done);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[SpaceWarp] Campaign load action {action.Name} of {action.ModId} failed: {e}");
+                    done();
+                }
+            }));
+        }
+
+        return steps;
+    }
+
+    /// <summary>
+    /// Tells each enabled plugin that the campaign has loaded, and owes it the matching unload.
+    /// </summary>
+    /// <param name="plugins">Each plugin with its mod id.</param>
+    public static void NotifyCampaignLoaded(IEnumerable<(string modId, ICampaignLifecycle plugin)> plugins)
+    {
+        foreach ((string modId, ICampaignLifecycle plugin) in plugins)
+        {
+            if (!ActiveFeatures.IsModEnabled(modId))
+                continue;
+
+            try
+            {
+                plugin.OnCampaignLoaded();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SpaceWarp] {modId} failed to load its campaign state: {e}");
+            }
+
+            OwedUnloads.Add(plugin.OnCampaignUnloading);
+        }
+    }
+
+    /// <summary>
+    /// Runs every unload owed for the campaign loaded now, latest first, and forgets them.
+    /// </summary>
+    public static void UnloadCampaign()
+    {
+        // Taken out first, so an unload that triggers another unload finds nothing left to run twice
+        var owed = new List<Action>(OwedUnloads);
+        OwedUnloads.Clear();
+        for (int i = owed.Count - 1; i >= 0; i--)
+        {
+            try
+            {
+                owed[i]();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SpaceWarp] A campaign unload failed: {e}");
+            }
+        }
     }
 
     /// <summary>
@@ -53,46 +219,6 @@ public static class SaveLoad
     /// </summary>
     /// <param name="flowAction">The FlowAction to insert</param>
     /// <param name="referenceAction">The name of the action to insert a TFlowActionType after. Use <c>null</c> to insert it at the start.</param>
-    /// <summary>
-    /// Registers work a mod does every time a campaign it is enabled in loads.
-    /// </summary>
-    /// <param name="modId">The mod the work belongs to.</param>
-    /// <param name="name">The name shown while it runs.</param>
-    /// <param name="phase">Where in loading it runs.</param>
-    /// <param name="load">The work, registering any teardown on its context and calling its second argument once done.</param>
-    /// <returns>The action, for chaining feature selectors.</returns>
-    public static CampaignAction AddCampaignLoadAction(
-        string modId,
-        string name,
-        CampaignPhase phase,
-        Action<CampaignContext, Action> load
-    ) => CampaignLifecycle.Add(new CampaignAction(modId, name, phase, load));
-
-    /// <summary>
-    /// Registers something a mod sets up every time a campaign it is enabled in loads, and disposes when the
-    /// campaign unloads.
-    /// </summary>
-    /// <param name="modId">The mod the scope belongs to.</param>
-    /// <param name="name">The name shown while it is set up.</param>
-    /// <param name="phase">Where in loading it is set up.</param>
-    /// <param name="open">Sets the scope up and returns what disposing tears it down.</param>
-    /// <returns>The action, for chaining feature selectors.</returns>
-    public static CampaignAction AddCampaignScope(
-        string modId,
-        string name,
-        CampaignPhase phase,
-        Func<CampaignContext, IDisposable> open
-    ) => AddCampaignLoadAction(modId, name, phase, (context, done) =>
-    {
-        IDisposable scope = open(context);
-        if (scope != null)
-        {
-            context.OnUnload(scope.Dispose);
-        }
-
-        done();
-    });
-
     public static void AddFlowActionToGameLoadAfter(IFlowAction flowAction, string referenceAction)
     {
         if (GameInitializingFlowActions.TryGetValue(referenceAction, out var actions))
@@ -359,4 +485,43 @@ public static class SaveLoad
             SavingFlowActions[referenceAction] = new List<IFlowAction> { flowAction };
         }
     }
+}
+
+/// <summary>
+/// Where in loading a campaign the work registered with <see cref="SaveLoad.AddCampaignLoadAction" /> runs.
+/// </summary>
+[PublicAPI]
+public enum CampaignPhase
+{
+    /// <summary>
+    /// Right after the campaign's feature set activates, before any of its content loads.
+    /// </summary>
+    Content,
+
+    /// <summary>
+    /// After the parts are read, before the universe is created.
+    /// </summary>
+    BeforeUniverse,
+
+    /// <summary>
+    /// Once the campaign has finished loading.
+    /// </summary>
+    Loaded
+}
+
+/// <summary>
+/// Implemented by a mod's plugin to hear when a campaign it is enabled in loads and unloads.
+/// </summary>
+[PublicAPI]
+public interface ICampaignLifecycle
+{
+    /// <summary>
+    /// Called once a campaign the mod is enabled in has loaded.
+    /// </summary>
+    void OnCampaignLoaded();
+
+    /// <summary>
+    /// Called before that campaign unloads, to undo what <see cref="OnCampaignLoaded" /> set up.
+    /// </summary>
+    void OnCampaignUnloading();
 }

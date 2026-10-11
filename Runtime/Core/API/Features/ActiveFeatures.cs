@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using JetBrains.Annotations;
 using SpaceWarp2.API.Lifecycle;
 using SpaceWarp2.API.Mods;
@@ -17,6 +19,11 @@ namespace SpaceWarp2.API.Features;
 [PublicAPI]
 public static class ActiveFeatures
 {
+    private const BindingFlags FIELD_FLAGS = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+    // Every set activation binds every plugin, so each type is scanned once
+    private static readonly Dictionary<Type, (FieldInfo field, string featureId)[]> FeatureFieldsByType = new();
+
     private static HashSet<string>? _enabled;
 
     [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -42,11 +49,11 @@ public static class ActiveFeatures
         {
             if (descriptor.Plugin != null)
             {
-                FeatureFields.Bind(descriptor.Plugin, descriptor.Guid);
+                BindFeatureFields(descriptor.Plugin, descriptor.Guid);
             }
         }
 
-        FeatureEnvironments.Refresh();
+        ModScriptRuntime.RefreshFeatureEnvironments();
     }
 
     /// <summary>
@@ -61,5 +68,53 @@ public static class ActiveFeatures
     /// </summary>
     /// <param name="modId">The mod id.</param>
     /// <returns>True if the mod is on, or if no set is active.</returns>
-    public static bool IsModEnabled(string modId) => IsEnabled(FeatureIds.DefaultFor(modId));
+    public static bool IsModEnabled(string modId) => IsEnabled(FeatureRegistry.DefaultFor(modId));
+
+    /// <summary>
+    /// Checks whether a mod's runtime hooks run in the active feature set.
+    /// </summary>
+    /// <remarks>
+    /// The console is not a mod, so its hooks always run.
+    /// </remarks>
+    /// <param name="modId">The id the hooks were registered under.</param>
+    /// <returns>True if the hooks run.</returns>
+    public static bool RunsHooksOf(string modId) => modId == ModScriptRuntime.ConsoleModId || IsModEnabled(modId);
+
+    /// <summary>
+    /// Sets each <see cref="FeatureAttribute" /> bool field of an object to whether its feature is on.
+    /// </summary>
+    /// <param name="target">The object, normally a mod's plugin.</param>
+    /// <param name="modId">The mod bare feature ids belong to.</param>
+    public static void BindFeatureFields(object target, string modId)
+    {
+        foreach (var (field, featureId) in FeatureFieldsOf(target.GetType()))
+        {
+            field.SetValue(target, IsEnabled(FeatureRegistry.Qualify(modId, featureId)));
+        }
+    }
+
+    private static (FieldInfo field, string featureId)[] FeatureFieldsOf(Type type)
+    {
+        if (FeatureFieldsByType.TryGetValue(type, out var fields))
+            return fields;
+
+        fields = HierarchyOf(type)
+            .SelectMany(level => level.GetFields(FIELD_FLAGS | BindingFlags.DeclaredOnly))
+            .Where(field => field.FieldType == typeof(bool))
+            .Select(field => (field, attribute: field.GetCustomAttribute<FeatureAttribute>()))
+            .Where(pair => pair.attribute != null)
+            .Select(pair => (pair.field, pair.attribute!.FeatureId))
+            .ToArray();
+        FeatureFieldsByType[type] = fields;
+        return fields;
+    }
+
+    // Private fields of base classes are only reachable from the class that declares them
+    private static IEnumerable<Type> HierarchyOf(Type type)
+    {
+        for (Type? level = type; level != null && level != typeof(object); level = level.BaseType)
+        {
+            yield return level;
+        }
+    }
 }

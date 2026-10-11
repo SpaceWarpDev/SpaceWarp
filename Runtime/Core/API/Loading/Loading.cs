@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using ReduxLib.GameInterfaces;
+using SpaceWarp2.API.Features;
 using SpaceWarp2.InternalUtilities;
 using SpaceWarp2.API.Loading.LoadingActions;
 using SpaceWarp2.API.Mods;
@@ -29,6 +30,57 @@ public static class Loading
     {
         DescriptorLoadingActionGenerators = new();
         GeneralLoadingActions = new();
+        SetActions.Clear();
+    }
+
+    // Data mods load per feature set, cleared and loaded again on boot and on every switch to another set, never on
+    // a reload into the same set, since the data is the same for every save on one set
+    private static readonly List<FeatureGatedAction> SetActions = new();
+
+    /// <summary>
+    /// Gets every registered per-set action.
+    /// </summary>
+    public static IReadOnlyList<FeatureGatedAction> RegisteredSetActions => SetActions;
+
+    /// <summary>
+    /// Lists the steps that bring per-set data in line with the active set.
+    /// </summary>
+    /// <remarks>
+    /// Every action resets first, whether or not it loads, so no load reads another mod's half-cleared data and
+    /// nothing from the previous set survives in an action that no longer applies.
+    /// </remarks>
+    /// <param name="actions">The actions, in registration order, normally <see cref="RegisteredSetActions" />.</param>
+    /// <returns>Each step's name and work, the work given a callback to call once done.</returns>
+    public static List<(string name, Action<Action> work)> SetActionSteps(IEnumerable<FeatureGatedAction> actions)
+    {
+        var all = new List<FeatureGatedAction>(actions);
+        var steps = new List<(string name, Action<Action> work)>();
+        foreach (FeatureGatedAction action in all)
+        {
+            steps.Add(($"Clearing {action.Name}", done =>
+            {
+                action.Reset?.Invoke();
+                done();
+            }));
+        }
+
+        // Selectors are read as each load starts, which is after the new set has activated
+        foreach (FeatureGatedAction action in all)
+        {
+            steps.Add(($"Loading {action.Name}", done =>
+            {
+                if (action.Applies())
+                {
+                    action.Run(done);
+                }
+                else
+                {
+                    done();
+                }
+            }));
+        }
+
+        return steps;
     }
 
     /// <summary>
@@ -82,12 +134,16 @@ public static class Loading
     /// Registers data a mod loads for the active feature set, cleared and loaded again whenever the set changes.
     /// </summary>
     /// <param name="modId">The mod the data belongs to.</param>
-    /// <param name="name">The name shown while it loads.</param>
+    /// <param name="name">What is loaded, shown as "Clearing" and "Loading" it.</param>
     /// <param name="reset">Clears the data loaded for the previous set.</param>
     /// <param name="load">Loads the data for the active set, calling its argument once done.</param>
     /// <returns>The action, for chaining feature selectors.</returns>
-    public static SetLoadingAction AddSetAction(string modId, string name, Action reset, Action<Action> load) =>
-        SetLoading.Add(new SetLoadingAction(modId, name, reset, load));
+    public static FeatureGatedAction AddSetAction(string modId, string name, Action reset, Action<Action> load)
+    {
+        var action = new FeatureGatedAction(modId, name, load, reset);
+        SetActions.Add(action);
+        return action;
+    }
 
     /// <summary>
     /// Registers an addressables label a mod loads for the active feature set, so its patched and gated assets
@@ -100,7 +156,7 @@ public static class Loading
     /// <param name="onAsset">Called with each loaded asset.</param>
     /// <param name="reset">Clears what the previous set's assets registered.</param>
     /// <returns>The action, for chaining feature selectors.</returns>
-    public static SetLoadingAction AddSetLoadingAction<T>(
+    public static FeatureGatedAction AddSetLoadingAction<T>(
         string modId,
         string name,
         string label,

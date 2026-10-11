@@ -7,6 +7,7 @@ using ReduxLib.GameInterfaces;
 using ReduxLib.Logging;
 using SpaceWarp2.API;
 using SpaceWarp2.API.Config;
+using SpaceWarp2.API.Features;
 using SpaceWarp2.API.Mods;
 
 namespace SpaceWarp2.API.Lifecycle;
@@ -30,9 +31,44 @@ public static class ModScriptRuntime
     public const string ConsoleModId = "spacewarp-console";
 
     private static readonly ModScriptLoader Loader = new();
-    private static readonly ILogger Logger = ReduxLib.ReduxLib.GetLogger("ModScriptRuntime");
+    // Taken on first use, so tracking feature environments does not need ReduxLib's logging to be up
+    private static ILogger _logger;
+    private static ILogger Logger => _logger ??= ReduxLib.ReduxLib.GetLogger("ModScriptRuntime");
     private static readonly Dictionary<string, DynValue> ConsoleGlobals = new();
     private static Table _consoleEnv;
+
+    // Mod environments whose Enabled follows the active feature set. Environments are forked per mod and per
+    // console run, so they are held weakly and dropped once collected
+    private static readonly List<(WeakReference<Table> env, string modId)> FeatureEnvironments = new();
+
+    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        FeatureEnvironments.Clear();
+    }
+
+    /// <summary>
+    /// Starts keeping an environment's <c>Enabled</c> in step with the active feature set, and sets it now.
+    /// </summary>
+    /// <param name="env">The environment's globals.</param>
+    /// <param name="modId">The mod the environment belongs to.</param>
+    public static void TrackFeatureEnvironment(Table env, string modId)
+    {
+        FeatureEnvironments.Add((new WeakReference<Table>(env), modId));
+        env["Enabled"] = ActiveFeatures.IsModEnabled(modId);
+    }
+
+    internal static void RefreshFeatureEnvironments()
+    {
+        FeatureEnvironments.RemoveAll(entry => !entry.env.TryGetTarget(out _));
+        foreach (var (reference, modId) in FeatureEnvironments)
+        {
+            if (reference.TryGetTarget(out Table env))
+            {
+                env["Enabled"] = ActiveFeatures.IsModEnabled(modId);
+            }
+        }
+    }
 
     /// <summary>
     /// Runs every script file the descriptor declared at discovery, in one forked environment.
@@ -163,7 +199,7 @@ public static class ModScriptRuntime
         // The console is not a mod, so it has no Enabled to keep up to date
         if (modId != ConsoleModId)
         {
-            FeatureEnvironments.Track(child, modId);
+            TrackFeatureEnvironment(child, modId);
         }
 
         foreach (var contributor in ModRuntime.Contributors)

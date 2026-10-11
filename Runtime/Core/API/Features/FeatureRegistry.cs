@@ -18,6 +18,38 @@ namespace SpaceWarp2.API.Features;
 [PublicAPI]
 public class FeatureRegistry
 {
+    /// <summary>
+    /// The character between the mod id and the feature id.
+    /// </summary>
+    public const char SEPARATOR = ':';
+
+    /// <summary>
+    /// Qualifies a feature id with a mod id unless it already names a mod.
+    /// </summary>
+    /// <param name="modId">The mod the id is relative to.</param>
+    /// <param name="featureId">A bare or already qualified feature id.</param>
+    /// <returns>The qualified feature id.</returns>
+    public static string Qualify(string modId, string featureId) =>
+        featureId.IndexOf(SEPARATOR) >= 0 ? featureId : $"{modId}{SEPARATOR}{featureId}";
+
+    /// <summary>
+    /// Gets the id of a mod's default feature.
+    /// </summary>
+    /// <param name="modId">The mod id.</param>
+    /// <returns>The default feature id, <c>ModId:ModId</c>.</returns>
+    public static string DefaultFor(string modId) => $"{modId}{SEPARATOR}{modId}";
+
+    /// <summary>
+    /// Gets the namespace of a qualified feature id, the part before the separator.
+    /// </summary>
+    /// <param name="featureId">The qualified feature id.</param>
+    /// <returns>The namespace, or the whole id when it has no separator.</returns>
+    public static string NamespaceOf(string featureId)
+    {
+        int separator = featureId.IndexOf(SEPARATOR);
+        return separator < 0 ? featureId : featureId.Substring(0, separator);
+    }
+
     private readonly Dictionary<string, FeatureDefinition> _features = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
@@ -64,8 +96,8 @@ public class FeatureRegistry
         Define(
             modId,
             modId,
-            info.Dependencies.Select(dependency => FeatureIds.DefaultFor(dependency.ID)),
-            info.Conflicts.Select(conflict => FeatureIds.DefaultFor(conflict.ID))
+            info.Dependencies.Select(dependency => FeatureRegistry.DefaultFor(dependency.ID)),
+            info.Conflicts.Select(conflict => FeatureRegistry.DefaultFor(conflict.ID))
         );
 
         foreach (KeyValuePair<string, FeatureInfo> feature in info.Features)
@@ -92,12 +124,12 @@ public class FeatureRegistry
         IEnumerable<string>? conflicts = null
     )
     {
-        string id = FeatureIds.Qualify(modId, featureId);
+        string id = FeatureRegistry.Qualify(modId, featureId);
 
         // A feature belongs to the namespace in its id, which differs from the declaring mod when, for example,
         // Redux declares the Stock features. Bare relations resolve in that namespace too.
-        string owner = FeatureIds.NamespaceOf(id);
-        string defaultId = FeatureIds.DefaultFor(owner);
+        string owner = FeatureRegistry.NamespaceOf(id);
+        string defaultId = FeatureRegistry.DefaultFor(owner);
 
         // A namespace's own default feature is the one feature that does not require itself.
         IEnumerable<string> implicitRequires = string.Equals(id, defaultId, StringComparison.OrdinalIgnoreCase)
@@ -183,9 +215,9 @@ public class FeatureRegistry
         return definition.Requires.All(required => IsSatisfiable(required, visited));
     }
 
-    private List<FeatureConflict> FindConflicts(HashSet<string> enabled)
+    private List<(string First, string Second)> FindConflicts(HashSet<string> enabled)
     {
-        var conflicts = new List<FeatureConflict>();
+        var conflicts = new List<(string First, string Second)>();
         var seen = new HashSet<(string, string)>();
         foreach (string id in enabled.OrderBy(id => id, StringComparer.Ordinal))
         {
@@ -194,8 +226,8 @@ public class FeatureRegistry
                 if (!_features.TryGetValue(conflicting, out FeatureDefinition other) || !enabled.Contains(other.Id))
                     continue;
 
-                var conflict = new FeatureConflict(id, other.Id);
-                if (seen.Add((conflict.First, conflict.Second)))
+                var conflict = string.CompareOrdinal(id, other.Id) <= 0 ? (id, other.Id) : (other.Id, id);
+                if (seen.Add(conflict))
                 {
                     conflicts.Add(conflict);
                 }
@@ -214,7 +246,7 @@ public class FeatureRegistry
             if (string.IsNullOrEmpty(id))
                 continue;
 
-            string full = FeatureIds.Qualify(modId, id);
+            string full = FeatureRegistry.Qualify(modId, id);
             if (seen.Add(full))
             {
                 qualified.Add(full);
