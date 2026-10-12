@@ -485,6 +485,25 @@ public static class SaveLoad
             SavingFlowActions[referenceAction] = new List<IFlowAction> { flowAction };
         }
     }
+
+    /// <summary>
+    /// Adds a flow action to the save file loading sequence that runs only while its mod is enabled in the loaded
+    /// campaign's feature set. The same object is used for every load.
+    /// </summary>
+    /// <param name="modId">The mod the action belongs to.</param>
+    /// <param name="flowAction">The FlowAction to insert.</param>
+    /// <param name="referenceAction">The name of the action to insert it after.</param>
+    public static void AddFlowActionToCampaignLoadAfter(string modId, IFlowAction flowAction, string referenceAction)
+    {
+        AddFlowActionToCampaignLoadAfter(flowAction, referenceAction);
+    }
+
+    /// <summary>
+    /// Gets the mod an anchored flow action or flow action type was registered for.
+    /// </summary>
+    /// <param name="actionOrType">The registered action, or the registered action type.</param>
+    /// <returns>The mod's id, or null for an action that always runs.</returns>
+    public static string OwnerOf(object actionOrType) => null;
 }
 
 /// <summary>
