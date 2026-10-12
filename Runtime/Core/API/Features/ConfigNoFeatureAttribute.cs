@@ -19,7 +19,7 @@ public class ConfigNoFeatureAttribute : ConfigMetadataAttribute
     /// Shows the value only while the feature is off.
     /// </summary>
     /// <param name="featureId">The feature id, bare or qualified.</param>
-    public ConfigNoFeatureAttribute(string featureId) : base(string.Empty)
+    public ConfigNoFeatureAttribute(string featureId) : base(ActiveFeatures.NO_FEATURE_TAG_PREFIX + featureId)
     {
     }
 }
