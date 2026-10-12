@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace SpaceWarp2.API;
@@ -20,11 +21,14 @@ public static class ModList
     /// </summary>
     public static bool ChangedSinceLastRun { get; internal set; }
 
+    private static readonly HashSet<string> MarkedFeatureDefaults = new(StringComparer.OrdinalIgnoreCase);
+
     [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStaticState()
     {
         DisabledPluginGuids = null;
         ChangedSinceLastRun = default;
+        MarkedFeatureDefaults.Clear();
     }
 
     internal static void Initialize()
@@ -35,6 +39,7 @@ public static class ModList
         }
 
         DisabledPluginGuids = File.ReadAllLines(CommonPaths.DisabledPlugins);
+        LoadFeatureDefaults();
 
         var oldHash = "";
         if (File.Exists(CommonPaths.HashLocation))
@@ -61,7 +66,7 @@ public static class ModList
     /// <summary>
     /// Gets the features the player marked to start every new save with, whatever its campaign pack.
     /// </summary>
-    public static IReadOnlyCollection<string> FeatureDefaults => Array.Empty<string>();
+    public static IReadOnlyCollection<string> FeatureDefaults => MarkedFeatureDefaults;
 
     /// <summary>
     /// Marks or unmarks a feature to start every new save with, and writes the choice to disk.
@@ -70,6 +75,14 @@ public static class ModList
     /// <param name="isDefault">Whether new saves start with the feature.</param>
     public static void SetFeatureDefault(string featureId, bool isDefault)
     {
+        bool changed = isDefault ? MarkedFeatureDefaults.Add(featureId) : MarkedFeatureDefaults.Remove(featureId);
+        if (!changed)
+            return;
+
+        File.WriteAllLines(
+            CommonPaths.FeatureDefaults,
+            MarkedFeatureDefaults.OrderBy(id => id, StringComparer.OrdinalIgnoreCase)
+        );
     }
 
     /// <summary>
@@ -77,6 +90,17 @@ public static class ModList
     /// </summary>
     public static void LoadFeatureDefaults()
     {
+        MarkedFeatureDefaults.Clear();
+        if (!File.Exists(CommonPaths.FeatureDefaults))
+            return;
+
+        foreach (string line in File.ReadAllLines(CommonPaths.FeatureDefaults))
+        {
+            if (!string.IsNullOrWhiteSpace(line))
+            {
+                MarkedFeatureDefaults.Add(line.Trim());
+            }
+        }
     }
 
     private static string GetHash(string text)
