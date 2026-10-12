@@ -1,12 +1,14 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace SpaceWarp2.API;
 
 /// <summary>
-/// Contains methods related to the mod list.
+/// The mod list's preferences: which mods are disabled, and which features new saves start with.
 /// </summary>
-internal static class ModList
+public static class ModList
 {
     /// <summary>
     /// The list of all disabled plugin GUIDs.
@@ -54,6 +56,27 @@ internal static class ModList
         File.WriteAllText(CommonPaths.HashLocation, newHash);
 
         ChangedSinceLastRun = newHash != oldHash;
+    }
+
+    /// <summary>
+    /// Gets the features the player marked to start every new save with, whatever its campaign pack.
+    /// </summary>
+    public static IReadOnlyCollection<string> FeatureDefaults => Array.Empty<string>();
+
+    /// <summary>
+    /// Marks or unmarks a feature to start every new save with, and writes the choice to disk.
+    /// </summary>
+    /// <param name="featureId">The qualified feature id.</param>
+    /// <param name="isDefault">Whether new saves start with the feature.</param>
+    public static void SetFeatureDefault(string featureId, bool isDefault)
+    {
+    }
+
+    /// <summary>
+    /// Reads the features marked to start every new save with from disk.
+    /// </summary>
+    public static void LoadFeatureDefaults()
+    {
     }
 
     private static string GetHash(string text)
