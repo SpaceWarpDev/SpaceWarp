@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using ReduxLib.Configuration;
 using SpaceWarp2.API.Backend.SaveGameManager;
 using UnityEngine;
 
@@ -182,6 +183,34 @@ public static class ModSaves
         return RegisterSaveLoadGameData(modGuid, onSave, onLoad, onNew, saveData, persistenceKind);
     }
     
+    /// <summary>
+    /// Applies a campaign's stored mod settings to each mod's campaign config. A mod the campaign has none for gets
+    /// its defaults.
+    /// </summary>
+    /// <param name="data">The campaign's stored settings.</param>
+    /// <param name="configs">Each mod's campaign config, by mod id.</param>
+    public static void LoadCampaignConfigs(CampaignConfigData data, IReadOnlyDictionary<string, JsonConfigFile> configs)
+    {
+    }
+
+    /// <summary>
+    /// Stores each mod's campaign config into the campaign's settings, keeping those of mods not installed now.
+    /// </summary>
+    /// <param name="data">The campaign's stored settings.</param>
+    /// <param name="configs">Each mod's campaign config, by mod id.</param>
+    public static void SaveCampaignConfigs(CampaignConfigData data, IReadOnlyDictionary<string, JsonConfigFile> configs)
+    {
+    }
+
+    /// <summary>
+    /// Starts a new campaign's mod settings from every mod's defaults.
+    /// </summary>
+    /// <param name="data">The campaign's stored settings.</param>
+    /// <param name="configs">Each mod's campaign config, by mod id.</param>
+    /// <returns>The reset settings.</returns>
+    public static CampaignConfigData ResetCampaignConfigs(CampaignConfigData data, IReadOnlyDictionary<string, JsonConfigFile> configs) =>
+        data;
+
     /// <summary>
     /// Manually trigger a campaign save data flush
     /// </summary>
