@@ -65,6 +65,13 @@ public interface IInternalModRegister
     }
 
     /// <summary>
+    /// Gets the mod id a KSP1 mod is listed under.
+    /// </summary>
+    /// <param name="name">The KSP1 mod's folder name.</param>
+    /// <returns>The mod id.</returns>
+    static string Ksp1ModId(string name) => $"ksp1.{name}";
+
+    /// <summary>
     /// Builds a <see cref="SpaceWarpPluginDescriptor"/> for a KSP1 mod surfaced through the
     /// KSP1 mod importer. These descriptors don't host a real plugin; they exist so the mod
     /// shows up under the "KSP1 Mods" foldout in the SpaceWarp mod list.
@@ -77,7 +84,7 @@ public interface IInternalModRegister
         string author = ""
     )
     {
-        string guid = $"ksp1.{name}";
+        string guid = Ksp1ModId(name);
         var descriptor = new SpaceWarpPluginDescriptor(
             plugin: null,
             guid: guid,

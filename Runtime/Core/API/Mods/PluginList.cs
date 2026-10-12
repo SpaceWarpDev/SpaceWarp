@@ -54,6 +54,21 @@ public static class PluginList
     public static SpaceWarpPluginDescriptor? TryGetDescriptor(string guid) => AllEnabledAndActivePlugins.FirstOrDefault(item => item.Guid == guid);
 
     /// <summary>
+    /// Gets the mod whose plugin lives in an assembly, for registrations made through APIs that take no mod id.
+    /// </summary>
+    /// <param name="assembly">The assembly.</param>
+    /// <returns>The mod's id, or null when no enabled plugin lives in the assembly, or several do, as Redux's core
+    /// mods all live in the game's own assembly.</returns>
+    public static string? ModIdOf(System.Reflection.Assembly assembly)
+    {
+        var owners = AllEnabledAndActivePlugins
+            .Where(descriptor => descriptor.Plugin != null && descriptor.Plugin.GetType().Assembly == assembly)
+            .Take(2)
+            .ToList();
+        return owners.Count == 1 ? owners[0].Guid : null;
+    }
+
+    /// <summary>
     /// Retrieves the instance of the specified plugin class.
     /// </summary>
     /// <typeparam name="T">The type of the plugin class</typeparam>

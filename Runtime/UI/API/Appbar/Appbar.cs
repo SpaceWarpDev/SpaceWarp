@@ -175,8 +175,5 @@ public static class Appbar
     }
 
     // A button registered through the old overloads belongs to the mod whose plugin lives in the calling assembly
-    private static string OwnerOf(Assembly assembly) =>
-        PluginList.AllEnabledAndActivePlugins
-            .FirstOrDefault(descriptor => descriptor.Plugin != null && descriptor.Plugin.GetType().Assembly == assembly)
-            ?.Guid;
+    private static string OwnerOf(Assembly assembly) => PluginList.ModIdOf(assembly);
 }

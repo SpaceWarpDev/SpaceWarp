@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using ReduxLib.GameInterfaces;
 using SpaceWarp2.API.Features;
+using SpaceWarp2.API.Mods;
 using UnityEngine;
 
 namespace SpaceWarp2.API.Loading;
@@ -30,7 +33,11 @@ public static class SaveLoad
         // A play session that ended without unloading leaves nothing for the next one to tear down
         CampaignActions.Clear();
         OwedUnloads.Clear();
+        AnchoredOwners.Clear();
     }
+
+    // The mod each anchored action or action type was registered for, so it runs only while that mod is enabled
+    private static readonly Dictionary<object, string> AnchoredOwners = new();
 
     // Work mods do every time a campaign loads, by where in loading it runs
     private static readonly Dictionary<CampaignPhase, List<FeatureGatedAction>> CampaignActions = new();
@@ -219,16 +226,10 @@ public static class SaveLoad
     /// </summary>
     /// <param name="flowAction">The FlowAction to insert</param>
     /// <param name="referenceAction">The name of the action to insert a TFlowActionType after. Use <c>null</c> to insert it at the start.</param>
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void AddFlowActionToGameLoadAfter(IFlowAction flowAction, string referenceAction)
     {
-        if (GameInitializingFlowActions.TryGetValue(referenceAction, out var actions))
-        {
-            actions.Add(flowAction);
-        }
-        else
-        {
-            GameInitializingFlowActions[referenceAction] = new List<IFlowAction> { flowAction };
-        }
+        AddFlowActionToGameLoadAfter(PluginList.ModIdOf(Assembly.GetCallingAssembly()), flowAction, referenceAction);
     }
 
     /// <summary>
@@ -307,16 +308,10 @@ public static class SaveLoad
     /// <typeparam name="TFlowActionType">The type of FlowAction to insert</typeparam>
     /// <param name="referenceAction">The name of the action to insert a TFlowActionType after. Use <c>null</c> to insert it at the start.</param>
     /// <exception cref="InvalidOperationException">Thrown if <c>TFlowActionType</c> does not have a valid Constructor</exception>
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void AddFlowActionToCampaignLoadAfter<TFlowActionType>(string referenceAction) where TFlowActionType : IFlowAction
     {
-        if (LoadingFlowActionTypes.TryGetValue(referenceAction, out var actions))
-        {
-            actions.Add(typeof(TFlowActionType));
-        }
-        else
-        {
-            LoadingFlowActionTypes[referenceAction] = new List<Type> { typeof(TFlowActionType) };
-        }
+        AddFlowActionToCampaignLoadAfter<TFlowActionType>(PluginList.ModIdOf(Assembly.GetCallingAssembly()), referenceAction);
     }
 
     /// <summary>
@@ -385,16 +380,10 @@ public static class SaveLoad
     /// </summary>
     /// <param name="flowAction">The FlowAction to insert</param>
     /// <param name="referenceAction">The name of the action to insert a FlowActionType after. Use <c>null</c> to insert it at the start.</param>
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void AddFlowActionToCampaignLoadAfter(IFlowAction flowAction, string referenceAction)
     {
-        if (LoadingFlowActions.TryGetValue(referenceAction, out var actions))
-        {
-            actions.Add(flowAction);
-        }
-        else
-        {
-            LoadingFlowActions[referenceAction] = new List<IFlowAction> { flowAction };
-        }
+        AddFlowActionToCampaignLoadAfter(PluginList.ModIdOf(Assembly.GetCallingAssembly()), flowAction, referenceAction);
     }
 
     /// <summary>
@@ -434,16 +423,10 @@ public static class SaveLoad
     /// <typeparam name="TFlowActionType">The type of FlowAction to insert</typeparam>
     /// <param name="referenceAction">The name of the action to insert a TFlowActionType after. Use <c>null</c> to insert it at the start.</param>
     /// <exception cref="InvalidOperationException">Thrown if <c>TFlowActionType</c> does not have a valid Constructor</exception>
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void AddFlowActionToCampaignSaveAfter<TFlowActionType>(string referenceAction) where TFlowActionType : IFlowAction
     {
-        if (SavingFlowActionTypes.TryGetValue(referenceAction, out var actions))
-        {
-            actions.Add(typeof(TFlowActionType));
-        }
-        else
-        {
-            SavingFlowActionTypes[referenceAction] = new List<Type> { typeof(TFlowActionType) };
-        }
+        AddFlowActionToCampaignSaveAfter<TFlowActionType>(PluginList.ModIdOf(Assembly.GetCallingAssembly()), referenceAction);
     }
 
     /// <summary>
@@ -474,28 +457,71 @@ public static class SaveLoad
     /// </summary>
     /// <param name="flowAction">The FlowAction to insert</param>
     /// <param name="referenceAction">The name of the action to insert a FlowActionType after. Use <c>null</c> to insert it at the start.</param>
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void AddFlowActionToCampaignSaveAfter(IFlowAction flowAction, string referenceAction)
     {
-        if (SavingFlowActions.TryGetValue(referenceAction, out var actions))
-        {
-            actions.Add(flowAction);
-        }
-        else
-        {
-            SavingFlowActions[referenceAction] = new List<IFlowAction> { flowAction };
-        }
+        AddFlowActionToCampaignSaveAfter(PluginList.ModIdOf(Assembly.GetCallingAssembly()), flowAction, referenceAction);
+    }
+
+    /// <summary>
+    /// Adds a flow action to the game's load sequence, after the first action with the given name, owned by a mod.
+    /// </summary>
+    /// <param name="modId">The mod the action belongs to, or null for an action that always runs.</param>
+    /// <param name="flowAction">The FlowAction to insert.</param>
+    /// <param name="referenceAction">The name of the action to insert it after.</param>
+    public static void AddFlowActionToGameLoadAfter(string modId, IFlowAction flowAction, string referenceAction)
+    {
+        Anchor(GameInitializingFlowActions, referenceAction, flowAction, modId);
+    }
+
+    /// <summary>
+    /// Adds a flow action type to the save file loading sequence that runs only while its mod is enabled in the
+    /// loaded campaign's feature set. A new <c>TFlowActionType</c> is constructed every load.
+    /// </summary>
+    /// <typeparam name="TFlowActionType">The type of FlowAction to insert.</typeparam>
+    /// <param name="modId">The mod the action belongs to, or null for an action that always runs.</param>
+    /// <param name="referenceAction">The name of the action to insert it after.</param>
+    public static void AddFlowActionToCampaignLoadAfter<TFlowActionType>(string modId, string referenceAction)
+        where TFlowActionType : IFlowAction
+    {
+        Anchor(LoadingFlowActionTypes, referenceAction, typeof(TFlowActionType), modId);
     }
 
     /// <summary>
     /// Adds a flow action to the save file loading sequence that runs only while its mod is enabled in the loaded
     /// campaign's feature set. The same object is used for every load.
     /// </summary>
-    /// <param name="modId">The mod the action belongs to.</param>
+    /// <param name="modId">The mod the action belongs to, or null for an action that always runs.</param>
     /// <param name="flowAction">The FlowAction to insert.</param>
     /// <param name="referenceAction">The name of the action to insert it after.</param>
     public static void AddFlowActionToCampaignLoadAfter(string modId, IFlowAction flowAction, string referenceAction)
     {
-        AddFlowActionToCampaignLoadAfter(flowAction, referenceAction);
+        Anchor(LoadingFlowActions, referenceAction, flowAction, modId);
+    }
+
+    /// <summary>
+    /// Adds a flow action type to the save file saving sequence that runs only while its mod is enabled in the
+    /// campaign's feature set. A new <c>TFlowActionType</c> is constructed every save.
+    /// </summary>
+    /// <typeparam name="TFlowActionType">The type of FlowAction to insert.</typeparam>
+    /// <param name="modId">The mod the action belongs to, or null for an action that always runs.</param>
+    /// <param name="referenceAction">The name of the action to insert it after.</param>
+    public static void AddFlowActionToCampaignSaveAfter<TFlowActionType>(string modId, string referenceAction)
+        where TFlowActionType : IFlowAction
+    {
+        Anchor(SavingFlowActionTypes, referenceAction, typeof(TFlowActionType), modId);
+    }
+
+    /// <summary>
+    /// Adds a flow action to the save file saving sequence that runs only while its mod is enabled in the campaign's
+    /// feature set. The same object is used for every save.
+    /// </summary>
+    /// <param name="modId">The mod the action belongs to, or null for an action that always runs.</param>
+    /// <param name="flowAction">The FlowAction to insert.</param>
+    /// <param name="referenceAction">The name of the action to insert it after.</param>
+    public static void AddFlowActionToCampaignSaveAfter(string modId, IFlowAction flowAction, string referenceAction)
+    {
+        Anchor(SavingFlowActions, referenceAction, flowAction, modId);
     }
 
     /// <summary>
@@ -503,7 +529,24 @@ public static class SaveLoad
     /// </summary>
     /// <param name="actionOrType">The registered action, or the registered action type.</param>
     /// <returns>The mod's id, or null for an action that always runs.</returns>
-    public static string OwnerOf(object actionOrType) => null;
+    public static string OwnerOf(object actionOrType) => AnchoredOwners.GetValueOrDefault(actionOrType);
+
+    private static void Anchor<T>(Dictionary<string, List<T>> anchors, string referenceAction, T entry, string modId)
+    {
+        if (anchors.TryGetValue(referenceAction, out List<T> entries))
+        {
+            entries.Add(entry);
+        }
+        else
+        {
+            anchors[referenceAction] = new List<T> { entry };
+        }
+
+        if (modId != null)
+        {
+            AnchoredOwners[entry] = modId;
+        }
+    }
 }
 
 /// <summary>
