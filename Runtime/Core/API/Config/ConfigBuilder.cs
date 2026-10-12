@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using ReduxLib.Configuration;
+using SpaceWarp2.API.Features;
 
 namespace SpaceWarp2.API.Config;
 
@@ -107,6 +108,16 @@ public sealed class ConfigBuilder
         _tags.Add(name);
         return this;
     }
+
+    /// <summary>
+    /// Shows the entry in the settings menu only while a feature is on. A bare id names one of this mod's features.
+    /// </summary>
+    public ConfigBuilder Feature(string featureId) => Tag(ActiveFeatures.FEATURE_TAG_PREFIX + featureId);
+
+    /// <summary>
+    /// Shows the entry in the settings menu only while a feature is off. A bare id names one of this mod's features.
+    /// </summary>
+    public ConfigBuilder NoFeature(string featureId) => Tag(ActiveFeatures.NO_FEATURE_TAG_PREFIX + featureId);
 
     /// <summary>Binds the entry and returns a live handle over it.</summary>
     public ConfigHandle Bind()

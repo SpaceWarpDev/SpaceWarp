@@ -1,3 +1,4 @@
+using System;
 using MoonSharp.Interpreter;
 using ReduxLib.Configuration;
 using SpaceWarp2.API.Mods;
@@ -15,6 +16,7 @@ namespace SpaceWarp2.API.Config;
 public sealed class ModConfig
 {
     private readonly IConfigFile _file;
+    private readonly Func<SpaceWarpPluginDescriptor, IConfigFile?> _configOf;
 
     static ModConfig()
     {
@@ -28,9 +30,20 @@ public sealed class ModConfig
     /// Creates a config namespace wrapping the given config file.
     /// </summary>
     /// <param name="file">The mod's config file, or null if the mod has none.</param>
-    public ModConfig(IConfigFile file)
+    public ModConfig(IConfigFile file) : this(file, descriptor => descriptor.ConfigFile)
+    {
+    }
+
+    /// <summary>
+    /// Creates a config namespace wrapping the given config file, which reaches other mods' configs of the same
+    /// kind, such as their campaign configs.
+    /// </summary>
+    /// <param name="file">The mod's config file, or null if the mod has none.</param>
+    /// <param name="configOf">Picks the config of the same kind from another mod.</param>
+    public ModConfig(IConfigFile file, Func<SpaceWarpPluginDescriptor, IConfigFile?> configOf)
     {
         _file = file;
+        _configOf = configOf;
     }
 
     /// <summary>
@@ -69,11 +82,12 @@ public sealed class ModConfig
     public ConfigView Mod(string modId)
     {
         var descriptor = PluginList.TryGetDescriptor(modId);
-        if (descriptor?.ConfigFile == null)
+        IConfigFile? config = descriptor == null ? null : _configOf(descriptor);
+        if (config == null)
         {
             throw new ScriptRuntimeException($"No config found for mod '{modId}'.");
         }
 
-        return new ConfigView(descriptor.ConfigFile);
+        return new ConfigView(config);
     }
 }

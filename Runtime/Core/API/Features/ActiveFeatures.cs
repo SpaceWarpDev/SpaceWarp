@@ -96,7 +96,21 @@ public static class ActiveFeatures
     /// <param name="modId">The mod the entry belongs to, which bare feature ids in its tags belong to.</param>
     /// <param name="tags">The entry's tags.</param>
     /// <returns>True if every feature the tags select is on and every one they exclude is off.</returns>
-    public static bool AllowsConfigEntry(string modId, IEnumerable<string> tags) => true;
+    public static bool AllowsConfigEntry(string modId, IEnumerable<string> tags)
+    {
+        foreach (string tag in tags)
+        {
+            if (tag.StartsWith(FEATURE_TAG_PREFIX, StringComparison.Ordinal)
+                && !IsEnabled(FeatureRegistry.Qualify(modId, tag.Substring(FEATURE_TAG_PREFIX.Length))))
+                return false;
+
+            if (tag.StartsWith(NO_FEATURE_TAG_PREFIX, StringComparison.Ordinal)
+                && IsEnabled(FeatureRegistry.Qualify(modId, tag.Substring(NO_FEATURE_TAG_PREFIX.Length))))
+                return false;
+        }
+
+        return true;
+    }
 
     /// <summary>
     /// Sets each <see cref="FeatureAttribute" /> bool field of an object to whether its feature is on.

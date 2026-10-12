@@ -191,6 +191,10 @@ public static class ModSaves
     /// <param name="configs">Each mod's campaign config, by mod id.</param>
     public static void LoadCampaignConfigs(CampaignConfigData data, IReadOnlyDictionary<string, JsonConfigFile> configs)
     {
+        foreach (KeyValuePair<string, JsonConfigFile> config in configs)
+        {
+            config.Value.Load(data.Mods.GetValueOrDefault(config.Key));
+        }
     }
 
     /// <summary>
@@ -200,16 +204,23 @@ public static class ModSaves
     /// <param name="configs">Each mod's campaign config, by mod id.</param>
     public static void SaveCampaignConfigs(CampaignConfigData data, IReadOnlyDictionary<string, JsonConfigFile> configs)
     {
+        foreach (KeyValuePair<string, JsonConfigFile> config in configs)
+        {
+            data.Mods[config.Key] = config.Value.ToJObject();
+        }
     }
 
     /// <summary>
     /// Starts a new campaign's mod settings from every mod's defaults.
     /// </summary>
-    /// <param name="data">The campaign's stored settings.</param>
     /// <param name="configs">Each mod's campaign config, by mod id.</param>
-    /// <returns>The reset settings.</returns>
-    public static CampaignConfigData ResetCampaignConfigs(CampaignConfigData data, IReadOnlyDictionary<string, JsonConfigFile> configs) =>
-        data;
+    /// <returns>The new campaign's settings, holding none of the previous campaign's.</returns>
+    public static CampaignConfigData ResetCampaignConfigs(IReadOnlyDictionary<string, JsonConfigFile> configs)
+    {
+        var reset = new CampaignConfigData();
+        LoadCampaignConfigs(reset, configs);
+        return reset;
+    }
 
     /// <summary>
     /// Manually trigger a campaign save data flush

@@ -172,6 +172,11 @@ public class SpaceWarpPluginDescriptor
     public IConfigFile? ConfigFile;
 
     /// <summary>
+    /// The plugin's per-campaign config, whose values each campaign keeps for itself.
+    /// </summary>
+    public readonly JsonConfigFile CampaignConfigFile = JsonConfigFile.InMemory();
+
+    /// <summary>
     /// Whether or not the plugin is outdated. Set by the version checking system.
     /// </summary>
     public bool Outdated;
